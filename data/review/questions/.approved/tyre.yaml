@@ -1,0 +1,1039 @@
+category: tyre
+loaded_at: '2026-10-23T17:12:06+00:00'
+reviewed_by: Aarav
+approved:
+  question tyre-main:
+    id: tyre-main
+    status: approved
+    stage: 2
+    text: What problem are you facing with your tyre?
+    choice_source: proposed
+    options:
+    - label: One tyre looks a little soft or low, but it is not flat
+      effects:
+      - fault: F04-TY-01
+        effect: supports
+        strength: strong
+      - fault: F04-TY-02
+        effect: supports
+        strength: strong
+      - fault: F04-TY-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The tyre goes soft again after I fill it with air
+      effects:
+      - fault: F04-TY-01
+        effect: supports
+        strength: strong
+      - fault: F04-TY-02
+        effect: supports
+        strength: strong
+      - fault: F04-TY-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The tyre is fully or almost fully flat
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The tyre burst, or I can see a bulge or cut on its side
+      effects:
+      - fault: F04-TY-05
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: After hitting a pothole, more than one tyre or wheel seems affected, or the car shakes
+      effects:
+      - fault: F04-TY-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q01:
+    id: tyre-q01
+    status: approved
+    stage: 3
+    text: After filling the tyre with air, how soon does it go soft again?
+    source_faults:
+    - F04-TY-01
+    - F04-TY-02
+    - F04-TY-04
+    - F04-TY-06
+    merged_from:
+    - 'F04-TY-01 (diagnosis_rules): After filling the tyre, did it become soft again within a few days?'
+    - 'F04-TY-02 (stages_text): How long does it take for the tyre to go soft?'
+    - 'F04-TY-02 (symptoms): After you fill it with air, does the tyre go low again?'
+    - 'F04-TY-04 (symptoms): After filling the tyre with air, did it go soft again?'
+    - 'F04-TY-06 (symptoms): After filling the tyres with air, does air loss happen again?'
+    options:
+    - label: Almost at once
+      effects:
+      - fault: F04-TY-02
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Within hours or days
+      effects:
+      - fault: F04-TY-01
+        effect: rules_out
+        strength: moderate
+      - fault: F04-TY-02
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Only after a longer time
+      effects:
+      - fault: F04-TY-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It goes soft again, but I don’t know how soon
+      effects:
+      - fault: F04-TY-04
+        effect: supports
+        strength: moderate
+      - fault: F04-TY-06
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It has not gone soft again; it stays firm
+      effects:
+      - fault: F04-TY-01
+        effect: supports
+        strength: moderate
+      - fault: F04-TY-02
+        effect: rules_out
+        strength: moderate
+      - fault: F04-TY-04
+        effect: rules_out
+        strength: moderate
+      - fault: F04-TY-06
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q02:
+    id: tyre-q02
+    status: approved
+    stage: 3
+    text: Does the car pull to one side?
+    source_faults:
+    - F04-TY-01
+    - F04-TY-02
+    merged_from:
+    - 'F04-TY-01 (symptoms): Does the car pull strongly to one side?'
+    - 'F04-TY-02 (symptoms): Does the car pull to one side?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F04-TY-02
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q03:
+    id: tyre-q03
+    status: approved
+    stage: 3
+    text: How many tyres or wheels seem affected?
+    source_faults:
+    - F04-TY-03
+    - F04-TY-05
+    - F04-TY-06
+    merged_from:
+    - 'F04-TY-03 (stages_text): Are the other tyres also flat?'
+    - 'F04-TY-05 (stages_text): From a safe distance, does the wheel or any other tyre look damaged too?'
+    - 'F04-TY-06 (stages_text): How many tyres or wheels seem affected?'
+    options:
+    - label: Two or more tyres seem affected
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: weak
+      - fault: F04-TY-05
+        effect: supports
+        strength: weak
+      - fault: F04-TY-06
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Only one tyre seems affected; the others look fine
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: moderate
+      - fault: F04-TY-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: I can see a bent wheel
+      effects:
+      - fault: F04-TY-05
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: None seem affected
+      effects:
+      - fault: F04-TY-06
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: I can’t tell
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q04:
+    id: tyre-q04
+    status: approved
+    stage: 3
+    text: Does the tyre look lower or wider at the bottom than the other tyres?
+    source_faults:
+    - F04-TY-01
+    merged_from:
+    - 'F04-TY-01 (symptoms): Does the tyre look lower or wider at the bottom than the other tyres?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F04-TY-01
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F04-TY-01
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q05:
+    id: tyre-q05
+    status: approved
+    stage: 3
+    text: Is the tyre pressure warning light on?
+    source_faults:
+    - F04-TY-01
+    merged_from:
+    - 'F04-TY-01 (symptoms): Is the tyre pressure warning light on?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F04-TY-01
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F04-TY-01
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q06:
+    id: tyre-q06
+    status: approved
+    stage: 3
+    text: Has it been many weeks since the tyre pressure was checked?
+    source_faults:
+    - F04-TY-01
+    merged_from:
+    - 'F04-TY-01 (causes): Has it been many weeks since the tyre pressure was checked?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F04-TY-01
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: No, it was checked recently
+      effects:
+      - fault: F04-TY-01
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q07:
+    id: tyre-q07
+    status: approved
+    stage: 3
+    text: Does the tyre smell of burning?
+    source_faults:
+    - F04-TY-01
+    merged_from:
+    - 'F04-TY-01 (symptoms): Does the tyre smell of burning?'
+    options:
+    - label: 'Yes'
+      effects: []
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q08:
+    id: tyre-q08
+    status: approved
+    stage: 3
+    text: Can you see a nail, screw, or thorn in the tyre tread?
+    source_faults:
+    - F04-TY-02
+    merged_from:
+    - 'F04-TY-02 (stages_text): Can you see a nail, screw or thorn in the tyre tread?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F04-TY-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q09:
+    id: tyre-q09
+    status: approved
+    stage: 3
+    text: Do you hear a hissing sound near the tyre?
+    source_faults:
+    - F04-TY-02
+    merged_from:
+    - 'F04-TY-02 (symptoms): Do you hear a hissing sound near the tyre?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F04-TY-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q10:
+    id: tyre-q10
+    status: approved
+    stage: 3
+    text: Is the tyre fully or almost fully flat now?
+    source_faults:
+    - F04-TY-03
+    merged_from:
+    - 'F04-TY-03 (symptoms): Is the tyre fully or almost fully flat now?'
+    options:
+    - label: Fully or almost fully flat
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Low, but not flat
+      effects:
+      - fault: F04-TY-03
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Looks normal
+      effects:
+      - fault: F04-TY-03
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q11:
+    id: tyre-q11
+    status: approved
+    stage: 3
+    text: Did the tyre lose air suddenly or slowly?
+    source_faults:
+    - F04-TY-03
+    merged_from:
+    - 'F04-TY-03 (stages_text): Did the tyre lose air suddenly or slowly?'
+    options:
+    - label: It lost air suddenly, possibly with a hissing sound
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It went low slowly
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: I don’t know
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q12:
+    id: tyre-q12
+    status: approved
+    stage: 3
+    text: From a safe place, what can you see on the tyre?
+    source_faults:
+    - F04-TY-03
+    merged_from:
+    - 'F04-TY-03 (stages_text): From a safe place, what can you see on the tyre?'
+    options:
+    - label: A nail, screw, or other sharp object
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: A cut, tear, or bulge
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: Nothing visible
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q13:
+    id: tyre-q13
+    status: approved
+    stage: 3
+    text: Did you recently hit a pothole or kerb?
+    source_faults:
+    - F04-TY-03
+    merged_from:
+    - 'F04-TY-03 (stages_text): Did you recently hit a pothole or kerb?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F04-TY-03
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: I don’t remember
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q14:
+    id: tyre-q14
+    status: approved
+    stage: 3
+    text: Is the car parked safely, away from moving traffic?
+    source_faults:
+    - F04-TY-03
+    merged_from:
+    - 'F04-TY-03 (stages_text): Is the car parked safely, away from moving traffic?'
+    options:
+    - label: Yes, away from moving traffic
+      effects: []
+      safety_trigger: false
+    - label: No, it is near moving traffic or in an unsafe place
+      effects: []
+      safety_trigger: true
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q15:
+    id: tyre-q15
+    status: approved
+    stage: 3
+    text: Do you hear a hissing sound near the valve?
+    source_faults:
+    - F04-TY-04
+    merged_from:
+    - 'F04-TY-04 (stages_text): Do you hear a hissing sound near the valve?'
+    options:
+    - label: Yes, the hiss is near the valve
+      effects:
+      - fault: F04-TY-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The hiss seems to come from somewhere else
+      effects:
+      - fault: F04-TY-04
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: I do not hear a hiss
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q16:
+    id: tyre-q16
+    status: approved
+    stage: 3
+    text: What have you noticed about the valve or its cap?
+    source_faults:
+    - F04-TY-04
+    merged_from:
+    - 'F04-TY-04 (stages_text): What have you noticed about the valve or its cap?'
+    options:
+    - label: The cap is missing or cracked
+      effects:
+      - fault: F04-TY-04
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: The valve looks bent, cracked, or old
+      effects:
+      - fault: F04-TY-04
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The valve and cap look normal
+      effects:
+      - fault: F04-TY-04
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q17:
+    id: tyre-q17
+    status: approved
+    stage: 3
+    text: Have you noticed a nail or air leaking from somewhere other than the valve?
+    source_faults:
+    - F04-TY-04
+    merged_from:
+    - 'F04-TY-04 (diagnosis_rules): Have you noticed a nail or air leaking from somewhere other than the valve?'
+    options:
+    - label: Yes, there is a nail or a leak elsewhere on the tyre
+      effects:
+      - fault: F04-TY-04
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: No nail or leak elsewhere is visible
+      effects:
+      - fault: F04-TY-04
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q18:
+    id: tyre-q18
+    status: approved
+    stage: 3
+    text: From a safe distance, what can you see on the tyre’s side?
+    source_faults:
+    - F04-TY-05
+    merged_from:
+    - 'F04-TY-05 (stages_text): From a safe distance, what can you see on the tyre’s side?'
+    options:
+    - label: A bulge, deep cut, or threads are visible
+      effects:
+      - fault: F04-TY-05
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: The tyre has burst or torn open
+      effects:
+      - fault: F04-TY-05
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: No visible cut or bulge
+      effects:
+      - fault: F04-TY-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q19:
+    id: tyre-q19
+    status: approved
+    stage: 3
+    text: How did the tyre lose air?
+    source_faults:
+    - F04-TY-05
+    merged_from:
+    - 'F04-TY-05 (symptoms): How did the tyre lose air?'
+    options:
+    - label: A loud bang, then the tyre went flat
+      effects:
+      - fault: F04-TY-05
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: It went soft gradually
+      effects:
+      - fault: F04-TY-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: It is still holding air, but looks odd
+      effects:
+      - fault: F04-TY-05
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q20:
+    id: tyre-q20
+    status: approved
+    stage: 3
+    text: What happened before you noticed the damage?
+    source_faults:
+    - F04-TY-05
+    merged_from:
+    - 'F04-TY-05 (causes): What happened before you noticed the damage?'
+    options:
+    - label: I hit a pothole or kerb
+      effects:
+      - fault: F04-TY-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: A sharp object may have cut it
+      effects:
+      - fault: F04-TY-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: I do not know of any impact or sharp object
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q21:
+    id: tyre-q21
+    status: approved
+    stage: 3
+    text: Did you hit a pothole or kerb before this started?
+    source_faults:
+    - F04-TY-06
+    merged_from:
+    - 'F04-TY-06 (stages_text): Did you hit a pothole or kerb before this started?'
+    options:
+    - label: Yes, I hit a pothole
+      effects:
+      - fault: F04-TY-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Yes, I hit a kerb
+      effects:
+      - fault: F04-TY-06
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: No, neither
+      effects:
+      - fault: F04-TY-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q22:
+    id: tyre-q22
+    status: approved
+    stage: 3
+    text: From a safe distance, does a wheel look bent or cracked?
+    source_faults:
+    - F04-TY-06
+    merged_from:
+    - 'F04-TY-06 (stages_text): From a safe distance, does a wheel look bent or cracked?'
+    options:
+    - label: It looks bent
+      effects:
+      - fault: F04-TY-06
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: I can see a crack
+      effects:
+      - fault: F04-TY-06
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: It looks normal
+      effects:
+      - fault: F04-TY-06
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question tyre-q23:
+    id: tyre-q23
+    status: approved
+    stage: 3
+    text: Does the steering wheel shake or does the car pull to one side?
+    source_faults:
+    - F04-TY-06
+    merged_from:
+    - 'F04-TY-06 (symptoms): Does the steering wheel shake or does the car pull to one side?'
+    options:
+    - label: The steering wheel shakes
+      effects:
+      - fault: F04-TY-06
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: The car pulls to one side
+      effects:
+      - fault: F04-TY-06
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Neither happens
+      effects:
+      - fault: F04-TY-06
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F04-TY-01:
+    status: approved
+    name: Low air pressure
+    stage2_choices:
+    - One tyre looks a little soft or low, but it is not flat
+    - The tyre goes soft again after I fill it with air
+    confirmation_test: A mechanic measures the tyre pressure with a gauge and tests the valve with soapy water before
+      saying it is a puncture. After filling to the correct pressure, check the tyre again after 24 hours and after
+      3–7 days.
+    danger_phrases:
+    - tyre nearly flat
+    - burning smell
+    - car pulls strongly to one side
+    - burst tyre
+    - bulge
+    - deep cut
+    - bent wheel
+    - very hot tyre
+    safety_trigger_options:
+    - question: tyre-q02
+      option: 'Yes'
+    - question: tyre-q07
+      option: 'Yes'
+  fault F04-TY-02:
+    status: approved
+    name: Slow/pinhole puncture
+    stage2_choices:
+    - One tyre looks a little soft or low, but it is not flat
+    - The tyre goes soft again after I fill it with air
+    confirmation_test: A mechanic finds the leak and confirms it with soapy water or a water-tank test that shows
+      bubbles at the exact spot. A tyre shop must also check the inside of the tyre.
+    danger_phrases:
+    - tyre is soft
+    - bulge
+    - pulls to one side
+    - tyre cannot hold air
+    - bent rim
+    - unsafe place
+    safety_trigger_options:
+    - question: tyre-q02
+      option: 'Yes'
+  fault F04-TY-03:
+    status: approved
+    name: Flat tyre
+    stage2_choices:
+    - The tyre is fully or almost fully flat
+    confirmation_test: A mechanic removes the tyre and inspects it inside and outside. They must check both the
+      tyre and rim before deciding whether to repair or replace it.
+    danger_phrases:
+    - fully flat tyre
+    - almost flat tyre
+    - car leaning to one side
+    - rim close to the road
+    - rubber smell
+    - pieces of rubber
+    safety_trigger_options:
+    - question: tyre-q10
+      option: Fully or almost fully flat
+    - question: tyre-q12
+      option: A cut, tear, or bulge
+    - question: tyre-q14
+      option: No, it is near moving traffic or in an unsafe place
+  fault F04-TY-04:
+    status: approved
+    name: Valve issue
+    stage2_choices:
+    - One tyre looks a little soft or low, but it is not flat
+    - The tyre goes soft again after I fill it with air
+    confirmation_test: A mechanic confirms the leak with soapy water showing bubbles at the valve only. The mechanic
+      should check the valve core first, then the stem, then the seal; if bubbles appear elsewhere, the cause is
+      uncertain.
+    danger_phrases:
+    - tyre very soft
+    - damaged valve
+    - damaged wheel
+    - rim damaged
+    - tyre cannot hold air
+    safety_trigger_options: []
+  fault F04-TY-05:
+    status: approved
+    name: Tyre burst/sidewall damage
+    stage2_choices:
+    - The tyre burst, or I can see a bulge or cut on its side
+    confirmation_test: A mechanic checks the tyre inside and outside, and checks the rim and the other tyres for
+      hidden damage.
+    danger_phrases:
+    - tyre burst
+    - loud bang then flat
+    - bulge
+    - bubble on tyre
+    - deep cut
+    - threads visible
+    - tyre smoking
+    - rubber smell
+    safety_trigger_options:
+    - question: tyre-q03
+      option: I can see a bent wheel
+    - question: tyre-q18
+      option: A bulge, deep cut, or threads are visible
+    - question: tyre-q18
+      option: The tyre has burst or torn open
+    - question: tyre-q19
+      option: A loud bang, then the tyre went flat
+  fault F04-TY-06:
+    status: approved
+    name: Multi-tyre/rim damage caused by pothole impact
+    stage2_choices:
+    - After hitting a pothole, more than one tyre or wheel seems affected, or the car shakes
+    confirmation_test: A mechanic must inspect every wheel and tyre, including the inside of the tyres, and check
+      wheel balance. The mechanic must also check all four wheels and the suspension; a wheel alignment check is
+      needed after repair.
+    danger_phrases:
+    - bent wheel
+    - cracked rim
+    - steering shakes
+    - car pulls
+    - two or more tyres losing air
+    - two or more tyres unusable
+    safety_trigger_options:
+    - question: tyre-q03
+      option: Two or more tyres seem affected
+    - question: tyre-q22
+      option: I can see a crack
+    - question: tyre-q22
+      option: It looks bent
+    - question: tyre-q23
+      option: The car pulls to one side
+    - question: tyre-q23
+      option: The steering wheel shakes
+  safety_rule tyre-s-F04-TY-01:
+    id: tyre-s-F04-TY-01
+    status: approved
+    fault: F04-TY-01
+    risk_level: medium
+    stop_driving_trigger: Stop in a safe place away from traffic. Do not fill air into a bulged, cut or very hot
+      tyre.
+    roadside_action: Use hazard lights and do not stand on the roadside. Do not over-fill; let a hot tyre cool before
+      checking pressure.
+    towing_recommendation: Towing is not needed for simple low air. Roadside help is needed only if the customer
+      cannot reach an air shop safely.
+    source_text:
+      safety_precautions: '• Stop in a safe place away from traffic. Use hazard lights.
+
+        • Do not stand on the road side.
+
+        • Do not fill air into a tyre that is bulged, cut or very hot.
+
+        • Do not over-fill. Too much air can burst the tyre.
+
+        • Let a hot tyre cool before checking pressure.'
+      if_towing_needed: Towing is NOT needed for simple low air. Roadside help is needed only if the customer cannot
+        reach an air shop safely.
+  safety_rule tyre-s-F04-TY-02:
+    id: tyre-s-F04-TY-02
+    status: approved
+    fault: F04-TY-02
+    risk_level: medium
+    stop_driving_trigger: Not stated
+    roadside_action: Park on firm, flat ground away from traffic, switch on hazard lights and apply the handbrake.
+      Do not work if traffic or the ground is unsafe. Use only the maker's jacking points; never put any body part
+      under a car held only by a jack.
+    towing_recommendation: Roadside help is enough in most cases. Tow only if the tyre cannot hold air, no safe
+      spare is available, the rim looks bent, or the car is in an unsafe place.
+    source_text:
+      safety_precautions: '• Park on firm, flat ground away from traffic. Hazard lights on. Handbrake on.
+
+        • Use only the maker''s jacking points.
+
+        • Never put any body part under a car held only by a jack.
+
+        • Do not repair a tyre with a bulge, a big cut or exposed cords.
+
+        • Tighten wheel nuts in a cross pattern with the correct torque.
+
+        • Do not work if traffic or ground is unsafe.'
+      if_towing_needed: 'Roadside help is enough in most cases. Towing is needed only if: the tyre cannot hold air,
+        no safe spare is available, the rim looks bent, or the car is in an unsafe place.'
+  safety_rule tyre-s-F04-TY-03:
+    id: tyre-s-F04-TY-03
+    status: approved
+    fault: F04-TY-03
+    risk_level: high
+    stop_driving_trigger: Stop at once and do not drive, even a short way.
+    roadside_action: Stop far from traffic, use hazard lights and a warning triangle, apply the handbrake, chock
+      the wheels, and keep passengers away from the road. Work only on firm, flat ground using the maker’s jacking
+      points; never put any body part under a car held by a jack. Do not touch a hot tyre or rim. If it is unsafe,
+      do not work and call help.
+    towing_recommendation: Roadside assistance is enough if the spare is good and the place is safe. Tow if there
+      is no usable spare, the spare size is wrong, more than one tyre is flat, the rim is bent or cracked, the car
+      is in a dangerous place, or the ground is not safe.
+    source_text:
+      safety_precautions: '• Stop far from traffic. Hazard lights and warning triangle.
+
+        • Handbrake on. Chock the wheels. Passengers stand away from the road.
+
+        • Work only on firm, flat ground.
+
+        • Use only the maker''s jacking points.
+
+        • NEVER put any body part under a car held by a jack.
+
+        • Tighten the wheel nuts in a cross pattern with the correct torque.
+
+        • Do not touch a hot tyre or rim.
+
+        • If unsafe, do not work. Call help.'
+      if_towing_needed: 'Roadside assistance is enough if the spare is good and the place is safe. Towing is needed
+        if: no usable spare, spare size is wrong, more than one tyre is flat, rim is bent or cracked, the car is
+        in a dangerous place, or the ground is not safe.'
+  safety_rule tyre-s-F04-TY-04:
+    id: tyre-s-F04-TY-04
+    status: approved
+    fault: F04-TY-04
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Park safely away from traffic. Do not fill air into a damaged valve or wheel. Do not remove
+      a valve core from a high-pressure tyre without care. Use jacking points only, never go under a car supported
+      by a jack, tighten wheel nuts in a cross pattern, and do not damage the TPMS sensor when opening the tyre.
+    towing_recommendation: Towing is not normally needed; roadside help is enough in most cases. Tow only if the
+      tyre cannot hold air and there is no usable spare, or if the rim is damaged.
+    source_text:
+      safety_precautions: '• Park safely, away from traffic.
+
+        • Do not fill air into a damaged valve or damaged wheel.
+
+        • Do not remove a valve core from a tyre that has high pressure without care (the air can blow out).
+
+        • Use jacking points only. Never go under the car on a jack.
+
+        • Tighten wheel nuts in a cross pattern.
+
+        • Do not damage the TPMS sensor while opening the tyre.'
+      if_towing_needed: Towing is not normally needed. Roadside help is enough in most cases. Towing is needed only
+        if the tyre cannot hold air and there is no usable spare, or the rim is damaged.
+  safety_rule tyre-s-F04-TY-05:
+    id: tyre-s-F04-TY-05
+    status: approved
+    fault: F04-TY-05
+    risk_level: high
+    stop_driving_trigger: Stop at once. Do not drive on a burst or bulged tyre, and never inflate a cut or bulged
+      tyre.
+    roadside_action: Park away from traffic, switch on hazard lights and use a triangle. Keep people away from the
+      damaged wheel. Do not work if traffic or the ground is unsafe, touch a hot tyre or rim, or put any body part
+      under a car held only by a jack. If changing a wheel, use only the maker’s jacking points and tighten the
+      nuts in a cross pattern to the correct torque.
+    towing_recommendation: Roadside help is enough if the place is safe and the spare is good. Tow if there is no
+      safe spare, the spare is the wrong size, the rim is bent or cracked, suspension or steering damage is suspected,
+      more than one tyre is unusable, or the car is in an unsafe place.
+    source_text:
+      safety_precautions: '• Stop at once. Do not drive on a burst or bulged tyre.
+
+        • Park away from traffic. Hazard lights and triangle.
+
+        • Keep people away from the damaged wheel. It may burst.
+
+        • Never inflate a cut or bulged tyre.
+
+        • Use only the maker''s jacking points.
+
+        • NEVER put any body part under a car held only by a jack.
+
+        • Do not touch a hot tyre or rim.
+
+        • Tighten nuts in a cross pattern to the correct torque.
+
+        • Do not work if traffic or ground is unsafe.'
+      if_towing_needed: 'Roadside help is enough if the place is safe and the spare is good. Towing is needed if:
+        no safe spare, spare is the wrong size, rim is bent or cracked, suspension or steering damage is suspected,
+        more than one tyre is unusable, or the car is in an unsafe place.'
+  safety_rule tyre-s-F04-TY-06:
+    id: tyre-s-F04-TY-06
+    status: approved
+    fault: F04-TY-06
+    risk_level: high
+    stop_driving_trigger: Stop at once and do not drive. Stop if a wheel looks bent, the steering shakes, or the
+      car pulls.
+    roadside_action: Park away from traffic, switch on hazard lights and use a triangle. Keep people away from the
+      damaged wheel. Do not fill air into a bent or cracked wheel or touch a hot tyre or rim. Use only the maker's
+      jacking points; never put any body part under a car held only by a jack. Do not work if traffic or ground
+      is unsafe. Roadside help can inspect the car.
+    towing_recommendation: Towing is needed if more than one tyre is unusable, the rim is cracked or badly bent,
+      steering or suspension may be damaged, no good spare is available, or the car is in an unsafe place.
+    source_text:
+      safety_precautions: '• Stop at once. Do not drive.
+
+        • Park away from traffic. Hazard lights and triangle.
+
+        • Keep people away from the damaged wheel.
+
+        • Do not fill air into a bent or cracked wheel.
+
+        • Do not touch a hot tyre or rim.
+
+        • Use only the maker''s jacking points.
+
+        • NEVER put any body part under a car held only by a jack.
+
+        • Tighten nuts in a cross pattern to the correct torque.
+
+        • Do not work if traffic or ground is unsafe.'
+      if_towing_needed: 'Roadside help can inspect the car. Towing is needed if: more than one tyre is unusable,
+        the rim is cracked or badly bent, the steering or suspension may be damaged, no good spare is available,
+        or the car is in an unsafe place. Towing estimate: about ₹1,500-2,500 for a flatbed within 10-15 km in a
+        city. SUV or premium car: about ₹2,500-4,000. Extra km: about ₹40-60 per km. Actual price depends on city,
+        distance, and time of day. Ask the provider before booking.'

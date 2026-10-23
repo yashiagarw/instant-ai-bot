@@ -1,0 +1,2943 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category battery
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: battery
+category_name: Battery dead / weak / jump start
+reviewed_by: ''
+generated:
+  at: '2026-10-23T16:49:59+00:00'
+  run_id: claude-code-battery
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: battery-main
+  status: draft
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Car not starting
+    effects:
+    - fault: F08-BT-01
+      effect: supports
+      strength: strong
+    - fault: F08-BT-02
+      effect: supports
+      strength: strong
+    - fault: F08-BT-03
+      effect: supports
+      strength: strong
+    - fault: F08-BT-04
+      effect: supports
+      strength: strong
+    - fault: F08-BT-07
+      effect: supports
+      strength: strong
+    - fault: F08-BT-16
+      effect: supports
+      strength: strong
+    - fault: F08-BT-17
+      effect: supports
+      strength: strong
+    - fault: F08-BT-20
+      effect: supports
+      strength: strong
+    - fault: F08-BT-21
+      effect: supports
+      strength: strong
+    - fault: F08-BT-22
+      effect: supports
+      strength: strong
+    - fault: F08-BT-23
+      effect: supports
+      strength: strong
+    - fault: F08-BT-24
+      effect: supports
+      strength: strong
+    - fault: F08-BT-29
+      effect: supports
+      strength: strong
+    - fault: F08-BT-31
+      effect: supports
+      strength: strong
+    - fault: F08-BT-32
+      effect: supports
+      strength: strong
+    - fault: F08-BT-37
+      effect: supports
+      strength: strong
+    - fault: F08-BT-38
+      effect: supports
+      strength: strong
+    - fault: F08-BT-39
+      effect: supports
+      strength: strong
+    - fault: F08-BT-42
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Self slow
+    effects:
+    - fault: F08-BT-01
+      effect: supports
+      strength: strong
+    - fault: F08-BT-05
+      effect: supports
+      strength: strong
+    - fault: F08-BT-16
+      effect: supports
+      strength: strong
+    - fault: F08-BT-21
+      effect: supports
+      strength: strong
+    - fault: F08-BT-22
+      effect: supports
+      strength: strong
+    - fault: F08-BT-25
+      effect: supports
+      strength: strong
+    - fault: F08-BT-27
+      effect: supports
+      strength: strong
+    - fault: F08-BT-34
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Only click sound
+    effects:
+    - fault: F08-BT-02
+      effect: supports
+      strength: strong
+    - fault: F08-BT-03
+      effect: supports
+      strength: strong
+    - fault: F08-BT-04
+      effect: supports
+      strength: strong
+    - fault: F08-BT-38
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Battery keeps going down
+    effects:
+    - fault: F08-BT-05
+      effect: supports
+      strength: strong
+    - fault: F08-BT-06
+      effect: supports
+      strength: strong
+    - fault: F08-BT-08
+      effect: supports
+      strength: strong
+    - fault: F08-BT-12
+      effect: supports
+      strength: strong
+    - fault: F08-BT-13
+      effect: supports
+      strength: strong
+    - fault: F08-BT-14
+      effect: supports
+      strength: strong
+    - fault: F08-BT-15
+      effect: supports
+      strength: strong
+    - fault: F08-BT-29
+      effect: supports
+      strength: strong
+    - fault: F08-BT-30
+      effect: supports
+      strength: strong
+    - fault: F08-BT-33
+      effect: supports
+      strength: strong
+    - fault: F08-BT-40
+      effect: supports
+      strength: strong
+    - fault: F08-BT-41
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Starts only with jump
+    effects:
+    - fault: F08-BT-02
+      effect: supports
+      strength: strong
+    - fault: F08-BT-03
+      effect: supports
+      strength: strong
+    - fault: F08-BT-05
+      effect: supports
+      strength: strong
+    - fault: F08-BT-06
+      effect: supports
+      strength: strong
+    - fault: F08-BT-07
+      effect: supports
+      strength: strong
+    - fault: F08-BT-09
+      effect: supports
+      strength: strong
+    - fault: F08-BT-12
+      effect: supports
+      strength: strong
+    - fault: F08-BT-33
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Battery light ON
+    effects:
+    - fault: F08-BT-06
+      effect: supports
+      strength: strong
+    - fault: F08-BT-08
+      effect: supports
+      strength: strong
+    - fault: F08-BT-09
+      effect: supports
+      strength: strong
+    - fault: F08-BT-10
+      effect: supports
+      strength: strong
+    - fault: F08-BT-11
+      effect: supports
+      strength: strong
+    - fault: F08-BT-26
+      effect: supports
+      strength: strong
+    - fault: F08-BT-41
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Battery hot or leaking
+    effects:
+    - fault: F08-BT-10
+      effect: supports
+      strength: strong
+    - fault: F08-BT-18
+      effect: supports
+      strength: strong
+    - fault: F08-BT-19
+      effect: supports
+      strength: strong
+    - fault: F08-BT-23
+      effect: supports
+      strength: strong
+    - fault: F08-BT-34
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other
+    effects:
+    - fault: F08-BT-25
+      effect: supports
+      strength: strong
+    - fault: F08-BT-26
+      effect: supports
+      strength: strong
+    - fault: F08-BT-27
+      effect: supports
+      strength: strong
+    - fault: F08-BT-28
+      effect: supports
+      strength: strong
+    - fault: F08-BT-35
+      effect: supports
+      strength: strong
+    - fault: F08-BT-36
+      effect: supports
+      strength: strong
+    - fault: F08-BT-37
+      effect: supports
+      strength: strong
+    - fault: F08-BT-40
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q01
+  status: draft
+  stage: 3
+  text: When you try to start the car, what happens?
+  source_faults:
+  - F08-BT-01
+  - F08-BT-02
+  - F08-BT-03
+  - F08-BT-04
+  - F08-BT-05
+  - F08-BT-16
+  - F08-BT-17
+  - F08-BT-21
+  - F08-BT-22
+  - F08-BT-27
+  - F08-BT-34
+  - F08-BT-38
+  - F08-BT-39
+  merged_from:
+  - 'F08-BT-01 (stages_text): Does the engine turn slowly, or not at all?'
+  - 'F08-BT-38 (stages_text): One click or many clicks?'
+  - 'F08-BT-39 (stages_text): Any click?'
+  options:
+  - label: Engine turns slowly
+    effects:
+    - fault: F08-BT-01
+      effect: supports
+      strength: strong
+    - fault: F08-BT-16
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-21
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-22
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-05
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-27
+      effect: supports
+      strength: weak
+    - fault: F08-BT-34
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Only one click
+    effects:
+    - fault: F08-BT-38
+      effect: supports
+      strength: strong
+    - fault: F08-BT-04
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Many clicks
+    effects:
+    - fault: F08-BT-02
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-04
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-38
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: No sound at all
+    effects:
+    - fault: F08-BT-39
+      effect: supports
+      strength: strong
+    - fault: F08-BT-03
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-17
+      effect: supports
+      strength: weak
+    - fault: F08-BT-01
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q02
+  status: draft
+  stage: 3
+  text: Do the dashboard lights come on?
+  source_faults:
+  - F08-BT-02
+  - F08-BT-03
+  - F08-BT-17
+  - F08-BT-31
+  - F08-BT-32
+  - F08-BT-37
+  - F08-BT-39
+  - F08-BT-42
+  merged_from:
+  - 'F08-BT-03 (stages_text): Do any dashboard lights come on?'
+  - 'F08-BT-37 (stages_text): Do dashboard lights come on normally?'
+  - 'F08-BT-39 (stages_text): Is the dashboard normal?'
+  - 'F08-BT-17 (stages_text): Battery looks fine but nothing switches ON?'
+  - 'F08-BT-31 (stages_text): Do the screen or locks work?'
+  options:
+  - label: Yes, normal and bright
+    effects:
+    - fault: F08-BT-37
+      effect: supports
+      strength: strong
+    - fault: F08-BT-39
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-03
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Yes, but dim
+    effects:
+    - fault: F08-BT-02
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-32
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No lights at all
+    effects:
+    - fault: F08-BT-03
+      effect: supports
+      strength: strong
+    - fault: F08-BT-17
+      effect: supports
+      strength: strong
+    - fault: F08-BT-31
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-42
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-37
+      effect: rules_out
+      strength: strong
+    - fault: F08-BT-39
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q03
+  status: draft
+  stage: 3
+  text: When you start, do the lights go dim or stay bright?
+  source_faults:
+  - F08-BT-01
+  - F08-BT-38
+  merged_from:
+  - 'F08-BT-01 (stages_text): Do dashboard lights go dim when starting?'
+  - 'F08-BT-38 (stages_text): Do lights stay bright?'
+  options:
+  - label: They go dim
+    effects:
+    - fault: F08-BT-01
+      effect: supports
+      strength: strong
+    - fault: F08-BT-38
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: They stay bright
+    effects:
+    - fault: F08-BT-38
+      effect: supports
+      strength: strong
+    - fault: F08-BT-01
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q04
+  status: draft
+  stage: 3
+  text: Did a jump-start help?
+  source_faults:
+  - F08-BT-02
+  - F08-BT-03
+  - F08-BT-07
+  - F08-BT-08
+  - F08-BT-09
+  - F08-BT-12
+  - F08-BT-38
+  - F08-BT-42
+  merged_from:
+  - 'F08-BT-02 (stages_text): Does it start after jump-start?'
+  - 'F08-BT-12 (stages_text): Does it start normally after jump?'
+  - 'F08-BT-38 (stages_text): Did jump-start help?'
+  options:
+  - label: Yes, it started and runs fine
+    effects:
+    - fault: F08-BT-02
+      effect: supports
+      strength: strong
+    - fault: F08-BT-12
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-07
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-38
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: It started but stopped again later
+    effects:
+    - fault: F08-BT-09
+      effect: supports
+      strength: strong
+    - fault: F08-BT-08
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No, it did not start even with a jump
+    effects:
+    - fault: F08-BT-38
+      effect: supports
+      strength: strong
+    - fault: F08-BT-42
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-02
+      effect: rules_out
+      strength: strong
+    - fault: F08-BT-07
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q05
+  status: draft
+  stage: 3
+  text: Was any light, music, AC fan or phone charger left ON while the engine was off?
+  source_faults:
+  - F08-BT-02
+  - F08-BT-03
+  merged_from:
+  - 'F08-BT-02 (stages_text): Was any light, music, AC fan or charger left ON?'
+  - 'F08-BT-03 (stages_text): Was something left ON, or was the car parked long?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-02
+      effect: supports
+      strength: strong
+    - fault: F08-BT-03
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-02
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q06
+  status: draft
+  stage: 3
+  text: How long was the car parked before this happened?
+  source_faults:
+  - F08-BT-02
+  - F08-BT-03
+  - F08-BT-12
+  - F08-BT-14
+  - F08-BT-21
+  merged_from:
+  - 'F08-BT-02 (stages_text): How long was the car parked?'
+  - 'F08-BT-21 (stages_text): How long was the car parked?'
+  - 'F08-BT-12 (stages_text): How long is the car parked before it dies?'
+  options:
+  - label: One night or a few days
+    effects:
+    - fault: F08-BT-12
+      effect: supports
+      strength: strong
+    - fault: F08-BT-14
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-21
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Several weeks
+    effects:
+    - fault: F08-BT-21
+      effect: supports
+      strength: strong
+    - fault: F08-BT-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: I drive it every day
+    effects:
+    - fault: F08-BT-21
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q07
+  status: draft
+  stage: 3
+  text: How old is the battery?
+  source_faults:
+  - F08-BT-01
+  - F08-BT-05
+  - F08-BT-06
+  - F08-BT-20
+  - F08-BT-23
+  - F08-BT-35
+  merged_from:
+  - 'F08-BT-01 (stages_text): How old is the battery?'
+  - 'F08-BT-05 (stages_text): How old is the battery?'
+  - 'F08-BT-20 (stages_text): How old is the battery? Do you have the bill?'
+  - 'F08-BT-23 (stages_text): How old is the battery?'
+  options:
+  - label: Less than 1 year
+    effects:
+    - fault: F08-BT-35
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-20
+      effect: supports
+      strength: weak
+    - fault: F08-BT-06
+      effect: supports
+      strength: weak
+    - fault: F08-BT-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: 1 to 3 years
+    effects: []
+    safety_trigger: false
+  - label: More than 3 years
+    effects:
+    - fault: F08-BT-05
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-01
+      effect: supports
+      strength: weak
+    - fault: F08-BT-23
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q08
+  status: draft
+  stage: 3
+  text: Was the battery changed recently?
+  source_faults:
+  - F08-BT-04
+  - F08-BT-05
+  - F08-BT-06
+  - F08-BT-16
+  - F08-BT-25
+  - F08-BT-27
+  - F08-BT-28
+  merged_from:
+  - 'F08-BT-06 (stages_text): Was the battery changed recently?'
+  - 'F08-BT-16 (stages_text): Battery new but slow start?'
+  - 'F08-BT-25 (stages_text): Was the battery changed? Which type?'
+  - 'F08-BT-28 (stages_text): Was the battery changed recently?'
+  - 'F08-BT-04 (stages_text): Any battery work done recently?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-28
+      effect: supports
+      strength: strong
+    - fault: F08-BT-27
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-16
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-06
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-04
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-25
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-05
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-28
+      effect: rules_out
+      strength: strong
+    - fault: F08-BT-27
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q09
+  status: draft
+  stage: 3
+  text: Is the battery warning light on while driving?
+  source_faults:
+  - F08-BT-02
+  - F08-BT-06
+  - F08-BT-08
+  - F08-BT-09
+  - F08-BT-10
+  - F08-BT-11
+  - F08-BT-41
+  merged_from:
+  - 'F08-BT-06 (stages_text): Is the battery light ON while driving?'
+  - 'F08-BT-08 (stages_text): Is the battery light ON while driving?'
+  - 'F08-BT-09 (stages_text): Is the battery light ON?'
+  - 'F08-BT-11 (stages_text): Is the battery light ON?'
+  - 'F08-BT-10 (stages_text): Does the battery light blink?'
+  - 'F08-BT-02 (stages_text): Any warning light after it starts?'
+  options:
+  - label: Yes, it stays on
+    effects:
+    - fault: F08-BT-08
+      effect: supports
+      strength: strong
+    - fault: F08-BT-09
+      effect: supports
+      strength: strong
+    - fault: F08-BT-11
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-06
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It blinks on and off
+    effects:
+    - fault: F08-BT-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Only when the car is idling
+    effects:
+    - fault: F08-BT-41
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-02
+      effect: supports
+      strength: weak
+    - fault: F08-BT-08
+      effect: rules_out
+      strength: moderate
+    - fault: F08-BT-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q10
+  status: draft
+  stage: 3
+  text: How do the headlights behave when the car is idling?
+  source_faults:
+  - F08-BT-04
+  - F08-BT-06
+  - F08-BT-08
+  - F08-BT-09
+  - F08-BT-16
+  - F08-BT-41
+  merged_from:
+  - 'F08-BT-06 (stages_text): Do headlights go dim at idle?'
+  - 'F08-BT-08 (stages_text): Do lights go dim?'
+  - 'F08-BT-04 (stages_text): Do lights flicker?'
+  options:
+  - label: They go dim
+    effects:
+    - fault: F08-BT-06
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-08
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-41
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-09
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: They flicker
+    effects:
+    - fault: F08-BT-04
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-16
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-41
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: They stay bright and steady
+    effects:
+    - fault: F08-BT-06
+      effect: rules_out
+      strength: weak
+    - fault: F08-BT-08
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q11
+  status: draft
+  stage: 3
+  text: Did the car stop by itself while driving, or did it die while parked?
+  source_faults:
+  - F08-BT-02
+  - F08-BT-03
+  - F08-BT-08
+  - F08-BT-09
+  - F08-BT-12
+  merged_from:
+  - 'F08-BT-08 (stages_text): Has the car stopped by itself?'
+  - 'F08-BT-09 (stages_text): Did the car stop while driving?'
+  - 'F08-BT-03 (stages_text): Did it die while driving or while parked?'
+  options:
+  - label: It stopped while driving
+    effects:
+    - fault: F08-BT-09
+      effect: supports
+      strength: strong
+    - fault: F08-BT-08
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-03
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It died while parked
+    effects:
+    - fault: F08-BT-12
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-02
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q12
+  status: draft
+  stage: 3
+  text: Do you hear a squeaking or growling sound from the engine?
+  source_faults:
+  - F08-BT-08
+  - F08-BT-09
+  - F08-BT-11
+  merged_from:
+  - 'F08-BT-08 (stages_text): Any squeaking sound from the engine?'
+  - 'F08-BT-09 (stages_text): Any growling sound?'
+  - 'F08-BT-11 (stages_text): Any squeaking sound?'
+  options:
+  - label: Squeaking
+    effects:
+    - fault: F08-BT-11
+      effect: supports
+      strength: strong
+    - fault: F08-BT-08
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Growling
+    effects:
+    - fault: F08-BT-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No unusual sound
+    effects:
+    - fault: F08-BT-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q13
+  status: draft
+  stage: 3
+  text: Is the squeaking louder when the AC is on?
+  source_faults:
+  - F08-BT-11
+  merged_from:
+  - 'F08-BT-11 (stages_text): Is the noise more with AC ON?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q14
+  status: draft
+  stage: 3
+  text: Is the engine temperature needle going up?
+  source_faults:
+  - F08-BT-11
+  merged_from:
+  - 'F08-BT-11 (stages_text): Is the temperature needle going up?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-11
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q15
+  status: draft
+  stage: 3
+  text: Are bulbs fusing (burning out) again and again?
+  source_faults:
+  - F08-BT-10
+  - F08-BT-18
+  merged_from:
+  - 'F08-BT-10 (stages_text): Are bulbs fusing often?'
+  - 'F08-BT-18 (stages_text): Are bulbs fusing?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-10
+      effect: supports
+      strength: strong
+    - fault: F08-BT-18
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q16
+  status: draft
+  stage: 3
+  text: Is the battery swollen, leaking, hot, smoking or giving a smell?
+  source_faults:
+  - F08-BT-07
+  - F08-BT-10
+  - F08-BT-18
+  - F08-BT-19
+  - F08-BT-23
+  - F08-BT-34
+  merged_from:
+  - 'F08-BT-19 (stages_text): Is the battery swollen, leaking, hot or smoking?'
+  - 'F08-BT-10 (stages_text): Is the battery hot or smelly?'
+  - 'F08-BT-18 (stages_text): Any smell from battery? Is the battery hot?'
+  - 'F08-BT-23 (stages_text): Is the battery swollen?'
+  - 'F08-BT-07 (stages_text): Is the battery swollen, leaking or smelling?'
+  options:
+  - label: Swollen or leaking
+    effects:
+    - fault: F08-BT-19
+      effect: supports
+      strength: strong
+    - fault: F08-BT-23
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-18
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Hot, or a rotten-egg / acid smell
+    effects:
+    - fault: F08-BT-18
+      effect: supports
+      strength: strong
+    - fault: F08-BT-10
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-34
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: Smoking or hissing
+    effects:
+    - fault: F08-BT-19
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: No, it looks normal
+    effects:
+    - fault: F08-BT-19
+      effect: rules_out
+      strength: strong
+    - fault: F08-BT-18
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q17
+  status: draft
+  stage: 3
+  text: How often does the battery go down?
+  source_faults:
+  - F08-BT-02
+  - F08-BT-05
+  - F08-BT-06
+  - F08-BT-12
+  - F08-BT-13
+  - F08-BT-14
+  - F08-BT-15
+  merged_from:
+  - 'F08-BT-06 (stages_text): After how many days does it go down?'
+  - 'F08-BT-05 (stages_text): How often do you need a jump-start?'
+  - 'F08-BT-15 (stages_text): Does it fail every night or only sometimes?'
+  options:
+  - label: Every night or every day
+    effects:
+    - fault: F08-BT-12
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-14
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-13
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Only on some days
+    effects:
+    - fault: F08-BT-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Every few days, even after driving
+    effects:
+    - fault: F08-BT-06
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-05
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: This is the first time
+    effects:
+    - fault: F08-BT-02
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-05
+      effect: rules_out
+      strength: moderate
+    - fault: F08-BT-12
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q18
+  status: draft
+  stage: 3
+  text: Was the battery charged and tested? What was the result?
+  source_faults:
+  - F08-BT-05
+  - F08-BT-06
+  - F08-BT-08
+  - F08-BT-12
+  - F08-BT-20
+  merged_from:
+  - 'F08-BT-05 (stages_text): Was it charged and still failing?'
+  - 'F08-BT-12 (stages_text): Was the battery tested recently?'
+  options:
+  - label: Charged, and it still failed the test
+    effects:
+    - fault: F08-BT-05
+      effect: supports
+      strength: strong
+    - fault: F08-BT-20
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It tested OK
+    effects:
+    - fault: F08-BT-12
+      effect: supports
+      strength: strong
+    - fault: F08-BT-08
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-06
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-05
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: It has not been tested
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q19
+  status: draft
+  stage: 3
+  text: Was any extra fitting added (music system, amplifier, dashcam, GPS tracker, alarm, LED or fog lights)?
+  source_faults:
+  - F08-BT-12
+  - F08-BT-13
+  - F08-BT-41
+  merged_from:
+  - 'F08-BT-13 (stages_text): Any fitting added recently?'
+  - 'F08-BT-12 (stages_text): Any extra fittings?'
+  - 'F08-BT-41 (stages_text): Any extra lights or music system fitted?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-13
+      effect: supports
+      strength: strong
+    - fault: F08-BT-12
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-41
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-13
+      effect: rules_out
+      strength: strong
+    - fault: F08-BT-41
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q20
+  status: draft
+  stage: 3
+  text: Did the problem start after that fitting was added?
+  source_faults:
+  - F08-BT-13
+  merged_from:
+  - 'F08-BT-13 (stages_text): Did problem start after fitting?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-13
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q21
+  status: draft
+  stage: 3
+  text: Is the dashcam's parking mode switched on?
+  source_faults:
+  - F08-BT-13
+  merged_from:
+  - 'F08-BT-13 (stages_text): Is dashcam parking mode ON?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No, or no dashcam
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q22
+  status: draft
+  stage: 3
+  text: After you lock the car, does any light stay on or does a door-open warning show?
+  source_faults:
+  - F08-BT-14
+  merged_from:
+  - 'F08-BT-14 (stages_text): Does any light stay ON after locking?'
+  - 'F08-BT-14 (stages_text): Door-open warning on dashboard?'
+  options:
+  - label: A light stays on (inside, boot or glove box)
+    effects:
+    - fault: F08-BT-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Door-open warning on the dashboard
+    effects:
+    - fault: F08-BT-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q23
+  status: draft
+  stage: 3
+  text: After you lock the car, do you hear clicking or does the screen stay on?
+  source_faults:
+  - F08-BT-15
+  merged_from:
+  - 'F08-BT-15 (stages_text): Do you hear clicking after locking?'
+  - 'F08-BT-15 (stages_text): Does the screen stay ON?'
+  options:
+  - label: Clicking sound
+    effects:
+    - fault: F08-BT-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The screen stays on
+    effects:
+    - fault: F08-BT-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q24
+  status: draft
+  stage: 3
+  text: Can you see white or green powder on the battery or its clamps?
+  source_faults:
+  - F08-BT-04
+  - F08-BT-18
+  - F08-BT-23
+  - F08-BT-34
+  merged_from:
+  - 'F08-BT-04 (stages_text): Can you see white or green powder on the battery?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-04
+      effect: supports
+      strength: strong
+    - fault: F08-BT-18
+      effect: supports
+      strength: weak
+    - fault: F08-BT-23
+      effect: supports
+      strength: weak
+    - fault: F08-BT-34
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-04
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q25
+  status: draft
+  stage: 3
+  text: Does the car start if the battery wire is shaken or pressed?
+  source_faults:
+  - F08-BT-04
+  merged_from:
+  - 'F08-BT-04 (stages_text): Does the car start after shaking the wire?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-04
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q26
+  status: draft
+  stage: 3
+  text: Does the battery move when you push it?
+  source_faults:
+  - F08-BT-36
+  merged_from:
+  - 'F08-BT-36 (stages_text): Does the battery move when you push it?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-36
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-36
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q27
+  status: draft
+  stage: 3
+  text: Was any other repair or electrical work done on the car recently?
+  source_faults:
+  - F08-BT-16
+  merged_from:
+  - 'F08-BT-16 (stages_text): Any repair work done recently?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-16
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q28
+  status: draft
+  stage: 3
+  text: Do you see smoke, a hot or burnt wire, or smell burning?
+  source_faults:
+  - F08-BT-09
+  - F08-BT-17
+  - F08-BT-29
+  - F08-BT-30
+  - F08-BT-42
+  merged_from:
+  - 'F08-BT-17 (stages_text): Hot wire or burning smell?'
+  - 'F08-BT-42 (stages_text): Any smoke?'
+  options:
+  - label: Smoke
+    effects:
+    - fault: F08-BT-42
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Hot or burnt wire, or a burning smell
+    effects:
+    - fault: F08-BT-17
+      effect: supports
+      strength: strong
+    - fault: F08-BT-29
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-42
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-09
+      effect: supports
+      strength: weak
+    - fault: F08-BT-30
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q29
+  status: draft
+  stage: 3
+  text: Did this start after a jump-start?
+  source_faults:
+  - F08-BT-17
+  - F08-BT-42
+  merged_from:
+  - 'F08-BT-17 (stages_text): Did it happen after a jump-start?'
+  - 'F08-BT-42 (stages_text): How were the jump cables connected?'
+  options:
+  - label: Yes, after a jump-start
+    effects:
+    - fault: F08-BT-17
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-42
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Yes, and the cables may have been connected the wrong way
+    effects:
+    - fault: F08-BT-42
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-42
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q30
+  status: draft
+  stage: 3
+  text: Is it worse in the morning?
+  source_faults:
+  - F08-BT-01
+  - F08-BT-22
+  merged_from:
+  - 'F08-BT-01 (stages_text): Is it worse in the morning?'
+  - 'F08-BT-22 (stages_text): Only on cold mornings?'
+  options:
+  - label: Yes, every morning
+    effects:
+    - fault: F08-BT-01
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Only on cold mornings, fine later in the day
+    effects:
+    - fault: F08-BT-22
+      effect: supports
+      strength: strong
+    - fault: F08-BT-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No difference
+    effects:
+    - fault: F08-BT-22
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q31
+  status: draft
+  stage: 3
+  text: Is the weather very hot these days?
+  source_faults:
+  - F08-BT-23
+  merged_from:
+  - 'F08-BT-23 (stages_text): Is it hot weather now?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-23
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-23
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q32
+  status: draft
+  stage: 3
+  text: 'Diesel cars: does the glow-plug light stay on for a long time before starting?'
+  source_faults:
+  - F08-BT-22
+  merged_from:
+  - 'F08-BT-22 (stages_text): Do you wait for the glow light to go off?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-22
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q33
+  status: draft
+  stage: 3
+  text: How do you usually drive the car?
+  source_faults:
+  - F08-BT-01
+  - F08-BT-25
+  - F08-BT-33
+  merged_from:
+  - 'F08-BT-33 (stages_text): How many km do you drive daily?'
+  - 'F08-BT-01 (stages_text): Do you drive only short trips?'
+  options:
+  - label: Only short trips or slow city traffic
+    effects:
+    - fault: F08-BT-33
+      effect: supports
+      strength: strong
+    - fault: F08-BT-01
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-25
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Long drives regularly
+    effects:
+    - fault: F08-BT-33
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q34
+  status: draft
+  stage: 3
+  text: Was the car in flood water?
+  source_faults:
+  - F08-BT-24
+  merged_from:
+  - 'F08-BT-24 (stages_text): How high did the water come?'
+  options:
+  - label: Yes, water came up to the engine or inside the car
+    effects:
+    - fault: F08-BT-24
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: Yes, a little water
+    effects:
+    - fault: F08-BT-24
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-24
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q35
+  status: draft
+  stage: 3
+  text: Did you try to start the car after it was in the water?
+  source_faults:
+  - F08-BT-24
+  merged_from:
+  - 'F08-BT-24 (stages_text): Did you try to start?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-24
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q36
+  status: draft
+  stage: 3
+  text: Did the problem start after a car wash or rain?
+  source_faults:
+  - F08-BT-40
+  merged_from:
+  - 'F08-BT-40 (stages_text): Did it start after a car wash or rain?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-40
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-40
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q37
+  status: draft
+  stage: 3
+  text: Does your car have auto start-stop? Is it working?
+  source_faults:
+  - F08-BT-25
+  - F08-BT-26
+  - F08-BT-27
+  - F08-BT-28
+  merged_from:
+  - 'F08-BT-25 (stages_text): Does the car have auto start-stop?'
+  - 'F08-BT-25 (stages_text): Is it working?'
+  options:
+  - label: It has start-stop, but it stopped working
+    effects:
+    - fault: F08-BT-25
+      effect: supports
+      strength: strong
+    - fault: F08-BT-26
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-28
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-27
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It has start-stop and it works
+    effects:
+    - fault: F08-BT-25
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: No start-stop
+    effects:
+    - fault: F08-BT-25
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q38
+  status: draft
+  stage: 3
+  text: Is there a battery or charging warning message on the screen?
+  source_faults:
+  - F08-BT-25
+  - F08-BT-26
+  - F08-BT-28
+  merged_from:
+  - 'F08-BT-26 (stages_text): What message is on the screen?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-26
+      effect: supports
+      strength: strong
+    - fault: F08-BT-25
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-28
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-26
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q39
+  status: draft
+  stage: 3
+  text: Does the battery fit its tray properly, with the wires not stretched?
+  source_faults:
+  - F08-BT-27
+  merged_from:
+  - 'F08-BT-27 (stages_text): Does it fit the tray properly?'
+  options:
+  - label: No, it is smaller or the wires are stretched
+    effects:
+    - fault: F08-BT-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-27
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q40
+  status: draft
+  stage: 3
+  text: Do you see rat droppings, a nest or bitten wires under the bonnet?
+  source_faults:
+  - F08-BT-29
+  merged_from:
+  - 'F08-BT-29 (stages_text): Any rat droppings or nest under bonnet?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-29
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q41
+  status: draft
+  stage: 3
+  text: Are many warning lights on at the same time?
+  source_faults:
+  - F08-BT-29
+  - F08-BT-32
+  - F08-BT-42
+  merged_from:
+  - 'F08-BT-29 (stages_text): Any warning lights?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-29
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-42
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-32
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q42
+  status: draft
+  stage: 3
+  text: Does the car have a CNG or LPG kit? Did the problem start after it was fitted or serviced?
+  source_faults:
+  - F08-BT-30
+  merged_from:
+  - 'F08-BT-30 (stages_text): Company kit or outside fitted?'
+  - 'F08-BT-30 (stages_text): Problem since kit was fitted?'
+  options:
+  - label: Yes, it started after the kit was fitted or serviced
+    effects:
+    - fault: F08-BT-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Yes, but the problem started later
+    effects:
+    - fault: F08-BT-30
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No kit
+    effects:
+    - fault: F08-BT-30
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q43
+  status: draft
+  stage: 3
+  text: Do you smell gas?
+  source_faults:
+  - F08-BT-30
+  merged_from:
+  - 'F08-BT-30 (stages_text): Any gas smell?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-30
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q44
+  status: draft
+  stage: 3
+  text: 'Electric cars: how much charge does the big battery show?'
+  source_faults:
+  - F08-BT-31
+  merged_from:
+  - 'F08-BT-31 (stages_text): How much charge does the big battery show?'
+  options:
+  - label: High charge, but the car will not switch on
+    effects:
+    - fault: F08-BT-31
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Low charge
+    effects:
+    - fault: F08-BT-31
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q45
+  status: draft
+  stage: 3
+  text: 'Electric and hybrid cars: does the READY light come on?'
+  source_faults:
+  - F08-BT-31
+  - F08-BT-32
+  merged_from:
+  - 'F08-BT-32 (stages_text): Does the READY light come?'
+  options:
+  - label: 'No'
+    effects:
+    - fault: F08-BT-32
+      effect: supports
+      strength: strong
+    - fault: F08-BT-31
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-32
+      effect: rules_out
+      strength: strong
+    - fault: F08-BT-31
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q46
+  status: draft
+  stage: 3
+  text: Do you see a 'key not detected' message?
+  source_faults:
+  - F08-BT-37
+  merged_from:
+  - 'F08-BT-37 (stages_text): Do you see ''key not detected''?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-37
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-37
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q47
+  status: draft
+  stage: 3
+  text: Does the spare key work?
+  source_faults:
+  - F08-BT-37
+  merged_from:
+  - 'F08-BT-37 (stages_text): Does the spare key work?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-37
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F08-BT-37
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q48
+  status: draft
+  stage: 3
+  text: Does the battery have caps on top that can be opened?
+  source_faults:
+  - F08-BT-34
+  merged_from:
+  - 'F08-BT-34 (stages_text): Does the battery have caps that open?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-34
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No, it is sealed
+    effects:
+    - fault: F08-BT-34
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q49
+  status: draft
+  stage: 3
+  text: Do you have the bill or warranty card for the battery?
+  source_faults:
+  - F08-BT-05
+  - F08-BT-35
+  merged_from:
+  - 'F08-BT-35 (stages_text): Do you have the bill?'
+  - 'F08-BT-05 (stages_text): Do you have the warranty card?'
+  - 'F08-BT-35 (stages_text): Where did you buy the battery?'
+  options:
+  - label: No bill or warranty card
+    effects:
+    - fault: F08-BT-35
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F08-BT-35
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: battery-q50
+  status: draft
+  stage: 3
+  text: Did the battery fail suddenly, or get weaker slowly?
+  source_faults:
+  - F08-BT-05
+  - F08-BT-20
+  - F08-BT-23
+  - F08-BT-33
+  merged_from:
+  - 'F08-BT-20 (stages_text): Did it fail suddenly?'
+  options:
+  - label: Suddenly
+    effects:
+    - fault: F08-BT-20
+      effect: supports
+      strength: strong
+    - fault: F08-BT-23
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Slowly got weaker
+    effects:
+    - fault: F08-BT-33
+      effect: supports
+      strength: moderate
+    - fault: F08-BT-05
+      effect: supports
+      strength: weak
+    - fault: F08-BT-20
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F08-BT-01:
+    status: draft
+    name: Weak Battery / Slow Start (Self Slow)
+    stage2_choices:
+    - Self slow
+    - Car not starting
+    confirmation_test: Charge the battery fully, then test it.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-02:
+    status: draft
+    name: Battery Down Because Something Was Left ON
+    stage2_choices:
+    - Car not starting
+    - Only click sound
+    - Starts only with jump
+    confirmation_test: Full charge, then battery test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-03:
+    status: draft
+    name: Battery Fully Dead (Nothing Works)
+    stage2_choices:
+    - Car not starting
+    - Only click sound
+    - Starts only with jump
+    confirmation_test: Charge and test. Check charging. Drain test if needed.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-04:
+    status: draft
+    name: Dirty (Rusted) or Loose Battery Terminal
+    stage2_choices:
+    - Car not starting
+    - Only click sound
+    confirmation_test: Power-loss test at the clamp while starting.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-05:
+    status: draft
+    name: Old Battery - Does Not Keep Charge
+    stage2_choices:
+    - Battery keeps going down
+    - Starts only with jump
+    - Self slow
+    confirmation_test: Full charge, rest, then test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-06:
+    status: draft
+    name: Battery Goes Down Again and Again - Charging Problem
+    stage2_choices:
+    - Battery keeps going down
+    - Starts only with jump
+    - Battery light ON
+    confirmation_test: Charging power test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-07:
+    status: draft
+    name: Car Needs Jump-Start (Service)
+    stage2_choices:
+    - Starts only with jump
+    - Car not starting
+    confirmation_test: Charging check after the jump. Battery test later.
+    danger_phrases:
+    - battery swollen
+    - battery leaking
+    - battery smell
+    safety_trigger_options: []
+  F08-BT-08:
+    status: draft
+    name: Battery Not Getting Charged While Driving
+    stage2_choices:
+    - Battery light ON
+    - Battery keeps going down
+    confirmation_test: Voltage at both ends, power test, wire test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-09:
+    status: draft
+    name: Alternator (Dynamo) Not Working
+    stage2_choices:
+    - Battery light ON
+    - Starts only with jump
+    confirmation_test: Alternator power test and bench test.
+    danger_phrases:
+    - burning smell
+    safety_trigger_options:
+    - question: battery-q28
+      option: Hot or burnt wire, or a burning smell
+  F08-BT-10:
+    status: draft
+    name: Alternator Regulator Fault (Charging Too Low or Too High)
+    stage2_choices:
+    - Battery light ON
+    - Battery hot or leaking
+    confirmation_test: Charging voltage test and bench test.
+    danger_phrases:
+    - battery hot
+    - battery smell
+    safety_trigger_options:
+    - question: battery-q16
+      option: Hot, or a rotten-egg / acid smell
+  F08-BT-11:
+    status: draft
+    name: Alternator Belt Slipping or Broken
+    stage2_choices:
+    - Battery light ON
+    confirmation_test: Look at the belt, check its tightness, check charging.
+    danger_phrases:
+    - temperature going up
+    safety_trigger_options:
+    - question: battery-q14
+      option: 'Yes'
+  F08-BT-12:
+    status: draft
+    name: Battery Drains When Car Is Parked (Hidden Drain)
+    stage2_choices:
+    - Battery keeps going down
+    - Starts only with jump
+    confirmation_test: Parked-car drain test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-13:
+    status: draft
+    name: Battery Drain From Extra Fittings (Music, Dashcam, GPS)
+    stage2_choices:
+    - Battery keeps going down
+    confirmation_test: Drain test with the fitting removed.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-14:
+    status: draft
+    name: Battery Drain From Inside Light or Boot Light
+    stage2_choices:
+    - Battery keeps going down
+    confirmation_test: Door / boot switch test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-15:
+    status: draft
+    name: Battery Drain From Faulty Relay or Car Computer Not Switching Off
+    stage2_choices:
+    - Battery keeps going down
+    confirmation_test: Recorded drain test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-16:
+    status: draft
+    name: Bad Earth Wire (Black Battery Wire)
+    stage2_choices:
+    - Self slow
+    - Car not starting
+    confirmation_test: Power-loss test on the earth (black) side.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-17:
+    status: draft
+    name: Red Battery Wire or Main Fuse Problem
+    stage2_choices:
+    - Car not starting
+    confirmation_test: Voltage and continuity test.
+    danger_phrases:
+    - hot wire
+    - burning smell
+    - melted fuse box
+    safety_trigger_options:
+    - question: battery-q28
+      option: Hot or burnt wire, or a burning smell
+  F08-BT-18:
+    status: draft
+    name: Battery Over-Charging (Too Much Charging)
+    stage2_choices:
+    - Battery hot or leaking
+    confirmation_test: Charging voltage test.
+    danger_phrases:
+    - rotten egg smell
+    - battery hot
+    - battery swelling
+    safety_trigger_options:
+    - question: battery-q16
+      option: Hot, or a rotten-egg / acid smell
+    - question: battery-q16
+      option: Swollen or leaking
+  F08-BT-19:
+    status: draft
+    name: Battery Swollen, Hot or Leaking (DANGER)
+    stage2_choices:
+    - Battery hot or leaking
+    confirmation_test: Look at the battery, then check charging.
+    danger_phrases:
+    - battery swollen
+    - battery leaking
+    - acid leak
+    - battery hot
+    - hissing
+    - battery smoking
+    safety_trigger_options:
+    - question: battery-q16
+      option: Smoking or hissing
+    - question: battery-q16
+      option: Swollen or leaking
+  F08-BT-20:
+    status: draft
+    name: Battery Cell Broken Inside (Sudden Failure)
+    stage2_choices:
+    - Car not starting
+    confirmation_test: Charge and test.
+    danger_phrases:
+    - battery hot while charging
+    safety_trigger_options: []
+  F08-BT-21:
+    status: draft
+    name: Battery Weak After Long Parking
+    stage2_choices:
+    - Car not starting
+    - Self slow
+    confirmation_test: Charge and test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-22:
+    status: draft
+    name: Battery Problem in Winter / Cold Morning
+    stage2_choices:
+    - Car not starting
+    - Self slow
+    confirmation_test: Battery test and glow plug check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-23:
+    status: draft
+    name: Battery Problem in Summer Heat
+    stage2_choices:
+    - Car not starting
+    - Battery hot or leaking
+    confirmation_test: Battery test and charging check.
+    danger_phrases:
+    - battery swollen
+    - battery hot
+    safety_trigger_options:
+    - question: battery-q16
+      option: Swollen or leaking
+  F08-BT-24:
+    status: draft
+    name: Car Went in Flood Water / Waterlogging
+    stage2_choices:
+    - Car not starting
+    confirmation_test: Full check of the electrical parts.
+    danger_phrases:
+    - flood
+    - water inside car
+    safety_trigger_options:
+    - question: battery-q34
+      option: Yes, water came up to the engine or inside the car
+    - question: battery-q35
+      option: 'Yes'
+  F08-BT-25:
+    status: draft
+    name: Start-Stop Car Battery Problem (AGM / EFB Battery)
+    stage2_choices:
+    - Self slow
+    - Other
+    confirmation_test: Battery test and car data check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-26:
+    status: draft
+    name: Battery Sensor Fault (IBS)
+    stage2_choices:
+    - Battery light ON
+    - Other
+    confirmation_test: Compare the sensor data with a meter reading.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-27:
+    status: draft
+    name: Wrong Battery Fitted (Wrong Size or Type)
+    stage2_choices:
+    - Self slow
+    - Other
+    confirmation_test: Compare the battery with the company specification.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-28:
+    status: draft
+    name: New Battery Needs Coding / Registration / Reset
+    stage2_choices:
+    - Other
+    confirmation_test: Scan tool check of battery registration.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-29:
+    status: draft
+    name: Rat Bite on Battery or Charging Wires
+    stage2_choices:
+    - Car not starting
+    - Battery keeps going down
+    confirmation_test: Look for bites, then test the wires.
+    danger_phrases:
+    - burnt smell
+    - rat bitten wire
+    safety_trigger_options:
+    - question: battery-q28
+      option: Hot or burnt wire, or a burning smell
+  F08-BT-30:
+    status: draft
+    name: CNG / LPG Kit Wiring Draining Battery
+    stage2_choices:
+    - Battery keeps going down
+    confirmation_test: Drain test.
+    danger_phrases:
+    - gas smell
+    - burnt smell
+    safety_trigger_options:
+    - question: battery-q28
+      option: Hot or burnt wire, or a burning smell
+    - question: battery-q43
+      option: 'Yes'
+  F08-BT-31:
+    status: draft
+    name: EV Small 12V Battery Down (Car Will Not Switch ON)
+    stage2_choices:
+    - Car not starting
+    confirmation_test: 12V battery test and charging check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-32:
+    status: draft
+    name: Hybrid Car Small 12V Battery Weak
+    stage2_choices:
+    - Car not starting
+    confirmation_test: 12V battery test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-33:
+    status: draft
+    name: Battery Weak From Short Trips / City Traffic
+    stage2_choices:
+    - Battery keeps going down
+    - Starts only with jump
+    confirmation_test: Charge, then test again.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-34:
+    status: draft
+    name: Battery Water Low (Battery With Open Caps)
+    stage2_choices:
+    - Self slow
+    - Battery hot or leaking
+    confirmation_test: Look at the water level, then check charging.
+    danger_phrases:
+    - acid smell
+    - battery hot
+    safety_trigger_options:
+    - question: battery-q16
+      option: Hot, or a rotten-egg / acid smell
+  F08-BT-35:
+    status: draft
+    name: Fake / Old / Repaired Battery Sold as New
+    stage2_choices:
+    - Other
+    confirmation_test: Brand and making-date check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-36:
+    status: draft
+    name: Battery Not Tied Down / Damaged by Shaking (Potholes)
+    stage2_choices:
+    - Other
+    confirmation_test: Look at the battery holder clamp.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-37:
+    status: draft
+    name: Car Key Remote Battery Low (Not the Car Battery)
+    stage2_choices:
+    - Car not starting
+    - Other
+    confirmation_test: Try the spare key / check the key cell.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-38:
+    status: draft
+    name: Starter Motor Problem (Battery Is Good)
+    stage2_choices:
+    - Only click sound
+    - Car not starting
+    confirmation_test: Voltage at the starter.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-39:
+    status: draft
+    name: No Start With Good Battery - Relay, Key Switch or Clutch/Brake Switch
+    stage2_choices:
+    - Car not starting
+    confirmation_test: Start signal check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-40:
+    status: draft
+    name: Water in Fuse Box After Rain or Car Wash
+    stage2_choices:
+    - Battery keeps going down
+    - Other
+    confirmation_test: Look inside the fuse / relay box.
+    danger_phrases: []
+    safety_trigger_options: []
+  F08-BT-41:
+    status: draft
+    name: Too Many Extra Lights / Music - Alternator Cannot Keep Up
+    stage2_choices:
+    - Battery keeps going down
+    - Battery light ON
+    confirmation_test: Electrical load test.
+    danger_phrases:
+    - hot wires
+    safety_trigger_options: []
+  F08-BT-42:
+    status: draft
+    name: Damage From Wrong Jump-Start (Cables Reversed)
+    stage2_choices:
+    - Car not starting
+    confirmation_test: Fuse and alternator test.
+    danger_phrases:
+    - smoke
+    - burnt smell
+    - burnt cable
+    safety_trigger_options:
+    - question: battery-q28
+      option: Hot or burnt wire, or a burning smell
+    - question: battery-q28
+      option: Smoke
+safety_rules:
+- id: battery-s-F08-BT-01
+  status: draft
+  fault: F08-BT-01
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: No fire or smoking near the battery. Remove rings and watch, wear eye protection. Never jump-start
+    a swollen or leaking battery.
+  towing_recommendation: Usually no. Tow only if the car does not start even after a jump-start.
+  source_text:
+    safety_precautions: '• No fire or smoking near the battery.
+
+      • Remove rings and watch before touching battery.
+
+      • Wear eye protection.
+
+      • Never jump-start a swollen or leaking battery.'
+    if_towing_needed: Usually NO. Tow only if the car does not start even after jump-start.
+- id: battery-s-F08-BT-02
+  status: draft
+  fault: F08-BT-02
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Connect jump cables in the right order. Never jump a swollen, leaking or frozen battery. Keep
+    cables away from the fan and belt.
+  towing_recommendation: No in most cases.
+  source_text:
+    safety_precautions: '• Connect jump cables in the right order.
+
+      • Never jump a swollen, leaking or frozen battery.
+
+      • Keep cables away from fan and belt.'
+    if_towing_needed: NO in most cases.
+- id: battery-s-F08-BT-03
+  status: draft
+  fault: F08-BT-03
+  risk_level: low
+  stop_driving_trigger: Stop if the car stops again while driving.
+  roadside_action: Never jump a frozen battery. Charge the battery in open air. Connect + and - correctly.
+  towing_recommendation: Only if the car does not start after a jump, or stops again while driving.
+  source_text:
+    safety_precautions: '• Never jump a frozen battery (cold hill areas).
+
+      • Charge the battery in open air.
+
+      • Connect + and - correctly.'
+    if_towing_needed: Only if the car does not start after jump, or stops again while driving.
+- id: battery-s-F08-BT-04
+  status: draft
+  fault: F08-BT-04
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: 'The powder has acid: wear gloves and goggles. Do not let a spanner touch red (+) and the car
+    body together. Keep powder away from paint.'
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Powder has acid. Wear gloves and goggles.
+
+      • Do not let a spanner touch red (+) and car body together.
+
+      • Keep powder away from paint.'
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-05
+  status: draft
+  fault: F08-BT-05
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: 'The battery is heavy: lift carefully. Give the old battery to an authorised dealer for recycling.'
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Battery is heavy. Lift carefully.
+
+      • Give old battery to an authorised dealer for recycling.'
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-06
+  status: draft
+  fault: F08-BT-06
+  risk_level: medium
+  stop_driving_trigger: Stop if the battery light is ON and the battery is going down fast.
+  roadside_action: Remove the battery wire before removing the alternator wire. Keep hands away from the moving
+    belt.
+  towing_recommendation: Depends. Tow if the battery light is ON and the battery is going down fast.
+  source_text:
+    safety_precautions: '• Remove battery wire before removing alternator wire.
+
+      • Keep hands away from moving belt.'
+    if_towing_needed: DEPENDS. Tow if battery light is ON and battery is going down fast.
+- id: battery-s-F08-BT-07
+  status: draft
+  fault: F08-BT-07
+  risk_level: medium
+  stop_driving_trigger: Not stated
+  roadside_action: No jump-start on a swollen, leaking or frozen battery. Red to +, black to engine metal. No fire
+    or sparks near the battery. Do not let the clamps touch each other.
+  towing_recommendation: Only if the jump fails, or the car is not charging / stops.
+  source_text:
+    safety_precautions: '• No jump on swollen, leaking or frozen battery.
+
+      • Red to + , black to engine metal.
+
+      • No fire or sparks near battery.
+
+      • Do not let clamps touch each other.'
+    if_towing_needed: Only if jump fails, or car is not charging / stops.
+- id: battery-s-F08-BT-08
+  status: draft
+  fault: F08-BT-08
+  risk_level: medium
+  stop_driving_trigger: Stop if the battery light is ON, voltage is falling or the car is stopping.
+  roadside_action: Keep away from the belt and fan when the engine runs. Remove the battery wire before electrical
+    work.
+  towing_recommendation: Depends. Tow if the light is ON, voltage is falling or the car is stopping.
+  source_text:
+    safety_precautions: '• Keep away from belt and fan when engine runs.
+
+      • Remove battery wire before electrical work.'
+    if_towing_needed: DEPENDS. Tow if light is ON, voltage falling or car stopping.
+- id: battery-s-F08-BT-09
+  status: draft
+  fault: F08-BT-09
+  risk_level: medium
+  stop_driving_trigger: Do not drive unless the workshop is very near and the battery is full.
+  roadside_action: Remove the battery wire before touching the alternator wire. The alternator is hot after driving.
+  towing_recommendation: Yes usually, unless the workshop is very near and the battery is full.
+  source_text:
+    safety_precautions: '• Remove battery wire before touching alternator wire.
+
+      • Alternator is hot after driving.'
+    if_towing_needed: YES usually, unless workshop is very near and battery is full.
+- id: battery-s-F08-BT-10
+  status: draft
+  fault: F08-BT-10
+  risk_level: medium
+  stop_driving_trigger: Stop if the battery is hot or smelling.
+  roadside_action: An over-charged battery can give gas that catches fire. Remove the battery wire before work.
+  towing_recommendation: Depends. Tow if the battery is hot or smelling.
+  source_text:
+    safety_precautions: '• Over-charged battery can give fire-catching gas.
+
+      • Remove battery wire before work.'
+    if_towing_needed: DEPENDS. Tow if battery is hot or smelling.
+- id: battery-s-F08-BT-11
+  status: draft
+  fault: F08-BT-11
+  risk_level: medium
+  stop_driving_trigger: Stop if the belt is broken and it also runs the water pump.
+  roadside_action: Never touch the belt when the engine is running. Engine parts are hot.
+  towing_recommendation: Yes if the belt is broken and it also runs the water pump. Otherwise depends.
+  source_text:
+    safety_precautions: '• Never touch the belt when engine is running.
+
+      • Engine parts are hot.'
+    if_towing_needed: YES if belt is broken and it also runs the water pump. Otherwise DEPENDS.
+- id: battery-s-F08-BT-12
+  status: draft
+  fault: F08-BT-12
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not open the meter circuit while the computers wake up. Remove fuses with the ignition OFF.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Do not open the meter circuit while computers wake up.
+
+      • Remove fuses with ignition OFF.'
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-13
+  status: draft
+  fault: F08-BT-13
+  risk_level: medium
+  stop_driving_trigger: Not stated
+  roadside_action: Wires without a fuse can catch fire. Remove the battery wire before re-wiring.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Wires without fuse can catch fire.
+
+      • Remove battery wire before re-wiring.'
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-14
+  status: draft
+  fault: F08-BT-14
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: For door lock work, follow the service book (airbag wires may be near).
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • For door lock work, follow the service book (airbag wires may be near).
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-15
+  status: draft
+  fault: F08-BT-15
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Follow the company sleep steps. Keep the battery charged during a software update.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Follow company sleep steps.
+
+      • Keep battery charged during software update.'
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-16
+  status: draft
+  fault: F08-BT-16
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Remove the battery wire first.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Remove battery wire first.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-17
+  status: draft
+  fault: F08-BT-17
+  risk_level: high
+  stop_driving_trigger: Stop if a wire is burnt or the short is not found.
+  roadside_action: A short to the body gives sparks and fire. Use only the correct fuse rating.
+  towing_recommendation: Depends. Tow if the wire is burnt or the short is not found.
+  source_text:
+    safety_precautions: '• Short to body = sparks and fire.
+
+      • Use only correct fuse rating.'
+    if_towing_needed: DEPENDS. Tow if wire is burnt or short is not found.
+- id: battery-s-F08-BT-18
+  status: draft
+  fault: F08-BT-18
+  risk_level: high
+  stop_driving_trigger: Stop if the battery is hot or smelling.
+  roadside_action: Battery gas can catch fire. Hot acid.
+  towing_recommendation: Yes if the battery is hot or smelling.
+  source_text:
+    safety_precautions: '• Battery gas can catch fire.
+
+      • Hot acid.'
+    if_towing_needed: YES if battery is hot or smelling.
+- id: battery-s-F08-BT-19
+  status: draft
+  fault: F08-BT-19
+  risk_level: high
+  stop_driving_trigger: 'Do not drive (towing column: YES).'
+  roadside_action: The battery can burst. Acid burns. Clean acid properly.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Can burst. Acid burns.
+
+      • Clean acid properly.'
+    if_towing_needed: YES.
+- id: battery-s-F08-BT-20
+  status: draft
+  fault: F08-BT-20
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: If the battery gets hot while charging, stop charging.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • If battery gets hot while charging, stop charging.
+    if_towing_needed: DEPENDS.
+- id: battery-s-F08-BT-21
+  status: draft
+  fault: F08-BT-21
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Normal jump-start safety.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Normal jump-start safety.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-22
+  status: draft
+  fault: F08-BT-22
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Never jump-start a frozen battery.
+  towing_recommendation: Usually no.
+  source_text:
+    safety_precautions: • Never jump-start a frozen battery.
+    if_towing_needed: Usually NO.
+- id: battery-s-F08-BT-23
+  status: draft
+  fault: F08-BT-23
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: 'Hot battery: use gloves.'
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Hot battery - use gloves.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-24
+  status: draft
+  fault: F08-BT-24
+  risk_level: high
+  stop_driving_trigger: 'Do not drive or start the engine: it can break if started with water (towing column: YES).'
+  roadside_action: Electric shock or short risk. EV high-voltage danger.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Engine can break if started with water.
+
+      • Electric shock / short.
+
+      • EV high-voltage danger.'
+    if_towing_needed: YES.
+- id: battery-s-F08-BT-25
+  status: draft
+  fault: F08-BT-25
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Charge an AGM battery only on the AGM setting.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Charge AGM only on AGM setting.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-26
+  status: draft
+  fault: F08-BT-26
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Remove the wires in the company order.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Remove wires in company order.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-27
+  status: draft
+  fault: F08-BT-27
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: The battery wire must not touch the bonnet.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Wire must not touch bonnet.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-28
+  status: draft
+  fault: F08-BT-28
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Keep the voltage steady during coding.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Keep voltage steady during coding.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-29
+  status: draft
+  fault: F08-BT-29
+  risk_level: medium
+  stop_driving_trigger: Stop if the main cable is bitten.
+  roadside_action: 'Short circuits give sparks. Rat droppings can spread disease: wear gloves and a mask.'
+  towing_recommendation: Depends. Tow if the main cable is bitten.
+  source_text:
+    safety_precautions: '• Short circuit sparks.
+
+      • Rat droppings can spread disease - wear gloves and mask.'
+    if_towing_needed: DEPENDS. Tow if main cable is bitten.
+- id: battery-s-F08-BT-30
+  status: draft
+  fault: F08-BT-30
+  risk_level: high
+  stop_driving_trigger: Stop if there is a gas smell.
+  roadside_action: Gas leak plus spark means fire. No electric work if there is a gas smell.
+  towing_recommendation: No usually. Yes if there is a gas smell.
+  source_text:
+    safety_precautions: • Gas leak + spark = fire. No electric work if gas smell.
+    if_towing_needed: NO usually. YES if gas smell.
+- id: battery-s-F08-BT-31
+  status: draft
+  fault: F08-BT-31
+  risk_level: medium
+  stop_driving_trigger: Not stated
+  roadside_action: High voltage danger.
+  towing_recommendation: Depends. Use a flatbed truck only (EV rule).
+  source_text:
+    safety_precautions: • High voltage danger.
+    if_towing_needed: DEPENDS. Use flatbed truck only (EV rule).
+- id: battery-s-F08-BT-32
+  status: draft
+  fault: F08-BT-32
+  risk_level: medium
+  stop_driving_trigger: Not stated
+  roadside_action: High voltage danger.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • High voltage danger.
+    if_towing_needed: DEPENDS.
+- id: battery-s-F08-BT-33
+  status: draft
+  fault: F08-BT-33
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Charge in open air.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Charge in open air.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-34
+  status: draft
+  fault: F08-BT-34
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Acid burns.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Acid burns.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-35
+  status: draft
+  fault: F08-BT-35
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Normal battery safety.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Normal battery safety.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-36
+  status: draft
+  fault: F08-BT-36
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: A battery touching the bonnet causes a short circuit.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery touching bonnet = short circuit.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-37
+  status: draft
+  fault: F08-BT-37
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Coin cells are dangerous if a child swallows them.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Coin cells are dangerous if a child swallows them.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-38
+  status: draft
+  fault: F08-BT-38
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Remove the battery wire first.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Remove battery wire first.
+    if_towing_needed: DEPENDS.
+- id: battery-s-F08-BT-39
+  status: draft
+  fault: F08-BT-39
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Normal electrical safety.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Normal electrical safety.
+    if_towing_needed: DEPENDS.
+- id: battery-s-F08-BT-40
+  status: draft
+  fault: F08-BT-40
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Remove the battery wire first.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Remove battery wire first.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-41
+  status: draft
+  fault: F08-BT-41
+  risk_level: medium
+  stop_driving_trigger: Not stated
+  roadside_action: Thin wires can catch fire.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Thin wires can catch fire.
+    if_towing_needed: NO.
+- id: battery-s-F08-BT-42
+  status: draft
+  fault: F08-BT-42
+  risk_level: high
+  stop_driving_trigger: 'Do not drive (towing column: YES).'
+  roadside_action: Burnt wires.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Burnt wires.
+    if_towing_needed: YES.
