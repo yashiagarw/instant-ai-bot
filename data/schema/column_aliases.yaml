@@ -1,0 +1,222 @@
+# Column alias map for the main fault sheet (first sheet of every file in data/raw/).
+#
+# Headers are matched after normalising: upper case, "₹" and "RS" removed,
+# runs of spaces and punctuation collapsed. See normalise_header() in
+# scripts/profile_datasets.py. Every header in the 18 files maps to exactly
+# one field below (checked by the profiler; unmapped headers are reported).
+#
+# visibility:
+#   customer  - may be shown to customers
+#   internal  - support / mechanics only, never shown to customers (CLAUDE.md)
+#   source    - used by the importer or the reviewed structuring step, not shown as is
+#
+# position is the 1-based column number in the template. The importer must map
+# by alias, not by position.
+
+template_columns:
+  - field: source_id
+    position: 1
+    visibility: customer
+    aliases: ["ID'S"]
+  - field: category
+    position: 2
+    visibility: source
+    aliases: ["CATEGORY"]
+  - field: sub_category
+    position: 3
+    visibility: customer
+    aliases: ["SUB-CATEGORY"]
+  - field: description
+    position: 4
+    visibility: customer
+    aliases: ["DESCRIPTION"]
+  - field: customer_phrases
+    position: 5
+    visibility: source
+    aliases: ["CUSTOMER ON AI"]
+  - field: symptoms
+    position: 6
+    visibility: customer
+    list: true
+    aliases: ["Common Symptoms"]
+  - field: causes
+    position: 7
+    visibility: customer
+    list: true
+    aliases: ["Possible Causes"]
+  - field: diagnosis_steps
+    position: 8
+    visibility: customer
+    list: true
+    aliases: ["DIAGNOSIS"]
+  - field: likely_fault
+    position: 9
+    visibility: customer
+    aliases: ["LIKELY FAULT"]
+  - field: resolution_steps
+    position: 10
+    visibility: customer
+    list: true
+    aliases: ["RESOLUTION"]
+  - field: road_repairable
+    position: 11
+    visibility: customer
+    aliases: ["Can It Be Repaired on the Road? (Yes / Limited / No)"]
+  - field: customer_advice
+    position: 12
+    visibility: customer
+    list: true
+    aliases: ["ADVICE FOR CUSTOMERS"]
+  - field: mechanic_task
+    position: 13
+    visibility: internal
+    list: true
+    aliases: ["MECHANIC TASK"]
+  - field: mechanic_repair_steps
+    position: 14
+    visibility: internal
+    list: true
+    aliases: ["HOW TO REPAIR BY MECHANIC"]
+  - field: repair_location
+    position: 15
+    visibility: customer
+    aliases: ["Recommended Repair Location"]
+  - field: safety_precautions
+    position: 16
+    visibility: customer
+    list: true
+    aliases: ["Safety Precautions"]
+  - field: towing_conditions
+    position: 17
+    visibility: customer
+    list: true
+    aliases: ["IF TOWING NEEDED"]
+
+  # Budget segment: car price below 10 lakh. "(>10LAKH)" in the old header is a
+  # typo for "below 10 lakh".
+  - field: budget_parts
+    position: 18
+    visibility: customer
+    list: true
+    aliases:
+      - "BUDGET CAR PARTS(>10LAKH)"
+      - "BUDGET CAR PARTS (BELOW ₹10 LAKH)"
+  - field: budget_part_prices
+    position: 19
+    visibility: customer
+    list: true
+    aliases: ["Budget Car - Individual Part Prices (INR)"]
+  - field: budget_labour
+    position: 20
+    visibility: customer
+    aliases: ["BUDGET RANGE LABOR CHARGE"]
+  - field: budget_total
+    position: 21
+    visibility: customer
+    aliases: ["Budget Car - Total Estimated Repair Cost (INR)"]
+
+  - field: mid_parts
+    position: 22
+    visibility: customer
+    list: true
+    aliases:
+      - "MID RANGE CAR PARTS(10-25LAKH)"
+      - "MID RANGE CAR PARTS (₹10-25 LAKH)"
+  - field: mid_part_prices
+    position: 23
+    visibility: customer
+    list: true
+    aliases: ["Mid-range Car - Individual Part Prices (INR)"]
+  - field: mid_labour
+    position: 24
+    visibility: customer
+    aliases: ["MID RANGE LABOR CHARGE"]
+  - field: mid_total
+    position: 25
+    visibility: customer
+    aliases: ["Mid-range Car - Total Estimated Repair Cost (INR)"]
+
+  - field: premium_parts
+    position: 26
+    visibility: customer
+    list: true
+    aliases:
+      - "Premium Car - Parts Required"
+      - "PREMIUM CAR PARTS (ABOVE ₹25 LAKH)"
+  - field: premium_part_prices
+    position: 27
+    visibility: customer
+    list: true
+    aliases: ["Premium Car - Individual Part Prices (INR)"]
+  - field: premium_labour
+    position: 28
+    visibility: customer
+    aliases: ["Premium Car - Labour Charges (INR)"]
+  - field: premium_total
+    position: 29
+    visibility: customer
+    aliases: ["Premium Car - Total Estimated Repair Cost (INR)"]
+
+  - field: repair_time
+    position: 30
+    visibility: customer
+    aliases: ["Estimated Repair Time"]
+  - field: minimum_cost
+    position: 31
+    visibility: customer
+    # File 7 adds a suffix; matched by prefix (see prefix_aliases below).
+    aliases: ["Minimum Estimated Cost (INR)"]
+  - field: internal_notes
+    position: 32
+    visibility: internal
+    aliases: ["SUGGESTIONS-AARAV"]
+  - field: parts_images
+    position: 33
+    visibility: source
+    aliases: ["PARTS IMAGES", "PARTS IMAGES (SCHEMATIC ILLUSTRATIONS)"]
+  - field: question_stages
+    position: 34
+    visibility: source
+    aliases: ["CUSTOMER PROBLEM IN STAGES(AI DIAGNOSIS)"]
+
+# Headers that carry a free-text suffix in some files. A header matches the
+# field when its normalised form starts with the normalised prefix.
+prefix_aliases:
+  minimum_cost: "Minimum Estimated Cost (INR)"
+
+# Extra columns that only the EV file (file 6) has, after column 34.
+# Stored in faults.extra under these keys until the reviewed structuring step
+# decides where each one goes.
+ev_extra_columns:
+  - field: ev_ai_matching_rules
+    position: 35
+    visibility: source
+    aliases: ["AI MATCHING RULES - SIMPLE WORDS"]
+  - field: ev_follow_up_questions
+    position: 36
+    visibility: source
+    aliases: ["FOLLOW-UP QUESTIONS FOR CUSTOMER"]
+  - field: ev_repair_plan
+    position: 37
+    visibility: internal   # open question: customer-facing or mechanic-only?
+    aliases: ["STEP-BY-STEP REPAIR PLAN"]
+  - field: ev_part_price_guide
+    position: 38
+    visibility: source
+    aliases: ["PART PRICE GUIDE - INDIA (INR)"]
+  - field: ev_labour_total_guide
+    position: 39
+    visibility: source
+    aliases: ["LABOUR AND TOTAL COST GUIDE - INDIA (INR)"]
+  - field: ev_estimated_time
+    position: 40
+    visibility: customer
+    aliases: ["ESTIMATED TIME"]
+  - field: ev_repair_result_check
+    position: 41
+    visibility: internal   # open question
+    aliases: ["REPAIR RESULT CHECK"]
+  - field: ev_price_basis
+    position: 42
+    visibility: source
+    aliases: ["PRICE BASIS / VEHICLE MATCH"]

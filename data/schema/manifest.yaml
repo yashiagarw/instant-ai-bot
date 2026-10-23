@@ -1,0 +1,124 @@
+# Source file manifest for data/raw/. One entry per Excel file.
+#
+# file_no      - number used in fault keys (F03-ST-01). Taken from the file
+#                name; files 7 and 15 have no number in their name.
+# main_sheet   - first sheet, the 34-column fault template
+# header_row   - 1-based row of the header (checked by scripts/profile_datasets.py)
+# split_by     - how rows are assigned to categories:
+#                  category_column - by the CATEGORY value
+#                  id_prefix       - by the ID prefix (file 9 has one CATEGORY value)
+# categories   - ID prefix -> category code used in taxonomy.yaml
+#
+# Never edit the files in data/raw/. If a file is replaced, update its entry
+# here and re-run the profiler.
+
+files:
+  - file_no: 1
+    path: "data/raw/CLUTCH CATEGORY 1.xlsx"
+    main_sheet: "CLUTCH DATASET"
+    header_row: 4
+    split_by: category_column
+    categories: {CL: clutch}
+  - file_no: 2
+    path: "data/raw/OVERHEATING CATEGORY 2.xlsx"
+    main_sheet: "OVER HEATING DATA SET"
+    header_row: 3
+    split_by: category_column
+    categories: {OH: cooling}
+  - file_no: 3
+    path: "data/raw/STEERING CATEGORY 3.xlsx"
+    main_sheet: "STEERING DATASET"
+    header_row: 3
+    split_by: category_column
+    categories: {ST: steering}
+  - file_no: 4
+    path: "data/raw/TYRE CATEGORY 4.xlsx"
+    main_sheet: "TYRE DATASET"
+    header_row: 1
+    split_by: category_column
+    categories: {TY: tyre}
+  - file_no: 5
+    path: "data/raw/AC CATEGORY 5.xlsx"
+    main_sheet: "AC DIAGNOSIS DATASET"
+    header_row: 4
+    split_by: category_column
+    categories: {AC: ac}
+  - file_no: 6
+    path: "data/raw/EV&HYBRID CATEGORY 6.xlsx"
+    main_sheet: "EV_HYBRID_CHARGING"
+    header_row: 1
+    split_by: category_column
+    categories: {EV: ev_hybrid}
+  - file_no: 7
+    path: "data/raw/SELF START & STUCK ISSUE..xlsx"
+    main_sheet: "SS&STUCK DATASET"
+    header_row: 3
+    split_by: category_column
+    categories: {SS: self_start, ST: stuck}
+  - file_no: 8
+    path: "data/raw/BATTERY ISSUE CATEGORY 8.xlsx"
+    main_sheet: "BATTERY ISSUE"
+    header_row: 4
+    split_by: category_column
+    categories: {BT: battery}
+  - file_no: 9
+    path: "data/raw/car not starting & aceelaration category 9.xlsx"
+    main_sheet: "BREAKDOWN-PICKUP-THROTTLE"
+    header_row: 4
+    split_by: id_prefix
+    categories: {AP: pickup_throttle, NS: not_starting}
+  - file_no: 10
+    path: "data/raw/FUEL EMPTY DASHBOARD ISSUE C-10.xlsx"
+    main_sheet: "FUEL-DASHBOARD"
+    header_row: 4
+    split_by: category_column
+    categories: {FD: fuel_delivery, DW: dashboard_warning}
+  - file_no: 11
+    path: "data/raw/BELT&BRAKE Category 11.xlsx"
+    main_sheet: "BELT-BRAKE"
+    header_row: 4
+    split_by: category_column
+    categories: {EB: engine_belt, BR: brakes}
+  - file_no: 12
+    path: "data/raw/ENGINE&WIRING&INDICATOR&HORN CATEGORY 12.xlsx"
+    main_sheet: "ENGINE-ELEC-LIGHTS"
+    header_row: 4
+    split_by: category_column
+    categories: {EN: engine, EL: electrical, LT: lights_horn}
+  - file_no: 13
+    path: "data/raw/IGNITION..STARTER MOTOR CATEGORY 13 (1).xlsx"
+    main_sheet: "IGNITION-UNDERBODY-STARTER"
+    header_row: 4
+    split_by: category_column
+    categories: {IG: ignition_key, UB: underbody, ST: starter_motor}
+  - file_no: 14
+    path: "data/raw/MIRROR.INSPECTTION.WINDOW CATEGORY 14.xlsx"
+    main_sheet: "MIRROR-INSP-SUSP-DOOR-WINDOW"
+    header_row: 4
+    split_by: category_column
+    categories: {MR: mirror, IN: inspection, SU: suspension, DB: door_boot_bonnet, WW: window_wiper}
+  - file_no: 15
+    path: "data/raw/JERKING.ECU.MISFIRING.xlsx"
+    main_sheet: "JERKING-SENSOR-ECU"
+    header_row: 4
+    split_by: category_column
+    categories: {JM: jerking_misfire, SE: sensor_ecu}
+  - file_no: 16
+    path: "data/raw/HOSE.INSPECTION.SUSPENSION CATEGORY 16.xlsx"
+    main_sheet: "INFOTAIN-SRS-LEAK-EXHAUST-SMOKE"
+    header_row: 4
+    split_by: category_column
+    categories: {IF: infotainment, AB: airbag_srs, HP: hose_leak, EX: exhaust, SM: smoke_fire}
+  - file_no: 17
+    path: "data/raw/Gearbox.deliverydiesel.keylockout.cng category 17.xlsx"
+    main_sheet: "GEAR-LOCK-SUSP-CNG-DIESEL"
+    header_row: 4
+    split_by: category_column
+    # SU here and SU in file 14 both map to "suspension" (merge after duplicate review).
+    categories: {GB: gearbox, KL: key_lockout, SU: suspension, CG: cng, DS: diesel}
+  - file_no: 18
+    path: "data/raw/Towing.Waterlogging.CATEGORY 18.xlsx"
+    main_sheet: "BODY-WATER-PLATE-TOWING"
+    header_row: 4
+    split_by: category_column
+    categories: {BD: body, WL: waterlogging, NF: number_plate, TW: towing_accident}

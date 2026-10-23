@@ -1,0 +1,423 @@
+# Problem taxonomy: categories, the tiles users tap, the emergency row and
+# inspection booking. DRAFT built from the "What the user taps" table in the
+# roadmap (23 Oct 2026). Hindi labels marked `hi_review: true` are drafts that
+# need a native-speaker check; the first four come from the roadmap.
+#
+# Becomes an admin screen in Phase 4. Until then, edit this file and re-run
+# the tests in scripts/tests/.
+
+version: 1
+status: draft
+
+# ---------------------------------------------------------------------------
+# Vehicle filters. A category with a filter is shown only when the selected car
+# matches. If the field is unknown (unlisted car, user answered "Not sure"),
+# the category is shown: a filter hides things only when we know they do not
+# apply.
+#
+# Fuel values: petrol, diesel, cng, hybrid, ev
+# Transmission values: mt, amt, cvt, dct, at
+vehicle_filters:
+  cng:
+    fuel: [cng]
+  ev_hybrid:
+    fuel: [ev, hybrid]
+  diesel:
+    fuel: [diesel]
+  clutch:
+    transmission: [mt, amt]
+  # Proposed, not in the brief: file 10's fuel rows are about petrol delivery.
+  # CNG cars start on petrol and hybrids have a petrol engine. See open questions.
+  petrol_engine:
+    fuel: [petrol, cng, hybrid]
+
+# ---------------------------------------------------------------------------
+# Categories. code is the stable key used by faults and questions.
+# sources: file number + ID prefix in data/raw (see manifest.yaml).
+# kind:
+#   diagnose   - one-at-a-time questions, ranked causes, segment costs
+#   fast_track - few questions (max 3), safety tips, then Request a Mechanic
+#   inspect    - checklist and booking, photo-led
+# wave: rollout wave from the roadmap (1 = Phase 1, 2 = Phase 2, 2.5 = Phase 2-3, 3 = Phase 3)
+# beta: shown with a "Beta" label until its questions are reviewed and tuned
+categories:
+  - code: clutch
+    name: Clutch system
+    sources: [{file: 1, prefix: CL}]
+    kind: diagnose
+    filter: clutch
+    wave: 1
+    beta: false
+  - code: cooling
+    name: Engine cooling / overheating
+    sources: [{file: 2, prefix: OH}]
+    kind: diagnose
+    wave: 1
+    beta: false
+  - code: steering
+    name: Steering system
+    sources: [{file: 3, prefix: ST}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: tyre
+    name: Tyres
+    sources: [{file: 4, prefix: TY}]
+    kind: diagnose
+    wave: 1
+    beta: false
+  - code: ac
+    name: Car AC
+    sources: [{file: 5, prefix: AC}]
+    kind: diagnose
+    wave: 1
+    beta: false
+  - code: ev_hybrid
+    name: EV / hybrid / charging
+    sources: [{file: 6, prefix: EV}]
+    kind: diagnose
+    filter: ev_hybrid
+    wave: 2.5
+    beta: true
+  - code: self_start
+    name: Self motor / self start
+    sources: [{file: 7, prefix: SS}]
+    kind: diagnose
+    wave: 1
+    beta: false
+  - code: stuck
+    name: Car not moving / stuck
+    sources: [{file: 7, prefix: ST}]
+    kind: fast_track
+    wave: 2
+    beta: true
+  - code: battery
+    name: Battery dead / weak / jump start
+    sources: [{file: 8, prefix: BT}]
+    kind: diagnose
+    wave: 1
+    beta: false
+  - code: pickup_throttle
+    name: Pickup / throttle / acceleration
+    sources: [{file: 9, prefix: AP}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: not_starting
+    name: Car not starting / breakdown
+    sources: [{file: 9, prefix: NS}]
+    kind: diagnose
+    wave: 1
+    beta: false
+  - code: fuel_delivery
+    name: Fuel empty / petrol delivery
+    sources: [{file: 10, prefix: FD}]
+    kind: diagnose
+    filter: petrol_engine
+    wave: 2
+    beta: true
+  - code: dashboard_warning
+    name: Dashboard warnings (EPC, ESP, ABS, EPS)
+    sources: [{file: 10, prefix: DW}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: engine_belt
+    name: Engine / alternator belt
+    sources: [{file: 11, prefix: EB}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: brakes
+    name: Brakes, pads and fluid
+    sources: [{file: 11, prefix: BR}]
+    kind: diagnose
+    wave: 1
+    beta: false
+  - code: engine
+    name: Engine warning / performance / failure
+    sources: [{file: 12, prefix: EN}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: electrical
+    name: Electrical / wiring / fuse
+    sources: [{file: 12, prefix: EL}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: lights_horn
+    name: Lights / indicators / horn
+    sources: [{file: 12, prefix: LT}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: ignition_key
+    name: Ignition / key / immobilizer
+    sources: [{file: 13, prefix: IG}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: underbody
+    name: Loose parts / underbody
+    sources: [{file: 13, prefix: UB}]
+    kind: diagnose
+    wave: 3
+    beta: true
+  - code: starter_motor
+    name: Starter motor / push-button start
+    sources: [{file: 13, prefix: ST}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: mirror
+    name: Mirrors (ORVM / IRVM)
+    sources: [{file: 14, prefix: MR}]
+    kind: diagnose
+    wave: 3
+    beta: true
+  - code: inspection
+    name: Inspection / used-car check
+    sources: [{file: 14, prefix: IN}]
+    kind: inspect
+    wave: 3
+    beta: true
+  - code: suspension
+    name: Suspension / shock absorber / noise
+    # Two source groups, merged after the duplicate review (open question).
+    sources: [{file: 14, prefix: SU}, {file: 17, prefix: SU}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: door_boot_bonnet
+    name: Door / boot / bonnet
+    sources: [{file: 14, prefix: DB}]
+    kind: diagnose
+    wave: 3
+    beta: true
+  - code: window_wiper
+    name: Window / wiper / sunroof
+    sources: [{file: 14, prefix: WW}]
+    kind: diagnose
+    wave: 3
+    beta: true
+  - code: jerking_misfire
+    name: Jerking / misfiring / stalling
+    sources: [{file: 15, prefix: JM}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: sensor_ecu
+    name: Sensor / ECU / reset
+    sources: [{file: 15, prefix: SE}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: infotainment
+    name: Infotainment / screen / camera
+    sources: [{file: 16, prefix: IF}]
+    kind: diagnose
+    wave: 3
+    beta: true
+  - code: airbag_srs
+    name: Airbag / SRS
+    sources: [{file: 16, prefix: AB}]
+    kind: diagnose
+    wave: 3
+    beta: true
+  - code: hose_leak
+    name: Hose / fluid leak
+    sources: [{file: 16, prefix: HP}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: exhaust
+    name: Exhaust / silencer
+    sources: [{file: 16, prefix: EX}]
+    kind: diagnose
+    wave: 3
+    beta: true
+  - code: smoke_fire
+    name: Smoke / burning smell / fire risk
+    sources: [{file: 16, prefix: SM}]
+    kind: fast_track
+    wave: 3
+    beta: true
+  - code: gearbox
+    name: Gearbox / transmission
+    sources: [{file: 17, prefix: GB}]
+    kind: diagnose
+    wave: 2
+    beta: true
+  - code: key_lockout
+    name: Key lockout / central lock / alarm
+    sources: [{file: 17, prefix: KL}]
+    kind: fast_track
+    wave: 2
+    beta: true
+  - code: cng
+    name: CNG system
+    sources: [{file: 17, prefix: CG}]
+    kind: diagnose
+    filter: cng
+    wave: 2.5
+    beta: true
+  - code: diesel
+    name: Diesel delivery / AdBlue
+    sources: [{file: 17, prefix: DS}]
+    kind: diagnose
+    filter: diesel
+    wave: 2.5
+    beta: true
+  - code: body
+    name: Body / dent / glass damage
+    sources: [{file: 18, prefix: BD}]
+    kind: inspect
+    wave: 3
+    beta: true
+  - code: waterlogging
+    name: Waterlogging / mud / pit
+    sources: [{file: 18, prefix: WL}]
+    kind: fast_track
+    wave: 3
+    beta: true
+  - code: number_plate
+    name: Number plate / fittings
+    sources: [{file: 18, prefix: NF}]
+    kind: diagnose
+    wave: 3
+    beta: true
+  - code: towing_accident
+    name: Towing / accident recovery
+    sources: [{file: 18, prefix: TW}]
+    kind: fast_track
+    wave: 3
+    beta: true
+
+# ---------------------------------------------------------------------------
+# The 13 problem tiles. A category may appear in more than one tile (battery is
+# under "Won't start" and "Battery, lights & warning lights").
+tiles:
+  - code: wont_start
+    label_en: "Won't start"
+    label_hi: "गाड़ी स्टार्ट नहीं हो रही"
+    categories: [self_start, not_starting, battery, ignition_key, starter_motor]
+  - code: pickup_jerking
+    label_en: "Pickup, jerking, stalling"
+    label_hi: "झटके, पिकअप"
+    categories: [pickup_throttle, jerking_misfire, sensor_ecu, engine]
+  - code: overheating_leaks
+    label_en: "Overheating & leaks"
+    label_hi: "गाड़ी गरम"
+    categories: [cooling, hose_leak]
+  - code: ac
+    label_en: "AC not cooling"
+    label_hi: "AC ठंडा नहीं"
+    categories: [ac]
+  - code: clutch_gearbox
+    label_en: "Clutch & gearbox"
+    label_hi: "क्लच और गियर"
+    hi_review: true
+    categories: [clutch, gearbox]
+  - code: brakes_steering
+    label_en: "Brakes & steering"
+    label_hi: "ब्रेक और स्टीयरिंग"
+    hi_review: true
+    categories: [brakes, steering]
+  - code: suspension_noise
+    label_en: "Suspension, noises, loose parts"
+    label_hi: "सस्पेंशन, आवाज़, ढीले पुर्ज़े"
+    hi_review: true
+    categories: [suspension, underbody, engine_belt, exhaust]
+  - code: tyres
+    label_en: "Tyres"
+    label_hi: "टायर"
+    hi_review: true
+    categories: [tyre]
+  - code: battery_lights
+    label_en: "Battery, lights & warning lights"
+    label_hi: "बैटरी, लाइट और वॉर्निंग लाइट"
+    hi_review: true
+    categories: [battery, electrical, lights_horn, dashboard_warning]
+  - code: fuel_cng_diesel
+    label_en: "Fuel, CNG & diesel"
+    label_hi: "पेट्रोल, CNG और डीज़ल"
+    hi_review: true
+    # Each category carries its own fuel filter, so a diesel car sees only diesel.
+    categories: [fuel_delivery, cng, diesel]
+  - code: ev_hybrid
+    label_en: "EV & hybrid"
+    label_hi: "EV और हाइब्रिड"
+    hi_review: true
+    categories: [ev_hybrid]
+  - code: body_doors
+    label_en: "Body, doors, windows, mirrors"
+    label_hi: "बॉडी, दरवाज़े, खिड़की, मिरर"
+    hi_review: true
+    categories: [body, door_boot_bonnet, window_wiper, mirror, number_plate]
+  - code: screen_airbag
+    label_en: "Screen, music, camera, airbag light"
+    label_hi: "स्क्रीन, म्यूज़िक, कैमरा, एयरबैग लाइट"
+    hi_review: true
+    categories: [infotainment, airbag_srs]
+
+# ---------------------------------------------------------------------------
+# Emergency row: roadside help. Always runs in fast_track mode (max 3
+# questions, safety tips, Request a Mechanic), whatever the category's own kind.
+# Categories are still filtered by vehicle: "Petrol finished" on a diesel car
+# uses the diesel rows, and on an EV it is hidden (see open questions).
+emergency:
+  mode: fast_track
+  wave: 1   # fast-track for the whole row ships in Phase 1 (roadmap)
+  topics:
+    - code: battery_dead
+      label_en: "Battery dead"
+      label_hi: "बैटरी डाउन"
+      hi_review: true
+      categories: [battery]
+    - code: flat_tyre
+      label_en: "Flat tyre"
+      label_hi: "टायर पंक्चर"
+      hi_review: true
+      categories: [tyre]
+    - code: out_of_fuel
+      label_en: "Petrol finished"
+      label_hi: "पेट्रोल खत्म"
+      hi_review: true
+      categories: [fuel_delivery, diesel]
+    - code: locked_out
+      label_en: "Locked out"
+      label_hi: "चाबी अंदर, गाड़ी लॉक"
+      hi_review: true
+      categories: [key_lockout]
+    - code: car_stuck
+      label_en: "Car stuck"
+      label_hi: "गाड़ी फंस गई"
+      hi_review: true
+      categories: [stuck]
+    - code: car_in_water
+      label_en: "Car in water"
+      label_hi: "गाड़ी पानी में"
+      hi_review: true
+      categories: [waterlogging]
+    - code: accident_tow
+      label_en: "Accident / tow"
+      label_hi: "एक्सीडेंट / टोइंग"
+      hi_review: true
+      categories: [towing_accident]
+    - code: smoke
+      label_en: "Smoke or burning smell"
+      label_hi: "धुआं या जलने की बदबू"
+      hi_review: true
+      categories: [smoke_fire]
+
+# ---------------------------------------------------------------------------
+# Inspection booking: checklist from USED_CAR_INSPECTION_CHECKLIST (file 14)
+# plus photo upload (Phase 3).
+inspection:
+  code: book_inspection
+  label_en: "Book an inspection"
+  label_hi: "जांच बुक करें"
+  hi_review: true
+  categories: [inspection]
+  checklist_source: {file: 14, sheet: USED_CAR_INSPECTION_CHECKLIST}
