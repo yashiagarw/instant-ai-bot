@@ -1,5 +1,5 @@
 category: battery
-loaded_at: '2026-10-23T17:46:02+00:00'
+loaded_at: '2026-10-23T18:15:44+00:00'
 reviewed_by: Aarav
 approved:
   question battery-main:
@@ -2536,6 +2536,19 @@ approved:
 
         • Keep powder away from paint.'
       if_towing_needed: NO.
+  safety_rule battery-s-F08-BT-05:
+    id: battery-s-F08-BT-05
+    status: approved
+    fault: F08-BT-05
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: 'The battery is heavy: lift carefully. Give the old battery to an authorised dealer for recycling.'
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: '• Battery is heavy. Lift carefully.
+
+        • Give old battery to an authorised dealer for recycling.'
+      if_towing_needed: NO.
   safety_rule battery-s-F08-BT-06:
     id: battery-s-F08-BT-06
     status: approved
@@ -2582,6 +2595,19 @@ approved:
 
         • Remove battery wire before electrical work.'
       if_towing_needed: DEPENDS. Tow if light is ON, voltage falling or car stopping.
+  safety_rule battery-s-F08-BT-09:
+    id: battery-s-F08-BT-09
+    status: approved
+    fault: F08-BT-09
+    risk_level: medium
+    stop_driving_trigger: Do not drive unless the workshop is very near and the battery is full.
+    roadside_action: Remove the battery wire before touching the alternator wire. The alternator is hot after driving.
+    towing_recommendation: Yes usually, unless the workshop is very near and the battery is full.
+    source_text:
+      safety_precautions: '• Remove battery wire before touching alternator wire.
+
+        • Alternator is hot after driving.'
+      if_towing_needed: YES usually, unless workshop is very near and battery is full.
   safety_rule battery-s-F08-BT-10:
     id: battery-s-F08-BT-10
     status: approved
@@ -2952,7 +2978,8 @@ approved:
     fault: F08-BT-41
     risk_level: medium
     stop_driving_trigger: Not stated
-    roadside_action: Thin wires can catch fire.
+    roadside_action: Switch off the extra lights and music system. Get the wiring checked by a mechanic before using
+      them again.
     towing_recommendation: No.
     source_text:
       safety_precautions: • Thin wires can catch fire.
@@ -2963,7 +2990,7 @@ approved:
     fault: F08-BT-42
     risk_level: high
     stop_driving_trigger: 'Do not drive (towing column: YES).'
-    roadside_action: Burnt wires.
+    roadside_action: Do not try to start the car again. Call for a tow.
     towing_recommendation: Yes.
     source_text:
       safety_precautions: • Burnt wires.

@@ -2523,7 +2523,7 @@ safety_rules:
       • Keep powder away from paint.'
     if_towing_needed: NO.
 - id: battery-s-F08-BT-05
-  status: dapproved
+  status: approved
   fault: F08-BT-05
   risk_level: low
   stop_driving_trigger: Not stated
@@ -2578,7 +2578,7 @@ safety_rules:
       • Remove battery wire before electrical work.'
     if_towing_needed: DEPENDS. Tow if light is ON, voltage falling or car stopping.
 - id: battery-s-F08-BT-09
-  status: dapproved
+  status: approved
   fault: F08-BT-09
   risk_level: medium
   stop_driving_trigger: Do not drive unless the workshop is very near and the battery is full.
@@ -2926,7 +2926,7 @@ safety_rules:
   fault: F08-BT-41
   risk_level: medium
   stop_driving_trigger: Not stated
-  roadside_action: Thin wires can catch fire.
+  roadside_action: Switch off the extra lights and music system. Get the wiring checked by a mechanic before using them again.
   towing_recommendation: No.
   source_text:
     safety_precautions: • Thin wires can catch fire.
@@ -2936,7 +2936,7 @@ safety_rules:
   fault: F08-BT-42
   risk_level: high
   stop_driving_trigger: 'Do not drive (towing column: YES).'
-  roadside_action: Burnt wires.
+  roadside_action: Do not try to start the car again. Call for a tow.
   towing_recommendation: Yes.
   source_text:
     safety_precautions: • Burnt wires.
