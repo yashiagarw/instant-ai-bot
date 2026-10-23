@@ -1,0 +1,2301 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category self_start
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: self_start
+category_name: Self motor / self start
+reviewed_by: ''
+generated:
+  at: '2026-10-23T17:22:16+00:00'
+  run_id: claude-code-self_start
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: self_start-main
+  status: draft
+  stage: 2
+  text: What happens when you try to start the car?
+  choice_source: proposed
+  options:
+  - label: Engine does not turn
+    effects:
+    - fault: F07-SS-02
+      effect: supports
+      strength: strong
+    - fault: F07-SS-04
+      effect: supports
+      strength: strong
+    - fault: F07-SS-05
+      effect: supports
+      strength: strong
+    - fault: F07-SS-06
+      effect: supports
+      strength: strong
+    - fault: F07-SS-07
+      effect: supports
+      strength: strong
+    - fault: F07-SS-08
+      effect: supports
+      strength: strong
+    - fault: F07-SS-09
+      effect: supports
+      strength: strong
+    - fault: F07-SS-10
+      effect: supports
+      strength: strong
+    - fault: F07-SS-11
+      effect: supports
+      strength: strong
+    - fault: F07-SS-12
+      effect: supports
+      strength: strong
+    - fault: F07-SS-13
+      effect: supports
+      strength: strong
+    - fault: F07-SS-14
+      effect: supports
+      strength: strong
+    - fault: F07-SS-15
+      effect: supports
+      strength: strong
+    - fault: F07-SS-16
+      effect: supports
+      strength: strong
+    - fault: F07-SS-19
+      effect: supports
+      strength: strong
+    - fault: F07-SS-20
+      effect: supports
+      strength: strong
+    - fault: F07-SS-21
+      effect: supports
+      strength: strong
+    - fault: F07-SS-22
+      effect: supports
+      strength: strong
+    - fault: F07-SS-23
+      effect: supports
+      strength: strong
+    - fault: F07-SS-24
+      effect: supports
+      strength: strong
+    - fault: F07-SS-25
+      effect: supports
+      strength: strong
+    - fault: F07-SS-32
+      effect: supports
+      strength: strong
+    - fault: F07-SS-33
+      effect: supports
+      strength: strong
+    - fault: F07-SS-34
+      effect: supports
+      strength: strong
+    - fault: F07-SS-35
+      effect: supports
+      strength: strong
+    - fault: F07-SS-38
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine turns slowly
+    effects:
+    - fault: F07-SS-01
+      effect: supports
+      strength: strong
+    - fault: F07-SS-17
+      effect: supports
+      strength: strong
+    - fault: F07-SS-18
+      effect: supports
+      strength: strong
+    - fault: F07-SS-19
+      effect: supports
+      strength: strong
+    - fault: F07-SS-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine turns but does not start
+    effects:
+    - fault: F07-SS-22
+      effect: supports
+      strength: strong
+    - fault: F07-SS-26
+      effect: supports
+      strength: strong
+    - fault: F07-SS-33
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Starts sometimes, not always
+    effects:
+    - fault: F07-SS-01
+      effect: supports
+      strength: strong
+    - fault: F07-SS-02
+      effect: supports
+      strength: strong
+    - fault: F07-SS-27
+      effect: supports
+      strength: strong
+    - fault: F07-SS-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Strange noise when starting
+    effects:
+    - fault: F07-SS-05
+      effect: supports
+      strength: strong
+    - fault: F07-SS-06
+      effect: supports
+      strength: strong
+    - fault: F07-SS-07
+      effect: supports
+      strength: strong
+    - fault: F07-SS-08
+      effect: supports
+      strength: strong
+    - fault: F07-SS-14
+      effect: supports
+      strength: strong
+    - fault: F07-SS-15
+      effect: supports
+      strength: strong
+    - fault: F07-SS-29
+      effect: supports
+      strength: strong
+    - fault: F07-SS-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Auto start-stop not working
+    effects:
+    - fault: F07-SS-03
+      effect: supports
+      strength: strong
+    - fault: F07-SS-36
+      effect: supports
+      strength: strong
+    - fault: F07-SS-37
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other
+    effects:
+    - fault: F07-SS-29
+      effect: supports
+      strength: strong
+    - fault: F07-SS-31
+      effect: supports
+      strength: strong
+    - fault: F07-SS-35
+      effect: supports
+      strength: strong
+    - fault: F07-SS-38
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q01
+  status: draft
+  stage: 3
+  text: When you try to start the car, what do you hear or see?
+  source_faults:
+  - F07-SS-01
+  - F07-SS-04
+  - F07-SS-05
+  - F07-SS-06
+  - F07-SS-07
+  - F07-SS-08
+  - F07-SS-09
+  - F07-SS-10
+  - F07-SS-11
+  - F07-SS-12
+  - F07-SS-13
+  - F07-SS-14
+  - F07-SS-15
+  - F07-SS-16
+  - F07-SS-17
+  - F07-SS-18
+  - F07-SS-19
+  - F07-SS-20
+  - F07-SS-21
+  - F07-SS-22
+  - F07-SS-23
+  - F07-SS-24
+  - F07-SS-25
+  - F07-SS-26
+  - F07-SS-28
+  - F07-SS-30
+  - F07-SS-32
+  - F07-SS-33
+  - F07-SS-34
+  merged_from:
+  - 'F07-SS-01 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-04 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-05 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-06 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-07 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-09 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-10 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-11 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-12 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-13 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-16 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-17 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-18 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-19 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-20 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-21 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-22 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-23 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-24 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-25 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-26 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-28 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-32 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-33 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-34 (stages_text): When starting: no sound, one click, repeated clicks, slow turning or normal turning?'
+  - 'F07-SS-08 (symptoms): Customer reports: Starter Motor Spinning but Engine Not Turning'
+  - 'F07-SS-14 (symptoms): Customer reports: Starter Bendix / Pinion Gear Fault'
+  - 'F07-SS-15 (symptoms): Customer reports: Flywheel Ring Gear Teeth Damage'
+  - 'F07-SS-30 (symptoms): Customer reports: Grinding Noise While Starting'
+  options:
+  - label: No sound at all
+    effects:
+    - fault: F07-SS-04
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-10
+      effect: supports
+      strength: weak
+    - fault: F07-SS-11
+      effect: supports
+      strength: weak
+    - fault: F07-SS-20
+      effect: supports
+      strength: weak
+    - fault: F07-SS-16
+      effect: supports
+      strength: weak
+    - fault: F07-SS-34
+      effect: supports
+      strength: weak
+    - fault: F07-SS-23
+      effect: supports
+      strength: weak
+    - fault: F07-SS-24
+      effect: supports
+      strength: weak
+    - fault: F07-SS-25
+      effect: supports
+      strength: weak
+    - fault: F07-SS-21
+      effect: supports
+      strength: weak
+    - fault: F07-SS-22
+      effect: supports
+      strength: weak
+    - fault: F07-SS-33
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: One click
+    effects:
+    - fault: F07-SS-06
+      effect: supports
+      strength: strong
+    - fault: F07-SS-09
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-05
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-32
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-04
+      effect: supports
+      strength: weak
+    - fault: F07-SS-13
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Repeated rapid clicks
+    effects:
+    - fault: F07-SS-07
+      effect: supports
+      strength: strong
+    - fault: F07-SS-05
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-19
+      effect: supports
+      strength: weak
+    - fault: F07-SS-18
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: The engine turns slowly
+    effects:
+    - fault: F07-SS-01
+      effect: supports
+      strength: strong
+    - fault: F07-SS-18
+      effect: supports
+      strength: strong
+    - fault: F07-SS-17
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-19
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-28
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: The engine turns normally but does not start
+    effects:
+    - fault: F07-SS-26
+      effect: supports
+      strength: strong
+    - fault: F07-SS-22
+      effect: supports
+      strength: weak
+    - fault: F07-SS-33
+      effect: supports
+      strength: weak
+    - fault: F07-SS-04
+      effect: rules_out
+      strength: moderate
+    - fault: F07-SS-08
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: The starter whirs or spins but the engine does not turn
+    effects:
+    - fault: F07-SS-08
+      effect: supports
+      strength: strong
+    - fault: F07-SS-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: A grinding noise
+    effects:
+    - fault: F07-SS-30
+      effect: supports
+      strength: strong
+    - fault: F07-SS-14
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-15
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q02
+  status: draft
+  stage: 3
+  text: Does the problem happen only at certain times?
+  source_faults:
+  - F07-SS-02
+  - F07-SS-16
+  - F07-SS-17
+  - F07-SS-18
+  - F07-SS-19
+  - F07-SS-27
+  - F07-SS-28
+  - F07-SS-31
+  - F07-SS-35
+  merged_from:
+  - 'F07-SS-02 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  - 'F07-SS-16 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  - 'F07-SS-17 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  - 'F07-SS-18 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  - 'F07-SS-19 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  - 'F07-SS-27 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  - 'F07-SS-28 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  - 'F07-SS-31 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  - 'F07-SS-35 (stages_text): Is the fault only hot/cold, after rain, after parking or after recent work?'
+  options:
+  - label: Only when the engine is hot
+    effects:
+    - fault: F07-SS-27
+      effect: supports
+      strength: strong
+    - fault: F07-SS-31
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Only in cold weather
+    effects:
+    - fault: F07-SS-28
+      effect: supports
+      strength: strong
+    - fault: F07-SS-18
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: After rain, a car wash or water
+    effects:
+    - fault: F07-SS-35
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-16
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: After the car was parked for a long time
+    effects:
+    - fault: F07-SS-18
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: After recent repair work or a battery change
+    effects:
+    - fault: F07-SS-16
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-17
+      effect: supports
+      strength: weak
+    - fault: F07-SS-19
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No pattern, it happens at random
+    effects:
+    - fault: F07-SS-02
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q03
+  status: draft
+  stage: 3
+  text: When you try to start, how are the dashboard lights?
+  source_faults:
+  - F07-SS-01
+  - F07-SS-04
+  - F07-SS-07
+  - F07-SS-11
+  - F07-SS-16
+  - F07-SS-17
+  - F07-SS-18
+  - F07-SS-19
+  - F07-SS-20
+  - F07-SS-23
+  - F07-SS-24
+  - F07-SS-25
+  - F07-SS-26
+  - F07-SS-28
+  - F07-SS-34
+  merged_from:
+  - 'F07-SS-01 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-04 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-07 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-11 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-16 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-17 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-18 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-19 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-20 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-23 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-24 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-25 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-26 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-28 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-34 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  options:
+  - label: Bright and normal
+    effects:
+    - fault: F07-SS-26
+      effect: supports
+      strength: weak
+    - fault: F07-SS-20
+      effect: supports
+      strength: weak
+    - fault: F07-SS-23
+      effect: supports
+      strength: weak
+    - fault: F07-SS-24
+      effect: supports
+      strength: weak
+    - fault: F07-SS-25
+      effect: supports
+      strength: weak
+    - fault: F07-SS-04
+      effect: supports
+      strength: weak
+    - fault: F07-SS-18
+      effect: rules_out
+      strength: moderate
+    - fault: F07-SS-01
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: They go dim
+    effects:
+    - fault: F07-SS-18
+      effect: supports
+      strength: strong
+    - fault: F07-SS-01
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-07
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-17
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-19
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-28
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No lights at all
+    effects:
+    - fault: F07-SS-19
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-11
+      effect: supports
+      strength: weak
+    - fault: F07-SS-16
+      effect: supports
+      strength: weak
+    - fault: F07-SS-34
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q04
+  status: draft
+  stage: 3
+  text: Is any warning light or message on the dashboard?
+  source_faults:
+  - F07-SS-03
+  - F07-SS-21
+  - F07-SS-22
+  - F07-SS-33
+  - F07-SS-36
+  - F07-SS-38
+  merged_from:
+  - 'F07-SS-03 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-21 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-22 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-33 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-36 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-38 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  options:
+  - label: A key, security or immobilizer warning
+    effects:
+    - fault: F07-SS-21
+      effect: supports
+      strength: strong
+    - fault: F07-SS-22
+      effect: supports
+      strength: strong
+    - fault: F07-SS-33
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: A start-stop warning or message
+    effects:
+    - fault: F07-SS-36
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-03
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-38
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Other warning lights
+    effects:
+    - fault: F07-SS-33
+      effect: supports
+      strength: weak
+    - fault: F07-SS-38
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No warnings
+    effects:
+    - fault: F07-SS-21
+      effect: rules_out
+      strength: weak
+    - fault: F07-SS-22
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q05
+  status: draft
+  stage: 3
+  text: Is there smoke, a burning smell or heat from the engine area?
+  source_faults:
+  - F07-SS-16
+  - F07-SS-29
+  - F07-SS-31
+  merged_from:
+  - 'F07-SS-16 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-29 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  - 'F07-SS-31 (stages_text): Are dashboard lights dim, warning lamps on, smoke, smell or unusual noise?'
+  options:
+  - label: Smoke
+    effects:
+    - fault: F07-SS-31
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: A burning smell or heat
+    effects:
+    - fault: F07-SS-31
+      effect: supports
+      strength: moderate
+    - fault: F07-SS-29
+      effect: supports
+      strength: weak
+    - fault: F07-SS-16
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q06
+  status: draft
+  stage: 3
+  text: Does the car start with the spare key?
+  source_faults:
+  - F07-SS-21
+  - F07-SS-22
+  merged_from:
+  - 'F07-SS-21 (symptoms): Customer reports: Smart Key / Push-Button Start Detection Fault'
+  - 'F07-SS-22 (symptoms): Customer reports: Immobilizer / Key Recognition Problem'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F07-SS-21
+      effect: supports
+      strength: strong
+    - fault: F07-SS-22
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F07-SS-21
+      effect: rules_out
+      strength: moderate
+    - fault: F07-SS-22
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: No spare key
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q07
+  status: draft
+  stage: 3
+  text: Does the starting problem seem linked to the gear lever, clutch or brake pedal?
+  source_faults:
+  - F07-SS-23
+  - F07-SS-24
+  - F07-SS-25
+  merged_from:
+  - 'F07-SS-23 (symptoms): Customer reports: Clutch Safety Switch Fault'
+  - 'F07-SS-24 (symptoms): Customer reports: Brake Pedal Switch Preventing Start'
+  - 'F07-SS-25 (symptoms): Customer reports: Park / Neutral Safety Switch Fault'
+  options:
+  - label: The gear lever position (P or N)
+    effects:
+    - fault: F07-SS-25
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The clutch pedal
+    effects:
+    - fault: F07-SS-23
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The brake pedal
+    effects:
+    - fault: F07-SS-24
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No link
+    effects:
+    - fault: F07-SS-23
+      effect: rules_out
+      strength: weak
+    - fault: F07-SS-24
+      effect: rules_out
+      strength: weak
+    - fault: F07-SS-25
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q08
+  status: draft
+  stage: 3
+  text: What does the car's automatic start-stop do now?
+  source_faults:
+  - F07-SS-03
+  - F07-SS-36
+  - F07-SS-37
+  merged_from:
+  - 'F07-SS-03 (symptoms): Customer reports: Automatic Start-Stop Not Working'
+  - 'F07-SS-36 (symptoms): Customer reports: Automatic Start-Stop Battery Sensor Fault'
+  - 'F07-SS-37 (symptoms): Customer reports: Automatic Start-Stop Temporarily Disabled by Normal Conditions'
+  options:
+  - label: It has stopped working completely
+    effects:
+    - fault: F07-SS-03
+      effect: supports
+      strength: strong
+    - fault: F07-SS-36
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It works only sometimes
+    effects:
+    - fault: F07-SS-37
+      effect: supports
+      strength: strong
+    - fault: F07-SS-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It shows a start-stop warning
+    effects:
+    - fault: F07-SS-36
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: My car has no start-stop
+    effects:
+    - fault: F07-SS-03
+      effect: rules_out
+      strength: strong
+    - fault: F07-SS-36
+      effect: rules_out
+      strength: strong
+    - fault: F07-SS-37
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q09
+  status: draft
+  stage: 3
+  text: Does the starter keep running or whirring after the engine has started?
+  source_faults:
+  - F07-SS-29
+  merged_from:
+  - 'F07-SS-29 (symptoms): Customer reports: Starter Keeps Running After Engine Starts'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F07-SS-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F07-SS-29
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q10
+  status: draft
+  stage: 3
+  text: Do you see rat droppings, a nest or bitten wires under the bonnet?
+  source_faults:
+  - F07-SS-34
+  merged_from:
+  - 'F07-SS-34 (symptoms): Customer reports: Rodent-Damaged Starter Wiring'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F07-SS-34
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F07-SS-34
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q11
+  status: draft
+  stage: 3
+  text: Was the car in flood or deep water?
+  source_faults:
+  - F07-SS-35
+  merged_from:
+  - 'F07-SS-35 (symptoms): Customer reports: Waterlogging / Flood-Damaged Starting Circuit'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F07-SS-35
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F07-SS-35
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q12
+  status: draft
+  stage: 3
+  text: Can you see white or green powder, or a loose clamp, on the battery?
+  source_faults:
+  - F07-SS-19
+  merged_from:
+  - 'F07-SS-19 (symptoms): Customer reports: Battery Terminal Corrosion / Loose Connection'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F07-SS-19
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F07-SS-19
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q13
+  status: draft
+  stage: 3
+  text: Is your car a mild hybrid?
+  source_faults:
+  - F07-SS-38
+  merged_from:
+  - 'F07-SS-38 (symptoms): Customer reports: Mild-Hybrid Starter-Generator Fault'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F07-SS-38
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F07-SS-38
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-q14
+  status: draft
+  stage: 3
+  text: Does the engine feel jammed, as if it cannot turn at all?
+  source_faults:
+  - F07-SS-32
+  merged_from:
+  - 'F07-SS-32 (symptoms): Customer reports: Engine Seized / Engine Cannot Rotate'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F07-SS-32
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F07-SS-32
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F07-SS-01:
+    status: draft
+    name: Slow / Hesitant Self Start
+    stage2_choices:
+    - Engine turns slowly
+    - Starts sometimes, not always
+    confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
+      replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-02:
+    status: draft
+    name: Intermittent Self Not Taking
+    stage2_choices:
+    - Starts sometimes, not always
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the battery, control circuit and starter operation. Do not replace
+      parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-03:
+    status: draft
+    name: Automatic Start-Stop Not Working
+    stage2_choices:
+    - Auto start-stop not working
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-04:
+    status: draft
+    name: Self Motor Failure — Complete Non-Start
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-05:
+    status: draft
+    name: Starter Clicking but Engine Not Cranking
+    stage2_choices:
+    - Engine does not turn
+    - Strange noise when starting
+    confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-06:
+    status: draft
+    name: Single Click During Starting
+    stage2_choices:
+    - Engine does not turn
+    - Strange noise when starting
+    confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-07:
+    status: draft
+    name: Repeated Rapid Clicking During Starting
+    stage2_choices:
+    - Engine does not turn
+    - Strange noise when starting
+    confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
+      replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-08:
+    status: draft
+    name: Starter Motor Spinning but Engine Not Turning
+    stage2_choices:
+    - Engine does not turn
+    - Strange noise when starting
+    confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-09:
+    status: draft
+    name: Starter Solenoid Failure
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-10:
+    status: draft
+    name: Starter Relay Failure
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-11:
+    status: draft
+    name: Starter Fuse / Fusible Link Fault
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-12:
+    status: draft
+    name: Starter Motor Brush Wear
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-13:
+    status: draft
+    name: Starter Motor Armature / Internal Failure
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-14:
+    status: draft
+    name: Starter Bendix / Pinion Gear Fault
+    stage2_choices:
+    - Strange noise when starting
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-15:
+    status: draft
+    name: Flywheel Ring Gear Teeth Damage
+    stage2_choices:
+    - Strange noise when starting
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the gear selector, brake switch, clutch, transmission control
+      and linkage. Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-16:
+    status: draft
+    name: Starter Wiring Loose / Damaged
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the wiring damage, moisture, mechanical rotation and safety. Do
+      not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options:
+    - question: self_start-q05
+      option: A burning smell or heat
+  F07-SS-17:
+    status: draft
+    name: Poor Engine Ground / Earthing
+    stage2_choices:
+    - Engine turns slowly
+    confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
+      replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-18:
+    status: draft
+    name: Weak Battery Causing Slow Cranking
+    stage2_choices:
+    - Engine turns slowly
+    confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
+      replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-19:
+    status: draft
+    name: Battery Terminal Corrosion / Loose Connection
+    stage2_choices:
+    - Engine turns slowly
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
+      replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-20:
+    status: draft
+    name: Ignition Switch / Start Button Failure
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-21:
+    status: draft
+    name: Smart Key / Push-Button Start Detection Fault
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-22:
+    status: draft
+    name: Immobilizer / Key Recognition Problem
+    stage2_choices:
+    - Engine does not turn
+    - Engine turns but does not start
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-23:
+    status: draft
+    name: Clutch Safety Switch Fault
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-24:
+    status: draft
+    name: Brake Pedal Switch Preventing Start
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-25:
+    status: draft
+    name: Park / Neutral Safety Switch Fault
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-26:
+    status: draft
+    name: Engine Cranks Normally but Does Not Start
+    stage2_choices:
+    - Engine turns but does not start
+    confirmation_test: Mechanic component test of the battery, control circuit and starter operation. Do not replace
+      parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-27:
+    status: draft
+    name: Starter Fails When Engine Is Hot
+    stage2_choices:
+    - Starts sometimes, not always
+    confirmation_test: Mechanic component test of the battery, control circuit and starter operation. Do not replace
+      parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-28:
+    status: draft
+    name: Difficult Starting During Cold Weather
+    stage2_choices:
+    - Engine turns slowly
+    - Starts sometimes, not always
+    confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
+      replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-29:
+    status: draft
+    name: Starter Keeps Running After Engine Starts
+    stage2_choices:
+    - Strange noise when starting
+    - Other
+    confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options:
+    - question: self_start-q05
+      option: A burning smell or heat
+  F07-SS-30:
+    status: draft
+    name: Grinding Noise While Starting
+    stage2_choices:
+    - Strange noise when starting
+    confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-31:
+    status: draft
+    name: Starter Motor Overheating
+    stage2_choices:
+    - Other
+    confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    - starter hot
+    safety_trigger_options:
+    - question: self_start-q05
+      option: A burning smell or heat
+    - question: self_start-q05
+      option: Smoke
+  F07-SS-32:
+    status: draft
+    name: Engine Seized / Engine Cannot Rotate
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the wiring damage, moisture, mechanical rotation and safety. Do
+      not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    - engine jammed
+    - engine cannot rotate
+    safety_trigger_options:
+    - question: self_start-q14
+      option: 'Yes'
+  F07-SS-33:
+    status: draft
+    name: ECU / BCM Starting Authorization Fault
+    stage2_choices:
+    - Engine does not turn
+    - Engine turns but does not start
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-34:
+    status: draft
+    name: Rodent-Damaged Starter Wiring
+    stage2_choices:
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the wiring damage, moisture, mechanical rotation and safety. Do
+      not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-35:
+    status: draft
+    name: Waterlogging / Flood-Damaged Starting Circuit
+    stage2_choices:
+    - Engine does not turn
+    - Other
+    confirmation_test: Mechanic component test of the wiring damage, moisture, mechanical rotation and safety. Do
+      not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    - flood
+    - water in the car
+    safety_trigger_options:
+    - question: self_start-q11
+      option: 'Yes'
+  F07-SS-36:
+    status: draft
+    name: Automatic Start-Stop Battery Sensor Fault
+    stage2_choices:
+    - Auto start-stop not working
+    confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
+      replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-37:
+    status: draft
+    name: Automatic Start-Stop Temporarily Disabled by Normal Conditions
+    stage2_choices:
+    - Auto start-stop not working
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+  F07-SS-38:
+    status: draft
+    name: Mild-Hybrid Starter-Generator Fault
+    stage2_choices:
+    - Other
+    - Engine does not turn
+    confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
+      Do not replace parts until a test confirms the fault.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options: []
+safety_rules:
+- id: self_start-s-F07-SS-01
+  status: draft
+  fault: F07-SS-01
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-02
+  status: draft
+  fault: F07-SS-02
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-03
+  status: draft
+  fault: F07-SS-03
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-04
+  status: draft
+  fault: F07-SS-04
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-05
+  status: draft
+  fault: F07-SS-05
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-06
+  status: draft
+  fault: F07-SS-06
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-07
+  status: draft
+  fault: F07-SS-07
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-08
+  status: draft
+  fault: F07-SS-08
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-09
+  status: draft
+  fault: F07-SS-09
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-10
+  status: draft
+  fault: F07-SS-10
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-11
+  status: draft
+  fault: F07-SS-11
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-12
+  status: draft
+  fault: F07-SS-12
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-13
+  status: draft
+  fault: F07-SS-13
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-14
+  status: draft
+  fault: F07-SS-14
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-15
+  status: draft
+  fault: F07-SS-15
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-16
+  status: draft
+  fault: F07-SS-16
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-17
+  status: draft
+  fault: F07-SS-17
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-18
+  status: draft
+  fault: F07-SS-18
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-19
+  status: draft
+  fault: F07-SS-19
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-20
+  status: draft
+  fault: F07-SS-20
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-21
+  status: draft
+  fault: F07-SS-21
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-22
+  status: draft
+  fault: F07-SS-22
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-23
+  status: draft
+  fault: F07-SS-23
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-24
+  status: draft
+  fault: F07-SS-24
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-25
+  status: draft
+  fault: F07-SS-25
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-26
+  status: draft
+  fault: F07-SS-26
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-27
+  status: draft
+  fault: F07-SS-27
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-28
+  status: draft
+  fault: F07-SS-28
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-29
+  status: draft
+  fault: F07-SS-29
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-30
+  status: draft
+  fault: F07-SS-30
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-31
+  status: draft
+  fault: F07-SS-31
+  risk_level: medium
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-32
+  status: draft
+  fault: F07-SS-32
+  risk_level: high
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-33
+  status: draft
+  fault: F07-SS-33
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-34
+  status: draft
+  fault: F07-SS-34
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-35
+  status: draft
+  fault: F07-SS-35
+  risk_level: high
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-36
+  status: draft
+  fault: F07-SS-36
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-37
+  status: draft
+  fault: F07-SS-37
+  risk_level: low
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
+- id: self_start-s-F07-SS-38
+  status: draft
+  fault: F07-SS-38
+  risk_level: medium
+  stop_driving_trigger: Stop and tow if the engine cannot rotate, or if there is smoke, flood exposure, a hot or
+    locked wheel, unsafe brakes or gearbox damage.
+  roadside_action: Do not bypass safety interlocks. Do not touch hot or moving parts. Never work under a car held
+    only by a jack. Do not force stuck brakes, gears or a seized engine. Follow the maker's procedures for hybrid
+    or EV high voltage.
+  towing_recommendation: Tow if the engine cannot rotate, smoke, flood exposure, a hot or locked wheel, unsafe brakes,
+    gearbox damage or no safe roadside fix. Use model-approved recovery.
+  source_text:
+    safety_precautions: '• Do not bypass safety interlocks
+
+      • Do not touch hot or moving components
+
+      • Never work under a jack-only supported vehicle
+
+      • Do not force stuck brakes, gears or a seized engine
+
+      • Follow OEM procedures for hybrid/EV high voltage'
+    if_towing_needed: Tow if engine cannot rotate, smoke, flood exposure, hot/locked wheel, unsafe brakes, gearbox
+      damage or no safe roadside fix. Use model-approved recovery.
