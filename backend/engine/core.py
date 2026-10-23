@@ -1,0 +1,444 @@
+"""Diagnosis engine v1: route to a category, narrow with the Stage 2 main complaint, then ask approved
+follow-up questions one at a time until one fault is clearly ahead.
+
+Score of a fault = TEXT_WEIGHT x free-text similarity (0..1) + sum of the effects of the chosen options
+(supports +weight, rules out -weight; weights 3 / 2 / 1 from the approved question files). "Not sure"
+changes nothing.
+"""
+
+from __future__ import annotations
+
+import re
+from itertools import combinations
+
+from engine.safety import danger_vocabulary, evaluate, global_rule_phrases
+from engine.text import Embed, Match, TextIndex
+from engine.types import (
+    ROUTE_QUESTION,
+    Category,
+    CategorySuggestion,
+    ChecklistItem,
+    CostOut,
+    Fault,
+    Group,
+    Knowledge,
+    OptionOut,
+    Question,
+    QuestionOut,
+    RankedFault,
+    Request,
+    Result,
+    Roadside,
+    SafetyAlert,
+    SafetyRule,
+    Vehicle,
+)
+
+ENGINE_VERSION = "1.0.0"
+DISCLAIMER = (
+    "This is an estimate based on your answers and our data. It is not a replacement for a professional "
+    "inspection by a mechanic."
+)
+
+TEXT_WEIGHT = 3.0  # a perfect text match counts as much as one strong answer
+STOP_MARGIN = 3.0  # leader ahead of the runner-up by one strong answer -> stop
+MAX_QUESTIONS = 8  # diagnose: main complaint + follow-ups
+FAST_TRACK_MAX = 3
+SPLIT_TOP = 5  # the next question is the one that best separates the current top 5
+MAX_RANKED = 5
+MAX_SUGGESTIONS = 3
+ROUTE_MIN = 0.25  # free text picks a category by itself only above this similarity ...
+ROUTE_RATIO = 1.5  # ... and this far ahead of the next category
+HIGH_RISK_SCORE = 3.0  # a high-risk fault's rules fire once its score reaches one strong answer
+LIKELY_TOP = 3  # when the flow ends, every rule of the top 3 faults fires
+MAX_TIPS = 8
+RULE_TIPS = 4  # fast_track: likely faults' rule actions shown before the topic's own lines
+TOPIC_TIPS = 3  # fast_track: the topic's most shared safety lines, always shown
+
+ROADSIDE_VERDICT = {"yes": "roadside_fix_possible", "limited": "roadside_limited", "no": "workshop"}
+
+
+def vehicle_allows(category: Category, vehicle: Vehicle) -> bool:
+    """All of the category's filters must match. An unknown vehicle field passes the filter."""
+    for f in category.filters:
+        for attr in ("fuel", "transmission"):
+            value = getattr(vehicle, attr)
+            if attr in f and value is not None and value not in f[attr]:
+                return False
+    return True
+
+
+def topic_variant(group: Group, vehicle: Vehicle) -> dict | None:
+    """First variant of an emergency topic whose `when` matches the car. Unknown fields never match."""
+    for v in group.variants:
+        when = v.get("when", {})
+        if when and all(getattr(vehicle, k, None) in vals for k, vals in when.items()):
+            return v
+    return None
+
+
+def model_listed(model: str, fit_text: str) -> bool:
+    return bool(re.search(rf"(?<![a-z0-9]){re.escape(model.lower())}(?![a-z0-9])", fit_text.lower()))
+
+
+def coverage_level(vehicle: Vehicle | None, top: Fault | None) -> str:
+    if vehicle is None or vehicle.segment is None or top is None:
+        return "general_guidance"
+    if vehicle.listed and vehicle.model and any(model_listed(vehicle.model, t) for t in top.part_fit_texts):
+        return "part_fit_verified"
+    return "segment_estimate"
+
+
+def cost_for(fault: Fault, vehicle: Vehicle | None) -> CostOut | None:
+    """The fault's cost for the car's price segment, with its approx label and check date."""
+    if vehicle is None or vehicle.segment is None:
+        return None
+    c = fault.costs.get(vehicle.segment)
+    if c is None:
+        return None
+    base = {"segment": c.segment, "approx_label": c.approx_label, "checked_on": c.checked_on}
+    if c.needs_review or c.display == "on_inspection":
+        return CostOut(display="on_inspection", text=c.text, **base)
+    if c.display == "amount":
+        return CostOut(display="amount", amount=c.total, **base)
+    if c.display == "range":
+        return CostOut(display="range", min=c.total_min, max=c.total_max, **base)
+    return CostOut(display="text", text=c.text, **base)
+
+
+class Engine:
+    def __init__(self, knowledge: Knowledge, embed: Embed | None = None):
+        self.k = knowledge
+        self.embed = embed
+        self.index = TextIndex(knowledge.texts)
+        vocab = danger_vocabulary(knowledge.rules)
+        self.rules: list[SafetyRule] = []
+        for r in knowledge.rules:
+            if r.scope != "fault" and not r.phrases:
+                r = SafetyRule(**{**r.__dict__, "phrases": global_rule_phrases(r.stop_trigger, vocab)})
+            self.rules.append(r)
+        self.faults_by_cat: dict[str, list[int]] = {}
+        for f in knowledge.faults.values():
+            self.faults_by_cat.setdefault(f.category, []).append(f.id)
+        self.main_q: dict[str, Question] = {}
+        self.followups: dict[str, list[Question]] = {}
+        self.options: dict[int, tuple[Question, object]] = {}
+        for q in sorted(knowledge.questions.values(), key=lambda q: q.id):
+            if q.stage == 2:
+                self.main_q.setdefault(q.category, q)
+            else:
+                self.followups.setdefault(q.category, []).append(q)
+            for o in q.options:
+                self.options[o.id] = (q, o)
+        self.trigger_options: dict[int, set[int]] = {}  # fault id -> its rules' trigger option ids
+        for r in self.rules:
+            if r.fault_id is not None:
+                self.trigger_options.setdefault(r.fault_id, set()).update(r.option_ids)
+        self.high_risk_faults = {r.fault_id for r in self.rules if r.fault_id is not None and r.risk == "high"}
+
+    # ------------------------------------------------------------ main entry
+
+    def diagnose(self, req: Request) -> Result:
+        k = self.k
+        vehicle = req.vehicle or Vehicle()
+        group = k.groups.get(req.group) if req.group else None
+        hint = None
+        if group and group.group_type == "emergency":
+            mode = "fast_track"
+            variant = topic_variant(group, vehicle)
+            cats = list(variant["categories"]) if variant else list(group.categories)
+            hint = variant.get("fault_hint") if variant else None
+        elif group and group.group_type == "inspection":
+            mode, cats = "inspect", list(group.categories)
+        elif group:
+            mode, cats = "diagnose", list(group.categories)
+        else:
+            mode = "suggest"  # free text only: every category may be suggested (fast_track / inspect too)
+            cats = list(k.categories)
+        cats = [c for c in cats if c in k.categories and vehicle_allows(k.categories[c], vehicle)]
+        if req.category and req.category in k.categories and (group is None or req.category in cats):
+            cats = [req.category] if vehicle_allows(k.categories[req.category], vehicle) else []
+
+        route_answer = next((a for a in req.answers if a.question_id == ROUTE_QUESTION), None)
+        if route_answer and route_answer.option_id in cats:
+            cats = [route_answer.option_id]
+
+        candidates = {fid for c in cats for fid in self.faults_by_cat.get(c, [])}
+        if hint:
+            hinted = {fid for fid in candidates if hint.lower() in k.faults[fid].name.lower()}
+            candidates = hinted or candidates
+        query_vec = self.embed(req.text) if self.embed and req.text.strip() else None
+        matches = self.index.match(req.text, query_vec, candidates) if req.text.strip() else {}
+
+        # Routing: several categories and none picked yet -> free text decides if clearly ahead, else ask.
+        suggestions = self._category_scores(cats, matches)
+        route_q = None
+        if len(cats) > 1 and route_answer is None:
+            ranked_cats = [s for s in suggestions if s.score > 0]
+            best = ranked_cats[0].score if ranked_cats else 0.0
+            second = ranked_cats[1].score if len(ranked_cats) > 1 else 0.0
+            if best >= ROUTE_MIN and (second == 0 or best / second >= ROUTE_RATIO):
+                cats = [ranked_cats[0].code]
+            else:
+                offer = [s.code for s in ranked_cats[:MAX_SUGGESTIONS]] if mode == "suggest" else cats
+                route_q = self._route_question(offer) if offer else None
+        if len(cats) == 1 and mode in ("diagnose", "suggest"):
+            mode = k.categories[cats[0]].kind
+        candidates = {fid for fid in candidates if k.faults[fid].category in cats}
+
+        # Answers: Stage 2 narrows, follow-ups add their effects.
+        scores = {fid: TEXT_WEIGHT * matches[fid].score if fid in matches else 0.0 for fid in candidates}
+        evidence: dict[int, list[str]] = {fid: [] for fid in candidates}
+        for fid, m in matches.items():
+            if fid in evidence:
+                evidence[fid].append(f"Matched {'your words' if m.kind == 'phrase' else 'symptom'}: {m.text}")
+        answered_q: set[int] = set()
+        answered_opts: set[int] = set()
+        asked = 0
+        narrowed = False
+        for a in req.answers:
+            if a.question_id == ROUTE_QUESTION or a.option_id not in self.options:
+                continue
+            q, o = self.options[a.option_id]
+            if q.id != a.question_id or q.id in answered_q:
+                continue
+            answered_q.add(q.id)
+            answered_opts.add(o.id)
+            asked += 1
+            if o.not_sure:
+                continue
+            if q.stage == 2:
+                supported = {fid for fid, w in o.effects.items() if w > 0}
+                in_cat = {fid for fid in candidates if k.faults[fid].category == q.category}
+                if supported & in_cat:
+                    candidates -= in_cat - supported
+                    narrowed = True
+                    for fid in supported & candidates:
+                        evidence[fid].append(f"Main problem: {o.label}")
+                continue
+            for fid, w in o.effects.items():
+                if fid in scores:
+                    scores[fid] += w
+                    evidence[fid].append(f"{q.text} {o.label} ({'supports' if w > 0 else 'rules out'})")
+
+        order, seen_groups = [], set()
+        for fid in sorted(candidates, key=lambda fid: (-scores[fid], fid)):
+            if k.canonical(fid) not in seen_groups:  # a merged duplicate is shown once
+                seen_groups.add(k.canonical(fid))
+                order.append(fid)
+        rank = {fid: i for i, fid in enumerate(order)}
+        option_labels = {oid: f"{q.text} {o.label}" for oid, (q, o) in self.options.items()}
+        likely_high = {
+            fid: f"Likely cause: {k.faults[fid].name}"
+            for fid in order
+            if scores[fid] >= HIGH_RISK_SCORE and fid in self.high_risk_faults
+        }
+
+        def safety(likely_any=None):
+            return evaluate(
+                self.rules, req.text, answered_opts, candidates, rank, k.faults, option_labels, likely_any, likely_high
+            )
+
+        alerts = safety()
+        # Observed danger (a trigger answer or trigger words) stops the questions; an inferred likely cause is
+        # shown at once and makes the verdict do_not_drive, but the questions continue to sharpen the result.
+        stop_now = any(a.risk == "high" and a.source != "likely" for a in alerts)
+
+        # Next question and stopping.
+        limit = FAST_TRACK_MAX if mode == "fast_track" else MAX_QUESTIONS
+        next_q: QuestionOut | None = None
+        done = False
+        if mode == "inspect":
+            done = True
+        elif stop_now:
+            done = True
+        elif route_q is not None:
+            next_q = route_q
+        elif not cats:
+            done = mode != "suggest"
+        elif len(cats) > 1 and route_answer is None:
+            pass  # several categories, nothing to route on yet (no free text): wait for a tile or text
+        else:
+            main = self.main_q.get(cats[0]) if len(cats) == 1 else None
+            if main and main.id not in answered_q and asked < limit:
+                next_q = self._out(main)
+            elif asked >= limit or self._leader_clear(order, scores) or len(order) <= 1:
+                done = True
+            else:
+                q = self._best_split(cats, answered_q, order, scores)
+                if q is None:
+                    done = True
+                else:
+                    next_q = self._out(q)
+
+        ranked = self._ranked(order, scores, evidence, vehicle, narrowed)
+        if done and ranked:  # the flow ended: the likely faults' safety rules always run
+            groups = {k.canonical(r.fault_id): r.name for r in ranked[:LIKELY_TOP]}
+            alerts = safety(
+                {fid: f"Likely cause: {groups[k.canonical(fid)]}" for fid in candidates if k.canonical(fid) in groups}
+            )
+        top = k.faults[ranked[0].fault_id] if ranked else None
+        actions: list[str] = []
+        if mode == "inspect":
+            actions.append("book_inspection")
+        elif done or mode == "fast_track" or stop_now:
+            actions.append("request_mechanic")
+        tips = (
+            self._tips(ranked, candidates, cats, mode == "fast_track")
+            if (mode == "fast_track" or done or stop_now)
+            else []
+        )
+        return Result(
+            engine_version=ENGINE_VERSION,
+            dataset_version_id=k.dataset_version_id,
+            mode=mode,
+            coverage=coverage_level(req.vehicle, top),
+            ranked=ranked,
+            next_question=None if done else next_q,
+            done=done,
+            safety_alerts=alerts,
+            roadside=self._roadside(alerts, top),
+            suggested_categories=[s for s in suggestions if s.score > 0][:MAX_SUGGESTIONS] if group is None else [],
+            actions=actions,
+            safety_tips=tips,
+            checklist=self._checklist(cats) if mode == "inspect" else [],
+            questions_asked=asked,
+            active_categories=cats,
+            disclaimer=DISCLAIMER,
+        )
+
+    # ------------------------------------------------------------ helpers
+
+    def _category_scores(self, cats: list[str], matches: dict[int, Match]) -> list[CategorySuggestion]:
+        best: dict[str, float] = {c: 0.0 for c in cats}
+        for fid, m in matches.items():
+            c = self.k.faults[fid].category
+            if c in best:
+                best[c] = max(best[c], m.score)
+        return sorted(
+            (CategorySuggestion(c, self.k.categories[c].name, round(s, 4)) for c, s in best.items()),
+            key=lambda s: (-s.score, s.code),
+        )
+
+    def _route_question(self, cats: list[str]) -> QuestionOut:
+        options = [OptionOut(c, self.k.categories[c].name) for c in cats]
+        options.append(OptionOut("", "Not sure", not_sure=True))
+        return QuestionOut(ROUTE_QUESTION, "Which of these is closest to your problem?", options, stage=1)
+
+    @staticmethod
+    def _out(q: Question) -> QuestionOut:
+        return QuestionOut(q.id, q.text, [OptionOut(o.id, o.label, o.not_sure) for o in q.options], q.category, q.stage)
+
+    @staticmethod
+    def _leader_clear(order: list[int], scores: dict[int, float]) -> bool:
+        if not order or scores[order[0]] <= 0:
+            return False
+        second = scores[order[1]] if len(order) > 1 else 0.0
+        return scores[order[0]] - second >= STOP_MARGIN
+
+    def _best_split(self, cats: list[str], answered: set[int], order: list[int], scores: dict[int, float]):
+        """The unanswered follow-up whose options best separate the current top faults."""
+        top = order[:SPLIT_TOP]
+        if len(top) < 2:
+            return None
+        best, best_value = None, 0.0
+        for c in cats:
+            for q in self.followups.get(c, []):
+                if q.id in answered:
+                    continue
+                opts = [o for o in q.options if not o.not_sure]
+                vectors = [[o.effects.get(fid, 0.0) for fid in top] for o in opts]
+                split = sum(max(abs(v[i] - v[j]) for v in vectors) for i, j in combinations(range(len(top)), 2))
+                if split <= 0:
+                    continue
+                # Small nudge: ask questions that can fire a top fault's safety rule early.
+                safety = any(o.id in self.trigger_options.get(fid, ()) for o in opts for fid in top)
+                value = split + (1.0 if safety else 0.0)
+                if value > best_value:
+                    best, best_value = q, value
+        return best
+
+    def _ranked(self, order, scores, evidence, vehicle, narrowed: bool) -> list[RankedFault]:
+        shown = [fid for fid in order if scores[fid] > 0][:MAX_RANKED]
+        if not shown and narrowed:
+            # Narrowed by the main complaint but no other evidence yet: show what is not ruled out.
+            shown = [fid for fid in order if scores[fid] >= 0][:MAX_RANKED]
+        if not shown:
+            return []
+        lead = scores[shown[0]]
+        second = scores[order[1]] if len(order) > 1 else 0.0
+        out = []
+        for i, fid in enumerate(shown):
+            f = self.k.faults[fid]
+            if i == 0:
+                margin = lead - second
+                conf = (
+                    "high" if lead > 0 and margin >= STOP_MARGIN else "medium" if margin >= STOP_MARGIN / 2 else "low"
+                )
+            else:
+                conf = "medium" if scores[fid] > 0 and lead - scores[fid] < STOP_MARGIN / 2 else "low"
+            out.append(
+                RankedFault(
+                    fault_id=fid,
+                    fault_key=f.key,
+                    name=f.name,
+                    category=f.category,
+                    score=round(scores[fid], 4),
+                    confidence=conf,
+                    evidence=evidence.get(fid, []),
+                    cost=cost_for(f, vehicle),
+                    repair_time=f.repair_time_text,
+                )
+            )
+        return out
+
+    @staticmethod
+    def _roadside(alerts: list[SafetyAlert], top: Fault | None) -> Roadside:
+        high = [a for a in alerts if a.risk == "high"]
+        if high:
+            return Roadside("do_not_drive", high[0].roadside_action or high[0].towing or high[0].stop_trigger)
+        if top is None:
+            return Roadside("unknown")
+        text = " ".join(t for t in (top.road_repairable_text, top.towing_text) if t)
+        return Roadside(ROADSIDE_VERDICT.get(top.road_repairable, "unknown"), text)
+
+    def _tips(self, ranked: list[RankedFault], candidates: set[int], cats: list[str], fast_track: bool) -> list[str]:
+        """Roadside actions of the likely faults' rules, the topic's own safety lines (fast_track), the global
+        rules from the same source files, then the likely faults' safety lines."""
+        focus = [r.fault_id for r in ranked[:3]] or sorted(candidates)
+        rules = [r for r in self.rules if r.fault_id in set(focus)]
+        rules.sort(key=lambda r: ({"high": 0, "medium": 1, "low": 2}.get(r.risk, 3), focus.index(r.fault_id)))
+        actions = [r.roadside_action for r in rules if r.roadside_action]
+        # A fast_track topic always shows its own advice: the safety lines most of its faults share, so the tips
+        # never depend on which fault happens to rank first (topics like key_lockout have no safety rules).
+        topic = self._topic_tips(candidates) if fast_track else []
+        files = {f for c in cats for f in self.k.categories[c].source_files}
+        globals_ = [r.stop_trigger for r in self.rules if r.scope == "global" and r.source_file in files and r.phrases]
+        own = [t for fid in focus for t in self.k.faults[fid].safety_tips]
+        tips = (
+            actions[:RULE_TIPS] + topic + actions[RULE_TIPS:] + globals_ + own
+            if fast_track
+            else actions + globals_ + own
+        )
+        out = []
+        for t in tips:
+            if t and t not in out:
+                out.append(t)
+        return out[:MAX_TIPS]
+
+    def _topic_tips(self, candidates: set[int]) -> list[str]:
+        counts: dict[str, int] = {}
+        for fid in candidates:
+            for t in self.k.faults[fid].safety_tips:
+                counts[t] = counts.get(t, 0) + 1
+        return [t for t, _ in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:TOPIC_TIPS]]
+
+    def _checklist(self, cats: list[str]) -> list[ChecklistItem]:
+        if "inspection" in cats and self.k.checklist:
+            return list(self.k.checklist)
+        return [ChecklistItem(self.k.faults[fid].name) for c in cats for fid in sorted(self.faults_by_cat.get(c, []))]
+
+
+def diagnose(knowledge: Knowledge, request: Request, embed: Embed | None = None) -> Result:
+    """One-shot convenience wrapper. Build an Engine once and reuse it when calling many times."""
+    return Engine(knowledge, embed).diagnose(request)

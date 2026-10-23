@@ -1,0 +1,52 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category body
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: body
+category_name: Body / dent / glass damage
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T20:56:13+00:00'
+  run_id: claude-code-separators-body
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: body-q01
+  status: approved
+  stage: 3
+  text: Is the bumper only loose or cracked, or is part of it hanging down?
+  source_faults:
+  - F18-BD-02
+  - F18-BD-07
+  merged_from:
+  - 'F18-BD-02 (symptoms): Loose bumper / Gap at edge / Crack / Rattle / Clip missing'
+  - 'F18-BD-07 (symptoms): Hanging part / Scraping / Broken clips'
+  options:
+  - label: Loose, cracked or rattling, but still in place
+    effects:
+    - fault: F18-BD-02
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Broken, with a part hanging or scraping
+    effects:
+    - fault: F18-BD-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+faults: {}
+safety_rules: []

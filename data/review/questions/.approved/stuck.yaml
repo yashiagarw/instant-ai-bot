@@ -1,0 +1,595 @@
+category: stuck
+loaded_at: '2026-10-23T20:56:24+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question stuck-q01:
+    id: stuck-q01
+    status: approved
+    stage: 3
+    text: Is the ABS warning light on, and the car will not move at all?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-04
+    merged_from:
+    - 'F07-ST-04 (name): Combined Major Fault - ABS Warning + Vehicle Immobile'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: the ABS light is on and the car does not move at all'
+      effects:
+      - fault: F07-ST-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q02:
+    id: stuck-q02
+    status: approved
+    stage: 3
+    text: Was the car parked for a long time or in rain, and now a wheel seems locked?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-23
+    merged_from:
+    - 'F07-ST-23 (name): Wheel Locked After Long Parking / Rain'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: after long parking or rain, a wheel is locked'
+      effects:
+      - fault: F07-ST-23
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q03:
+    id: stuck-q03
+    status: approved
+    stage: 3
+    text: Have several electrical items failed (many warning lights, things not working), and the car will not move?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-33
+    merged_from:
+    - 'F07-ST-33 (name): Vehicle Immobilized by Multiple Electrical Faults'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: several electrical items or warning lights have failed and the car will not move'
+      effects:
+      - fault: F07-ST-33
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q04:
+    id: stuck-q04
+    status: approved
+    stage: 3
+    text: Does one wheel seem held, as if its brake is stuck on?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-07
+    merged_from:
+    - 'F07-ST-07 (name): Brake Caliper Seized'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: One wheel seems held, as if its brake is stuck on
+      effects:
+      - fault: F07-ST-07
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q05:
+    id: stuck-q05
+    status: approved
+    stage: 3
+    text: (Manual car) Can you put the car into gear?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-14
+    merged_from:
+    - 'F07-ST-14 (name): Manual Gear Cannot Engage'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'No: the gear will not go in'
+      effects:
+      - fault: F07-ST-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'Yes: the gears go in, but the car moves slowly, as if dragging'
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q06:
+    id: stuck-q06
+    status: approved
+    stage: 3
+    text: When you press the accelerator in gear, do the engine revs go up but the car does not move?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-16
+    merged_from:
+    - 'F07-ST-16 (name): Clutch Slipping - Engine Revs but Car Does Not Move'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: the engine revs go up but the car does not move'
+      effects:
+      - fault: F07-ST-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q07:
+    id: stuck-q07
+    status: approved
+    stage: 3
+    text: Did a mechanic find a broken driveshaft or CV joint (the shaft that turns a front wheel)?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-20
+    merged_from:
+    - 'F07-ST-20 (name): Driveshaft / CV Joint Failure'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: a mechanic found a broken driveshaft or CV joint'
+      effects:
+      - fault: F07-ST-20
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q08:
+    id: stuck-q08
+    status: approved
+    stage: 3
+    text: Did a mechanic find a differential or final drive fault?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-21
+    merged_from:
+    - 'F07-ST-21 (name): Differential / Final Drive Failure'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: a mechanic found a differential or final drive fault'
+      effects:
+      - fault: F07-ST-21
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q09:
+    id: stuck-q09
+    status: approved
+    stage: 3
+    text: Is a tyre or wheel jammed so that it will not turn?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-27
+    merged_from:
+    - 'F07-ST-27 (name): Tyre / Wheel Mechanically Jammed'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: A tyre or wheel is jammed and will not turn
+      effects:
+      - fault: F07-ST-27
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q10:
+    id: stuck-q10
+    status: approved
+    stage: 3
+    text: Does your car have Auto-Hold or Hill-Hold, and it does not release when you try to move off?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-35
+    merged_from:
+    - 'F07-ST-35 (name): Hill-Hold / Auto-Hold Release Problem'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: Auto-Hold / Hill-Hold does not release when I try to move'
+      effects:
+      - fault: F07-ST-35
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q11:
+    id: stuck-q11
+    status: approved
+    stage: 3
+    text: Does the parking brake (handbrake) seem stuck on, so the car will not move?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-02
+    merged_from:
+    - 'F07-ST-02 (name): Parking Brake / Mechanical Stuck'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: The parking brake seems stuck on
+      effects:
+      - fault: F07-ST-02
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q12:
+    id: stuck-q12
+    status: approved
+    stage: 3
+    text: Is the gear lever locked, or does the key not turn, so you cannot move off?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-03
+    merged_from:
+    - 'F07-ST-03 (name): Gear Lock / Key-Not-Moving Fault'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: The gear lever is locked, or the key will not turn
+      effects:
+      - fault: F07-ST-03
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q13:
+    id: stuck-q13
+    status: approved
+    stage: 3
+    text: Is the handbrake lever released, but the car is still held as if the handbrake were on?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-05
+    merged_from:
+    - 'F07-ST-05 (name): Handbrake Cable Seized'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: The handbrake lever is down, but the car is still held as if it were on
+      effects:
+      - fault: F07-ST-05
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q14:
+    id: stuck-q14
+    status: approved
+    stage: 3
+    text: (Car with an electronic parking brake button) Does the electronic parking brake refuse to release?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-09
+    merged_from:
+    - 'F07-ST-09 (name): Electronic Parking Brake Not Releasing'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: the electronic parking brake will not release'
+      effects:
+      - fault: F07-ST-09
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q15:
+    id: stuck-q15
+    status: approved
+    stage: 3
+    text: Is there an electronic parking brake fault warning on the dashboard?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-10
+    merged_from:
+    - 'F07-ST-10 (name): Electronic Parking Brake Actuator Fault'
+    - 'F07-ST-10 (phrase): Gaadi mein warning light jal rahi hai.'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: there is an electronic parking brake fault warning'
+      effects:
+      - fault: F07-ST-10
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q16:
+    id: stuck-q16
+    status: approved
+    stage: 3
+    text: (Automatic or CVT) Is there a gearbox warning, with the car only creeping or stuck in one gear?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-19
+    merged_from:
+    - 'F07-ST-19 (name): CVT / Automatic Transmission Limp Mode'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: there is a gearbox warning and the car only creeps (limp mode)'
+      effects:
+      - fault: F07-ST-19
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q17:
+    id: stuck-q17
+    status: approved
+    stage: 3
+    text: Is one wheel locked or very hot, and will not turn?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-22
+    merged_from:
+    - 'F07-ST-22 (name): Wheel Bearing Seized'
+    - 'F07-ST-22 (towing): Tow if ... hot/locked wheel'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: One wheel is locked or very hot
+      effects:
+      - fault: F07-ST-22
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q18:
+    id: stuck-q18
+    status: approved
+    stage: 3
+    text: With a gear selected, does the engine run but no power reach the wheels at all?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-26
+    merged_from:
+    - 'F07-ST-26 (name): Engine Running but No Power Reaching Wheels'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: The engine runs, but no power reaches the wheels at all
+      effects:
+      - fault: F07-ST-26
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q19:
+    id: stuck-q19
+    status: approved
+    stage: 3
+    text: Is the car stuck in mud, sand or a waterlogged road?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-29
+    merged_from:
+    - 'F07-ST-29 (name): Car Stuck in Mud / Sand / Waterlogged Road'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: it is stuck in mud, sand or water on the road'
+      effects:
+      - fault: F07-ST-29
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q20:
+    id: stuck-q20
+    status: approved
+    stage: 3
+    text: Did this start after an accident or a hit?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-30
+    merged_from:
+    - 'F07-ST-30 (name): Vehicle Not Moving After Accident'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: it started after an accident'
+      effects:
+      - fault: F07-ST-30
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question stuck-q21:
+    id: stuck-q21
+    status: approved
+    stage: 3
+    text: After you take your foot off the brake pedal, do the brakes stay on?
+    source_faults:
+    - F07-ST-01
+    - F07-ST-34
+    merged_from:
+    - 'F07-ST-34 (name): Brake Hydraulic Pressure Not Releasing'
+    - 'F07-ST-34 (phrase): Brake chhodne par bhi gaadi nahi hilti.'
+    - 'F07-ST-01 (name): Slow to Move / Minor Drag'
+    options:
+    - label: 'Yes: the brakes stay on after I release the pedal'
+      effects:
+      - fault: F07-ST-34
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but slowly, as if something is dragging slightly
+      effects:
+      - fault: F07-ST-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)

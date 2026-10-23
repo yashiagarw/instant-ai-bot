@@ -4,7 +4,7 @@ Updated 24 Oct 2026. Every diagnose category now has a loaded question file. Cla
 
 ## 1. Safety sign-off (required before launch)
 
-- **625 safety rules are loaded as `approved`, signed off by `claude_code (auto, pending mechanic sign-off)`.** The first batch was 171: self_start 38, not_starting 34, cooling 20, ac 32, clutch 16, brakes 31. This batch added 454 (44 high, 119 medium, 291 low). No mechanic has checked any of them.
+- **643 safety rules are loaded as `approved`, signed off by `claude_code (auto, pending mechanic sign-off)`** (625 earlier + 18 smoke_fire, see section 6). The first batch was 171: self_start 38, not_starting 34, cooling 20, ac 32, clutch 16, brakes 31. This batch added 454 (44 high, 119 medium, 291 low). No mechanic has checked any of them.
 - **Sheet rules stay pending.** door_boot_bonnet, electrical, engine, lights_horn, mirror and window_wiper, plus the file 14 half of suspension, have SAFETY_AND_TOWING_RULES sheet rules. No rules were drafted for them. The loader only attached the approved question triggers to those rules (status `active_pending_signoff`, unchanged), so they still need sign-off in the normal way. They pass the launch check ("no rule may still be pending sign-off") only because of that automatic sign-off. A mechanic must check each one and sign it off by name. To find them: `SELECT id, fault_id FROM safety_rules WHERE signed_off_by LIKE 'claude_code%';`
 - Files 1, 2, 5, 9 and 11 have no SAFETY_AND_TOWING_RULES sheet, so every rule in those categories was drafted from the fault's Safety Precautions and IF TOWING NEEDED text, and its roadside action was rewritten by me as a customer action. Check each roadside action against the source text stored in `source_text`.
 - All 38 self_start rules share one wording, because every file 7 row has the same Safety Precautions and IF TOWING NEEDED text. Check that this generic rule is acceptable for each fault.
@@ -102,7 +102,101 @@ brakes
 - **Wording removed during review because it was not in the data:** "report theft to the police" (diesel DS-17), "get medical help" (exhaust EX-15), "yellowish oily" as the colour of brake fluid (hose_leak), and brand names and "torque converter" in the gearbox AMT answer.
 - **No entries were rejected in this batch.** Where the data had no threshold, I did not ask about it at all. Earlier batches rejected a km question for that reason.
 
-## 6. battery.yaml changes made in this review
+## 6. Separator questions, merged duplicates and likely-cause alerts (24 Oct 2026)
+
+### Separator questions (30, approved by `claude_code (auto, pending mechanic sign-off)`)
+
+`run_eval.py --simulate` listed the 30 most-confused fault pairs that no approved question could tell apart. All 30
+were in categories that had no question file, so six new files were created: `stuck.yaml` (21), `waterlogging.yaml`
+(3), `towing_accident.yaml` (2), `smoke_fire.yaml` (2), `body.yaml` (1) and `number_plate.yaml` (1). Each question has
+one option per fault (supports, strong) plus "Not sure", worded from the fault names, symptoms, AI_DIAGNOSIS_RULES
+question and phrases. Every question carries `approved_by: claude_code (auto, pending mechanic sign-off)`.
+
+| Category | Pair | Question | Options (first fault / second fault) |
+|---|---|---|---|
+| stuck | F07-ST-04 vs F07-ST-01 | Is the ABS warning light on, and the car will not move at all? | Yes: the ABS light is on and the car does not move at all / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-23 vs F07-ST-01 | Was the car parked for a long time or in rain, and now a wheel seems locked? | Yes: after long parking or rain, a wheel is locked / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-33 vs F07-ST-01 | Have several electrical items failed (many warning lights, things not working), and the car will not move? | Yes: several electrical items or warning lights have failed and the car will not move / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-07 vs F07-ST-01 | Does one wheel seem held, as if its brake is stuck on? | One wheel seems held, as if its brake is stuck on / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-14 vs F07-ST-01 | (Manual car) Can you put the car into gear? | No: the gear will not go in / Yes: the gears go in, but the car moves slowly, as if dragging |
+| stuck | F07-ST-16 vs F07-ST-01 | When you press the accelerator in gear, do the engine revs go up but the car does not move? | Yes: the engine revs go up but the car does not move / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-20 vs F07-ST-01 | Did a mechanic find a broken driveshaft or CV joint (the shaft that turns a front wheel)? | Yes: a mechanic found a broken driveshaft or CV joint / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-21 vs F07-ST-01 | Did a mechanic find a differential or final drive fault? | Yes: a mechanic found a differential or final drive fault / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-27 vs F07-ST-01 | Is a tyre or wheel jammed so that it will not turn? | A tyre or wheel is jammed and will not turn / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-35 vs F07-ST-01 | Does your car have Auto-Hold or Hill-Hold, and it does not release when you try to move off? | Yes: Auto-Hold / Hill-Hold does not release when I try to move / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-02 vs F07-ST-01 | Does the parking brake (handbrake) seem stuck on, so the car will not move? | The parking brake seems stuck on / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-03 vs F07-ST-01 | Is the gear lever locked, or does the key not turn, so you cannot move off? | The gear lever is locked, or the key will not turn / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-05 vs F07-ST-01 | Is the handbrake lever released, but the car is still held as if the handbrake were on? | The handbrake lever is down, but the car is still held as if it were on / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-09 vs F07-ST-01 | (Car with an electronic parking brake button) Does the electronic parking brake refuse to release? | Yes: the electronic parking brake will not release / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-10 vs F07-ST-01 | Is there an electronic parking brake fault warning on the dashboard? | Yes: there is an electronic parking brake fault warning / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-19 vs F07-ST-01 | (Automatic or CVT) Is there a gearbox warning, with the car only creeping or stuck in one gear? | Yes: there is a gearbox warning and the car only creeps (limp mode) / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-22 vs F07-ST-01 | Is one wheel locked or very hot, and will not turn? | One wheel is locked or very hot / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-26 vs F07-ST-01 | With a gear selected, does the engine run but no power reach the wheels at all? | The engine runs, but no power reaches the wheels at all / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-29 vs F07-ST-01 | Is the car stuck in mud, sand or a waterlogged road? | Yes: it is stuck in mud, sand or water on the road / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-30 vs F07-ST-01 | Did this start after an accident or a hit? | Yes: it started after an accident / It moves, but slowly, as if something is dragging slightly |
+| stuck | F07-ST-34 vs F07-ST-01 | After you take your foot off the brake pedal, do the brakes stay on? | Yes: the brakes stay on after I release the pedal / It moves, but slowly, as if something is dragging slightly |
+| towing_accident | F18-TW-03 vs F18-TW-16 | Was your car in an accident, or is it missing from where you parked it? | It was in an accident and cannot be driven / It is missing from where I parked it (it may have been towed by the traffic police) |
+| towing_accident | F18-TW-06 vs F18-TW-11 | Does the car need recovery because of damaged tyres, or because it went through flood water? | Flat or damaged tyres (more than the spare can fix) / It went through flood water |
+| smoke_fire | F16-SM-12 vs F16-SM-01 | What does the smell remind you of? | Petrol or diesel (fuel) / A faint smell after driving in traffic or braking, with no smoke |
+| smoke_fire | F16-SM-17 vs F16-SM-03 | Did you drive over garbage, plastic or leaves just before the smell or smoke started? | Yes: I drove over garbage, plastic or leaves, and the smell is from under the car / No: there is smoke from the engine or the wiring |
+| body | F18-BD-02 vs F18-BD-07 | Is the bumper only loose or cracked, or is part of it hanging down? | Loose, cracked or rattling, but still in place / Broken, with a part hanging or scraping |
+| waterlogging | F18-WL-05 vs F18-WL-01 | How many wheels are stuck in the mud? | Two or more wheels, in deep mud / The wheels spin on soft ground |
+| waterlogging | F18-WL-02 vs F18-WL-07 | Where is the water, and is the engine still running? | Water has reached the floor or the doors, and the engine is off / The road is waterlogged, but the engine is still running |
+| waterlogging | F18-WL-03 vs F18-WL-15 | Is the car under water right now, or has it already come out of the flood? | It is fully under water, or water is over the bonnet / It is out of the water now; there are water marks, mud or a smell inside |
+| number_plate | F18-NF-08 vs F18-NF-11 | Is your request about the number plate light, or about fitting an underbody guard? | The number plate light is off or flickering / Fitting an underbody guard or splash shield |
+
+Check in particular:
+
+- **stuck (file 7) is templated.** Every row shares the same symptoms and phrases, so the questions rest on the
+  fault names alone. All 21 are "F07-ST-01 Slow to Move / Minor Drag" against another fault. ST-01's cause group in
+  the data is "Battery, terminals, charging system and voltage drop", which does not match its name. Check the source row.
+- **Two stuck questions can only ask what a mechanic found** (driveshaft / CV joint, differential / final drive):
+  the data gives no sign a customer can see.
+- **body and number_plate are inspect categories.** Inspect mode returns the checklist and never asks questions, so
+  those two questions are loaded but not used until inspect mode asks questions.
+- **stuck and smoke_fire have no safety rules at all** (no sheet, never drafted). Their fuel-smell, smoke and
+  locked-wheel answers fire nothing. Draft rules for these categories next.
+- fast_track topics now ask up to 3 of these questions (before: none), so ST-01 still gets confused in the
+  simulation; 3 questions cannot separate it from all 21 neighbours.
+
+### Merged duplicates (`data/review/merges.yaml`, decided by `claude_code (auto, pending human review)`)
+
+All 66 candidates in `duplicates.csv` were decided: 47 groups (48 aliases) merged, 17 pairs kept separate with a
+reason (for example crank vs cam sensor, petrol vs diesel fuel filter, brake fluid leak vs brake hose leak). The 16
+suspension F14 / F17 pairs are folded into the F14 fault. Cross-category groups (for example "Fuel Filter Blocked" in
+not_starting and fuel_delivery) keep both faults in their own category and are shown once. No rows were deleted.
+A human must check every merge decision, especially the cross-category ones and the canonical choice
+(the earlier-wave category wins). Re-run `uv run python -m app.knowledge.merges apply` after every re-import.
+
+### smoke_fire safety rules (18, approved by `claude_code (auto, pending mechanic sign-off)`)
+
+smoke_fire had no live safety rules. 18 rules were drafted in `smoke_fire.yaml` from each fault's Safety Precautions,
+IF TOWING NEEDED, roadside solution (STAGE 6) and the shared STAGE 5 emergency steps, with fault entries carrying
+danger phrases from the symptoms. Check every one, especially the high-risk rules:
+
+| Rule | Risk | Roadside action (summary) | Triggers |
+|---|---|---|---|
+| SM-03 Visible smoke - electrical / oil | high | stop, switch off, everyone out, do not open the bonnet or restart; tow | answer "smoke from the engine or the wiring"; words "visible smoke", "smoke from engine / wiring" |
+| SM-04 Burst pipe with smoke / steam | high | stop, switch off, move away; steam burns, fire risk if fuel / oil; tow | words "burst pipe", "hissing", "steam" |
+| SM-12 Fuel / petrol / diesel smell | high | do not start if the smell is strong or fuel drips; move away; tow | answer "Petrol or diesel (fuel)"; words "fuel / petrol / diesel smell", "fuel dripping" |
+| SM-13 Smoke from AC vents / dashboard | high | as SM-03 | words "smoke from vents", "smoke in cabin" |
+| SM-15 Heavy smoke / engine-bay fire | high | everyone out, move far away, do not open the bonnet, call 101 / 112 | words "flames", "fire", "heavy smoke", "glow under bonnet" |
+
+Medium: SM-06, SM-07, SM-08, SM-09, SM-14, SM-18 (towing only under a condition). Low: SM-01, SM-02, SM-05, SM-10,
+SM-11, SM-16, SM-17 (towing NO). SM-12 is high although its towing text is conditional, because the data marks it
+"Fire risk". The words "steam" (SM-04) and "fire" (SM-15) are broad; check they do not over-alert.
+
+key_lockout and stuck still have **no safety rules** (not requested). fast_track topics now always show the topic's
+own safety lines (the lines most of its faults share), so "Locked out" and "Car stuck" show 4-5 tips from the data.
+
+### Likely-cause safety alerts (engine)
+
+A live safety rule now also fires when its fault is in the final top 3, and a high-risk fault's rules fire as soon as
+its score reaches 3.0 (one strong answer or a perfect text match). These alerts say "Likely cause: ...". They set the
+verdict to do-not-drive when high-risk but do not stop the questions; only observed danger (a trigger answer or
+trigger words) stops the flow. Check that this split is right for each high-risk rule.
+
+## 7. battery.yaml changes made in this review
 
 - BT-41 and BT-42 roadside actions rewritten as customer actions.
 - Status typo `dapproved` corrected to `approved` on safety rules BT-05 and BT-09 (the loader skips anything that is not exactly `approved`).

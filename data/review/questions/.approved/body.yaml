@@ -1,0 +1,32 @@
+category: body
+loaded_at: '2026-10-23T20:56:26+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question body-q01:
+    id: body-q01
+    status: approved
+    stage: 3
+    text: Is the bumper only loose or cracked, or is part of it hanging down?
+    source_faults:
+    - F18-BD-02
+    - F18-BD-07
+    merged_from:
+    - 'F18-BD-02 (symptoms): Loose bumper / Gap at edge / Crack / Rattle / Clip missing'
+    - 'F18-BD-07 (symptoms): Hanging part / Scraping / Broken clips'
+    options:
+    - label: Loose, cracked or rattling, but still in place
+      effects:
+      - fault: F18-BD-02
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Broken, with a part hanging or scraping
+      effects:
+      - fault: F18-BD-07
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)

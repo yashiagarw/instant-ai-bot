@@ -1,0 +1,88 @@
+category: waterlogging
+loaded_at: '2026-10-23T20:56:27+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question waterlogging-q01:
+    id: waterlogging-q01
+    status: approved
+    stage: 3
+    text: How many wheels are stuck in the mud?
+    source_faults:
+    - F18-WL-01
+    - F18-WL-05
+    merged_from:
+    - 'F18-WL-05 (AI rules): How many wheels are stuck? / symptoms: Deep mud / No movement'
+    - 'F18-WL-01 (symptoms): Wheel spin / No traction / Car sinking / Engine running fine'
+    options:
+    - label: Two or more wheels, in deep mud
+      effects:
+      - fault: F18-WL-05
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The wheels spin on soft ground
+      effects:
+      - fault: F18-WL-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question waterlogging-q02:
+    id: waterlogging-q02
+    status: approved
+    stage: 3
+    text: Where is the water, and is the engine still running?
+    source_faults:
+    - F18-WL-02
+    - F18-WL-07
+    merged_from:
+    - 'F18-WL-02 (symptoms): Water at floor / doors / Engine off / Wet cabin'
+    - 'F18-WL-07 (AI rules): Is the engine still running? / symptoms: Water on road / Engine running'
+    options:
+    - label: Water has reached the floor or the doors, and the engine is off
+      effects:
+      - fault: F18-WL-02
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The road is waterlogged, but the engine is still running
+      effects:
+      - fault: F18-WL-07
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  question waterlogging-q03:
+    id: waterlogging-q03
+    status: approved
+    stage: 3
+    text: Is the car under water right now, or has it already come out of the flood?
+    source_faults:
+    - F18-WL-03
+    - F18-WL-15
+    merged_from:
+    - 'F18-WL-03 (symptoms): Fully submerged / Water over bonnet / Cabin full / Engine off'
+    - 'F18-WL-15 (symptoms): Water marks / Smell / Mud in cabin / Electrical faults / No start'
+    options:
+    - label: It is fully under water, or water is over the bonnet
+      effects:
+      - fault: F18-WL-03
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It is out of the water now; there are water marks, mud or a smell inside
+      effects:
+      - fault: F18-WL-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)

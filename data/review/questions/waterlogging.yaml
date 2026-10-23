@@ -1,0 +1,106 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category waterlogging
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: waterlogging
+category_name: Waterlogging / mud / pit
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T20:56:13+00:00'
+  run_id: claude-code-separators-waterlogging
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: waterlogging-q01
+  status: approved
+  stage: 3
+  text: How many wheels are stuck in the mud?
+  source_faults:
+  - F18-WL-01
+  - F18-WL-05
+  merged_from:
+  - 'F18-WL-05 (AI rules): How many wheels are stuck? / symptoms: Deep mud / No movement'
+  - 'F18-WL-01 (symptoms): Wheel spin / No traction / Car sinking / Engine running fine'
+  options:
+  - label: Two or more wheels, in deep mud
+    effects:
+    - fault: F18-WL-05
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The wheels spin on soft ground
+    effects:
+    - fault: F18-WL-01
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: waterlogging-q02
+  status: approved
+  stage: 3
+  text: Where is the water, and is the engine still running?
+  source_faults:
+  - F18-WL-02
+  - F18-WL-07
+  merged_from:
+  - 'F18-WL-02 (symptoms): Water at floor / doors / Engine off / Wet cabin'
+  - 'F18-WL-07 (AI rules): Is the engine still running? / symptoms: Water on road / Engine running'
+  options:
+  - label: Water has reached the floor or the doors, and the engine is off
+    effects:
+    - fault: F18-WL-02
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The road is waterlogged, but the engine is still running
+    effects:
+    - fault: F18-WL-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: waterlogging-q03
+  status: approved
+  stage: 3
+  text: Is the car under water right now, or has it already come out of the flood?
+  source_faults:
+  - F18-WL-03
+  - F18-WL-15
+  merged_from:
+  - 'F18-WL-03 (symptoms): Fully submerged / Water over bonnet / Cabin full / Engine off'
+  - 'F18-WL-15 (symptoms): Water marks / Smell / Mud in cabin / Electrical faults / No start'
+  options:
+  - label: It is fully under water, or water is over the bonnet
+    effects:
+    - fault: F18-WL-03
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It is out of the water now; there are water marks, mud or a smell inside
+    effects:
+    - fault: F18-WL-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+faults: {}
+safety_rules: []

@@ -1,0 +1,32 @@
+category: number_plate
+loaded_at: '2026-10-23T20:56:28+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question number_plate-q01:
+    id: number_plate-q01
+    status: approved
+    stage: 3
+    text: Is your request about the number plate light, or about fitting an underbody guard?
+    source_faults:
+    - F18-NF-08
+    - F18-NF-11
+    merged_from:
+    - 'F18-NF-08 (symptoms): Lamp off / Flicker / Water inside / Fuse blown'
+    - 'F18-NF-11 (symptoms): Missing cover / Scrapes / Sump marks / Request'
+    options:
+    - label: The number plate light is off or flickering
+      effects:
+      - fault: F18-NF-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Fitting an underbody guard or splash shield
+      effects:
+      - fault: F18-NF-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+    approved_by: claude_code (auto, pending mechanic sign-off)

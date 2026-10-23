@@ -1,0 +1,496 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category smoke_fire
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: smoke_fire
+category_name: Smoke / burning smell / fire risk
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T20:56:13+00:00'
+  run_id: claude-code-separators-smoke_fire
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: smoke_fire-q01
+  status: approved
+  stage: 3
+  text: What does the smell remind you of?
+  source_faults:
+  - F16-SM-01
+  - F16-SM-12
+  merged_from:
+  - 'F16-SM-12 (symptoms): Fuel smell / Drip / wet patch / After refuel'
+  - 'F16-SM-01 (symptoms): Faint smell / No smoke / After long drive / traffic / Smell only after braking or traffic'
+  options:
+  - label: Petrol or diesel (fuel)
+    effects:
+    - fault: F16-SM-12
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: A faint smell after driving in traffic or braking, with no smoke
+    effects:
+    - fault: F16-SM-01
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-q02
+  status: approved
+  stage: 3
+  text: Did you drive over garbage, plastic or leaves just before the smell or smoke started?
+  source_faults:
+  - F16-SM-03
+  - F16-SM-17
+  merged_from:
+  - 'F16-SM-17 (AI rules): Did you drive over garbage or leaves? / symptoms: Plastic smell below / Smoke from catalyst
+    area'
+  - 'F16-SM-03 (symptoms): Visible smoke / Burning smell / Electrical failure / Oil leak on engine'
+  options:
+  - label: 'Yes: I drove over garbage, plastic or leaves, and the smell is from under the car'
+    effects:
+    - fault: F16-SM-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No: there is smoke from the engine or the wiring'
+    effects:
+    - fault: F16-SM-03
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+faults:
+  F16-SM-01:
+    status: approved
+    name: Faint Smell, No Visible Smoke
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-02:
+    status: approved
+    name: Burning Smell - Belt / Clutch
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Clutch slip test and belt check.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-03:
+    status: approved
+    name: Visible Smoke - Electrical / Oil
+    stage2_choices:
+    - Smoke coming
+    confirmation_test: Inspection.
+    danger_phrases:
+    - visible smoke
+    - smoke from engine
+    - smoke from wiring
+    safety_trigger_options:
+    - question: smoke_fire-q02
+      option: 'No: there is smoke from the engine or the wiring'
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-04:
+    status: approved
+    name: Burst Pipe with Smoke / Steam / Fire Risk
+    stage2_choices:
+    - Smoke coming
+    confirmation_test: Inspection.
+    danger_phrases:
+    - burst pipe
+    - hissing
+    - steam
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-05:
+    status: approved
+    name: Burning Rubber Smell
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-06:
+    status: approved
+    name: Burning Plastic / Electrical Insulation Smell
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Inspection.
+    danger_phrases:
+    - smoke from dashboard
+    - melted plastic
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-07:
+    status: approved
+    name: Engine Oil Burning on Hot Exhaust
+    stage2_choices:
+    - Smoke coming
+    confirmation_test: Inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-08:
+    status: approved
+    name: Coolant Steam from Engine Bay
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Pressure test.
+    danger_phrases:
+    - steam from bonnet
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-09:
+    status: approved
+    name: White Smoke from Exhaust
+    stage2_choices:
+    - Smoke coming
+    confirmation_test: Coolant level and leak test.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-10:
+    status: approved
+    name: Blue Smoke from Exhaust
+    stage2_choices:
+    - Smoke coming
+    confirmation_test: Compression test and PCV check.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-11:
+    status: approved
+    name: Black Smoke from Exhaust
+    stage2_choices:
+    - Smoke coming
+    confirmation_test: Scan and checks.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-12:
+    status: approved
+    name: Fuel / Petrol / Diesel Smell
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Inspection.
+    danger_phrases:
+    - fuel smell
+    - petrol smell
+    - diesel smell
+    - fuel dripping
+    safety_trigger_options:
+    - question: smoke_fire-q01
+      option: Petrol or diesel (fuel)
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-13:
+    status: approved
+    name: Smoke from AC Vents / Dashboard
+    stage2_choices:
+    - Smoke coming
+    confirmation_test: Inspection.
+    danger_phrases:
+    - smoke from vents
+    - smoke in cabin
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-14:
+    status: approved
+    name: Brake Overheating / Burning Smell
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Inspection.
+    danger_phrases:
+    - hot wheel
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-15:
+    status: approved
+    name: Heavy Smoke / Suspected Engine-Bay Fire
+    stage2_choices:
+    - Smoke coming
+    confirmation_test: Fire inspection.
+    danger_phrases:
+    - flames
+    - fire
+    - heavy smoke
+    - glow under bonnet
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-16:
+    status: approved
+    name: New Car / After-Service Burning Smell (Normal Bedding / Spill)  [NEW - India]
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-17:
+    status: approved
+    name: Plastic Bag / Leaves Stuck on Hot Exhaust  [NEW - India]
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Visual check.
+    danger_phrases: []
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+  F16-SM-18:
+    status: approved
+    name: Melting Wires From Extra Horns / Lights / Accessories  [NEW - India]
+    stage2_choices:
+    - Burning smell
+    confirmation_test: Inspection.
+    danger_phrases:
+    - melted wire
+    safety_trigger_options: []
+    approved_by: claude_code (auto, pending mechanic sign-off)
+safety_rules:
+- id: smoke_fire-s-F16-SM-01
+  status: approved
+  fault: F16-SM-01
+  risk_level: low
+  stop_driving_trigger: Stop if the smell grows or you see smoke.
+  roadside_action: Drive gently. Stop if the smell grows or you see smoke. Do not touch or put your face close to
+    hot parts.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not touch or put your face close to hot or smoking parts.
+    if_towing_needed: NO.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-02
+  status: approved
+  fault: F16-SM-02
+  risk_level: low
+  stop_driving_trigger: Stop if the smell is strong.
+  roadside_action: Stop and let the clutch and engine cool. Keep away from the belts while the engine runs.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Engine OFF near belts.
+    if_towing_needed: NO.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-03
+  status: approved
+  fault: F16-SM-03
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: visible smoke.'
+  roadside_action: Stop safely and switch off the engine if it is safe. Get everyone out and move far away from
+    the car. Do not open the bonnet and do not restart the car. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Stop safely and switch off the engine if safe.
+
+      • Get everyone out and move far away from the car.
+
+      • Do not open the bonnet.'
+    if_towing_needed: YES.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-04
+  status: approved
+  fault: F16-SM-04
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: steam or smoke with fluid loss.'
+  roadside_action: Stop, switch off the engine and move away from the car. Steam burns, and there is a fire risk
+    if it is fuel or oil. Do not open the bonnet. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Steam burns.
+
+      • Fire risk if fuel/oil.'
+    if_towing_needed: YES.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-05
+  status: approved
+  fault: F16-SM-05
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Stop and let the car cool. Check from a safe distance whether something is rubbing a tyre. Do
+    not touch hot parts.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not touch or put your face close to hot or smoking parts.
+    if_towing_needed: NO.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-06
+  status: approved
+  fault: F16-SM-06
+  risk_level: medium
+  stop_driving_trigger: Stop if there is smoke from the dashboard.
+  roadside_action: Stop and switch off. If there is smoke, get everyone out. Do not fit a bigger fuse.
+  towing_recommendation: Yes, if there is smoke.
+  source_text:
+    safety_precautions: '• Battery OFF.
+
+      • Never bigger fuse.'
+    if_towing_needed: YES if smoke.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-07
+  status: approved
+  fault: F16-SM-07
+  risk_level: medium
+  stop_driving_trigger: Stop if the smoke grows.
+  roadside_action: 'Stop if the smoke grows. Do not touch the hot engine or exhaust: there is a fire risk.'
+  towing_recommendation: If there is heavy smoke.
+  source_text:
+    safety_precautions: • Fire risk.
+    if_towing_needed: If heavy smoke.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-08
+  status: approved
+  fault: F16-SM-08
+  risk_level: medium
+  stop_driving_trigger: Stop if the temperature is high.
+  roadside_action: 'Stop, switch off the engine and let it cool. Keep away from the steam: it burns.'
+  towing_recommendation: If the temperature is high.
+  source_text:
+    safety_precautions: • Steam burns.
+    if_towing_needed: If temperature high.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-09
+  status: approved
+  fault: F16-SM-09
+  risk_level: medium
+  stop_driving_trigger: Stop if the white smoke is heavy and coolant is going down.
+  roadside_action: If the white smoke is heavy and the coolant level keeps dropping, stop and get the car checked.
+  towing_recommendation: If the engine is overheating.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: If overheating.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-10
+  status: approved
+  fault: F16-SM-10
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Check the engine oil level and get the car checked.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-11
+  status: approved
+  fault: F16-SM-11
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Get the car checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-12
+  status: approved
+  fault: F16-SM-12
+  risk_level: high
+  stop_driving_trigger: Do not start the car if the fuel smell is strong or fuel is dripping.
+  roadside_action: 'If the fuel smell is strong or fuel is dripping, do not start the car. Move away from it: there
+    is a fire risk. Call for a tow.'
+  towing_recommendation: Yes, if the smell is strong or fuel is dripping.
+  source_text:
+    safety_precautions: • Fire risk.
+    if_towing_needed: YES if strong or dripping.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-13
+  status: approved
+  fault: F16-SM-13
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: smoke from the vents or dashboard.'
+  roadside_action: Stop safely and switch off the engine if it is safe. Get everyone out and move far away from
+    the car. Do not open the bonnet and do not restart the car. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Stop safely and switch off the engine if safe.
+
+      • Get everyone out and move far away from the car.
+
+      • Do not open the bonnet.'
+    if_towing_needed: YES.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-14
+  status: approved
+  fault: F16-SM-14
+  risk_level: medium
+  stop_driving_trigger: Stop if the brakes feel weak.
+  roadside_action: Stop safely and let the brakes cool. Do not touch the hot wheel. If the brakes feel weak, call
+    for a tow.
+  towing_recommendation: If the brakes are weak.
+  source_text:
+    safety_precautions: • Hot brakes burn.
+    if_towing_needed: If brakes weak.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-15
+  status: approved
+  fault: F16-SM-15
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: heavy smoke or fire.'
+  roadside_action: Get everyone out and move far away from the car. Do not open the bonnet. Call fire emergency
+    101 / 112. Do not restart the car.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Stop safely and switch off the engine if safe.
+
+      • Get everyone out and move far away from the car.
+
+      • Do not open the bonnet.
+
+      • Call fire emergency 101 / 112.'
+    if_towing_needed: YES.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-16
+  status: approved
+  fault: F16-SM-16
+  risk_level: low
+  stop_driving_trigger: Stop if the smell grows or there is smoke.
+  roadside_action: A mild smell on a new or just-serviced car usually fades. Get it checked if it grows or you see
+    smoke.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-17
+  status: approved
+  fault: F16-SM-17
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Stop and let the exhaust cool before carefully removing the plastic or leaves. The hot exhaust
+    burns.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Hot exhaust burns.
+    if_towing_needed: NO.
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: smoke_fire-s-F16-SM-18
+  status: approved
+  fault: F16-SM-18
+  risk_level: medium
+  stop_driving_trigger: Stop if there is smoke.
+  roadside_action: Stop and switch off the extra accessory. If there is smoke, get out of the car. Do not fit a
+    bigger fuse.
+  towing_recommendation: If there is smoke.
+  source_text:
+    safety_precautions: '• Battery OFF.
+
+      • Never bigger fuse.'
+    if_towing_needed: If smoke.
+  approved_by: claude_code (auto, pending mechanic sign-off)

@@ -1,0 +1,79 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category towing_accident
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: towing_accident
+category_name: Towing / accident recovery
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T20:56:13+00:00'
+  run_id: claude-code-separators-towing_accident
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: towing_accident-q01
+  status: approved
+  stage: 3
+  text: Was your car in an accident, or is it missing from where you parked it?
+  source_faults:
+  - F18-TW-03
+  - F18-TW-16
+  merged_from:
+  - 'F18-TW-03 (symptoms): Not moving / Wheel damage / Leak / Airbags / Steering wrong / No start'
+  - 'F18-TW-16 (symptoms): Car missing / Notice / chalk mark / Fine / Yard location'
+  options:
+  - label: It was in an accident and cannot be driven
+    effects:
+    - fault: F18-TW-03
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It is missing from where I parked it (it may have been towed by the traffic police)
+    effects:
+    - fault: F18-TW-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+- id: towing_accident-q02
+  status: approved
+  stage: 3
+  text: Does the car need recovery because of damaged tyres, or because it went through flood water?
+  source_faults:
+  - F18-TW-06
+  - F18-TW-11
+  merged_from:
+  - 'F18-TW-06 (symptoms): Flat tyres / Bent rim / No spare / Car tilted'
+  - 'F18-TW-11 (symptoms): Flood exposure / No start / Wet cabin / Mud / Electrics dead'
+  options:
+  - label: Flat or damaged tyres (more than the spare can fix)
+    effects:
+    - fault: F18-TW-06
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It went through flood water
+    effects:
+    - fault: F18-TW-11
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+faults: {}
+safety_rules: []

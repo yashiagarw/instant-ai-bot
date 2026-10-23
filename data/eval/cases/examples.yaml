@@ -1,0 +1,18 @@
+# Worked examples of the case format (see README.md). Answers use the approved question text exactly.
+- id: tyre-flat
+  vehicle: {fuel: petrol, segment: budget}
+  group: tyres
+  text: "tyre puncture ho gaya"
+  answers:
+    - question: "What problem are you facing with your tyre?"
+      option: "The tyre is fully or almost fully flat"
+  expected: F04-TY-03
+
+- id: tyre-slow-puncture
+  group: tyres
+  answers:
+    - question: "What problem are you facing with your tyre?"
+      option: "The tyre goes soft again after I fill it with air"
+    - question: "After filling the tyre with air, how soon does it go soft again?"
+      option: "Within hours or days"
+  expected: F04-TY-02

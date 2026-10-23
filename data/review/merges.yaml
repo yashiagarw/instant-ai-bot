@@ -1,0 +1,407 @@
+# Reviewed duplicate decisions (from data/review/duplicates.csv). Applied to the database as merged_into
+# links by:  cd backend && uv run python -m app.knowledge.merges apply   (re-run after every re-import).
+# Same-category aliases are folded into the canonical fault by the engine loader; cross-category aliases
+# stay in their own category and are shown once. No source rows are deleted.
+decided_by: claude_code (auto, pending human review)
+decided_on: '2026-10-24'
+merge:
+- canonical: F14-SU-01
+  aliases:
+  - F17-SU-01
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-01: Minor Noise Over Speed Breakers
+    F17-SU-01: Minor Noise While Driving (Over Bumps / Speed Breakers)
+- canonical: F14-SU-02
+  aliases:
+  - F17-SU-02
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-02: Disturbing Noise While Driving
+    F17-SU-02: Disturbing Noise While Driving
+- canonical: F14-SU-03
+  aliases:
+  - F17-SU-03
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-03: Shock Absorber Fault - One Side
+    F17-SU-03: Shock Absorber Fault - One Side
+- canonical: F14-SU-04
+  aliases:
+  - F17-SU-04
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-04: Suspension Component Broken
+    F17-SU-04: Suspension Component Broken
+- canonical: F14-SU-05
+  aliases:
+  - F17-SU-05
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-05: Shock Absorber Oil Leakage
+    F17-SU-05: Shock Absorber Oil Leakage
+- canonical: F14-SU-06
+  aliases:
+  - F17-SU-06
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-06: Excessive Bouncing After Bumps
+    F17-SU-06: Excessive Bouncing After Speed Breakers
+- canonical: F14-SU-07
+  aliases:
+  - F17-SU-07
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-07: Stabilizer Link / Anti-Roll Bar Link Noise
+    F17-SU-07: Stabilizer Link / Anti-Roll Bar Link Noise
+- canonical: F14-SU-08
+  aliases:
+  - F17-SU-08
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-08: Suspension Bush Worn / Cracked
+    F17-SU-08: Suspension Bush Worn / Cracked
+- canonical: F14-SU-09
+  aliases:
+  - F17-SU-09
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-09: Control Arm / Lower Arm Fault
+    F17-SU-09: Control Arm / Lower Arm Fault
+- canonical: F14-SU-10
+  aliases:
+  - F17-SU-10
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-10: Ball Joint Loose / Worn
+    F17-SU-10: Ball Joint Loose / Worn
+- canonical: F14-SU-11
+  aliases:
+  - F17-SU-11
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-11: Strut Mount / Bearing Noise
+    F17-SU-11: Strut Mount / Bearing Noise
+- canonical: F14-SU-12
+  aliases:
+  - F17-SU-12
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-12: Coil Spring Broken / Sagging
+    F17-SU-12: Coil Spring Broken / Sagging
+- canonical: F14-SU-13
+  aliases:
+  - F17-SU-15
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-13: Car Pulling to One Side / Uneven Ride Height
+    F17-SU-15: Uneven Ride Height / Vehicle Pulling
+- canonical: F14-SU-14
+  aliases:
+  - F17-SU-14
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-14: Steering / Wheel Vibration - Suspension-Related Suspected
+    F17-SU-14: Steering Wheel Vibration - Suspension Suspected
+- canonical: F14-SU-15
+  aliases:
+  - F17-SU-16
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-15: Severe Suspension Damage After Pothole / Road Impact
+    F17-SU-16: Severe Suspension Damage After Pothole / Road Impact
+- canonical: F14-SU-16
+  aliases:
+  - F17-SU-17
+  reason: Same fault in the file 14 and file 17 suspension lists.
+  names:
+    F14-SU-16: Underbody Scraping / Low Car With Full Load (Speed Breakers)  [NEW - India]
+    F17-SU-17: Underbody Scraping / Low Car With Full Load (Speed Breakers)  [NEW - India]
+- canonical: F09-NS-08
+  aliases:
+  - F10-FD-10
+  reason: Same fault (fuel filter blocked) listed under not-starting and fuel delivery.
+  names:
+    F09-NS-08: Fuel Filter Blocked
+    F10-FD-10: Fuel Filter Blocked
+- canonical: F12-EN-06
+  aliases:
+  - F15-JM-09
+  reason: Same fault (engine misfire at idle) in the engine and jerking files.
+  names:
+    F12-EN-06: Engine Misfire at Idle
+    F15-JM-09: Engine Misfire at Idle
+- canonical: F12-EL-14
+  aliases:
+  - F13-IG-08
+  reason: Same fault (ignition switch electrical fault) in the electrical and ignition files.
+  names:
+    F12-EL-14: Ignition Switch Electrical Fault
+    F13-IG-08: Ignition Switch Electrical Fault
+- canonical: F09-NS-10
+  aliases:
+  - F12-EN-16
+  - F15-JM-13
+  reason: Same fault (ignition coil failure) in three files.
+  names:
+    F09-NS-10: Ignition Coil Failed
+    F12-EN-16: Ignition Coil Failure
+    F15-JM-13: Ignition Coil Fault
+- canonical: F10-DW-25
+  aliases:
+  - F16-AB-01
+  reason: Same fault (airbag / SRS warning light) in the dashboard and airbag files.
+  names:
+    F10-DW-25: Airbag / SRS Warning Light
+    F16-AB-01: Airbag Warning Light
+- canonical: F09-NS-12
+  aliases:
+  - F15-SE-06
+  reason: Same fault (crankshaft position sensor).
+  names:
+    F09-NS-12: Crank Position Sensor Fault
+    F15-SE-06: Crankshaft Position Sensor Fault
+- canonical: F09-NS-13
+  aliases:
+  - F15-SE-07
+  reason: Same fault (camshaft position sensor).
+  names:
+    F09-NS-13: Cam Position Sensor Fault
+    F15-SE-07: Camshaft Position Sensor Fault
+- canonical: F09-AP-08
+  aliases:
+  - F15-SE-11
+  reason: Same fault (accelerator pedal position sensor).
+  names:
+    F09-AP-08: Accelerator Pedal Sensor Fault
+    F15-SE-11: Accelerator Pedal Position Sensor Fault
+- canonical: F09-AP-09
+  aliases:
+  - F15-SE-10
+  reason: Same fault (throttle position sensor).
+  names:
+    F09-AP-09: Throttle Position Sensor Fault
+    F15-SE-10: Throttle Position Sensor (TPS) Fault
+- canonical: F09-NS-07
+  aliases:
+  - F10-FD-06
+  reason: Same fault (fuel pump relay failed).
+  names:
+    F09-NS-07: Fuel Pump Relay or Fuse Failed
+    F10-FD-06: Fuel Pump Relay Failed
+- canonical: F07-ST-13
+  aliases:
+  - F17-GB-07
+  reason: Same fault (gear selector cable / linkage) in the stuck and gearbox files.
+  names:
+    F07-ST-13: Gear Selector Cable / Linkage Failure
+    F17-GB-07: Gear Selector Cable / Linkage Fault
+- canonical: F10-DW-19
+  aliases:
+  - F12-EL-17
+  reason: Same fault (CAN bus communication wiring).
+  names:
+    F10-DW-19: Network (CAN) Communication / Wiring Fault
+    F12-EL-17: CAN Bus / Communication Wiring Fault
+- canonical: F15-JM-24
+  aliases:
+  - F17-CG-07
+  reason: Same fault (jerking / misfire only in CNG mode).
+  names:
+    F15-JM-24: CNG Mode Jerking / Stalling
+    F17-CG-07: CNG Mode Jerking / Misfiring
+- canonical: F09-NS-18
+  aliases:
+  - F15-JM-21
+  reason: Same fault (engine stalls when the AC is switched on).
+  names:
+    F09-NS-18: Engine Stops When AC Is Turned ON
+    F15-JM-21: Engine Stalling When AC Is Switched On
+- canonical: F10-FD-15
+  aliases:
+  - F15-SE-15
+  reason: Same fault (fuel rail pressure sensor).
+  names:
+    F10-FD-15: Fuel Rail Pressure Sensor Fault (Direct Injection Petrol)
+    F15-SE-15: Fuel Rail Pressure Sensor Fault
+- canonical: F08-BT-42
+  aliases:
+  - F12-EL-27
+  reason: Same fault (damage after a reversed jump-start).
+  names:
+    F08-BT-42: Damage From Wrong Jump-Start (Cables Reversed)  [NEW - India]
+    F12-EL-27: Damage After Wrong Jump-Start (Reverse Polarity / Sparks)  [NEW - India]
+- canonical: F12-EN-17
+  aliases:
+  - F15-JM-12
+  reason: Same fault (spark plug wear / fouling).
+  names:
+    F12-EN-17: Spark Plug Wear / Ignition Fault
+    F15-JM-12: Spark Plug Wear / Fouling
+- canonical: F12-EL-18
+  aliases:
+  - F15-SE-17
+  reason: Same fault (ECU power supply / ground).
+  names:
+    F12-EL-18: ECU / BCM Power or Ground Fault
+    F15-SE-17: ECU Power Supply / Ground Fault
+- canonical: F09-AP-21
+  aliases:
+  - F12-EN-07
+  reason: Same fault (misfire when accelerating).
+  names:
+    F09-AP-21: Misfire When Accelerating
+    F12-EN-07: Engine Misfire During Acceleration
+- canonical: F09-NS-22
+  aliases:
+  - F12-EN-23
+  reason: Same fault (engine stopped in water / hydrolock).
+  names:
+    F09-NS-22: Engine Stopped in Water (Flood / Hydrolock Risk)
+    F12-EN-23: Engine Water Ingress / Hydrolock Risk
+- canonical: F11-BR-24
+  aliases:
+  - F16-SM-14
+  reason: Same fault (brake overheating / fade with burning smell).
+  names:
+    F11-BR-24: Brake Overheating / Brake Fade
+    F16-SM-14: Brake Overheating / Burning Smell
+- canonical: F17-DS-16
+  aliases:
+  - F16-EX-14
+  reason: Same fault (diesel DPF warning).
+  names:
+    F17-DS-16: Diesel DPF Regeneration / Exhaust Restriction Warning
+    F16-EX-14: Diesel DPF / Exhaust Aftertreatment Warning
+- canonical: F07-SS-24
+  aliases:
+  - F13-ST-13
+  reason: Same fault (brake / clutch pedal switch preventing start).
+  names:
+    F07-SS-24: Brake Pedal Switch Preventing Start
+    F13-ST-13: Brake / Clutch Pedal Switch Preventing Start
+- canonical: F09-NS-27
+  aliases:
+  - F10-FD-19
+  reason: Same fault (water or dirt in petrol).
+  names:
+    F09-NS-27: Water or Dirt in Fuel (Bad Fuel)  [NEW - India]
+    F10-FD-19: Water or Dirt in Petrol (Contaminated Fuel)
+- canonical: F07-SS-10
+  aliases:
+  - F13-ST-07
+  reason: Same fault (starter relay).
+  names:
+    F07-SS-10: Starter Relay Failure
+    F13-ST-07: Starter Relay Fault
+- canonical: F07-SS-09
+  aliases:
+  - F13-ST-08
+  reason: Same fault (starter solenoid).
+  names:
+    F07-SS-09: Starter Solenoid Failure
+    F13-ST-08: Starter Solenoid Fault
+- canonical: F13-IG-16
+  aliases:
+  - F17-KL-17
+  reason: Same fault (uncoded local duplicate key).
+  names:
+    F13-IG-16: Duplicate Key from Local Key Maker - Cranks but No Start  [NEW - India]
+    F17-KL-17: Local Duplicate Key Turns But Car Won't Start (No Chip Coding)  [NEW - India]
+- canonical: F12-EN-08
+  aliases:
+  - F15-JM-11
+  reason: Same fault (engine shaking / rough idle).
+  names:
+    F12-EN-08: Engine Shaking / Excessive Vibration
+    F15-JM-11: Engine Shaking / Rough Idle
+- canonical: F09-AP-10
+  aliases:
+  - F12-EN-19
+  reason: Same fault (MAF / MAP air sensor).
+  names:
+    F09-AP-10: Air Sensor Fault (MAF or MAP Sensor)
+    F12-EN-19: Air Intake / MAF / MAP Sensor Fault
+- canonical: F12-EN-05
+  aliases:
+  - F15-JM-25
+  reason: Same fault (flashing check-engine light / severe misfire).
+  names:
+    F12-EN-05: Check Engine Light Flashing / Severe Misfire
+    F15-JM-25: Severe Misfire / Flashing Check Engine Light
+- canonical: F09-NS-06
+  aliases:
+  - F10-FD-09
+  reason: Same fault (electric fuel pump failed).
+  names:
+    F09-NS-06: Fuel Pump Failed / No Fuel Reaching Engine
+    F10-FD-09: Electric Fuel Pump Completely Failed
+keep_separate:
+- faults:
+  - F09-NS-12
+  - F15-SE-07
+  reason: 'Crankshaft sensor vs camshaft sensor: different parts.'
+- faults:
+  - F09-NS-08
+  - F17-DS-08
+  reason: 'Petrol fuel filter vs diesel fuel filter: different part and procedure.'
+- faults:
+  - F10-FD-10
+  - F17-DS-08
+  reason: 'Petrol fuel filter vs diesel fuel filter: different part and procedure.'
+- faults:
+  - F09-NS-13
+  - F15-SE-06
+  reason: 'Camshaft sensor vs crankshaft sensor: different parts.'
+- faults:
+  - F09-AP-09
+  - F15-SE-07
+  reason: 'Throttle position sensor vs camshaft sensor: different parts.'
+- faults:
+  - F08-BT-40
+  - F15-JM-30
+  reason: 'Water in the fuse box vs misfire from water in plug wells: different faults.'
+- faults:
+  - F09-NS-12
+  - F15-SE-11
+  reason: 'Crank sensor vs accelerator pedal sensor: different parts.'
+- faults:
+  - F09-AP-09
+  - F15-SE-06
+  reason: 'Throttle position sensor vs crank sensor: different parts.'
+- faults:
+  - F16-HP-12
+  - F17-DS-11
+  reason: 'Petrol fuel hose leak vs diesel fuel line leak: different system and risk.'
+- faults:
+  - F12-EN-07
+  - F15-JM-05
+  reason: 'Misfire vs jerking during acceleration: jerking has wider causes (clutch, mounts, fuel).'
+- faults:
+  - F12-EL-15
+  - F13-ST-12
+  reason: 'Starter control (signal) wiring vs starter main cable / ground: different circuits.'
+- faults:
+  - F12-EN-06
+  - F15-JM-10
+  reason: 'Misfire at idle vs under load: different causes.'
+- faults:
+  - F09-AP-09
+  - F15-SE-11
+  reason: 'Throttle position sensor vs accelerator pedal sensor: different parts.'
+- faults:
+  - F11-EB-05
+  - F15-JM-05
+  reason: 'Belt slipping vs jerking during acceleration: different faults.'
+- faults:
+  - F09-NS-09
+  - F10-FD-13
+  reason: 'General injector problem vs injector electrical fault: the second is a subset.'
+- faults:
+  - F09-NS-07
+  - F10-FD-09
+  reason: 'Fuel pump relay vs failed pump: different parts.'
+- faults:
+  - F11-BR-13
+  - F16-HP-13
+  reason: 'Brake fluid leak (anywhere) vs brake hose leak: the second is a subset.'

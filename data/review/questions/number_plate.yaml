@@ -1,0 +1,52 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category number_plate
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: number_plate
+category_name: Number plate / fittings
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T20:56:13+00:00'
+  run_id: claude-code-separators-number_plate
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: number_plate-q01
+  status: approved
+  stage: 3
+  text: Is your request about the number plate light, or about fitting an underbody guard?
+  source_faults:
+  - F18-NF-08
+  - F18-NF-11
+  merged_from:
+  - 'F18-NF-08 (symptoms): Lamp off / Flicker / Water inside / Fuse blown'
+  - 'F18-NF-11 (symptoms): Missing cover / Scrapes / Sump marks / Request'
+  options:
+  - label: The number plate light is off or flickering
+    effects:
+    - fault: F18-NF-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Fitting an underbody guard or splash shield
+    effects:
+    - fault: F18-NF-11
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+  approved_by: claude_code (auto, pending mechanic sign-off)
+faults: {}
+safety_rules: []
