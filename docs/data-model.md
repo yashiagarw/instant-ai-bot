@@ -148,6 +148,7 @@ List cells split into ordered items.
 | position | smallint | order inside the cell |
 | text | text | marker stripped |
 | internal | boolean | true for `mechanic_task`, `mechanic_step` |
+| embedding | vector(384) null | symptom items only (migration 0003), for free-text matching |
 
 Types and source columns:
 

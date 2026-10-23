@@ -316,6 +316,12 @@ class FaultItem(Base):
     __table_args__ = (
         UniqueConstraint("fault_id", "type", "position"),
         CheckConstraint("internal = (type IN ('mechanic_task', 'mechanic_step'))", name="internal_matches_type"),
+        Index(
+            "ix_fault_items_embedding_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -324,6 +330,8 @@ class FaultItem(Base):
     position: Mapped[int] = mapped_column(SmallInteger)
     text: Mapped[str] = mapped_column(Text)
     internal: Mapped[bool] = mapped_column(default=False, server_default="false")
+    # Filled for symptom items only (semantic matching of free text to symptoms).
+    embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
 
     fault: Mapped[Fault] = relationship(back_populates="items")
 

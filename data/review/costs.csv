@@ -1,0 +1,697 @@
+fault_key,file,name,segment,raw_total,resolution,display_mode,total_min_inr,total_max_inr,review_reason
+F02-OH-01,2,COOLANT SLIGHTLY LOW,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-01,2,COOLANT SLIGHTLY LOW,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-01,2,COOLANT SLIGHTLY LOW,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-02,2,TEMPERATURE GAUGE RISING / APPROACHING RED,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-02,2,TEMPERATURE GAUGE RISING / APPROACHING RED,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-02,2,TEMPERATURE GAUGE RISING / APPROACHING RED,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-03,2,MINOR COOLANT LEAKAGE,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-03,2,MINOR COOLANT LEAKAGE,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-03,2,MINOR COOLANT LEAKAGE,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-04,2,COOLING FAN / THERMOSTAT FAILURE,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-04,2,COOLING FAN / THERMOSTAT FAILURE,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-04,2,COOLING FAN / THERMOSTAT FAILURE,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-05,2,SEVERE OVERHEATING / HEAD GASKET RISK,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-05,2,SEVERE OVERHEATING / HEAD GASKET RISK,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-05,2,SEVERE OVERHEATING / HEAD GASKET RISK,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-06,2,COOLANT LEVEL KEEPS DROPPING WITHOUT VISIBLE LEAK,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-06,2,COOLANT LEVEL KEEPS DROPPING WITHOUT VISIBLE LEAK,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-06,2,COOLANT LEVEL KEEPS DROPPING WITHOUT VISIBLE LEAK,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-07,2,RADIATOR OR COOLANT HOSE LEAKAGE,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-07,2,RADIATOR OR COOLANT HOSE LEAKAGE,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-07,2,RADIATOR OR COOLANT HOSE LEAKAGE,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-08,2,RADIATOR BLOCKAGE / DAMAGE / POOR COOLING,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-08,2,RADIATOR BLOCKAGE / DAMAGE / POOR COOLING,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-08,2,RADIATOR BLOCKAGE / DAMAGE / POOR COOLING,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-09,2,RADIATOR CAP / RESERVOIR CAP FAILURE,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-09,2,RADIATOR CAP / RESERVOIR CAP FAILURE,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-09,2,RADIATOR CAP / RESERVOIR CAP FAILURE,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-10,2,WATER PUMP LEAKAGE OR FAILURE,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-10,2,WATER PUMP LEAKAGE OR FAILURE,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-10,2,WATER PUMP LEAKAGE OR FAILURE,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-11,2,COOLING FAN NOT RUNNING,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-11,2,COOLING FAN NOT RUNNING,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-11,2,COOLING FAN NOT RUNNING,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-12,2,THERMOSTAT STUCK CLOSED / NOT OPENING CORRECTLY,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-12,2,THERMOSTAT STUCK CLOSED / NOT OPENING CORRECTLY,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-12,2,THERMOSTAT STUCK CLOSED / NOT OPENING CORRECTLY,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-13,2,COOLANT TEMPERATURE SENSOR / ELECTRICAL FAULT,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-13,2,COOLANT TEMPERATURE SENSOR / ELECTRICAL FAULT,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-13,2,COOLANT TEMPERATURE SENSOR / ELECTRICAL FAULT,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-14,2,AIR TRAPPED IN COOLING SYSTEM AFTER SERVICE,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-14,2,AIR TRAPPED IN COOLING SYSTEM AFTER SERVICE,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-14,2,AIR TRAPPED IN COOLING SYSTEM AFTER SERVICE,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-15,2,CABIN HEATER BLOWS COLD AIR WHILE ENGINE OVERHEATS,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-15,2,CABIN HEATER BLOWS COLD AIR WHILE ENGINE OVERHEATS,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-15,2,CABIN HEATER BLOWS COLD AIR WHILE ENGINE OVERHEATS,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-16,2,COOLANT MIXING WITH ENGINE OIL / INTERNAL LEAK SUSPECTED,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-16,2,COOLANT MIXING WITH ENGINE OIL / INTERNAL LEAK SUSPECTED,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-16,2,COOLANT MIXING WITH ENGINE OIL / INTERNAL LEAK SUSPECTED,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-17,2,REPEATED OVERHEATING IN TRAFFIC / WITH AC,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-17,2,REPEATED OVERHEATING IN TRAFFIC / WITH AC,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-17,2,REPEATED OVERHEATING IN TRAFFIC / WITH AC,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-18,2,ENGINE OVERHEATS SOON AFTER START / SHORT DRIVE,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-18,2,ENGINE OVERHEATS SOON AFTER START / SHORT DRIVE,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-18,2,ENGINE OVERHEATS SOON AFTER START / SHORT DRIVE,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-19,2,POSSIBLE HEAD GASKET FAILURE AFTER OVERHEATING (TEST-CONFIRMED),budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-19,2,POSSIBLE HEAD GASKET FAILURE AFTER OVERHEATING (TEST-CONFIRMED),mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-19,2,POSSIBLE HEAD GASKET FAILURE AFTER OVERHEATING (TEST-CONFIRMED),premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs approved labour
+F02-OH-20,2,MULTIPLE COOLING FAULTS / UNCERTAIN OVERHEATING CAUSE,budget,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs parts total
+F02-OH-20,2,MULTIPLE COOLING FAULTS / UNCERTAIN OVERHEATING CAUSE,mid,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs parts total
+F02-OH-20,2,MULTIPLE COOLING FAULTS / UNCERTAIN OVERHEATING CAUSE,premium,#REF!,price_on_inspection (needs approved labour in costs/F02-labour.yaml),on_inspection,,,#REF! total; recalculation needs parts total
+F06-EV-01,6,Charging Slower Than Expected,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-01,6,Charging Slower Than Expected,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-01,6,Charging Slower Than Expected,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-02,6,Charger Point / Connector Not Working,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-02,6,Charger Point / Connector Not Working,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-02,6,Charger Point / Connector Not Working,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-03,6,Onboard Charger Fault,budget,"₹25,000–₹60,000",text_quotation_required,text,,,
+F06-EV-03,6,Onboard Charger Fault,mid,"₹30,000–₹60,000",text_quotation_required,text,,,
+F06-EV-03,6,Onboard Charger Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-04,6,High-Voltage System Failure,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-04,6,High-Voltage System Failure,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-04,6,High-Voltage System Failure,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-05,6,Charging Starts but Stops Repeatedly,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-05,6,Charging Starts but Stops Repeatedly,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-05,6,Charging Starts but Stops Repeatedly,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-06,6,Charging Speed Drops After a Short Time,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-06,6,Charging Speed Drops After a Short Time,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-06,6,Charging Speed Drops After a Short Time,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-07,6,Home Charging Is Slow but Public Charging Works,budget,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-07,6,Home Charging Is Slow but Public Charging Works,mid,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-07,6,Home Charging Is Slow but Public Charging Works,premium,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-08,6,Public Charging Is Slow but Home Charging Works,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-08,6,Public Charging Is Slow but Home Charging Works,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-08,6,Public Charging Is Slow but Home Charging Works,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-09,6,Vehicle Does Not Accept the Charger's Expected Power,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-09,6,Vehicle Does Not Accept the Charger's Expected Power,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-09,6,Vehicle Does Not Accept the Charger's Expected Power,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-10,6,Charging Stops at a Particular Battery Percentage,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-10,6,Charging Stops at a Particular Battery Percentage,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-10,6,Charging Stops at a Particular Battery Percentage,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-11,6,Charging Speed Reduced Due to Battery Temperature,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-11,6,Charging Speed Reduced Due to Battery Temperature,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-11,6,Charging Speed Reduced Due to Battery Temperature,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-12,6,Charging Speed Reduced Due to Battery Protection or Control,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-12,6,Charging Speed Reduced Due to Battery Protection or Control,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-12,6,Charging Speed Reduced Due to Battery Protection or Control,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-13,6,Charging Speed Lower Than Expected After Software Update or Service,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-13,6,Charging Speed Lower Than Expected After Software Update or Service,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-13,6,Charging Speed Lower Than Expected After Software Update or Service,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-14,6,Charging Error After a Long Drive or in Hot Weather,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-14,6,Charging Error After a Long Drive or in Hot Weather,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-14,6,Charging Error After a Long Drive or in Hot Weather,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-15,6,Charging Inlet or Port Not Working,budget,"₹6,000–₹25,000",text_quotation_required,text,,,
+F06-EV-15,6,Charging Inlet or Port Not Working,mid,"₹6,000–₹25,000",text_quotation_required,text,,,
+F06-EV-15,6,Charging Inlet or Port Not Working,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-16,6,Charging Connector Does Not Lock or Release,budget,"₹8,000–₹25,000",text_quotation_required,text,,,
+F06-EV-16,6,Charging Connector Does Not Lock or Release,mid,"₹8,000–₹25,000",text_quotation_required,text,,,
+F06-EV-16,6,Charging Connector Does Not Lock or Release,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-17,6,Charging Cable or Portable Charger Fault,budget,"₹20,000 + labour if applicable",text_quotation_required,text,,,
+F06-EV-17,6,Charging Cable or Portable Charger Fault,mid,"₹15,000–₹40,000 + labour/diagnosis if not included",text_quotation_required,text,,,
+F06-EV-17,6,Charging Cable or Portable Charger Fault,premium,"₹20,000 + labour if applicable",text_quotation_required,text,,,
+F06-EV-18,6,"Damaged, Loose or Overheated Charging Connector",budget,"₹6,000–₹25,000",text_quotation_required,text,,,
+F06-EV-18,6,"Damaged, Loose or Overheated Charging Connector",mid,"₹6,000–₹25,000",text_quotation_required,text,,,
+F06-EV-18,6,"Damaged, Loose or Overheated Charging Connector",premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-19,6,Charging Port Locking Actuator Fault,budget,"₹8,000–₹25,000",text_quotation_required,text,,,
+F06-EV-19,6,Charging Port Locking Actuator Fault,mid,"₹8,000–₹25,000",text_quotation_required,text,,,
+F06-EV-19,6,Charging Port Locking Actuator Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-20,6,Charging Port Communication or Pilot-Signal Fault,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-20,6,Charging Port Communication or Pilot-Signal Fault,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-20,6,Charging Port Communication or Pilot-Signal Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-21,6,"Moisture, Corrosion or Foreign Material at Charging Inlet",budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-21,6,"Moisture, Corrosion or Foreign Material at Charging Inlet",mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-21,6,"Moisture, Corrosion or Foreign Material at Charging Inlet",premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-22,6,Charging Connector Does Not Fit or Is Not Compatible,budget,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-22,6,Charging Connector Does Not Fit or Is Not Compatible,mid,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-22,6,Charging Connector Does Not Fit or Is Not Compatible,premium,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-23,6,Charging Fails After Rain or Water Exposure,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-23,6,Charging Fails After Rain or Water Exposure,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-23,6,Charging Fails After Rain or Water Exposure,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-24,6,Charging Station Cannot Communicate With Vehicle,budget,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-24,6,Charging Station Cannot Communicate With Vehicle,mid,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-24,6,Charging Station Cannot Communicate With Vehicle,premium,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-25,6,Home Charger or Wallbox Not Working,budget,"₹22,000–₹22,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-25,6,Home Charger or Wallbox Not Working,mid,"₹45,000–₹45,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-25,6,Home Charger or Wallbox Not Working,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-26,6,Home Charging Circuit Trips Repeatedly,budget,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-26,6,Home Charging Circuit Trips Repeatedly,mid,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-26,6,Home Charging Circuit Trips Repeatedly,premium,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-27,6,Earthing or Electrical Supply Problem,budget,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-27,6,Earthing or Electrical Supply Problem,mid,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-27,6,Earthing or Electrical Supply Problem,premium,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-28,6,Home Charger Power Supply or MCB/RCCB Fault,budget,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-28,6,Home Charger Power Supply or MCB/RCCB Fault,mid,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-28,6,Home Charger Power Supply or MCB/RCCB Fault,premium,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-29,6,Charging Station Is Offline or Out of Service,budget,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-29,6,Charging Station Is Offline or Out of Service,mid,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-29,6,Charging Station Is Offline or Out of Service,premium,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-30,6,"Charging App, Authentication or Payment Problem",budget,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-30,6,"Charging App, Authentication or Payment Problem",mid,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-30,6,"Charging App, Authentication or Payment Problem",premium,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-31,6,Charging Fails at One Station but Works at Another,budget,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-31,6,Charging Fails at One Station but Works at Another,mid,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-31,6,Charging Fails at One Station but Works at Another,premium,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-32,6,Charger Output Is Limited by Available Electrical Supply,budget,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-32,6,Charger Output Is Limited by Available Electrical Supply,mid,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-32,6,Charger Output Is Limited by Available Electrical Supply,premium,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-33,6,"Charging Cable, Socket or Wallbox Overheating",budget,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-33,6,"Charging Cable, Socket or Wallbox Overheating",mid,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-33,6,"Charging Cable, Socket or Wallbox Overheating",premium,"₹1,500–₹8,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-34,6,Onboard Charger (OBC) Suspected Fault,budget,"₹25,000–₹60,000",text_quotation_required,text,,,
+F06-EV-34,6,Onboard Charger (OBC) Suspected Fault,mid,"₹30,000–₹60,000",text_quotation_required,text,,,
+F06-EV-34,6,Onboard Charger (OBC) Suspected Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-35,6,Onboard Charger Overheating or Thermal Protection,budget,"₹25,000–₹60,000",text_quotation_required,text,,,
+F06-EV-35,6,Onboard Charger Overheating or Thermal Protection,mid,"₹30,000–₹60,000",text_quotation_required,text,,,
+F06-EV-35,6,Onboard Charger Overheating or Thermal Protection,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-36,6,AC Charging Fails but DC Fast Charging Works,budget,"₹25,000–₹60,000",text_quotation_required,text,,,
+F06-EV-36,6,AC Charging Fails but DC Fast Charging Works,mid,"₹30,000–₹60,000",text_quotation_required,text,,,
+F06-EV-36,6,AC Charging Fails but DC Fast Charging Works,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-37,6,AC Charging Works but DC Fast Charging Fails,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-37,6,AC Charging Works but DC Fast Charging Fails,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-37,6,AC Charging Works but DC Fast Charging Fails,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-38,6,"Charging Contactor, Relay or Control Circuit Fault",budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-38,6,"Charging Contactor, Relay or Control Circuit Fault",mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-38,6,"Charging Contactor, Relay or Control Circuit Fault",premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-39,6,Charging Communication or Control Module Fault,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-39,6,Charging Communication or Control Module Fault,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-39,6,Charging Communication or Control Module Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-40,6,"Charging Software, Calibration or Firmware Fault",budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-40,6,"Charging Software, Calibration or Firmware Fault",mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-40,6,"Charging Software, Calibration or Firmware Fault",premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-41,6,Charging Inlet Sensor or Temperature Sensor Fault,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-41,6,Charging Inlet Sensor or Temperature Sensor Fault,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-41,6,Charging Inlet Sensor or Temperature Sensor Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-42,6,Charging-Related Fuse or Low-Voltage Supply Fault,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-42,6,Charging-Related Fuse or Low-Voltage Supply Fault,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-42,6,Charging-Related Fuse or Low-Voltage Supply Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-43,6,High-Voltage System Warning,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-43,6,High-Voltage System Warning,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-43,6,High-Voltage System Warning,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-44,6,High-Voltage Interlock or Isolation Fault,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-44,6,High-Voltage Interlock or Isolation Fault,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-44,6,High-Voltage Interlock or Isolation Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-45,6,Battery Management System (BMS) Warning,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-45,6,Battery Management System (BMS) Warning,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-45,6,Battery Management System (BMS) Warning,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-46,6,Traction Battery Temperature Warning,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-46,6,Traction Battery Temperature Warning,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-46,6,Traction Battery Temperature Warning,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-47,6,High-Voltage Cooling System Fault,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-47,6,High-Voltage Cooling System Fault,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-47,6,High-Voltage Cooling System Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-48,6,Battery Contactors Do Not Close,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-48,6,Battery Contactors Do Not Close,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-48,6,Battery Contactors Do Not Close,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-49,6,High-Voltage Cable or Connector Fault Suspected,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-49,6,High-Voltage Cable or Connector Fault Suspected,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-49,6,High-Voltage Cable or Connector Fault Suspected,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-50,6,DC-to-DC Converter or 12V Supply Fault Affecting Charging,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-50,6,DC-to-DC Converter or 12V Supply Fault Affecting Charging,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-50,6,DC-to-DC Converter or 12V Supply Fault Affecting Charging,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-51,6,Vehicle Will Not Enter Ready Mode After Charging Error,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-51,6,Vehicle Will Not Enter Ready Mode After Charging Error,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-51,6,Vehicle Will Not Enter Ready Mode After Charging Error,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-52,6,Charging Disabled by a Safety Protection System,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-52,6,Charging Disabled by a Safety Protection System,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-52,6,Charging Disabled by a Safety Protection System,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-53,6,Plug-in Hybrid Will Not Charge Externally,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-53,6,Plug-in Hybrid Will Not Charge Externally,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-53,6,Plug-in Hybrid Will Not Charge Externally,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-54,6,Plug-in Hybrid Charges Slowly,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-54,6,Plug-in Hybrid Charges Slowly,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-54,6,Plug-in Hybrid Charges Slowly,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-55,6,Hybrid Battery Warning or Reduced Power,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-55,6,Hybrid Battery Warning or Reduced Power,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-55,6,Hybrid Battery Warning or Reduced Power,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-56,6,Hybrid System Fault That Is Not an External Charging Fault,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-56,6,Hybrid System Fault That Is Not an External Charging Fault,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-56,6,Hybrid System Fault That Is Not an External Charging Fault,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-57,6,Conventional Hybrid Owner Mistakes Regenerative Charging for Plug-in Charging,budget,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-57,6,Conventional Hybrid Owner Mistakes Regenerative Charging for Plug-in Charging,mid,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-57,6,Conventional Hybrid Owner Mistakes Regenerative Charging for Plug-in Charging,premium,₹0 + labour if applicable,text_quotation_required,text,,,
+F06-EV-58,6,Hybrid 12V Battery Fault Causing Start or System Warnings,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-58,6,Hybrid 12V Battery Fault Causing Start or System Warnings,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-58,6,Hybrid 12V Battery Fault Causing Start or System Warnings,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-59,6,Hybrid Battery Cooling or Temperature Warning,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-59,6,Hybrid Battery Cooling or Temperature Warning,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-59,6,Hybrid Battery Cooling or Temperature Warning,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-60,6,Charging Starts Only After Reconnecting the Plug,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-60,6,Charging Starts Only After Reconnecting the Plug,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-60,6,Charging Starts Only After Reconnecting the Plug,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-61,6,Charging Indicator or Dashboard Shows an Incorrect Status,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-61,6,Charging Indicator or Dashboard Shows an Incorrect Status,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-61,6,Charging Indicator or Dashboard Shows an Incorrect Status,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-62,6,"Charging Failure After Repair, Accident or Component Replacement",budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-62,6,"Charging Failure After Repair, Accident or Component Replacement",mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-62,6,"Charging Failure After Repair, Accident or Component Replacement",premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-63,6,Charging Fault Appears Only in Hot or Wet Conditions,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-63,6,Charging Fault Appears Only in Hot or Wet Conditions,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-63,6,Charging Fault Appears Only in Hot or Wet Conditions,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-64,6,Charging Port or Cable Has a Burning Smell or Visible Damage,budget,"₹6,000–₹25,000",text_quotation_required,text,,,
+F06-EV-64,6,Charging Port or Cable Has a Burning Smell or Visible Damage,mid,"₹6,000–₹25,000",text_quotation_required,text,,,
+F06-EV-64,6,Charging Port or Cable Has a Burning Smell or Visible Damage,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-65,6,Vehicle Has Multiple Charging or Electrical Warnings,budget,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-65,6,Vehicle Has Multiple Charging or Electrical Warnings,mid,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-65,6,Vehicle Has Multiple Charging or Electrical Warnings,premium,Quotation required — compatible part and labour price not publicly verified,text_quotation_required,text,,,
+F06-EV-66,6,Charging Fault Cannot Be Identified From Symptoms Alone,budget,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-66,6,Charging Fault Cannot Be Identified From Symptoms Alone,mid,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F06-EV-66,6,Charging Fault Cannot Be Identified From Symptoms Alone,premium,"₹800–₹3,000 + additional quotation required",text_quotation_required,text,,,
+F07-SS-01,7,Slow / Hesitant Self Start,budget,"₹9,800–₹12,740
+(parts + labour)",range_parsed,range,9800,12740,
+F07-SS-01,7,Slow / Hesitant Self Start,mid,"₹16,700–₹21,710
+(parts + labour)",range_parsed,range,16700,21710,
+F07-SS-01,7,Slow / Hesitant Self Start,premium,"₹31,050–₹40,365
+(parts + labour)",range_parsed,range,31050,40365,
+F07-SS-02,7,Intermittent Self Not Taking,budget,"₹2,150–₹2,795
+(parts + labour)",range_parsed,range,2150,2795,
+F07-SS-02,7,Intermittent Self Not Taking,mid,"₹3,700–₹4,810
+(parts + labour)",range_parsed,range,3700,4810,
+F07-SS-02,7,Intermittent Self Not Taking,premium,"₹6,600–₹8,580
+(parts + labour)",range_parsed,range,6600,8580,
+F07-SS-03,7,Automatic Start-Stop Not Working,budget,"₹9,800–₹12,740
+(parts + labour)",range_parsed,range,9800,12740,
+F07-SS-03,7,Automatic Start-Stop Not Working,mid,"₹16,700–₹21,710
+(parts + labour)",range_parsed,range,16700,21710,
+F07-SS-03,7,Automatic Start-Stop Not Working,premium,"₹31,050–₹40,365
+(parts + labour)",range_parsed,range,31050,40365,
+F07-SS-04,7,Self Motor Failure — Complete Non-Start,budget,"₹11,800–₹15,340
+(parts + labour)",range_parsed,range,11800,15340,
+F07-SS-04,7,Self Motor Failure — Complete Non-Start,mid,"₹20,100–₹26,130
+(parts + labour)",range_parsed,range,20100,26130,
+F07-SS-04,7,Self Motor Failure — Complete Non-Start,premium,"₹37,450–₹48,685
+(parts + labour)",range_parsed,range,37450,48685,
+F07-SS-05,7,Starter Clicking but Engine Not Cranking,budget,"₹2,850–₹3,705
+(parts + labour)",range_parsed,range,2850,3705,
+F07-SS-05,7,Starter Clicking but Engine Not Cranking,mid,"₹4,850–₹6,305
+(parts + labour)",range_parsed,range,4850,6305,
+F07-SS-05,7,Starter Clicking but Engine Not Cranking,premium,"₹8,800–₹11,440
+(parts + labour)",range_parsed,range,8800,11440,
+F07-SS-06,7,Single Click During Starting,budget,"₹6,900–₹8,970
+(parts + labour)",range_parsed,range,6900,8970,
+F07-SS-06,7,Single Click During Starting,mid,"₹11,750–₹15,275
+(parts + labour)",range_parsed,range,11750,15275,
+F07-SS-06,7,Single Click During Starting,premium,"₹21,750–₹28,275
+(parts + labour)",range_parsed,range,21750,28275,
+F07-SS-07,7,Repeated Rapid Clicking During Starting,budget,"₹9,800–₹12,740
+(parts + labour)",range_parsed,range,9800,12740,
+F07-SS-07,7,Repeated Rapid Clicking During Starting,mid,"₹16,700–₹21,710
+(parts + labour)",range_parsed,range,16700,21710,
+F07-SS-07,7,Repeated Rapid Clicking During Starting,premium,"₹31,050–₹40,365
+(parts + labour)",range_parsed,range,31050,40365,
+F07-SS-08,7,Starter Motor Spinning but Engine Not Turning,budget,"₹3,300–₹4,290
+(parts + labour)",range_parsed,range,3300,4290,
+F07-SS-08,7,Starter Motor Spinning but Engine Not Turning,mid,"₹5,650–₹7,345
+(parts + labour)",range_parsed,range,5650,7345,
+F07-SS-08,7,Starter Motor Spinning but Engine Not Turning,premium,"₹10,250–₹13,325
+(parts + labour)",range_parsed,range,10250,13325,
+F07-SS-09,7,Starter Solenoid Failure,budget,"₹2,850–₹3,705
+(parts + labour)",range_parsed,range,2850,3705,
+F07-SS-09,7,Starter Solenoid Failure,mid,"₹4,850–₹6,305
+(parts + labour)",range_parsed,range,4850,6305,
+F07-SS-09,7,Starter Solenoid Failure,premium,"₹8,800–₹11,440
+(parts + labour)",range_parsed,range,8800,11440,
+F07-SS-10,7,Starter Relay Failure,budget,"₹1,450–₹1,885
+(parts + labour)",range_parsed,range,1450,1885,
+F07-SS-10,7,Starter Relay Failure,mid,"₹2,450–₹3,185
+(parts + labour)",range_parsed,range,2450,3185,
+F07-SS-10,7,Starter Relay Failure,premium,"₹4,300–₹5,590
+(parts + labour)",range_parsed,range,4300,5590,
+F07-SS-11,7,Starter Fuse / Fusible Link Fault,budget,"₹1,900–₹2,470
+(parts + labour)",range_parsed,range,1900,2470,
+F07-SS-11,7,Starter Fuse / Fusible Link Fault,mid,"₹3,250–₹4,225
+(parts + labour)",range_parsed,range,3250,4225,
+F07-SS-11,7,Starter Fuse / Fusible Link Fault,premium,"₹5,750–₹7,475
+(parts + labour)",range_parsed,range,5750,7475,
+F07-SS-12,7,Starter Motor Brush Wear,budget,"₹1,550–₹2,015
+(parts + labour)",range_parsed,range,1550,2015,
+F07-SS-12,7,Starter Motor Brush Wear,mid,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-SS-12,7,Starter Motor Brush Wear,premium,"₹4,650–₹6,045
+(parts + labour)",range_parsed,range,4650,6045,
+F07-SS-13,7,Starter Motor Armature / Internal Failure,budget,"₹8,900–₹11,570
+(parts + labour)",range_parsed,range,8900,11570,
+F07-SS-13,7,Starter Motor Armature / Internal Failure,mid,"₹15,150–₹19,695
+(parts + labour)",range_parsed,range,15150,19695,
+F07-SS-13,7,Starter Motor Armature / Internal Failure,premium,"₹28,150–₹36,595
+(parts + labour)",range_parsed,range,28150,36595,
+F07-SS-14,7,Starter Bendix / Pinion Gear Fault,budget,"₹3,300–₹4,290
+(parts + labour)",range_parsed,range,3300,4290,
+F07-SS-14,7,Starter Bendix / Pinion Gear Fault,mid,"₹5,650–₹7,345
+(parts + labour)",range_parsed,range,5650,7345,
+F07-SS-14,7,Starter Bendix / Pinion Gear Fault,premium,"₹10,250–₹13,325
+(parts + labour)",range_parsed,range,10250,13325,
+F07-SS-15,7,Flywheel Ring Gear Teeth Damage,budget,"₹5,200–₹6,760
+(parts + labour)",range_parsed,range,5200,6760,
+F07-SS-15,7,Flywheel Ring Gear Teeth Damage,mid,"₹8,900–₹11,570
+(parts + labour)",range_parsed,range,8900,11570,
+F07-SS-15,7,Flywheel Ring Gear Teeth Damage,premium,"₹16,350–₹21,255
+(parts + labour)",range_parsed,range,16350,21255,
+F07-SS-16,7,Starter Wiring Loose / Damaged,budget,"₹6,200–₹8,060
+(parts + labour)",range_parsed,range,6200,8060,
+F07-SS-16,7,Starter Wiring Loose / Damaged,mid,"₹10,600–₹13,780
+(parts + labour)",range_parsed,range,10600,13780,
+F07-SS-16,7,Starter Wiring Loose / Damaged,premium,"₹19,550–₹25,415
+(parts + labour)",range_parsed,range,19550,25415,
+F07-SS-17,7,Poor Engine Ground / Earthing,budget,"₹5,150–₹6,695
+(parts + labour)",range_parsed,range,5150,6695,
+F07-SS-17,7,Poor Engine Ground / Earthing,mid,"₹8,700–₹11,310
+(parts + labour)",range_parsed,range,8700,11310,
+F07-SS-17,7,Poor Engine Ground / Earthing,premium,"₹16,150–₹20,995
+(parts + labour)",range_parsed,range,16150,20995,
+F07-SS-18,7,Weak Battery Causing Slow Cranking,budget,"₹9,800–₹12,740
+(parts + labour)",range_parsed,range,9800,12740,
+F07-SS-18,7,Weak Battery Causing Slow Cranking,mid,"₹16,700–₹21,710
+(parts + labour)",range_parsed,range,16700,21710,
+F07-SS-18,7,Weak Battery Causing Slow Cranking,premium,"₹31,050–₹40,365
+(parts + labour)",range_parsed,range,31050,40365,
+F07-SS-19,7,Battery Terminal Corrosion / Loose Connection,budget,"₹5,150–₹6,695
+(parts + labour)",range_parsed,range,5150,6695,
+F07-SS-19,7,Battery Terminal Corrosion / Loose Connection,mid,"₹8,700–₹11,310
+(parts + labour)",range_parsed,range,8700,11310,
+F07-SS-19,7,Battery Terminal Corrosion / Loose Connection,premium,"₹16,150–₹20,995
+(parts + labour)",range_parsed,range,16150,20995,
+F07-SS-20,7,Ignition Switch / Start Button Failure,budget,"₹1,850–₹2,405
+(parts + labour)",range_parsed,range,1850,2405,
+F07-SS-20,7,Ignition Switch / Start Button Failure,mid,"₹3,100–₹4,030
+(parts + labour)",range_parsed,range,3100,4030,
+F07-SS-20,7,Ignition Switch / Start Button Failure,premium,"₹5,600–₹7,280
+(parts + labour)",range_parsed,range,5600,7280,
+F07-SS-21,7,Smart Key / Push-Button Start Detection Fault,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-SS-21,7,Smart Key / Push-Button Start Detection Fault,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-SS-21,7,Smart Key / Push-Button Start Detection Fault,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-SS-22,7,Immobilizer / Key Recognition Problem,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-SS-22,7,Immobilizer / Key Recognition Problem,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-SS-22,7,Immobilizer / Key Recognition Problem,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-SS-23,7,Clutch Safety Switch Fault,budget,"₹1,850–₹2,405
+(parts + labour)",range_parsed,range,1850,2405,
+F07-SS-23,7,Clutch Safety Switch Fault,mid,"₹3,100–₹4,030
+(parts + labour)",range_parsed,range,3100,4030,
+F07-SS-23,7,Clutch Safety Switch Fault,premium,"₹5,600–₹7,280
+(parts + labour)",range_parsed,range,5600,7280,
+F07-SS-24,7,Brake Pedal Switch Preventing Start,budget,"₹1,850–₹2,405
+(parts + labour)",range_parsed,range,1850,2405,
+F07-SS-24,7,Brake Pedal Switch Preventing Start,mid,"₹3,100–₹4,030
+(parts + labour)",range_parsed,range,3100,4030,
+F07-SS-24,7,Brake Pedal Switch Preventing Start,premium,"₹5,600–₹7,280
+(parts + labour)",range_parsed,range,5600,7280,
+F07-SS-25,7,Park / Neutral Safety Switch Fault,budget,"₹1,850–₹2,405
+(parts + labour)",range_parsed,range,1850,2405,
+F07-SS-25,7,Park / Neutral Safety Switch Fault,mid,"₹3,100–₹4,030
+(parts + labour)",range_parsed,range,3100,4030,
+F07-SS-25,7,Park / Neutral Safety Switch Fault,premium,"₹5,600–₹7,280
+(parts + labour)",range_parsed,range,5600,7280,
+F07-SS-26,7,Engine Cranks Normally but Does Not Start,budget,"₹3,050–₹3,965
+(parts + labour)",range_parsed,range,3050,3965,
+F07-SS-26,7,Engine Cranks Normally but Does Not Start,mid,"₹5,200–₹6,760
+(parts + labour)",range_parsed,range,5200,6760,
+F07-SS-26,7,Engine Cranks Normally but Does Not Start,premium,"₹9,450–₹12,285
+(parts + labour)",range_parsed,range,9450,12285,
+F07-SS-27,7,Starter Fails When Engine Is Hot,budget,"₹8,200–₹10,660
+(parts + labour)",range_parsed,range,8200,10660,
+F07-SS-27,7,Starter Fails When Engine Is Hot,mid,"₹14,000–₹18,200
+(parts + labour)",range_parsed,range,14000,18200,
+F07-SS-27,7,Starter Fails When Engine Is Hot,premium,"₹25,950–₹33,735
+(parts + labour)",range_parsed,range,25950,33735,
+F07-SS-28,7,Difficult Starting During Cold Weather,budget,"₹9,800–₹12,740
+(parts + labour)",range_parsed,range,9800,12740,
+F07-SS-28,7,Difficult Starting During Cold Weather,mid,"₹16,700–₹21,710
+(parts + labour)",range_parsed,range,16700,21710,
+F07-SS-28,7,Difficult Starting During Cold Weather,premium,"₹31,050–₹40,365
+(parts + labour)",range_parsed,range,31050,40365,
+F07-SS-29,7,Starter Keeps Running After Engine Starts,budget,"₹3,600–₹4,680
+(parts + labour)",range_parsed,range,3600,4680,
+F07-SS-29,7,Starter Keeps Running After Engine Starts,mid,"₹6,150–₹7,995
+(parts + labour)",range_parsed,range,6150,7995,
+F07-SS-29,7,Starter Keeps Running After Engine Starts,premium,"₹11,200–₹14,560
+(parts + labour)",range_parsed,range,11200,14560,
+F07-SS-30,7,Grinding Noise While Starting,budget,"₹8,200–₹10,660
+(parts + labour)",range_parsed,range,8200,10660,
+F07-SS-30,7,Grinding Noise While Starting,mid,"₹14,000–₹18,200
+(parts + labour)",range_parsed,range,14000,18200,
+F07-SS-30,7,Grinding Noise While Starting,premium,"₹25,950–₹33,735
+(parts + labour)",range_parsed,range,25950,33735,
+F07-SS-31,7,Starter Motor Overheating,budget,"₹11,800–₹15,340
+(parts + labour)",range_parsed,range,11800,15340,
+F07-SS-31,7,Starter Motor Overheating,mid,"₹20,100–₹26,130
+(parts + labour)",range_parsed,range,20100,26130,
+F07-SS-31,7,Starter Motor Overheating,premium,"₹37,450–₹48,685
+(parts + labour)",range_parsed,range,37450,48685,
+F07-SS-32,7,Engine Seized / Engine Cannot Rotate,budget,"₹3,200–₹4,160
+(parts + labour)",range_parsed,range,3200,4160,
+F07-SS-32,7,Engine Seized / Engine Cannot Rotate,mid,"₹5,500–₹7,150
+(parts + labour)",range_parsed,range,5500,7150,
+F07-SS-32,7,Engine Seized / Engine Cannot Rotate,premium,"₹9,950–₹12,935
+(parts + labour)",range_parsed,range,9950,12935,
+F07-SS-33,7,ECU / BCM Starting Authorization Fault,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-SS-33,7,ECU / BCM Starting Authorization Fault,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-SS-33,7,ECU / BCM Starting Authorization Fault,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-SS-34,7,Rodent-Damaged Starter Wiring,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-SS-34,7,Rodent-Damaged Starter Wiring,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-SS-34,7,Rodent-Damaged Starter Wiring,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-SS-35,7,Waterlogging / Flood-Damaged Starting Circuit,budget,"₹9,350–₹12,155
+(parts + labour)",range_parsed,range,9350,12155,
+F07-SS-35,7,Waterlogging / Flood-Damaged Starting Circuit,mid,"₹15,900–₹20,670
+(parts + labour)",range_parsed,range,15900,20670,
+F07-SS-35,7,Waterlogging / Flood-Damaged Starting Circuit,premium,"₹29,450–₹38,285
+(parts + labour)",range_parsed,range,29450,38285,
+F07-SS-36,7,Automatic Start-Stop Battery Sensor Fault,budget,"₹9,800–₹12,740
+(parts + labour)",range_parsed,range,9800,12740,
+F07-SS-36,7,Automatic Start-Stop Battery Sensor Fault,mid,"₹16,700–₹21,710
+(parts + labour)",range_parsed,range,16700,21710,
+F07-SS-36,7,Automatic Start-Stop Battery Sensor Fault,premium,"₹31,050–₹40,365
+(parts + labour)",range_parsed,range,31050,40365,
+F07-SS-37,7,Automatic Start-Stop Temporarily Disabled by Normal Conditions,budget,"₹1,550–₹2,015
+(parts + labour)",range_parsed,range,1550,2015,
+F07-SS-37,7,Automatic Start-Stop Temporarily Disabled by Normal Conditions,mid,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-SS-37,7,Automatic Start-Stop Temporarily Disabled by Normal Conditions,premium,"₹4,650–₹6,045
+(parts + labour)",range_parsed,range,4650,6045,
+F07-SS-38,7,Mild-Hybrid Starter-Generator Fault,budget,"₹6,200–₹8,060
+(parts + labour)",range_parsed,range,6200,8060,
+F07-SS-38,7,Mild-Hybrid Starter-Generator Fault,mid,"₹10,600–₹13,780
+(parts + labour)",range_parsed,range,10600,13780,
+F07-SS-38,7,Mild-Hybrid Starter-Generator Fault,premium,"₹19,550–₹25,415
+(parts + labour)",range_parsed,range,19550,25415,
+F07-ST-01,7,Slow to Move / Minor Drag,budget,"₹1,550–₹2,015
+(parts + labour)",range_parsed,range,1550,2015,
+F07-ST-01,7,Slow to Move / Minor Drag,mid,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-ST-01,7,Slow to Move / Minor Drag,premium,"₹4,650–₹6,045
+(parts + labour)",range_parsed,range,4650,6045,
+F07-ST-02,7,Parking Brake / Mechanical Stuck,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-ST-02,7,Parking Brake / Mechanical Stuck,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-ST-02,7,Parking Brake / Mechanical Stuck,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-ST-03,7,Gear Lock / Key-Not-Moving Fault,budget,"₹3,300–₹4,290
+(parts + labour)",range_parsed,range,3300,4290,
+F07-ST-03,7,Gear Lock / Key-Not-Moving Fault,mid,"₹5,650–₹7,345
+(parts + labour)",range_parsed,range,5650,7345,
+F07-ST-03,7,Gear Lock / Key-Not-Moving Fault,premium,"₹10,250–₹13,325
+(parts + labour)",range_parsed,range,10250,13325,
+F07-ST-04,7,Combined Major Fault — ABS Warning + Vehicle Immobile,budget,"₹5,200–₹6,760
+(parts + labour)",range_parsed,range,5200,6760,
+F07-ST-04,7,Combined Major Fault — ABS Warning + Vehicle Immobile,mid,"₹8,850–₹11,505
+(parts + labour)",range_parsed,range,8850,11505,
+F07-ST-04,7,Combined Major Fault — ABS Warning + Vehicle Immobile,premium,"₹16,200–₹21,060
+(parts + labour)",range_parsed,range,16200,21060,
+F07-ST-05,7,Handbrake Cable Seized,budget,"₹3,200–₹4,160
+(parts + labour)",range_parsed,range,3200,4160,
+F07-ST-05,7,Handbrake Cable Seized,mid,"₹5,500–₹7,150
+(parts + labour)",range_parsed,range,5500,7150,
+F07-ST-05,7,Handbrake Cable Seized,premium,"₹9,950–₹12,935
+(parts + labour)",range_parsed,range,9950,12935,
+F07-ST-06,7,Rear Drum Brake Shoes Stuck,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-ST-06,7,Rear Drum Brake Shoes Stuck,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-ST-06,7,Rear Drum Brake Shoes Stuck,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-ST-07,7,Brake Caliper Seized,budget,"₹7,300–₹9,490
+(parts + labour)",range_parsed,range,7300,9490,
+F07-ST-07,7,Brake Caliper Seized,mid,"₹12,400–₹16,120
+(parts + labour)",range_parsed,range,12400,16120,
+F07-ST-07,7,Brake Caliper Seized,premium,"₹22,900–₹29,770
+(parts + labour)",range_parsed,range,22900,29770,
+F07-ST-08,7,Brake Pads Binding Against Disc,budget,"₹3,500–₹4,550
+(parts + labour)",range_parsed,range,3500,4550,
+F07-ST-08,7,Brake Pads Binding Against Disc,mid,"₹6,000–₹7,800
+(parts + labour)",range_parsed,range,6000,7800,
+F07-ST-08,7,Brake Pads Binding Against Disc,premium,"₹10,900–₹14,170
+(parts + labour)",range_parsed,range,10900,14170,
+F07-ST-09,7,Electronic Parking Brake Not Releasing,budget,"₹6,500–₹8,450
+(parts + labour)",range_parsed,range,6500,8450,
+F07-ST-09,7,Electronic Parking Brake Not Releasing,mid,"₹11,100–₹14,430
+(parts + labour)",range_parsed,range,11100,14430,
+F07-ST-09,7,Electronic Parking Brake Not Releasing,premium,"₹20,500–₹26,650
+(parts + labour)",range_parsed,range,20500,26650,
+F07-ST-10,7,Electronic Parking Brake Actuator Fault,budget,"₹5,150–₹6,695
+(parts + labour)",range_parsed,range,5150,6695,
+F07-ST-10,7,Electronic Parking Brake Actuator Fault,mid,"₹8,700–₹11,310
+(parts + labour)",range_parsed,range,8700,11310,
+F07-ST-10,7,Electronic Parking Brake Actuator Fault,premium,"₹16,150–₹20,995
+(parts + labour)",range_parsed,range,16150,20995,
+F07-ST-11,7,Automatic Gear Selector Stuck in Park,budget,"₹3,600–₹4,680
+(parts + labour)",range_parsed,range,3600,4680,
+F07-ST-11,7,Automatic Gear Selector Stuck in Park,mid,"₹6,150–₹7,995
+(parts + labour)",range_parsed,range,6150,7995,
+F07-ST-11,7,Automatic Gear Selector Stuck in Park,premium,"₹11,200–₹14,560
+(parts + labour)",range_parsed,range,11200,14560,
+F07-ST-12,7,Brake Shift Interlock Fault,budget,"₹2,900–₹3,770
+(parts + labour)",range_parsed,range,2900,3770,
+F07-ST-12,7,Brake Shift Interlock Fault,mid,"₹5,000–₹6,500
+(parts + labour)",range_parsed,range,5000,6500,
+F07-ST-12,7,Brake Shift Interlock Fault,premium,"₹9,000–₹11,700
+(parts + labour)",range_parsed,range,9000,11700,
+F07-ST-13,7,Gear Selector Cable / Linkage Failure,budget,"₹4,150–₹5,395
+(parts + labour)",range_parsed,range,4150,5395,
+F07-ST-13,7,Gear Selector Cable / Linkage Failure,mid,"₹7,000–₹9,100
+(parts + labour)",range_parsed,range,7000,9100,
+F07-ST-13,7,Gear Selector Cable / Linkage Failure,premium,"₹12,950–₹16,835
+(parts + labour)",range_parsed,range,12950,16835,
+F07-ST-14,7,Manual Gear Cannot Engage,budget,"₹7,800–₹10,140
+(parts + labour)",range_parsed,range,7800,10140,
+F07-ST-14,7,Manual Gear Cannot Engage,mid,"₹13,300–₹17,290
+(parts + labour)",range_parsed,range,13300,17290,
+F07-ST-14,7,Manual Gear Cannot Engage,premium,"₹24,650–₹32,045
+(parts + labour)",range_parsed,range,24650,32045,
+F07-ST-15,7,Clutch Not Disengaging,budget,"₹7,800–₹10,140
+(parts + labour)",range_parsed,range,7800,10140,
+F07-ST-15,7,Clutch Not Disengaging,mid,"₹13,300–₹17,290
+(parts + labour)",range_parsed,range,13300,17290,
+F07-ST-15,7,Clutch Not Disengaging,premium,"₹24,650–₹32,045
+(parts + labour)",range_parsed,range,24650,32045,
+F07-ST-16,7,Clutch Slipping — Engine Revs but Car Does Not Move,budget,"₹4,150–₹5,395
+(parts + labour)",range_parsed,range,4150,5395,
+F07-ST-16,7,Clutch Slipping — Engine Revs but Car Does Not Move,mid,"₹7,000–₹9,100
+(parts + labour)",range_parsed,range,7000,9100,
+F07-ST-16,7,Clutch Slipping — Engine Revs but Car Does Not Move,premium,"₹12,950–₹16,835
+(parts + labour)",range_parsed,range,12950,16835,
+F07-ST-17,7,Automatic Transmission Not Engaging Drive,budget,"₹3,000–₹3,900
+(parts + labour)",range_parsed,range,3000,3900,
+F07-ST-17,7,Automatic Transmission Not Engaging Drive,mid,"₹5,100–₹6,630
+(parts + labour)",range_parsed,range,5100,6630,
+F07-ST-17,7,Automatic Transmission Not Engaging Drive,premium,"₹9,250–₹12,025
+(parts + labour)",range_parsed,range,9250,12025,
+F07-ST-18,7,AMT Actuator / Gear Selection Failure,budget,"₹4,150–₹5,395
+(parts + labour)",range_parsed,range,4150,5395,
+F07-ST-18,7,AMT Actuator / Gear Selection Failure,mid,"₹7,000–₹9,100
+(parts + labour)",range_parsed,range,7000,9100,
+F07-ST-18,7,AMT Actuator / Gear Selection Failure,premium,"₹12,950–₹16,835
+(parts + labour)",range_parsed,range,12950,16835,
+F07-ST-19,7,CVT / Automatic Transmission Limp Mode,budget,"₹3,000–₹3,900
+(parts + labour)",range_parsed,range,3000,3900,
+F07-ST-19,7,CVT / Automatic Transmission Limp Mode,mid,"₹5,100–₹6,630
+(parts + labour)",range_parsed,range,5100,6630,
+F07-ST-19,7,CVT / Automatic Transmission Limp Mode,premium,"₹9,250–₹12,025
+(parts + labour)",range_parsed,range,9250,12025,
+F07-ST-20,7,Driveshaft / CV Joint Failure,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-ST-20,7,Driveshaft / CV Joint Failure,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-ST-20,7,Driveshaft / CV Joint Failure,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-ST-21,7,Differential / Final Drive Failure,budget,"₹3,800–₹4,940
+(parts + labour)",range_parsed,range,3800,4940,
+F07-ST-21,7,Differential / Final Drive Failure,mid,"₹6,500–₹8,450
+(parts + labour)",range_parsed,range,6500,8450,
+F07-ST-21,7,Differential / Final Drive Failure,premium,"₹11,850–₹15,405
+(parts + labour)",range_parsed,range,11850,15405,
+F07-ST-22,7,Wheel Bearing Seized,budget,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-ST-22,7,Wheel Bearing Seized,mid,"₹7,700–₹10,010
+(parts + labour)",range_parsed,range,7700,10010,
+F07-ST-22,7,Wheel Bearing Seized,premium,"₹14,100–₹18,330
+(parts + labour)",range_parsed,range,14100,18330,
+F07-ST-23,7,Wheel Locked After Long Parking / Rain,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-ST-23,7,Wheel Locked After Long Parking / Rain,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-ST-23,7,Wheel Locked After Long Parking / Rain,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-ST-24,7,ABS / ESC Fault with Possible Brake or Drivetrain Issue,budget,"₹3,500–₹4,550
+(parts + labour)",range_parsed,range,3500,4550,
+F07-ST-24,7,ABS / ESC Fault with Possible Brake or Drivetrain Issue,mid,"₹6,000–₹7,800
+(parts + labour)",range_parsed,range,6000,7800,
+F07-ST-24,7,ABS / ESC Fault with Possible Brake or Drivetrain Issue,premium,"₹10,900–₹14,170
+(parts + labour)",range_parsed,range,10900,14170,
+F07-ST-25,7,Transmission Fluid Loss / Internal Transmission Damage,budget,"₹21,100–₹27,430
+(parts + labour)",range_parsed,range,21100,27430,
+F07-ST-25,7,Transmission Fluid Loss / Internal Transmission Damage,mid,"₹35,850–₹46,605
+(parts + labour)",range_parsed,range,35850,46605,
+F07-ST-25,7,Transmission Fluid Loss / Internal Transmission Damage,premium,"₹67,050–₹87,165
+(parts + labour)",range_parsed,range,67050,87165,
+F07-ST-26,7,Engine Running but No Power Reaching Wheels,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-ST-26,7,Engine Running but No Power Reaching Wheels,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-ST-26,7,Engine Running but No Power Reaching Wheels,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-ST-27,7,Tyre / Wheel Mechanically Jammed,budget,"₹5,600–₹7,280
+(parts + labour)",range_parsed,range,5600,7280,
+F07-ST-27,7,Tyre / Wheel Mechanically Jammed,mid,"₹9,550–₹12,415
+(parts + labour)",range_parsed,range,9550,12415,
+F07-ST-27,7,Tyre / Wheel Mechanically Jammed,premium,"₹17,500–₹22,750
+(parts + labour)",range_parsed,range,17500,22750,
+F07-ST-28,7,Underbody Damage / Object Blocking Wheel,budget,"₹3,200–₹4,160
+(parts + labour)",range_parsed,range,3200,4160,
+F07-ST-28,7,Underbody Damage / Object Blocking Wheel,mid,"₹5,500–₹7,150
+(parts + labour)",range_parsed,range,5500,7150,
+F07-ST-28,7,Underbody Damage / Object Blocking Wheel,premium,"₹9,950–₹12,935
+(parts + labour)",range_parsed,range,9950,12935,
+F07-ST-29,7,Car Stuck in Mud / Sand / Waterlogged Road,budget,"₹2,150–₹2,795
+(parts + labour)",range_parsed,range,2150,2795,
+F07-ST-29,7,Car Stuck in Mud / Sand / Waterlogged Road,mid,"₹3,600–₹4,680
+(parts + labour)",range_parsed,range,3600,4680,
+F07-ST-29,7,Car Stuck in Mud / Sand / Waterlogged Road,premium,"₹6,550–₹8,515
+(parts + labour)",range_parsed,range,6550,8515,
+F07-ST-30,7,Vehicle Not Moving After Accident,budget,"₹5,600–₹7,280
+(parts + labour)",range_parsed,range,5600,7280,
+F07-ST-30,7,Vehicle Not Moving After Accident,mid,"₹9,550–₹12,415
+(parts + labour)",range_parsed,range,9550,12415,
+F07-ST-30,7,Vehicle Not Moving After Accident,premium,"₹17,500–₹22,750
+(parts + labour)",range_parsed,range,17500,22750,
+F07-ST-31,7,Parking Pawl Under Load / Vehicle Stuck in Park,budget,"₹2,600–₹3,380
+(parts + labour)",range_parsed,range,2600,3380,
+F07-ST-31,7,Parking Pawl Under Load / Vehicle Stuck in Park,mid,"₹4,500–₹5,850
+(parts + labour)",range_parsed,range,4500,5850,
+F07-ST-31,7,Parking Pawl Under Load / Vehicle Stuck in Park,premium,"₹8,050–₹10,465
+(parts + labour)",range_parsed,range,8050,10465,
+F07-ST-32,7,Electronic Gear Selector / Transmission Control Fault,budget,"₹3,300–₹4,290
+(parts + labour)",range_parsed,range,3300,4290,
+F07-ST-32,7,Electronic Gear Selector / Transmission Control Fault,mid,"₹5,650–₹7,345
+(parts + labour)",range_parsed,range,5650,7345,
+F07-ST-32,7,Electronic Gear Selector / Transmission Control Fault,premium,"₹10,250–₹13,325
+(parts + labour)",range_parsed,range,10250,13325,
+F07-ST-33,7,Vehicle Immobilized by Multiple Electrical Faults,budget,"₹7,300–₹9,490
+(parts + labour)",range_parsed,range,7300,9490,
+F07-ST-33,7,Vehicle Immobilized by Multiple Electrical Faults,mid,"₹12,450–₹16,185
+(parts + labour)",range_parsed,range,12450,16185,
+F07-ST-33,7,Vehicle Immobilized by Multiple Electrical Faults,premium,"₹22,950–₹29,835
+(parts + labour)",range_parsed,range,22950,29835,
+F07-ST-34,7,Brake Hydraulic Pressure Not Releasing,budget,"₹4,000–₹5,200
+(parts + labour)",range_parsed,range,4000,5200,
+F07-ST-34,7,Brake Hydraulic Pressure Not Releasing,mid,"₹6,800–₹8,840
+(parts + labour)",range_parsed,range,6800,8840,
+F07-ST-34,7,Brake Hydraulic Pressure Not Releasing,premium,"₹12,350–₹16,055
+(parts + labour)",range_parsed,range,12350,16055,
+F07-ST-35,7,Hill-Hold / Auto-Hold Release Problem,budget,"₹3,800–₹4,940
+(parts + labour)",range_parsed,range,3800,4940,
+F07-ST-35,7,Hill-Hold / Auto-Hold Release Problem,mid,"₹6,500–₹8,450
+(parts + labour)",range_parsed,range,6500,8450,
+F07-ST-35,7,Hill-Hold / Auto-Hold Release Problem,premium,"₹11,850–₹15,405
+(parts + labour)",range_parsed,range,11850,15405,

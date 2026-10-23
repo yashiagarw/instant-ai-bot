@@ -39,6 +39,7 @@ cd backend
 uv sync
 uv run alembic upgrade head
 uv run python -m app.vehicles.seed      # vehicle catalogue from data/catalogue/vehicles.yaml
+uv run python -m app.knowledge.importer --all   # the 18 datasets (first run downloads a ~470 MB embedding model)
 cd ..
 
 # 4. Web
@@ -87,6 +88,7 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 - The test database is created by `docker/postgres/init/` the first time the volume is created. If you created the volume before that script existed, run `docker compose down -v && docker compose up -d db` (this deletes local data).
 - pytest refuses to run against a database whose name does not end in `_test`.
 - Vehicle catalogue: edit `data/catalogue/vehicles.yaml`, then `cd backend && uv run python -m app.vehicles.seed` (safe to re-run; add `--prune` to delete entries removed from the file).
+- Dataset import: `cd backend && uv run python -m app.knowledge.importer --all` (or `--file "data/raw/TYRE CATEGORY 4.xlsx"`). Safe to re-run: the same inputs replace the same dataset version. `--no-embeddings` is faster but leaves re-imported phrases and symptoms without vectors. Outputs for people to review go to `data/review/` (import report, costs.csv, duplicates.csv, review_items.csv, and `costs/F02-labour.yaml`, where Overheating labour is approved). Extracted pictures go to `data/media/` (not in git; the importer regenerates them).
 - New migration: `cd backend && uv run alembic revision -m "describe change"` (autogenerate works once models exist: add `--autogenerate`). Never edit an applied migration.
 
 ## Environment variables

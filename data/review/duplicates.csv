@@ -1,0 +1,67 @@
+fault_a,name_a,category_a,fault_b,name_b,category_b,same_category,name_similarity,embedding_similarity,score
+F14-SU-02,Disturbing Noise While Driving,suspension,F17-SU-02,Disturbing Noise While Driving,suspension,True,1.0,1.0,1.0
+F14-SU-03,Shock Absorber Fault - One Side,suspension,F17-SU-03,Shock Absorber Fault - One Side,suspension,True,1.0,1.0,1.0
+F14-SU-04,Suspension Component Broken,suspension,F17-SU-04,Suspension Component Broken,suspension,True,1.0,1.0,1.0
+F14-SU-05,Shock Absorber Oil Leakage,suspension,F17-SU-05,Shock Absorber Oil Leakage,suspension,True,1.0,1.0,1.0
+F14-SU-07,Stabilizer Link / Anti-Roll Bar Link Noise,suspension,F17-SU-07,Stabilizer Link / Anti-Roll Bar Link Noise,suspension,True,1.0,1.0,1.0
+F14-SU-08,Suspension Bush Worn / Cracked,suspension,F17-SU-08,Suspension Bush Worn / Cracked,suspension,True,1.0,1.0,1.0
+F14-SU-09,Control Arm / Lower Arm Fault,suspension,F17-SU-09,Control Arm / Lower Arm Fault,suspension,True,1.0,1.0,1.0
+F14-SU-10,Ball Joint Loose / Worn,suspension,F17-SU-10,Ball Joint Loose / Worn,suspension,True,1.0,1.0,1.0
+F14-SU-11,Strut Mount / Bearing Noise,suspension,F17-SU-11,Strut Mount / Bearing Noise,suspension,True,1.0,1.0,1.0
+F14-SU-12,Coil Spring Broken / Sagging,suspension,F17-SU-12,Coil Spring Broken / Sagging,suspension,True,1.0,1.0,1.0
+F14-SU-15,Severe Suspension Damage After Pothole / Road Impact,suspension,F17-SU-16,Severe Suspension Damage After Pothole / Road Impact,suspension,True,1.0,1.0,1.0
+F14-SU-16,Underbody Scraping / Low Car With Full Load (Speed Breakers)  [NEW - India],suspension,F17-SU-17,Underbody Scraping / Low Car With Full Load (Speed Breakers)  [NEW - India],suspension,True,1.0,1.0,1.0
+F09-NS-08,Fuel Filter Blocked,not_starting,F10-FD-10,Fuel Filter Blocked,fuel_delivery,False,1.0,0.947,0.974
+F12-EN-06,Engine Misfire at Idle,engine,F15-JM-09,Engine Misfire at Idle,jerking_misfire,False,1.0,0.944,0.972
+F14-SU-14,Steering / Wheel Vibration - Suspension-Related Suspected,suspension,F17-SU-14,Steering Wheel Vibration - Suspension Suspected,suspension,True,0.918,0.988,0.953
+F12-EL-14,Ignition Switch Electrical Fault,electrical,F13-IG-08,Ignition Switch Electrical Fault,ignition_key,False,1.0,0.845,0.923
+F09-NS-10,Ignition Coil Failed,not_starting,F12-EN-16,Ignition Coil Failure,engine,False,0.927,0.917,0.922
+F10-DW-25,Airbag / SRS Warning Light,dashboard_warning,F16-AB-01,Airbag Warning Light,airbag_srs,False,0.909,0.928,0.919
+F09-NS-12,Crank Position Sensor Fault,not_starting,F15-SE-06,Crankshaft Position Sensor Fault,sensor_ecu,False,0.915,0.914,0.915
+F09-NS-13,Cam Position Sensor Fault,not_starting,F15-SE-07,Camshaft Position Sensor Fault,sensor_ecu,False,0.909,0.883,0.896
+F12-EN-16,Ignition Coil Failure,engine,F15-JM-13,Ignition Coil Fault,jerking_misfire,False,0.85,0.933,0.892
+F09-AP-08,Accelerator Pedal Sensor Fault,pickup_throttle,F15-SE-11,Accelerator Pedal Position Sensor Fault,sensor_ecu,False,0.87,0.913,0.891
+F09-AP-09,Throttle Position Sensor Fault,pickup_throttle,F15-SE-10,Throttle Position Sensor (TPS) Fault,sensor_ecu,False,0.938,0.836,0.887
+F09-NS-07,Fuel Pump Relay or Fuse Failed,not_starting,F10-FD-06,Fuel Pump Relay Failed,fuel_delivery,False,0.846,0.925,0.885
+F09-NS-10,Ignition Coil Failed,not_starting,F15-JM-13,Ignition Coil Fault,jerking_misfire,False,0.872,0.886,0.879
+F14-SU-06,Excessive Bouncing After Bumps,suspension,F17-SU-06,Excessive Bouncing After Speed Breakers,suspension,True,0.783,0.948,0.865
+F14-SU-01,Minor Noise Over Speed Breakers,suspension,F17-SU-01,Minor Noise While Driving (Over Bumps / Speed Breakers),suspension,True,0.756,0.952,0.854
+F07-ST-13,Gear Selector Cable / Linkage Failure,stuck,F17-GB-07,Gear Selector Cable / Linkage Fault,gearbox,False,0.912,0.792,0.852
+F09-NS-12,Crank Position Sensor Fault,not_starting,F15-SE-07,Camshaft Position Sensor Fault,sensor_ecu,False,0.842,0.85,0.846
+F09-NS-08,Fuel Filter Blocked,not_starting,F17-DS-08,Diesel Fuel Filter Blocked,diesel,False,0.844,0.843,0.844
+F10-FD-10,Fuel Filter Blocked,fuel_delivery,F17-DS-08,Diesel Fuel Filter Blocked,diesel,False,0.844,0.839,0.842
+F10-DW-19,Network (CAN) Communication / Wiring Fault,dashboard_warning,F12-EL-17,CAN Bus / Communication Wiring Fault,electrical,False,0.833,0.852,0.842
+F15-JM-24,CNG Mode Jerking / Stalling,jerking_misfire,F17-CG-07,CNG Mode Jerking / Misfiring,cng,False,0.824,0.849,0.836
+F09-NS-18,Engine Stops When AC Is Turned ON,not_starting,F15-JM-21,Engine Stalling When AC Is Switched On,jerking_misfire,False,0.761,0.886,0.823
+F09-NS-13,Cam Position Sensor Fault,not_starting,F15-SE-06,Crankshaft Position Sensor Fault,sensor_ecu,False,0.842,0.797,0.819
+F10-FD-15,Fuel Rail Pressure Sensor Fault (Direct Injection Petrol),fuel_delivery,F15-SE-15,Fuel Rail Pressure Sensor Fault,sensor_ecu,False,0.721,0.917,0.819
+F08-BT-42,Damage From Wrong Jump-Start (Cables Reversed)  [NEW - India],battery,F12-EL-27,Damage After Wrong Jump-Start (Reverse Polarity / Sparks)  [NEW - India],electrical,False,0.752,0.882,0.817
+F09-AP-09,Throttle Position Sensor Fault,pickup_throttle,F15-SE-07,Camshaft Position Sensor Fault,sensor_ecu,False,0.767,0.867,0.817
+F08-BT-40,Water in Fuse Box After Rain or Car Wash  [NEW - India],battery,F15-JM-30,Jerking / Misfire After Rain or Car Wash  [NEW - India],jerking_misfire,False,0.816,0.802,0.809
+F12-EN-17,Spark Plug Wear / Ignition Fault,engine,F15-JM-12,Spark Plug Wear / Fouling,jerking_misfire,False,0.717,0.902,0.809
+F12-EL-18,ECU / BCM Power or Ground Fault,electrical,F15-SE-17,ECU Power Supply / Ground Fault,sensor_ecu,False,0.793,0.823,0.808
+F09-NS-12,Crank Position Sensor Fault,not_starting,F15-SE-11,Accelerator Pedal Position Sensor Fault,sensor_ecu,False,0.758,0.857,0.807
+F09-AP-09,Throttle Position Sensor Fault,pickup_throttle,F15-SE-06,Crankshaft Position Sensor Fault,sensor_ecu,False,0.742,0.869,0.806
+F16-HP-12,Fuel Hose / Fuel Line Leak,hose_leak,F17-DS-11,Diesel Fuel Line Leak,diesel,False,0.756,0.856,0.806
+F12-EN-07,Engine Misfire During Acceleration,engine,F15-JM-05,Jerking During Acceleration,jerking_misfire,False,0.754,0.85,0.802
+F12-EL-15,Starter Control Wiring Fault,electrical,F13-ST-12,Starter Motor Wiring / Ground Fault,starter_motor,False,0.787,0.809,0.798
+F09-AP-21,Misfire When Accelerating,pickup_throttle,F12-EN-07,Engine Misfire During Acceleration,engine,False,0.712,0.883,0.797
+F09-NS-22,Engine Stopped in Water (Flood / Hydrolock Risk),not_starting,F12-EN-23,Engine Water Ingress / Hydrolock Risk,engine,False,0.709,0.886,0.797
+F11-BR-24,Brake Overheating / Brake Fade,brakes,F16-SM-14,Brake Overheating / Burning Smell,smoke_fire,False,0.712,0.882,0.797
+F12-EN-06,Engine Misfire at Idle,engine,F15-JM-10,Engine Misfire Under Load,jerking_misfire,False,0.723,0.865,0.794
+F16-EX-14,Diesel DPF / Exhaust Aftertreatment Warning,exhaust,F17-DS-16,Diesel DPF Regeneration / Exhaust Restriction Warning,diesel,False,0.696,0.889,0.792
+F09-AP-09,Throttle Position Sensor Fault,pickup_throttle,F15-SE-11,Accelerator Pedal Position Sensor Fault,sensor_ecu,False,0.696,0.885,0.791
+F07-SS-24,Brake Pedal Switch Preventing Start,self_start,F13-ST-13,Brake / Clutch Pedal Switch Preventing Start,starter_motor,False,0.909,0.67,0.79
+F11-EB-05,Belt Slipping During Acceleration,engine_belt,F15-JM-05,Jerking During Acceleration,jerking_misfire,False,0.8,0.771,0.786
+F09-NS-27,Water or Dirt in Fuel (Bad Fuel)  [NEW - India],not_starting,F10-FD-19,Water or Dirt in Petrol (Contaminated Fuel),fuel_delivery,False,0.667,0.896,0.781
+F07-SS-10,Starter Relay Failure,self_start,F13-ST-07,Starter Relay Fault,starter_motor,False,0.85,0.687,0.769
+F09-NS-09,Fuel Injector Problem,not_starting,F10-FD-13,Fuel Injector Electrical Fault,fuel_delivery,False,0.627,0.91,0.769
+F09-NS-07,Fuel Pump Relay or Fuse Failed,not_starting,F10-FD-09,Electric Fuel Pump Completely Failed,fuel_delivery,False,0.606,0.907,0.756
+F07-SS-09,Starter Solenoid Failure,self_start,F13-ST-08,Starter Solenoid Fault,starter_motor,False,0.87,0.628,0.749
+F13-IG-16,Duplicate Key from Local Key Maker - Cranks but No Start  [NEW - India],ignition_key,F17-KL-17,Local Duplicate Key Turns But Car Won't Start (No Chip Coding)  [NEW - India],key_lockout,False,0.582,0.915,0.748
+F12-EN-08,Engine Shaking / Excessive Vibration,engine,F15-JM-11,Engine Shaking / Rough Idle,jerking_misfire,False,0.542,0.923,0.733
+F14-SU-13,Car Pulling to One Side / Uneven Ride Height,suspension,F17-SU-15,Uneven Ride Height / Vehicle Pulling,suspension,True,0.474,0.979,0.726
+F11-BR-13,Brake Fluid Leakage,brakes,F16-HP-13,Brake Fluid Pipe / Flexible Brake Hose Leak,hose_leak,False,0.533,0.906,0.72
+F09-AP-10,Air Sensor Fault (MAF or MAP Sensor),pickup_throttle,F12-EN-19,Air Intake / MAF / MAP Sensor Fault,engine,False,0.492,0.901,0.697
+F12-EN-05,Check Engine Light Flashing / Severe Misfire,engine,F15-JM-25,Severe Misfire / Flashing Check Engine Light,jerking_misfire,False,0.429,0.95,0.69
+F09-NS-06,Fuel Pump Failed / No Fuel Reaching Engine,not_starting,F10-FD-09,Electric Fuel Pump Completely Failed,fuel_delivery,False,0.421,0.901,0.661

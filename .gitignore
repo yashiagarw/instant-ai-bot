@@ -14,3 +14,6 @@ node_modules/
 .next/
 coverage/
 *.tsbuildinfo
+
+# Pictures extracted by the importer (regenerate: cd backend && uv run python -m app.knowledge.importer --all)
+data/media/

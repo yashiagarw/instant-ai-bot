@@ -1,0 +1,328 @@
+# File 2 (Overheating) labour, needed to recalculate costs (decision 1).
+# The raw file's labour/total cells are #REF!. Fill `labour` per segment from the candidates below,
+# write the `basis`, set `approved: true` and `approved_by`, then re-run the importer.
+# Unapproved entries show 'Price on inspection'. The importer keeps your values on re-import.
+candidates:
+- 'F12 labour research: Head gasket job (excl. machine work) = budget 5000 / mid 8000 / premium 25000 (APPROX)'
+- 'F09-NS-20 Engine Overheated and Stopped / Will Not Restart: labour budget 1500 / mid 2000 / premium 3000'
+- 'F10-DW-24 Engine Temperature / Overheating Warning: labour budget 500 / mid 800 / premium 1500'
+- 'F11-EB-13 Belt Contaminated by Engine Oil / Coolant: labour budget 800 / mid 1200 / premium 3000'
+- 'F11-EB-17 Belt-Driven Water Pump Fault: labour budget 1200 / mid 1800 / premium 4500'
+- 'F11-EB-20 Belt Failure with Overheating: labour budget 2300 / mid 3200 / premium 6000'
+- 'F12-EN-11 Engine Overheating / Temperature Warning: labour budget 800 / mid 1200 / premium 2500'
+- 'F12-EN-21 Head Gasket Failure Suspected: labour budget 5000 / mid 8000 / premium 25000'
+- 'F12-EN-28 Engine Heating in Summer Traffic Jam (Fan / AC Load)  [NEW - India]: labour budget 500 / mid 800 / premium 1500'
+- 'F15-SE-13 Engine Coolant Temperature (ECT) Sensor Fault: labour budget 400 / mid 600 / premium 1200'
+- 'F16-HP-05 Upper Radiator Hose Leak: labour budget 500 / mid 900 / premium 2500'
+- 'F16-HP-06 Lower Radiator Hose Leak: labour budget 500 / mid 900 / premium 2500'
+- 'F16-HP-07 Coolant Hose Clamp Loose: labour budget 200 / mid 300 / premium 800'
+- 'F16-HP-10 Thermostat Housing / Coolant Outlet Leak: labour budget 500 / mid 900 / premium 2500'
+- 'F16-HP-11 Water Pump Hose Connection Leak: labour budget 400 / mid 600 / premium 1500'
+- 'F16-HP-15 Hose Burst with Rapid Fluid Loss / Overheating Risk: labour budget 500 / mid 900 / premium 2500'
+- 'F16-HP-16 Rat-Bitten Coolant / Washer / Vacuum Hoses  [NEW - India]: labour budget 600 / mid 1000 / premium 2500'
+- 'F16-HP-17 Plain Water / Wrong Coolant Used (Corrosion and Leaks)  [NEW - India]: labour budget 500 / mid 900 / premium
+  2500'
+- 'F16-SM-08 Coolant Steam from Engine Bay: labour budget 400 / mid 600 / premium 1500'
+- 'F16-SM-14 Brake Overheating / Burning Smell: labour budget 500 / mid 800 / premium 2000'
+faults:
+  F02-OH-01:
+    name: COOLANT SLIGHTLY LOW
+    hands_on_time: 'Hands-on: 20 to 40 minutes (inspection and top-up). Add cooling time of 30 to 60 minutes if the engine
+      is hot. If a pressure test is needed, add 30 to 45 minutes. Hands-on time and waiting time (parts, cooling, machining)
+      are separate.'
+    parts_total:
+      budget: 350
+      mid: 450
+      premium: 750
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-02:
+    name: TEMPERATURE GAUGE RISING / APPROACHING RED
+    hands_on_time: 'First check: 1 to 2 hours (level, leak check, pressure test, fan check). The repair time depends on what
+      is found. See the matching record. Cooling time: 30 to 60 minutes. Hands-on time and waiting time (parts, cooling, machining)
+      are separate.'
+    parts_total:
+      budget: 350
+      mid: 450
+      premium: 750
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-03:
+    name: MINOR COOLANT LEAKAGE
+    hands_on_time: 'Pressure test and leak finding: 30 to 60 minutes. Hose or clamp replacement: 1 to 2 hours. Cooling time
+      30 to 60 minutes. Parts may take 0 to 2 days if not in stock. Hands-on time and waiting time (parts, cooling, machining)
+      are separate.'
+    parts_total:
+      budget: 1230
+      mid: 2000
+      premium: 4450
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-04:
+    name: COOLING FAN / THERMOSTAT FAILURE
+    hands_on_time: 'Fan circuit diagnosis: 45 to 90 minutes. Thermostat replacement: 1 to 2 hours. Cooling time 30 to 60 minutes.
+      Parts wait: 0 to 3 days. Hands-on time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 1400
+      mid: 2700
+      premium: 7000
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-05:
+    name: SEVERE OVERHEATING / HEAD GASKET RISK
+    hands_on_time: 'Diagnosis: 2 to 4 hours (cooling time, pressure test, gas test). Compression and leak-down: add 1 to 2
+      hours. If repair is needed, see OH-19. Parts or machining wait may add days. Hands-on time and waiting time (parts,
+      cooling, machining) are separate.'
+    parts_total:
+      budget: 700
+      mid: 900
+      premium: 1500
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-06:
+    name: COOLANT LEVEL KEEPS DROPPING WITHOUT VISIBLE LEAK
+    hands_on_time: 'Testing: 1 to 2 hours. Cap replacement: 15 to 30 minutes. If internal leak is found, see OH-19. Recheck
+      after 2 to 3 days. Hands-on time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 1000
+      mid: 1500
+      premium: 3000
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-07:
+    name: RADIATOR OR COOLANT HOSE LEAKAGE
+    hands_on_time: 'Diagnosis: 30 to 60 minutes. Hose replacement: 1 to 2.5 hours. Cooling time 30 to 60 minutes. Parts wait
+      0 to 2 days. Hands-on time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 2030
+      mid: 3400
+      premium: 7800
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-08:
+    name: RADIATOR BLOCKAGE / DAMAGE / POOR COOLING
+    hands_on_time: 'Flush and external cleaning: 2 to 3 hours. Radiator replacement: 2 to 4 hours. Parts wait 0 to 3 days.
+      Hands-on time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 6200
+      mid: 11300
+      premium: 29000
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-09:
+    name: RADIATOR CAP / RESERVOIR CAP FAILURE
+    hands_on_time: 'Cap test and replacement: 15 to 30 minutes. Cooling time 30 to 60 minutes. Hands-on time and waiting time
+      (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 650
+      mid: 1050
+      premium: 2250
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-10:
+    name: WATER PUMP LEAKAGE OR FAILURE
+    hands_on_time: 'Diagnosis: 45 to 90 minutes. Pump replacement: 3 to 6 hours. Parts wait 0 to 3 days. Hands-on time and
+      waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 4020
+      mid: 8450
+      premium: 18900
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-11:
+    name: COOLING FAN NOT RUNNING
+    hands_on_time: 'Fan circuit diagnosis: 45 to 90 minutes. Fan motor replacement: 1 to 2.5 hours. Parts wait 0 to 3 days.
+      Hands-on time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 2800
+      mid: 6000
+      premium: 14500
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-12:
+    name: THERMOSTAT STUCK CLOSED / NOT OPENING CORRECTLY
+    hands_on_time: 'Thermostat replacement: 1 to 2 hours. Cooling time 30 to 60 minutes. Parts wait 0 to 3 days. Hands-on
+      time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 1400
+      mid: 2700
+      premium: 7000
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-13:
+    name: COOLANT TEMPERATURE SENSOR / ELECTRICAL FAULT
+    hands_on_time: 'Diagnosis: 30 to 60 minutes. Replacement: 30 to 90 minutes. Hands-on time and waiting time (parts, cooling,
+      machining) are separate.'
+    parts_total:
+      budget: 800
+      mid: 1550
+      premium: 4050
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-14:
+    name: AIR TRAPPED IN COOLING SYSTEM AFTER SERVICE
+    hands_on_time: 'Bleeding: 30 to 60 minutes. Cooling time 30 to 60 minutes. Hands-on time and waiting time (parts, cooling,
+      machining) are separate.'
+    parts_total:
+      budget: 350
+      mid: 450
+      premium: 750
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-15:
+    name: CABIN HEATER BLOWS COLD AIR WHILE ENGINE OVERHEATS
+    hands_on_time: 'Diagnosis: 1 to 2 hours. Hands-on time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 700
+      mid: 900
+      premium: 1500
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-16:
+    name: COOLANT MIXING WITH ENGINE OIL / INTERNAL LEAK SUSPECTED
+    hands_on_time: 'Testing: 2 to 4 hours. Repair time depends on the cause (see OH-19). Hands-on time and waiting time (parts,
+      cooling, machining) are separate.'
+    parts_total:
+      budget: 3900
+      mid: 5550
+      premium: 11300
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-17:
+    name: REPEATED OVERHEATING IN TRAFFIC / WITH AC
+    hands_on_time: 'Diagnosis and cleaning: 1.5 to 3 hours. Hands-on time and waiting time (parts, cooling, machining) are
+      separate.'
+    parts_total:
+      budget: 350
+      mid: 450
+      premium: 750
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-18:
+    name: ENGINE OVERHEATS SOON AFTER START / SHORT DRIVE
+    hands_on_time: 'Diagnosis: 1 to 2 hours. Hands-on time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: 350
+      mid: 450
+      premium: 750
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-19:
+    name: POSSIBLE HEAD GASKET FAILURE AFTER OVERHEATING (TEST-CONFIRMED)
+    hands_on_time: 'Hands-on: 1.5 to 3 days. Machining wait: 1 to 3 days. Hands-on time and waiting time (parts, cooling,
+      machining) are separate.'
+    parts_total:
+      budget: 8550
+      mid: 16350
+      premium: 37750
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
+  F02-OH-20:
+    name: MULTIPLE COOLING FAULTS / UNCERTAIN OVERHEATING CAUSE
+    hands_on_time: 'Staged diagnosis: 3 to 6 hours. Hands-on time and waiting time (parts, cooling, machining) are separate.'
+    parts_total:
+      budget: null
+      mid: null
+      premium: null
+    labour:
+      budget: null
+      mid: null
+      premium: null
+    basis: ''
+    approved: false
+    approved_by: ''
