@@ -1,0 +1,2373 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category ac
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: ac
+category_name: Car AC
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:14:54+00:00'
+  run_id: claude-code-ac
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: ac-main
+  status: approved
+  stage: 2
+  text: Which problem bothers you the most?
+  choice_source: proposed
+  options:
+  - label: Not cooling well
+    effects:
+    - fault: F05-AC-01
+      effect: supports
+      strength: strong
+    - fault: F05-AC-05
+      effect: supports
+      strength: strong
+    - fault: F05-AC-06
+      effect: supports
+      strength: strong
+    - fault: F05-AC-07
+      effect: supports
+      strength: strong
+    - fault: F05-AC-08
+      effect: supports
+      strength: strong
+    - fault: F05-AC-09
+      effect: supports
+      strength: strong
+    - fault: F05-AC-12
+      effect: supports
+      strength: strong
+    - fault: F05-AC-13
+      effect: supports
+      strength: strong
+    - fault: F05-AC-19
+      effect: supports
+      strength: strong
+    - fault: F05-AC-20
+      effect: supports
+      strength: strong
+    - fault: F05-AC-21
+      effect: supports
+      strength: strong
+    - fault: F05-AC-27
+      effect: supports
+      strength: strong
+    - fault: F05-AC-28
+      effect: supports
+      strength: strong
+    - fault: F05-AC-29
+      effect: supports
+      strength: strong
+    - fault: F05-AC-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Weak air or no air from the vents
+    effects:
+    - fault: F05-AC-02
+      effect: supports
+      strength: strong
+    - fault: F05-AC-05
+      effect: supports
+      strength: strong
+    - fault: F05-AC-14
+      effect: supports
+      strength: strong
+    - fault: F05-AC-15
+      effect: supports
+      strength: strong
+    - fault: F05-AC-16
+      effect: supports
+      strength: strong
+    - fault: F05-AC-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Noise when the AC is on
+    effects:
+    - fault: F05-AC-03
+      effect: supports
+      strength: strong
+    - fault: F05-AC-10
+      effect: supports
+      strength: strong
+    - fault: F05-AC-11
+      effect: supports
+      strength: strong
+    - fault: F05-AC-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Electrical problem (fuse, buttons, lights dim)
+    effects:
+    - fault: F05-AC-04
+      effect: supports
+      strength: strong
+    - fault: F05-AC-22
+      effect: supports
+      strength: strong
+    - fault: F05-AC-23
+      effect: supports
+      strength: strong
+    - fault: F05-AC-24
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Bad smell or water leak
+    effects:
+    - fault: F05-AC-16
+      effect: supports
+      strength: strong
+    - fault: F05-AC-18
+      effect: supports
+      strength: strong
+    - fault: F05-AC-25
+      effect: supports
+      strength: strong
+    - fault: F05-AC-26
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other
+    effects:
+    - fault: F05-AC-31
+      effect: supports
+      strength: strong
+    - fault: F05-AC-32
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q01
+  status: approved
+  stage: 3
+  text: Right now, do you see smoke, smell burning, see the engine temperature rising, or are the headlights or
+    dashboard lights failing?
+  source_faults:
+  - F05-AC-02
+  - F05-AC-04
+  - F05-AC-06
+  - F05-AC-13
+  - F05-AC-14
+  - F05-AC-20
+  - F05-AC-23
+  - F05-AC-24
+  - F05-AC-28
+  merged_from:
+  - 'F05-AC-02 (stages_text): Do you see smoke, smell burning, see the engine temperature rising, or are your headlights/dashboard
+    failing right now?'
+  - 'F05-AC-04 (stages_text): Do you see smoke, smell burning, see the engine temperature rising, or are your headlights/dashboard
+    failing right now?'
+  - 'F05-AC-20 (stages_text): Do you see smoke, smell burning, see the engine temperature rising, or are your headlights/dashboard
+    failing right now?'
+  - 'F05-AC-23 (stages_text): Do you see smoke, smell burning, see the engine temperature rising, or are your headlights/dashboard
+    failing right now?'
+  options:
+  - label: Smoke or a burning smell
+    effects:
+    - fault: F05-AC-23
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-02
+      effect: supports
+      strength: weak
+    - fault: F05-AC-14
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: The engine temperature is rising
+    effects:
+    - fault: F05-AC-20
+      effect: supports
+      strength: strong
+    - fault: F05-AC-06
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-13
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-28
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: The headlights or dashboard lights are failing
+    effects:
+    - fault: F05-AC-04
+      effect: supports
+      strength: strong
+    - fault: F05-AC-24
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q02
+  status: approved
+  stage: 3
+  text: With the blower on high, how is the air from the vents?
+  source_faults:
+  - F05-AC-01
+  - F05-AC-02
+  - F05-AC-05
+  - F05-AC-07
+  - F05-AC-14
+  - F05-AC-15
+  - F05-AC-16
+  - F05-AC-17
+  - F05-AC-19
+  merged_from:
+  - 'F05-AC-01 (stages_text): Please put the blower on high. Do you feel strong air at the vents?'
+  - 'F05-AC-02 (stages_text): When you turn the blower knob, do you get any air at all?'
+  - 'F05-AC-17 (stages_text): Is the air weak at every vent, or only some?'
+  - 'F05-AC-19 (stages_text): Is the cooling weak even with strong air?'
+  options:
+  - label: Strong air
+    effects:
+    - fault: F05-AC-19
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-01
+      effect: supports
+      strength: weak
+    - fault: F05-AC-07
+      effect: supports
+      strength: weak
+    - fault: F05-AC-17
+      effect: rules_out
+      strength: moderate
+    - fault: F05-AC-16
+      effect: rules_out
+      strength: moderate
+    - fault: F05-AC-02
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Weak air
+    effects:
+    - fault: F05-AC-17
+      effect: supports
+      strength: strong
+    - fault: F05-AC-16
+      effect: supports
+      strength: strong
+    - fault: F05-AC-15
+      effect: supports
+      strength: weak
+    - fault: F05-AC-05
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Air only from some vents
+    effects:
+    - fault: F05-AC-17
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No air at all
+    effects:
+    - fault: F05-AC-02
+      effect: supports
+      strength: strong
+    - fault: F05-AC-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q03
+  status: approved
+  stage: 3
+  text: Which blower speeds work?
+  source_faults:
+  - F05-AC-02
+  - F05-AC-14
+  merged_from:
+  - 'F05-AC-14 (stages_text): Which blower speeds work and which do not?'
+  - 'F05-AC-02 (stages_text): Does the blower work on any one speed, even a very low one?'
+  options:
+  - label: Only the highest speed
+    effects:
+    - fault: F05-AC-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Some speeds do not work
+    effects:
+    - fault: F05-AC-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No speed works
+    effects:
+    - fault: F05-AC-02
+      effect: supports
+      strength: strong
+    - fault: F05-AC-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: All speeds work
+    effects:
+    - fault: F05-AC-14
+      effect: rules_out
+      strength: strong
+    - fault: F05-AC-02
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q04
+  status: approved
+  stage: 3
+  text: When you switch on the AC, do you hear a click from the engine side?
+  source_faults:
+  - F05-AC-02
+  - F05-AC-09
+  - F05-AC-27
+  - F05-AC-30
+  merged_from:
+  - 'F05-AC-09 (stages_text): When you switch on AC, do you hear a click from the engine side?'
+  - 'F05-AC-02 (stages_text): Does the AC compressor still click on, even though no air comes out?'
+  options:
+  - label: No click
+    effects:
+    - fault: F05-AC-09
+      effect: supports
+      strength: strong
+    - fault: F05-AC-30
+      effect: supports
+      strength: weak
+    - fault: F05-AC-27
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Yes, it clicks
+    effects:
+    - fault: F05-AC-09
+      effect: rules_out
+      strength: moderate
+    - fault: F05-AC-02
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q05
+  status: approved
+  stage: 3
+  text: Does the AC click on and off very often?
+  source_faults:
+  - F05-AC-01
+  - F05-AC-05
+  - F05-AC-08
+  - F05-AC-12
+  - F05-AC-21
+  merged_from:
+  - 'F05-AC-01 (symptoms): Compressor clicks on and off often'
+  - 'F05-AC-12 (symptoms): Compressor clicks often'
+  - 'F05-AC-21 (symptoms): Compressor clicks on/off'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-01
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-12
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-21
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-05
+      effect: supports
+      strength: weak
+    - fault: F05-AC-08
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q06
+  status: approved
+  stage: 3
+  text: Does the AC cool better when the car is moving than when it is standing in traffic?
+  source_faults:
+  - F05-AC-01
+  - F05-AC-06
+  - F05-AC-12
+  - F05-AC-13
+  - F05-AC-28
+  merged_from:
+  - 'F05-AC-01 (stages_text): Does the AC cool better when the car is moving than when standing in traffic?'
+  - 'F05-AC-06 (stages_text): Is the AC weak only when the car is stopped or moving slowly?'
+  - 'F05-AC-13 (stages_text): Is cooling worse in traffic?'
+  - 'F05-AC-28 (stages_text): Does the AC cool at high speed?'
+  options:
+  - label: Yes, better when moving
+    effects:
+    - fault: F05-AC-06
+      effect: supports
+      strength: strong
+    - fault: F05-AC-13
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-28
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No, it is the same all the time
+    effects:
+    - fault: F05-AC-01
+      effect: supports
+      strength: weak
+    - fault: F05-AC-12
+      effect: supports
+      strength: weak
+    - fault: F05-AC-06
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q07
+  status: approved
+  stage: 3
+  text: Does the AC cool well at first, then become warm after some time?
+  source_faults:
+  - F05-AC-05
+  - F05-AC-19
+  merged_from:
+  - 'F05-AC-05 (stages_text): After how many minutes does the cold air become warm?'
+  - 'F05-AC-19 (stages_text): Does it cool in the first few minutes then drop?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-05
+      effect: supports
+      strength: strong
+    - fault: F05-AC-19
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F05-AC-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q08
+  status: approved
+  stage: 3
+  text: If you switch the AC off for 10 minutes, does the cooling come back for a while?
+  source_faults:
+  - F05-AC-05
+  merged_from:
+  - 'F05-AC-05 (stages_text): If you switch the AC off for 10 minutes, does cooling come back for a while?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-05
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q09
+  status: approved
+  stage: 3
+  text: Is the AC weak mainly in hot afternoons, or all day?
+  source_faults:
+  - F05-AC-01
+  - F05-AC-07
+  merged_from:
+  - 'F05-AC-07 (stages_text): Is the AC weak mainly in hot afternoons or all day?'
+  options:
+  - label: Mainly in hot afternoons
+    effects:
+    - fault: F05-AC-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: All day
+    effects:
+    - fault: F05-AC-07
+      effect: rules_out
+      strength: moderate
+    - fault: F05-AC-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q10
+  status: approved
+  stage: 3
+  text: Does the recirculation button (air from inside the car) help the cooling?
+  source_faults:
+  - F05-AC-07
+  merged_from:
+  - 'F05-AC-07 (stages_text): Does recirculation mode help cooling?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q11
+  status: approved
+  stage: 3
+  text: Does the AC stop cooling suddenly and then start again?
+  source_faults:
+  - F05-AC-08
+  - F05-AC-21
+  merged_from:
+  - 'F05-AC-08 (stages_text): Does the AC stop cooling suddenly and then start again by itself?'
+  - 'F05-AC-21 (stages_text): Does it come back after you press the button?'
+  options:
+  - label: Yes, it comes back by itself
+    effects:
+    - fault: F05-AC-08
+      effect: supports
+      strength: strong
+    - fault: F05-AC-21
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It switches off and comes back only when I press the AC button
+    effects:
+    - fault: F05-AC-21
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F05-AC-08
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q12
+  status: approved
+  stage: 3
+  text: Does it happen after bumps on the road?
+  source_faults:
+  - F05-AC-08
+  merged_from:
+  - 'F05-AC-08 (stages_text): Does it happen after bumps, in heat, or at certain speeds?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-08
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q13
+  status: approved
+  stage: 3
+  text: What kind of noise do you hear?
+  source_faults:
+  - F05-AC-03
+  - F05-AC-10
+  - F05-AC-11
+  - F05-AC-15
+  merged_from:
+  - 'F05-AC-03 (stages_text): What kind of noise is it - a sharp squeal, a rattle, or a grinding sound?'
+  - 'F05-AC-10 (stages_text): Is the noise a rattle, grinding or a squeal?'
+  - 'F05-AC-11 (stages_text): Is the squeal on starting the car, with AC on, or all the time?'
+  - 'F05-AC-15 (stages_text): What type of noise is it - rattle, hum or squeal?'
+  options:
+  - label: A squeal
+    effects:
+    - fault: F05-AC-11
+      effect: supports
+      strength: strong
+    - fault: F05-AC-03
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-10
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A rattle or grinding from the engine side
+    effects:
+    - fault: F05-AC-10
+      effect: supports
+      strength: strong
+    - fault: F05-AC-03
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: A rattle or hum from behind the dashboard
+    effects:
+    - fault: F05-AC-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No noise
+    effects:
+    - fault: F05-AC-03
+      effect: rules_out
+      strength: moderate
+    - fault: F05-AC-10
+      effect: rules_out
+      strength: moderate
+    - fault: F05-AC-11
+      effect: rules_out
+      strength: moderate
+    - fault: F05-AC-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q14
+  status: approved
+  stage: 3
+  text: Does the noise stop when you switch the AC off?
+  source_faults:
+  - F05-AC-03
+  - F05-AC-10
+  merged_from:
+  - 'F05-AC-03 (stages_text): Does the noise stop when you switch the AC OFF?'
+  - 'F05-AC-10 (stages_text): Does the noise stop when AC is OFF?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-03
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-10
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No, it continues
+    effects:
+    - fault: F05-AC-10
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-03
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q15
+  status: approved
+  stage: 3
+  text: Is the battery warning light on?
+  source_faults:
+  - F05-AC-03
+  - F05-AC-04
+  - F05-AC-11
+  - F05-AC-24
+  merged_from:
+  - 'F05-AC-03 (stages_text): Is the battery light or temperature light on?'
+  - 'F05-AC-11 (stages_text): Is the battery or temperature light on?'
+  - 'F05-AC-24 (stages_text): Is the battery light on?'
+  - 'F05-AC-04 (stages_text): Is the battery light on, or does the engine start slowly?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-04
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-24
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-11
+      effect: supports
+      strength: weak
+    - fault: F05-AC-03
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q16
+  status: approved
+  stage: 3
+  text: Do the headlights or dashboard lights go dim when the AC is on?
+  source_faults:
+  - F05-AC-04
+  - F05-AC-24
+  merged_from:
+  - 'F05-AC-24 (stages_text): Do the lights dim only when the AC is on?'
+  - 'F05-AC-04 (stages_text): Does the AC cooling stop when the lights dim?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-24
+      effect: supports
+      strength: strong
+    - fault: F05-AC-04
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F05-AC-24
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q17
+  status: approved
+  stage: 3
+  text: Does the engine start slowly?
+  source_faults:
+  - F05-AC-04
+  - F05-AC-24
+  merged_from:
+  - 'F05-AC-24 (stages_text): Does the engine start easily?'
+  - 'F05-AC-04 (stages_text): Is the battery light on, or does the engine start slowly?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-04
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-24
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q18
+  status: approved
+  stage: 3
+  text: Does the engine belt look cracked, shiny or loose?
+  source_faults:
+  - F05-AC-03
+  - F05-AC-11
+  merged_from:
+  - 'F05-AC-11 (symptoms): Cracks or glazing on belt'
+  - 'F05-AC-11 (symptoms): Belt looks loose'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-11
+      effect: supports
+      strength: strong
+    - fault: F05-AC-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q19
+  status: approved
+  stage: 3
+  text: How many times has the AC been filled with gas in the last year?
+  source_faults:
+  - F05-AC-12
+  merged_from:
+  - 'F05-AC-12 (stages_text): How many times has the AC been filled with gas in the last year?'
+  options:
+  - label: More than once
+    effects:
+    - fault: F05-AC-12
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Once
+    effects: []
+    safety_trigger: false
+  - label: Never
+    effects:
+    - fault: F05-AC-12
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q20
+  status: approved
+  stage: 3
+  text: Have you seen oil stains near the AC pipes, or heard a hissing sound?
+  source_faults:
+  - F05-AC-05
+  - F05-AC-12
+  - F05-AC-13
+  - F05-AC-19
+  merged_from:
+  - 'F05-AC-12 (stages_text): Have you seen oil stains near the AC pipes or any hissing noise?'
+  - 'F05-AC-13 (symptoms): Oily patch on condenser'
+  - 'F05-AC-19 (symptoms): Oil mark at drain'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-12
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-13
+      effect: supports
+      strength: weak
+    - fault: F05-AC-19
+      effect: supports
+      strength: weak
+    - fault: F05-AC-05
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q21
+  status: approved
+  stage: 3
+  text: Did the front of the car get hit, or is the area behind the front grille very dusty?
+  source_faults:
+  - F05-AC-06
+  - F05-AC-13
+  merged_from:
+  - 'F05-AC-13 (stages_text): Did the front of the car get hit, or is the area behind the grille dusty?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-13
+      effect: supports
+      strength: strong
+    - fault: F05-AC-06
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q22
+  status: approved
+  stage: 3
+  text: When the AC is on, can you hear or see the cooling fan at the front of the engine running?
+  source_faults:
+  - F05-AC-06
+  - F05-AC-28
+  merged_from:
+  - 'F05-AC-06 (stages_text): Can you hear the front fan running when AC is switched on?'
+  - 'F05-AC-28 (stages_text): Does the front fan spin when AC is on?'
+  options:
+  - label: 'No'
+    effects:
+    - fault: F05-AC-28
+      effect: supports
+      strength: strong
+    - fault: F05-AC-06
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-28
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q23
+  status: approved
+  stage: 3
+  text: Does the AC stop cooling when the engine temperature gauge goes high, and come back after the engine cools?
+  source_faults:
+  - F05-AC-20
+  merged_from:
+  - 'F05-AC-20 (stages_text): Does the temperature gauge go high when the AC stops?'
+  - 'F05-AC-20 (stages_text): Does cooling return after the engine cools?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-20
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F05-AC-20
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q24
+  status: approved
+  stage: 3
+  text: Was the AC filled with gas, or any AC part changed, in the last 3 months?
+  source_faults:
+  - F05-AC-12
+  - F05-AC-29
+  - F05-AC-30
+  merged_from:
+  - 'F05-AC-29 (stages_text): Was the AC filled with gas, or any AC part changed, in the last 3 months?'
+  - 'F05-AC-30 (stages_text): Was the AC filled with gas, or any AC part changed, in the last 3 months?'
+  - 'F05-AC-29 (stages_text): Who filled the gas and how much?'
+  - 'F05-AC-30 (stages_text): What was repaired or refilled last week?'
+  options:
+  - label: Yes, and it has not cooled properly since then
+    effects:
+    - fault: F05-AC-30
+      effect: supports
+      strength: strong
+    - fault: F05-AC-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Yes, and it was fine for a while
+    effects:
+    - fault: F05-AC-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F05-AC-30
+      effect: rules_out
+      strength: strong
+    - fault: F05-AC-29
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q25
+  status: approved
+  stage: 3
+  text: When was the cabin (AC) air filter last changed?
+  source_faults:
+  - F05-AC-16
+  - F05-AC-17
+  merged_from:
+  - 'F05-AC-16 (stages_text): When was the cabin filter last changed?'
+  options:
+  - label: More than a year ago, or never
+    effects:
+    - fault: F05-AC-16
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Recently
+    effects:
+    - fault: F05-AC-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q26
+  status: approved
+  stage: 3
+  text: What kind of smell comes from the vents?
+  source_faults:
+  - F05-AC-14
+  - F05-AC-16
+  - F05-AC-17
+  - F05-AC-18
+  - F05-AC-19
+  - F05-AC-23
+  - F05-AC-25
+  merged_from:
+  - 'F05-AC-18 (stages_text): Is the smell musty, burning or sweet?'
+  - 'F05-AC-16 (stages_text): Is the smell dusty or musty?'
+  - 'F05-AC-19 (stages_text): Any sweet smell or oily water inside?'
+  options:
+  - label: Musty or damp
+    effects:
+    - fault: F05-AC-18
+      effect: supports
+      strength: strong
+    - fault: F05-AC-25
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Dusty
+    effects:
+    - fault: F05-AC-16
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Sweet
+    effects:
+    - fault: F05-AC-19
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Burning
+    effects:
+    - fault: F05-AC-23
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-14
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: No smell
+    effects:
+    - fault: F05-AC-18
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q27
+  status: approved
+  stage: 3
+  text: Does the smell come only in the first few minutes after switching on the AC?
+  source_faults:
+  - F05-AC-18
+  merged_from:
+  - 'F05-AC-18 (stages_text): Does the smell come only in the first few minutes?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-18
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q28
+  status: approved
+  stage: 3
+  text: Is there water on the floor or a wet carpet inside the car?
+  source_faults:
+  - F05-AC-18
+  - F05-AC-25
+  merged_from:
+  - 'F05-AC-25 (stages_text): Is the carpet wet?'
+  - 'F05-AC-18 (stages_text): Any water leak inside?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-25
+      effect: supports
+      strength: strong
+    - fault: F05-AC-18
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F05-AC-25
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q29
+  status: approved
+  stage: 3
+  text: Is water dripping under the car while the AC runs? What is it like?
+  source_faults:
+  - F05-AC-26
+  merged_from:
+  - 'F05-AC-26 (stages_text): What colour is the water under the car?'
+  - 'F05-AC-26 (stages_text): Does it smell sweet or oily?'
+  - 'F05-AC-26 (stages_text): Does it appear only when the AC is on?'
+  options:
+  - label: Clear water with no smell, only when the AC is on
+    effects:
+    - fault: F05-AC-26
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Coloured liquid, or it smells sweet or oily
+    effects:
+    - fault: F05-AC-26
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: No water under the car
+    effects:
+    - fault: F05-AC-26
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q30
+  status: approved
+  stage: 3
+  text: Do the AC buttons and display work?
+  source_faults:
+  - F05-AC-22
+  - F05-AC-23
+  merged_from:
+  - 'F05-AC-22 (stages_text): Is the AC display on or blank?'
+  - 'F05-AC-22 (stages_text): Do any buttons work?'
+  options:
+  - label: The display is blank or the buttons do nothing
+    effects:
+    - fault: F05-AC-22
+      effect: supports
+      strength: strong
+    - fault: F05-AC-23
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: They work normally
+    effects:
+    - fault: F05-AC-22
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q31
+  status: approved
+  stage: 3
+  text: Does an AC fuse keep blowing?
+  source_faults:
+  - F05-AC-02
+  - F05-AC-21
+  - F05-AC-23
+  merged_from:
+  - 'F05-AC-23 (stages_text): Which AC fuse is blowing?'
+  - 'F05-AC-02 (symptoms): Burning smell or blown fuse before it stopped'
+  - 'F05-AC-21 (symptoms): Fuse may blow'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-23
+      effect: supports
+      strength: strong
+    - fault: F05-AC-02
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-21
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F05-AC-23
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q32
+  status: approved
+  stage: 3
+  text: Is any AC-related warning light on?
+  source_faults:
+  - F05-AC-22
+  - F05-AC-27
+  merged_from:
+  - 'F05-AC-27 (stages_text): Is there any warning light?'
+  - 'F05-AC-22 (symptoms): Warning light'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-27
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-22
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q33
+  status: approved
+  stage: 3
+  text: Did a workshop suggest replacing a big AC part (compressor, condenser or evaporator) without showing test
+    results?
+  source_faults:
+  - F05-AC-31
+  merged_from:
+  - 'F05-AC-31 (stages_text): Which tests did the workshop show you?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-31
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q34
+  status: approved
+  stage: 3
+  text: Does the blower inside the car stop and start by itself?
+  source_faults:
+  - F05-AC-15
+  merged_from:
+  - 'F05-AC-15 (stages_text): Does it stop suddenly or fade?'
+  - 'F05-AC-15 (symptoms): Blower stops and starts'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-15
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ac-q35
+  status: approved
+  stage: 3
+  text: Do you see ice on the AC pipes under the bonnet?
+  source_faults:
+  - F05-AC-01
+  - F05-AC-19
+  merged_from:
+  - 'F05-AC-19 (symptoms): Icy pipe or weak cooling'
+  - 'F05-AC-01 (symptoms): Ice or water marks on AC pipes in some cases'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F05-AC-19
+      effect: supports
+      strength: moderate
+    - fault: F05-AC-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F05-AC-01:
+    status: approved
+    name: AC Not Cooling Well
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Filter check, condenser and fan check, gauge pressure test and leak test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-02:
+    status: approved
+    name: AC Blower Not Working
+    stage2_choices:
+    - Weak air or no air from the vents
+    confirmation_test: Fuse, relay, blower plug power test and blower motor test.
+    danger_phrases:
+    - burning smell
+    safety_trigger_options:
+    - question: ac-q01
+      option: Smoke or a burning smell
+  F05-AC-03:
+    status: approved
+    name: AC Belt / Compressor Noise Issue
+    stage2_choices:
+    - Noise when the AC is on
+    confirmation_test: Stethoscope check, belt and tensioner check, AC on/off test.
+    danger_phrases:
+    - grinding
+    - smoke
+    - burning smell
+    - battery light
+    safety_trigger_options:
+    - question: ac-q15
+      option: 'Yes'
+  F05-AC-04:
+    status: approved
+    name: AC and Lights / Electrical Combined Failure
+    stage2_choices:
+    - Electrical problem (fuse, buttons, lights dim)
+    confirmation_test: Battery test, charging test, ground and fuse checks.
+    danger_phrases:
+    - headlights failing
+    - battery light
+    - burning smell
+    safety_trigger_options:
+    - question: ac-q01
+      option: The headlights or dashboard lights are failing
+    - question: ac-q15
+      option: 'Yes'
+  F05-AC-05:
+    status: approved
+    name: AC cools initially but becomes warm after some time
+    stage2_choices:
+    - Not cooling well
+    - Weak air or no air from the vents
+    confirmation_test: Filter and airflow check, gauge pressure log over time, sensor check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-06:
+    status: approved
+    name: AC cooling weak in traffic but improves at higher speed
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Cooling fan test, condenser inspection and gauge pressure test.
+    danger_phrases:
+    - temperature rising
+    safety_trigger_options:
+    - question: ac-q01
+      option: The engine temperature is rising
+  F05-AC-07:
+    status: approved
+    name: AC cooling weak in hot weather or during afternoon driving
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Vent temperature, gauge test, condenser and filter check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-08:
+    status: approved
+    name: AC works intermittently and stops cooling
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Wiggle test, signal and pressure monitoring.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-09:
+    status: approved
+    name: AC compressor does not engage
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Fuse and relay check, compressor clutch power test, gauge test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-10:
+    status: approved
+    name: AC compressor clutch or pulley noise
+    stage2_choices:
+    - Noise when the AC is on
+    confirmation_test: Stethoscope test, pulley and clutch check.
+    danger_phrases:
+    - battery light
+    safety_trigger_options: []
+  F05-AC-11:
+    status: approved
+    name: AC belt slipping, squealing, loose or damaged
+    stage2_choices:
+    - Noise when the AC is on
+    confirmation_test: Belt inspection, belt tension and pulley checks.
+    danger_phrases:
+    - battery light
+    - temperature light
+    safety_trigger_options:
+    - question: ac-q15
+      option: 'Yes'
+  F05-AC-12:
+    status: approved
+    name: Suspected refrigerant leakage
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Leak test and gauge test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-13:
+    status: approved
+    name: Condenser damaged, blocked or unable to release heat
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Condenser inspection, leak test and gauge test.
+    danger_phrases:
+    - temperature rising
+    safety_trigger_options:
+    - question: ac-q01
+      option: The engine temperature is rising
+  F05-AC-14:
+    status: approved
+    name: Cabin blower runs at only one speed or some speeds do not work
+    stage2_choices:
+    - Weak air or no air from the vents
+    confirmation_test: Blower resistor, plug and motor current test.
+    danger_phrases:
+    - burning smell
+    safety_trigger_options:
+    - question: ac-q01
+      option: Smoke or a burning smell
+    - question: ac-q26
+      option: Burning
+  F05-AC-15:
+    status: approved
+    name: Blower motor makes noise or works intermittently
+    stage2_choices:
+    - Noise when the AC is on
+    - Weak air or no air from the vents
+    confirmation_test: Remove and inspect the blower.
+    danger_phrases:
+    - burning smell
+    safety_trigger_options: []
+  F05-AC-16:
+    status: approved
+    name: AC air filter or cabin filter blocked
+    stage2_choices:
+    - Weak air or no air from the vents
+    - Bad smell or water leak
+    confirmation_test: Inspect and replace the cabin filter.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-17:
+    status: approved
+    name: AC airflow is weak even when the blower is running
+    stage2_choices:
+    - Weak air or no air from the vents
+    confirmation_test: Check the filter, air intake, flaps and evaporator.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-18:
+    status: approved
+    name: AC smells bad or produces a musty smell
+    stage2_choices:
+    - Bad smell or water leak
+    confirmation_test: Filter and drain check, cleaning.
+    danger_phrases:
+    - burning smell
+    safety_trigger_options: []
+  F05-AC-19:
+    status: approved
+    name: AC evaporator or expansion valve problem suspected
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Gauge test and leak test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-20:
+    status: approved
+    name: AC cooling stops when the engine becomes hot
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Engine cooling system tests.
+    danger_phrases:
+    - temperature high
+    - steam
+    safety_trigger_options:
+    - question: ac-q01
+      option: The engine temperature is rising
+    - question: ac-q23
+      option: 'Yes'
+  F05-AC-21:
+    status: approved
+    name: AC trips or switches off repeatedly
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Gauge, relay and pressure switch test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-22:
+    status: approved
+    name: AC control panel, buttons or climate-control system not responding
+    stage2_choices:
+    - Electrical problem (fuse, buttons, lights dim)
+    confirmation_test: Power test and scan of the AC control panel.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-23:
+    status: approved
+    name: AC fuse, relay, wiring, connector or electrical supply fault
+    stage2_choices:
+    - Electrical problem (fuse, buttons, lights dim)
+    confirmation_test: Current reading and wire trace.
+    danger_phrases:
+    - burning smell
+    - melted plug
+    safety_trigger_options:
+    - question: ac-q01
+      option: Smoke or a burning smell
+    - question: ac-q26
+      option: Burning
+  F05-AC-24:
+    status: approved
+    name: AC and headlights, dashboard lights or other electrical systems fail together
+    stage2_choices:
+    - Electrical problem (fuse, buttons, lights dim)
+    confirmation_test: Battery and charging test.
+    danger_phrases:
+    - headlights failing
+    - battery light
+    safety_trigger_options:
+    - question: ac-q01
+      option: The headlights or dashboard lights are failing
+    - question: ac-q15
+      option: 'Yes'
+  F05-AC-25:
+    status: approved
+    name: Water dripping inside the cabin or suspected blocked AC drain
+    stage2_choices:
+    - Bad smell or water leak
+    confirmation_test: AC drain inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-26:
+    status: approved
+    name: Water dripping under the car during AC use (normal or not?)
+    stage2_choices:
+    - Bad smell or water leak
+    confirmation_test: Check what the fluid is.
+    danger_phrases:
+    - coloured fluid
+    safety_trigger_options: []
+  F05-AC-27:
+    status: approved
+    name: AC pressure or temperature sensor fault suspected
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Scan and live data check of the AC sensors.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-28:
+    status: approved
+    name: Cooling fan not operating correctly when AC is requested
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Cooling fan test.
+    danger_phrases:
+    - temperature rising
+    safety_trigger_options:
+    - question: ac-q01
+      option: The engine temperature is rising
+  F05-AC-29:
+    status: approved
+    name: Refrigerant overcharge, undercharge or incorrect refrigerant suspected
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Recover the gas and check its weight.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-30:
+    status: approved
+    name: AC system not cooling after a recent refill or repair
+    stage2_choices:
+    - Not cooling well
+    confirmation_test: Gauge test and leak test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-31:
+    status: approved
+    name: AC compressor, condenser or evaporator replacement assessment
+    stage2_choices:
+    - Other
+    confirmation_test: Test each part (leak and gauge) before replacing anything.
+    danger_phrases: []
+    safety_trigger_options: []
+  F05-AC-32:
+    status: approved
+    name: Multiple AC symptoms or uncertain cause
+    stage2_choices:
+    - Other
+    confirmation_test: Full AC check.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: ac-s-F05-AC-01
+  status: approved
+  fault: F05-AC-01
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Switch off the AC. Do not open the AC pipes or use gas cans or leak-seal sprays. Get the AC checked
+    at a workshop.
+  towing_recommendation: Not normally. Tow only if the belt is broken, the engine is heating, or there is smoke.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not use gas cans or leak-seal chemicals from the market.'
+    if_towing_needed: Not normally. Tow only if belt is broken, engine heating, or smoke. No towing rates are listed;
+      ask the local recovery operator.
+- id: ac-s-F05-AC-02
+  status: approved
+  fault: F05-AC-02
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not fit a thicker fuse. Avoid driving in rain if the windscreen mists up. Get it checked at
+    a workshop.
+  towing_recommendation: No. The car can be driven in daytime.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not put a thicker fuse.'
+    if_towing_needed: No. Car can be driven in daytime. Avoid driving in rain with misting windshield. No towing
+      rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-03
+  status: approved
+  fault: F05-AC-03
+  risk_level: medium
+  stop_driving_trigger: Stop if the belt is broken, the battery warning light is on, or the engine is overheating.
+  roadside_action: Switch off the AC if there is grinding, smoke or a burning smell. Drive slowly to a garage with
+    the AC off.
+  towing_recommendation: Tow if the belt is broken, the battery warning light is on, or the engine is overheating.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Switch AC OFF if grinding, smoke or burning smell.'
+    if_towing_needed: Tow if belt is broken, battery warning light is on, or engine is overheating. Otherwise slow
+      drive to garage with AC off. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-04
+  status: approved
+  fault: F05-AC-04
+  risk_level: medium
+  stop_driving_trigger: Stop if the headlights fail at night, the battery light stays on, the engine stalls or there
+    is a burning smell.
+  roadside_action: If the headlights fail at night, stop in a safe place and call for help.
+  towing_recommendation: Tow if the headlights fail at night, the battery light stays on, the engine stalls or there
+    is a burning smell.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • If headlights fail at night, stop safely and call assistance.'
+    if_towing_needed: Tow if headlights fail at night, battery light stays on, engine stalls or burning smell is
+      present. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-05
+  status: approved
+  fault: F05-AC-05
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not open the AC pipes or use gas cans or leak-seal sprays. Get the AC checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not add gas cans.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-06
+  status: approved
+  fault: F05-AC-06
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine temperature rises.
+  roadside_action: If the temperature gauge goes up, stop safely and switch off the AC. Do not open the radiator
+    cap.
+  towing_recommendation: Only if the engine is overheating.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • If temperature rises → stop safely and follow overheating safety steps.'
+    if_towing_needed: Only if engine is overheating. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-07
+  status: approved
+  fault: F05-AC-07
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: When the car is very hot, open the windows for a minute before using the AC.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Open windows first when car is very hot.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-08
+  status: approved
+  fault: F05-AC-08
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not pull or hit any wires. Get it checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not hit or pull wires.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-09
+  status: approved
+  fault: F05-AC-09
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not try to bypass any AC switch. Get it checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not bypass the pressure switch.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-10
+  status: approved
+  fault: F05-AC-10
+  risk_level: medium
+  stop_driving_trigger: Stop if the belt is broken or the battery light is on.
+  roadside_action: Switch off the AC and do not touch the pulley. Get it checked at a workshop.
+  towing_recommendation: Tow if the belt is broken or the battery light is on.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not touch the pulley.'
+    if_towing_needed: Tow if belt is broken or battery light is on. No towing rates are listed; ask the local recovery
+      operator.
+- id: ac-s-F05-AC-11
+  status: approved
+  fault: F05-AC-11
+  risk_level: medium
+  stop_driving_trigger: Stop if the battery or temperature light stays on.
+  roadside_action: Stop if the battery or temperature light stays on. Otherwise switch off the AC and get the belt
+    checked.
+  towing_recommendation: Tow if the belt snapped and the engine is heating or the battery light is on.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Stop if battery or temperature light stays on.'
+    if_towing_needed: Tow if belt snapped and engine heating or battery light on. No towing rates are listed; ask
+      the local recovery operator.
+- id: ac-s-F05-AC-12
+  status: approved
+  fault: F05-AC-12
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not open the AC pipes or use gas cans or leak-seal sprays. Get a leak test done.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not use leak-seal chemicals.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-13
+  status: approved
+  fault: F05-AC-13
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine is overheating.
+  roadside_action: If the engine temperature rises, stop safely and switch off the AC. Do not pressure-wash the
+    condenser.
+  towing_recommendation: Tow if the engine is overheating.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not pressure-wash the fins.'
+    if_towing_needed: Tow if engine is overheating. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-14
+  status: approved
+  fault: F05-AC-14
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: If you smell burning, stop using the blower. Do not touch the wires.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not touch the resistor or wires.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-15
+  status: approved
+  fault: F05-AC-15
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: If you smell burning, stop using the blower. Do not push objects into the vents.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not push objects into vents.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-16
+  status: approved
+  fault: F05-AC-16
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Get the cabin filter replaced.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Replace filter every 10,000-15,000 km or yearly.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-17
+  status: approved
+  fault: F05-AC-17
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not push objects into the vents. Get it checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not push objects in vents.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-18
+  status: approved
+  fault: F05-AC-18
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: If the smell is burning, switch off the AC, stop and call for help.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • If burning smell → stop and call help.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-19
+  status: approved
+  fault: F05-AC-19
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not open the AC pipes or use gas cans or leak-seal sprays. Get the AC checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not use gas cans.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-20
+  status: approved
+  fault: F05-AC-20
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine temperature is high.
+  roadside_action: Stop safely when the temperature is high and let the engine cool. Do not open the radiator cap.
+  towing_recommendation: Tow if the engine overheats.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Stop if temperature is high.'
+    if_towing_needed: Tow if engine overheats. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-21
+  status: approved
+  fault: F05-AC-21
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not keep switching the AC back on. Get it checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not keep resetting.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-22
+  status: approved
+  fault: F05-AC-22
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not keep pressing the buttons. Get it checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not press buttons repeatedly.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-23
+  status: approved
+  fault: F05-AC-23
+  risk_level: medium
+  stop_driving_trigger: Stop if there is a burning smell.
+  roadside_action: Switch off the AC. Do not fit a bigger fuse. If there is a burning smell, stop and call a mechanic.
+  towing_recommendation: No, unless something is burning.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not use higher fuse.'
+    if_towing_needed: No unless burning. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-24
+  status: approved
+  fault: F05-AC-24
+  risk_level: medium
+  stop_driving_trigger: Do not drive at night if the lights fail.
+  roadside_action: Do not drive at night if the lights fail. Get the battery and charging checked.
+  towing_recommendation: Tow if the lights fail at night.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not drive at night if lights fail.'
+    if_towing_needed: Tow if lights fail at night. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-25
+  status: approved
+  fault: F05-AC-25
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Keep wet areas away from electrical parts. Get the AC drain checked.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not drive with wet electrical areas.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-26
+  status: approved
+  fault: F05-AC-26
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Clear water under the car with the AC on is normal. If the fluid is coloured, get it checked.
+  towing_recommendation: Only if the fluid is coloured and the engine is heating.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Clear water is normal.'
+    if_towing_needed: Only if coloured fluid and engine heating. No towing rates are listed; ask the local recovery
+      operator.
+- id: ac-s-F05-AC-27
+  status: approved
+  fault: F05-AC-27
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not disconnect any sensors. Get it checked at a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not disconnect sensors.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-28
+  status: approved
+  fault: F05-AC-28
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine is overheating.
+  roadside_action: If the engine temperature rises, stop safely. Do not touch the fan.
+  towing_recommendation: Tow if the engine is overheating.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not touch fan.'
+    if_towing_needed: Tow if overheating. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-29
+  status: approved
+  fault: F05-AC-29
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not open the AC pipes or use gas cans or leak-seal sprays. Ask the workshop to recover and
+    weigh the gas.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not add gas cans.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-30
+  status: approved
+  fault: F05-AC-30
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Keep the bill and the repair report. Ask the workshop to recheck.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Keep bill and report.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-31
+  status: approved
+  fault: F05-AC-31
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Ask for test proof before paying for a big part.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Ask for proof before paying.'
+    if_towing_needed: No. No towing rates are listed; ask the local recovery operator.
+- id: ac-s-F05-AC-32
+  status: approved
+  fault: F05-AC-32
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not open the AC pipes or use gas cans or leak-seal sprays. Get a full AC check.
+  towing_recommendation: Only if it is unsafe to drive.
+  source_text:
+    safety_precautions: '• Switch the engine OFF before touching anything under the bonnet.
+
+      • Keep hands, hair and clothes away from the belt, pulley and fans.
+
+      • AC gas is under pressure. Never open AC pipes or release gas.
+
+      • Wear gloves and eye protection near AC lines.
+
+      • Disconnect the battery before any electrical work.
+
+      • Work in open air; keep fire and sparks away.
+
+      • Do not use gas cans.'
+    if_towing_needed: Only if unsafe. No towing rates are listed; ask the local recovery operator.

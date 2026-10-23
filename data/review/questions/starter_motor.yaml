@@ -1,0 +1,1029 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category starter_motor
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: starter_motor
+category_name: Starter motor / push-button start
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:46:04+00:00'
+  run_id: claude-code-starter_motor
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: starter_motor-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Key is hard to turn
+    effects: []
+    safety_trigger: false
+  - label: Key is stuck
+    effects: []
+    safety_trigger: false
+  - label: Key not detected
+    effects: []
+    safety_trigger: false
+  - label: Ignition not working
+    effects: []
+    safety_trigger: false
+  - label: Something is loose under the car
+    effects: []
+    safety_trigger: false
+  - label: Bottom cover is hanging
+    effects: []
+    safety_trigger: false
+  - label: Something is touching the road
+    effects: []
+    safety_trigger: false
+  - label: Push-start button not working
+    effects:
+    - fault: F13-ST-01
+      effect: supports
+      strength: strong
+    - fault: F13-ST-02
+      effect: supports
+      strength: strong
+    - fault: F13-ST-03
+      effect: supports
+      strength: strong
+    - fault: F13-ST-13
+      effect: supports
+      strength: strong
+    - fault: F13-ST-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Car makes a clicking sound
+    effects:
+    - fault: F13-ST-04
+      effect: supports
+      strength: strong
+    - fault: F13-ST-06
+      effect: supports
+      strength: strong
+    - fault: F13-ST-08
+      effect: supports
+      strength: strong
+    - fault: F13-ST-09
+      effect: supports
+      strength: strong
+    - fault: F13-ST-12
+      effect: supports
+      strength: strong
+    - fault: F13-ST-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Starter motor not working
+    effects:
+    - fault: F13-ST-04
+      effect: supports
+      strength: strong
+    - fault: F13-ST-05
+      effect: supports
+      strength: strong
+    - fault: F13-ST-07
+      effect: supports
+      strength: strong
+    - fault: F13-ST-08
+      effect: supports
+      strength: strong
+    - fault: F13-ST-09
+      effect: supports
+      strength: strong
+    - fault: F13-ST-10
+      effect: supports
+      strength: strong
+    - fault: F13-ST-11
+      effect: supports
+      strength: strong
+    - fault: F13-ST-12
+      effect: supports
+      strength: strong
+    - fault: F13-ST-13
+      effect: supports
+      strength: strong
+    - fault: F13-ST-14
+      effect: supports
+      strength: strong
+    - fault: F13-ST-16
+      effect: supports
+      strength: strong
+    - fault: F13-ST-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F13-ST-02
+      effect: supports
+      strength: strong
+    - fault: F13-ST-10
+      effect: supports
+      strength: strong
+    - fault: F13-ST-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q01
+  status: approved
+  stage: 3
+  text: Is there a burning smell or smoke near the starter, or is a cable hot?
+  source_faults:
+  - F13-ST-04
+  - F13-ST-12
+  merged_from:
+  - 'F13-ST-04 (symptoms): Burnt smell (sometimes)'
+  - 'F13-ST-12 (stages_text): Is any cable hot after starting?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F13-ST-04
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-12
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q02
+  status: approved
+  stage: 3
+  text: Was the car in deep water before this started?
+  source_faults:
+  - F13-ST-16
+  merged_from:
+  - 'F13-ST-16 (stages_text): Was the car in deep water?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F13-ST-16
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F13-ST-16
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q03
+  status: approved
+  stage: 3
+  text: When you try to start, what happens?
+  source_faults:
+  - F13-ST-01
+  - F13-ST-04
+  - F13-ST-05
+  - F13-ST-06
+  - F13-ST-07
+  - F13-ST-08
+  - F13-ST-10
+  - F13-ST-11
+  - F13-ST-12
+  - F13-ST-13
+  - F13-ST-14
+  merged_from:
+  - 'F13-ST-04 (stages_text): Click or silence?'
+  - 'F13-ST-05 (stages_text): Does it turn slowly?'
+  - 'F13-ST-11 (stages_text): Do you hear the starter spinning fast?'
+  - 'F13-ST-01 (stages_text): Does the engine crank?'
+  options:
+  - label: The engine turns slowly
+    effects:
+    - fault: F13-ST-05
+      effect: supports
+      strength: strong
+    - fault: F13-ST-12
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Rapid clicking
+    effects:
+    - fault: F13-ST-06
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: One loud click, no turning
+    effects:
+    - fault: F13-ST-08
+      effect: supports
+      strength: strong
+    - fault: F13-ST-04
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-06
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Complete silence
+    effects:
+    - fault: F13-ST-04
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-07
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-13
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: A fast whirring, but the engine does not turn
+    effects:
+    - fault: F13-ST-11
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Grinding while starting
+    effects:
+    - fault: F13-ST-10
+      effect: supports
+      strength: strong
+    - fault: F13-ST-11
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q04
+  status: approved
+  stage: 3
+  text: Do the dashboard lights stay bright when you try to start?
+  source_faults:
+  - F13-ST-04
+  - F13-ST-05
+  - F13-ST-06
+  - F13-ST-07
+  - F13-ST-08
+  - F13-ST-12
+  merged_from:
+  - 'F13-ST-06 (stages_text): Do dashboard lights stay bright?'
+  - 'F13-ST-04 (stages_text): Does the dashboard light up?'
+  options:
+  - label: They go dim
+    effects:
+    - fault: F13-ST-06
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-05
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: They stay bright
+    effects:
+    - fault: F13-ST-04
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-08
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-07
+      effect: supports
+      strength: weak
+    - fault: F13-ST-06
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q05
+  status: approved
+  stage: 3
+  text: How old is the battery, or has it become weak recently?
+  source_faults:
+  - F13-ST-01
+  - F13-ST-05
+  - F13-ST-06
+  merged_from:
+  - 'F13-ST-05 (stages_text): How old is the battery?'
+  - 'F13-ST-01 (stages_text): Did the battery become weak recently?'
+  options:
+  - label: Old or weak
+    effects:
+    - fault: F13-ST-05
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-06
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-01
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: New and strong
+    effects:
+    - fault: F13-ST-05
+      effect: rules_out
+      strength: weak
+    - fault: F13-ST-06
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q06
+  status: approved
+  stage: 3
+  text: Is the brake (automatic) or clutch (manual) pressed fully when you start?
+  source_faults:
+  - F13-ST-01
+  - F13-ST-03
+  - F13-ST-13
+  merged_from:
+  - 'F13-ST-13 (stages_text): Is the pedal pressed fully?'
+  - 'F13-ST-01 (stages_text): Is brake/clutch fully pressed?'
+  - 'F13-ST-03 (stages_text): Is the brake fully pressed?'
+  options:
+  - label: It starts only when I press harder, or a floor mat is in the way
+    effects:
+    - fault: F13-ST-13
+      effect: supports
+      strength: strong
+    - fault: F13-ST-01
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Yes, pressed fully
+    effects:
+    - fault: F13-ST-13
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q07
+  status: approved
+  stage: 3
+  text: Do the brake lights at the back work?
+  source_faults:
+  - F13-ST-13
+  merged_from:
+  - 'F13-ST-13 (stages_text): Do brake lights work?'
+  options:
+  - label: 'No'
+    effects:
+    - fault: F13-ST-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F13-ST-13
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q08
+  status: approved
+  stage: 3
+  text: (Automatic) Does it start when the gear lever is in N but not in P?
+  source_faults:
+  - F13-ST-14
+  merged_from:
+  - 'F13-ST-14 (stages_text): Does it start in N?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F13-ST-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F13-ST-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Manual car
+    effects:
+    - fault: F13-ST-14
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q09
+  status: approved
+  stage: 3
+  text: Does the push-start button respond at all?
+  source_faults:
+  - F13-ST-01
+  - F13-ST-02
+  - F13-ST-03
+  - F13-ST-15
+  merged_from:
+  - 'F13-ST-03 (stages_text): Is the key detected?'
+  - 'F13-ST-03 (symptoms): No response to button'
+  - 'F13-ST-01 (symptoms): Delay before crank'
+  options:
+  - label: No response at all
+    effects:
+    - fault: F13-ST-03
+      effect: supports
+      strength: strong
+    - fault: F13-ST-15
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: There is a delay, or I must press twice
+    effects:
+    - fault: F13-ST-01
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It beeps and shows a message
+    effects:
+    - fault: F13-ST-02
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No push-start button
+    effects:
+    - fault: F13-ST-01
+      effect: rules_out
+      strength: strong
+    - fault: F13-ST-02
+      effect: rules_out
+      strength: moderate
+    - fault: F13-ST-03
+      effect: rules_out
+      strength: strong
+    - fault: F13-ST-15
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q10
+  status: approved
+  stage: 3
+  text: What does the dashboard message say?
+  source_faults:
+  - F13-ST-01
+  - F13-ST-02
+  - F13-ST-13
+  - F13-ST-14
+  - F13-ST-15
+  merged_from:
+  - 'F13-ST-02 (stages_text): What does the dashboard message say?'
+  - 'F13-ST-15 (stages_text): What warning shows?'
+  options:
+  - label: Press brake / clutch
+    effects:
+    - fault: F13-ST-02
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Shift to P
+    effects:
+    - fault: F13-ST-02
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Key not detected, or key battery low
+    effects:
+    - fault: F13-ST-02
+      effect: supports
+      strength: moderate
+    - fault: F13-ST-01
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: A start system or keyless warning, although the key is detected
+    effects:
+    - fault: F13-ST-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No message
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q11
+  status: approved
+  stage: 3
+  text: Does it fail only sometimes, especially when the engine is hot?
+  source_faults:
+  - F13-ST-04
+  - F13-ST-08
+  - F13-ST-09
+  merged_from:
+  - 'F13-ST-09 (stages_text): Is it worse when the engine is hot?'
+  - 'F13-ST-08 (symptoms): Intermittent'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F13-ST-09
+      effect: supports
+      strength: strong
+    - fault: F13-ST-08
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No, it fails every time
+    effects:
+    - fault: F13-ST-09
+      effect: rules_out
+      strength: moderate
+    - fault: F13-ST-04
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q12
+  status: approved
+  stage: 3
+  text: Do you hear the grinding during starting, or after the engine has started?
+  source_faults:
+  - F13-ST-10
+  merged_from:
+  - 'F13-ST-10 (stages_text): Grinding during or after start?'
+  options:
+  - label: During or after starting
+    effects:
+    - fault: F13-ST-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No grinding
+    effects:
+    - fault: F13-ST-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q13
+  status: approved
+  stage: 3
+  text: Did a mechanic swap the starter relay, and it worked?
+  source_faults:
+  - F13-ST-07
+  merged_from:
+  - 'F13-ST-07 (stages_text): Do you hear any click?'
+  - 'F13-ST-07 (symptoms): Works after swap'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F13-ST-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q14
+  status: approved
+  stage: 3
+  text: Was an aftermarket alarm, immobiliser or central locking kit fitted? Is its LED flashing?
+  source_faults:
+  - F13-ST-17
+  merged_from:
+  - 'F13-ST-17 (stages_text): Was an alarm or security kit fitted?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F13-ST-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F13-ST-17
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: starter_motor-q15
+  status: approved
+  stage: 3
+  text: Can you see corroded battery terminals or chewed starter cables?
+  source_faults:
+  - F13-ST-05
+  - F13-ST-12
+  merged_from:
+  - 'F13-ST-12 (symptoms): Corrosion'
+  - 'F13-ST-12 (symptoms): Chewed cable'
+  - 'F13-ST-05 (symptoms): Corroded terminals'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F13-ST-12
+      effect: supports
+      strength: strong
+    - fault: F13-ST-05
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F13-ST-01:
+    status: approved
+    name: Push Start Slow Response
+    stage2_choices:
+    - Push-start button not working
+    confirmation_test: Battery tests and live data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-02:
+    status: approved
+    name: Beeping Before Starting
+    stage2_choices:
+    - Push-start button not working
+    - Other problem
+    confirmation_test: Read the dashboard message and scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-03:
+    status: approved
+    name: Push-Start Button Not Working
+    stage2_choices:
+    - Push-start button not working
+    confirmation_test: Scan the start inputs.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-04:
+    status: approved
+    name: Complete Starter Motor Failure
+    stage2_choices:
+    - Starter motor not working
+    - Car makes a clicking sound
+    confirmation_test: Starter signal, voltage drop and bench test.
+    danger_phrases:
+    - burnt smell
+    safety_trigger_options:
+    - question: starter_motor-q01
+      option: 'Yes'
+  F13-ST-05:
+    status: approved
+    name: Starter Motor Slow Cranking
+    stage2_choices:
+    - Starter motor not working
+    confirmation_test: Battery and voltage drop test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-06:
+    status: approved
+    name: Starter Motor Clicks but Does Not Crank
+    stage2_choices:
+    - Car makes a clicking sound
+    confirmation_test: Battery and voltage drop test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-07:
+    status: approved
+    name: Starter Relay Fault
+    stage2_choices:
+    - Starter motor not working
+    confirmation_test: Starter relay swap test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-08:
+    status: approved
+    name: Starter Solenoid Fault
+    stage2_choices:
+    - Car makes a clicking sound
+    - Starter motor not working
+    confirmation_test: Voltage tests at the solenoid.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-09:
+    status: approved
+    name: Starter Motor Intermittent Operation
+    stage2_choices:
+    - Starter motor not working
+    - Car makes a clicking sound
+    confirmation_test: Hot test and bench test of the starter.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-10:
+    status: approved
+    name: Starter Motor Grinding / Abnormal Noise
+    stage2_choices:
+    - Starter motor not working
+    - Other problem
+    confirmation_test: Inspection of the starter pinion and ring gear.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-11:
+    status: approved
+    name: Starter Motor Spins but Engine Does Not Crank
+    stage2_choices:
+    - Starter motor not working
+    confirmation_test: Inspection of the starter drive.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-12:
+    status: approved
+    name: Starter Motor Wiring / Ground Fault
+    stage2_choices:
+    - Starter motor not working
+    - Car makes a clicking sound
+    confirmation_test: Voltage drop test.
+    danger_phrases:
+    - hot cable
+    safety_trigger_options:
+    - question: starter_motor-q01
+      option: 'Yes'
+  F13-ST-13:
+    status: approved
+    name: Brake / Clutch Pedal Switch Preventing Start
+    stage2_choices:
+    - Starter motor not working
+    - Push-start button not working
+    confirmation_test: Check the brake / clutch switch status.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-14:
+    status: approved
+    name: Park / Neutral Start Interlock Fault
+    stage2_choices:
+    - Starter motor not working
+    confirmation_test: Park / neutral switch test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-15:
+    status: approved
+    name: Push-Start System / Start Authorization Module Fault
+    stage2_choices:
+    - Push-start button not working
+    confirmation_test: Scan and power supply tests of the keyless module.
+    danger_phrases: []
+    safety_trigger_options: []
+  F13-ST-16:
+    status: approved
+    name: Starter Not Working After Water / Flood Exposure  [NEW - India]
+    stage2_choices:
+    - Starter motor not working
+    - Car makes a clicking sound
+    confirmation_test: Engine check and starter test.
+    danger_phrases:
+    - deep water
+    safety_trigger_options:
+    - question: starter_motor-q02
+      option: 'Yes'
+  F13-ST-17:
+    status: approved
+    name: Start Problems After Aftermarket Alarm / Immobiliser / Central Lock Fitting  [NEW - India]
+    stage2_choices:
+    - Starter motor not working
+    - Other problem
+    confirmation_test: Inspection of the aftermarket alarm kit.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: starter_motor-s-F13-ST-01
+  status: approved
+  fault: F13-ST-01
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Press the brake or clutch fully and hold the key close to the start button. Do not keep cranking.
+    Never bridge the starter or bypass any switch or the car's security.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+    if_towing_needed: NO.
+- id: starter_motor-s-F13-ST-02
+  status: approved
+  fault: F13-ST-02
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: 'Follow the dashboard message: press the brake, select P, or hold the key near the button.'
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: starter_motor-s-F13-ST-03
+  status: approved
+  fault: F13-ST-03
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Press the brake fully, hold the key near the button, and check the battery. Do not keep cranking.
+    Never bridge the starter or bypass any switch or the car's security.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+    if_towing_needed: Depends.
+- id: starter_motor-s-F13-ST-04
+  status: approved
+  fault: F13-ST-04
+  risk_level: medium
+  stop_driving_trigger: Stop trying if there is a burning smell or smoke.
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. If
+    there is a burning smell, stop trying and get out of the car. Call a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: '• Battery negative OFF before starter removal.
+
+      • Never bridge starter terminals or bypass clutch/brake/park switches. Do not push-start automatic, hybrid
+      or electric cars.'
+    if_towing_needed: Depends.
+- id: starter_motor-s-F13-ST-05
+  status: approved
+  fault: F13-ST-05
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Get the battery terminals cleaned and tightened, or a correct jump-start from a trained person.
+    Do not keep cranking. Never bridge the starter or bypass any switch or the car's security.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Correct jump order.
+    if_towing_needed: NO.
+- id: starter_motor-s-F13-ST-06
+  status: approved
+  fault: F13-ST-06
+  risk_level: low
+  stop_driving_trigger: Stop trying if there is a burning smell or smoke near the starter.
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. Call
+    a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Never bridge starter terminals or bypass clutch/brake/park switches. Do not push-start
+      automatic, hybrid or electric cars.
+    if_towing_needed: Depends.
+- id: starter_motor-s-F13-ST-07
+  status: approved
+  fault: F13-ST-07
+  risk_level: low
+  stop_driving_trigger: Stop trying if there is a burning smell or smoke near the starter.
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. Call
+    a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Same relay only.
+    if_towing_needed: NO.
+- id: starter_motor-s-F13-ST-08
+  status: approved
+  fault: F13-ST-08
+  risk_level: low
+  stop_driving_trigger: Stop trying if there is a burning smell or smoke near the starter.
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. Call
+    a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Never bridge starter terminals or bypass clutch/brake/park switches. Do not push-start
+      automatic, hybrid or electric cars.
+    if_towing_needed: Depends.
+- id: starter_motor-s-F13-ST-09
+  status: approved
+  fault: F13-ST-09
+  risk_level: low
+  stop_driving_trigger: Stop trying if there is a burning smell or smoke near the starter.
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. Call
+    a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Never bridge starter terminals or bypass clutch/brake/park switches. Do not push-start
+      automatic, hybrid or electric cars.
+    if_towing_needed: NO.
+- id: starter_motor-s-F13-ST-10
+  status: approved
+  fault: F13-ST-10
+  risk_level: low
+  stop_driving_trigger: Stop trying if there is a burning smell or smoke near the starter.
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. Call
+    a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: starter_motor-s-F13-ST-11
+  status: approved
+  fault: F13-ST-11
+  risk_level: low
+  stop_driving_trigger: Stop trying if there is a burning smell or smoke near the starter.
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. Call
+    a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: Depends.
+- id: starter_motor-s-F13-ST-12
+  status: approved
+  fault: F13-ST-12
+  risk_level: medium
+  stop_driving_trigger: Stop if a cable is hot or smells.
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. If
+    a cable is hot or smells, stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery OFF.
+    if_towing_needed: NO.
+- id: starter_motor-s-F13-ST-13
+  status: approved
+  fault: F13-ST-13
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Move the floor mat away and press the pedal fully. Do not keep cranking. Never bridge the starter
+    or bypass any switch or the car's security.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never bridge starter terminals or bypass clutch/brake/park switches. Do not push-start
+      automatic, hybrid or electric cars.
+    if_towing_needed: NO.
+- id: starter_motor-s-F13-ST-14
+  status: approved
+  fault: F13-ST-14
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Try starting in N with the brake pressed. Do not keep cranking. Never bridge the starter or bypass
+    any switch or the car's security.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Never bridge starter terminals or bypass clutch/brake/park switches. Do not push-start
+      automatic, hybrid or electric cars.
+    if_towing_needed: Depends.
+- id: starter_motor-s-F13-ST-15
+  status: approved
+  fault: F13-ST-15
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not keep cranking. Never bridge the starter or bypass any switch or the car's security. Call
+    for a tow.
+  towing_recommendation: Yes, usually.
+  source_text:
+    safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+    if_towing_needed: YES usually.
+- id: starter_motor-s-F13-ST-16
+  status: approved
+  fault: F13-ST-16
+  risk_level: high
+  stop_driving_trigger: Do not crank after the car was in deep water.
+  roadside_action: Do not try to start the engine. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • No cranking until engine checked.
+    if_towing_needed: YES.
+- id: starter_motor-s-F13-ST-17
+  status: approved
+  fault: F13-ST-17
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Disarm the alarm with its own remote. Do not keep cranking. Never bridge the starter or bypass
+    any switch or the car's security.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+    if_towing_needed: NO.

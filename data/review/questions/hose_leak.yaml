@@ -1,0 +1,1090 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category hose_leak
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: hose_leak
+category_name: Hose / fluid leak
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:40:33+00:00'
+  run_id: claude-code-hose_leak
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: hose_leak-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Screen not working
+    effects: []
+    safety_trigger: false
+  - label: Music not working
+    effects: []
+    safety_trigger: false
+  - label: Camera not working
+    effects: []
+    safety_trigger: false
+  - label: Airbag warning
+    effects: []
+    safety_trigger: false
+  - label: Pipe leaking
+    effects:
+    - fault: F16-HP-01
+      effect: supports
+      strength: strong
+    - fault: F16-HP-02
+      effect: supports
+      strength: strong
+    - fault: F16-HP-03
+      effect: supports
+      strength: strong
+    - fault: F16-HP-04
+      effect: supports
+      strength: strong
+    - fault: F16-HP-05
+      effect: supports
+      strength: strong
+    - fault: F16-HP-06
+      effect: supports
+      strength: strong
+    - fault: F16-HP-07
+      effect: supports
+      strength: strong
+    - fault: F16-HP-12
+      effect: supports
+      strength: strong
+    - fault: F16-HP-13
+      effect: supports
+      strength: strong
+    - fault: F16-HP-14
+      effect: supports
+      strength: strong
+    - fault: F16-HP-15
+      effect: supports
+      strength: strong
+    - fault: F16-HP-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Water or coolant leaking
+    effects:
+    - fault: F16-HP-01
+      effect: supports
+      strength: strong
+    - fault: F16-HP-02
+      effect: supports
+      strength: strong
+    - fault: F16-HP-03
+      effect: supports
+      strength: strong
+    - fault: F16-HP-04
+      effect: supports
+      strength: strong
+    - fault: F16-HP-05
+      effect: supports
+      strength: strong
+    - fault: F16-HP-06
+      effect: supports
+      strength: strong
+    - fault: F16-HP-07
+      effect: supports
+      strength: strong
+    - fault: F16-HP-08
+      effect: supports
+      strength: strong
+    - fault: F16-HP-09
+      effect: supports
+      strength: strong
+    - fault: F16-HP-10
+      effect: supports
+      strength: strong
+    - fault: F16-HP-11
+      effect: supports
+      strength: strong
+    - fault: F16-HP-15
+      effect: supports
+      strength: strong
+    - fault: F16-HP-16
+      effect: supports
+      strength: strong
+    - fault: F16-HP-17
+      effect: supports
+      strength: strong
+    - fault: F16-HP-18
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Silencer noise
+    effects: []
+    safety_trigger: false
+  - label: Smoke coming
+    effects:
+    - fault: F16-HP-04
+      effect: supports
+      strength: strong
+    - fault: F16-HP-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Burning smell
+    effects: []
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F16-HP-08
+      effect: supports
+      strength: strong
+    - fault: F16-HP-14
+      effect: supports
+      strength: strong
+    - fault: F16-HP-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q01
+  status: approved
+  stage: 3
+  text: Do you smell petrol or diesel near the leak?
+  source_faults:
+  - F16-HP-01
+  - F16-HP-03
+  - F16-HP-12
+  merged_from:
+  - 'F16-HP-12 (stages_text): Is there a strong petrol smell?'
+  - 'F16-HP-03 (stages_text): Any petrol smell?'
+  - 'F16-HP-01 (stages_text): Does it smell like petrol or diesel?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-12
+      effect: supports
+      strength: strong
+    - fault: F16-HP-03
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F16-HP-12
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q02
+  status: approved
+  stage: 3
+  text: Does the brake pedal feel soft, or go lower than normal?
+  source_faults:
+  - F16-HP-01
+  - F16-HP-03
+  - F16-HP-13
+  merged_from:
+  - 'F16-HP-13 (stages_text): Is the brake pedal soft?'
+  - 'F16-HP-01 (stages_text): Is the brake pedal feeling different?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-13
+      effect: supports
+      strength: strong
+    - fault: F16-HP-03
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F16-HP-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q03
+  status: approved
+  stage: 3
+  text: Is steam coming from the engine, or is the temperature needle high or red?
+  source_faults:
+  - F16-HP-01
+  - F16-HP-02
+  - F16-HP-04
+  - F16-HP-05
+  - F16-HP-06
+  - F16-HP-07
+  - F16-HP-10
+  - F16-HP-11
+  - F16-HP-15
+  merged_from:
+  - 'F16-HP-04 (stages_text): Is steam coming?'
+  - 'F16-HP-15 (stages_text): Is the temperature high?'
+  - 'F16-HP-01 (stages_text): Is the temperature normal?'
+  options:
+  - label: Heavy steam, or the needle is in the red
+    effects:
+    - fault: F16-HP-15
+      effect: supports
+      strength: strong
+    - fault: F16-HP-04
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: The needle is rising slowly
+    effects:
+    - fault: F16-HP-02
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-05
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-06
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-10
+      effect: supports
+      strength: weak
+    - fault: F16-HP-11
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Temperature is normal, no steam
+    effects:
+    - fault: F16-HP-01
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-07
+      effect: supports
+      strength: weak
+    - fault: F16-HP-15
+      effect: rules_out
+      strength: strong
+    - fault: F16-HP-04
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q04
+  status: approved
+  stage: 3
+  text: What colour is the liquid, and does it smell?
+  source_faults:
+  - F16-HP-01
+  - F16-HP-02
+  - F16-HP-03
+  - F16-HP-05
+  - F16-HP-06
+  - F16-HP-07
+  - F16-HP-12
+  - F16-HP-13
+  - F16-HP-17
+  - F16-HP-18
+  merged_from:
+  - 'F16-HP-02 (stages_text): What colour is the liquid?'
+  - 'F16-HP-03 (stages_text): What colour is it?'
+  - 'F16-HP-18 (stages_text): Is the water clear with no smell?'
+  options:
+  - label: Green, pink, orange or blue, with a sweet smell (coolant)
+    effects:
+    - fault: F16-HP-02
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-01
+      effect: supports
+      strength: weak
+    - fault: F16-HP-05
+      effect: supports
+      strength: weak
+    - fault: F16-HP-06
+      effect: supports
+      strength: weak
+    - fault: F16-HP-07
+      effect: supports
+      strength: weak
+    - fault: F16-HP-18
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Clear water with no smell, only when the AC is on
+    effects:
+    - fault: F16-HP-18
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Brown or rusty
+    effects:
+    - fault: F16-HP-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Clear liquid near a wheel
+    effects:
+    - fault: F16-HP-13
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-03
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Smells of petrol or diesel
+    effects:
+    - fault: F16-HP-12
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q05
+  status: approved
+  stage: 3
+  text: Where is the leak?
+  source_faults:
+  - F16-HP-01
+  - F16-HP-02
+  - F16-HP-03
+  - F16-HP-05
+  - F16-HP-06
+  - F16-HP-07
+  - F16-HP-08
+  - F16-HP-09
+  - F16-HP-13
+  merged_from:
+  - 'F16-HP-05 (stages_text): Is the leak at the top?'
+  - 'F16-HP-06 (stages_text): Is the drip under the front?'
+  - 'F16-HP-07 (stages_text): Is it leaking only at the end?'
+  - 'F16-HP-01 (stages_text): Where is the leak?'
+  options:
+  - label: At the top hose of the radiator
+    effects:
+    - fault: F16-HP-05
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Dripping under the front of the car
+    effects:
+    - fault: F16-HP-06
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-02
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-03
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Only at the end of a hose, where the clamp is
+    effects:
+    - fault: F16-HP-07
+      effect: supports
+      strength: strong
+    - fault: F16-HP-01
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: At the coolant tank
+    effects:
+    - fault: F16-HP-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'Inside the car: wet carpet'
+    effects:
+    - fault: F16-HP-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Near a wheel
+    effects:
+    - fault: F16-HP-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q06
+  status: approved
+  stage: 3
+  text: How fast is the coolant going down?
+  source_faults:
+  - F16-HP-01
+  - F16-HP-02
+  - F16-HP-04
+  - F16-HP-06
+  - F16-HP-07
+  - F16-HP-15
+  merged_from:
+  - 'F16-HP-01 (stages_text): How fast is coolant going down?'
+  - 'F16-HP-04 (symptoms): Fast coolant loss'
+  options:
+  - label: Slowly, over days or weeks, with no puddle
+    effects:
+    - fault: F16-HP-01
+      effect: supports
+      strength: strong
+    - fault: F16-HP-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: A puddle forms after parking
+    effects:
+    - fault: F16-HP-02
+      effect: supports
+      strength: strong
+    - fault: F16-HP-06
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Very fast, it is spraying out
+    effects:
+    - fault: F16-HP-04
+      effect: supports
+      strength: strong
+    - fault: F16-HP-15
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q07
+  status: approved
+  stage: 3
+  text: Can you see a split or crack in a hose, or hear hissing?
+  source_faults:
+  - F16-HP-01
+  - F16-HP-02
+  - F16-HP-04
+  - F16-HP-15
+  merged_from:
+  - 'F16-HP-04 (symptoms): Visible split'
+  - 'F16-HP-04 (symptoms): Hissing sound'
+  - 'F16-HP-01 (stages_text): Did a pipe burst?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-04
+      effect: supports
+      strength: strong
+    - fault: F16-HP-15
+      effect: supports
+      strength: moderate
+    - fault: F16-HP-02
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-HP-04
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q08
+  status: approved
+  stage: 3
+  text: Is the coolant tank cracked, or does coolant come out of the overflow?
+  source_faults:
+  - F16-HP-09
+  merged_from:
+  - 'F16-HP-09 (stages_text): Is the tank cracked?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-HP-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q09
+  status: approved
+  stage: 3
+  text: Is the carpet inside the car wet, and does it smell sweet? Is the heater blowing cold?
+  source_faults:
+  - F16-HP-08
+  merged_from:
+  - 'F16-HP-08 (stages_text): Is the wet carpet smelling sweet?'
+  - 'F16-HP-08 (symptoms): Cold heater'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-HP-08
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q10
+  status: approved
+  stage: 3
+  text: Does the temperature needle move up and down oddly?
+  source_faults:
+  - F16-HP-10
+  merged_from:
+  - 'F16-HP-10 (stages_text): Is temperature erratic?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-HP-10
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q11
+  status: approved
+  stage: 3
+  text: Is there a squeal or noise from the belt area, or coolant on the belt?
+  source_faults:
+  - F16-HP-11
+  merged_from:
+  - 'F16-HP-11 (stages_text): Is there squeal or noise?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-11
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-HP-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q12
+  status: approved
+  stage: 3
+  text: When you accelerate, do you hear a hiss or whistle and feel low power?
+  source_faults:
+  - F16-HP-14
+  merged_from:
+  - 'F16-HP-14 (stages_text): Do you hear hiss on acceleration?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-HP-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q13
+  status: approved
+  stage: 3
+  text: Can you see bite marks, a rat nest or droppings under the bonnet?
+  source_faults:
+  - F16-HP-16
+  merged_from:
+  - 'F16-HP-16 (stages_text): Any bite marks?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-HP-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q14
+  status: approved
+  stage: 3
+  text: Do you top up with plain water instead of coolant?
+  source_faults:
+  - F16-HP-17
+  merged_from:
+  - 'F16-HP-17 (stages_text): Do you add plain water?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-HP-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: hose_leak-q15
+  status: approved
+  stage: 3
+  text: Was a hose or radiator repaired recently?
+  source_faults:
+  - F16-HP-07
+  merged_from:
+  - 'F16-HP-07 (symptoms): Leak after recent repair'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-HP-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F16-HP-01:
+    status: approved
+    name: Minor Pipe Seepage
+    stage2_choices:
+    - Water or coolant leaking
+    - Pipe leaking
+    confirmation_test: Cooling system pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-HP-02:
+    status: approved
+    name: Moderate Hose Pipe Leak
+    stage2_choices:
+    - Water or coolant leaking
+    - Pipe leaking
+    confirmation_test: Cooling system pressure test.
+    danger_phrases:
+    - temperature rising
+    safety_trigger_options: []
+  F16-HP-03:
+    status: approved
+    name: Front Pipeline Leak (Find Which Fluid)
+    stage2_choices:
+    - Pipe leaking
+    - Water or coolant leaking
+    confirmation_test: Identify which fluid is leaking.
+    danger_phrases:
+    - fuel smell
+    - brake fluid
+    safety_trigger_options:
+    - question: hose_leak-q01
+      option: 'Yes'
+    - question: hose_leak-q02
+      option: 'Yes'
+    - question: hose_leak-q04
+      option: Clear liquid near a wheel
+  F16-HP-04:
+    status: approved
+    name: Major Pipe Crack / Split
+    stage2_choices:
+    - Pipe leaking
+    - Water or coolant leaking
+    - Smoke coming
+    confirmation_test: Visual check and pressure test.
+    danger_phrases:
+    - steam
+    - high temperature
+    safety_trigger_options:
+    - question: hose_leak-q03
+      option: Heavy steam, or the needle is in the red
+    - question: hose_leak-q06
+      option: Very fast, it is spraying out
+  F16-HP-05:
+    status: approved
+    name: Upper Radiator Hose Leak
+    stage2_choices:
+    - Water or coolant leaking
+    - Pipe leaking
+    confirmation_test: Cooling system pressure test.
+    danger_phrases:
+    - overheating
+    safety_trigger_options: []
+  F16-HP-06:
+    status: approved
+    name: Lower Radiator Hose Leak
+    stage2_choices:
+    - Water or coolant leaking
+    - Pipe leaking
+    confirmation_test: Cooling system pressure test.
+    danger_phrases:
+    - overheating
+    safety_trigger_options: []
+  F16-HP-07:
+    status: approved
+    name: Coolant Hose Clamp Loose
+    stage2_choices:
+    - Water or coolant leaking
+    - Pipe leaking
+    confirmation_test: Cooling system pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-HP-08:
+    status: approved
+    name: Heater Hose / Heater Core Pipe Leak
+    stage2_choices:
+    - Water or coolant leaking
+    - Other problem
+    confirmation_test: Cooling system pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-HP-09:
+    status: approved
+    name: Expansion Tank / Overflow Hose Leak
+    stage2_choices:
+    - Water or coolant leaking
+    confirmation_test: Pressure test and cap test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-HP-10:
+    status: approved
+    name: Thermostat Housing / Coolant Outlet Leak
+    stage2_choices:
+    - Water or coolant leaking
+    confirmation_test: Cooling system pressure test.
+    danger_phrases:
+    - overheating
+    safety_trigger_options: []
+  F16-HP-11:
+    status: approved
+    name: Water Pump Hose Connection Leak
+    stage2_choices:
+    - Water or coolant leaking
+    confirmation_test: Cooling system pressure test.
+    danger_phrases:
+    - overheating
+    safety_trigger_options: []
+  F16-HP-12:
+    status: approved
+    name: Fuel Hose / Fuel Line Leak
+    stage2_choices:
+    - Pipe leaking
+    confirmation_test: Workshop inspection of the fuel line.
+    danger_phrases:
+    - fuel smell
+    safety_trigger_options:
+    - question: hose_leak-q01
+      option: 'Yes'
+    - question: hose_leak-q04
+      option: Smells of petrol or diesel
+  F16-HP-13:
+    status: approved
+    name: Brake Fluid Pipe / Flexible Brake Hose Leak
+    stage2_choices:
+    - Pipe leaking
+    confirmation_test: Inspection of the brake hose.
+    danger_phrases:
+    - soft brake pedal
+    safety_trigger_options:
+    - question: hose_leak-q02
+      option: 'Yes'
+    - question: hose_leak-q04
+      option: Clear liquid near a wheel
+  F16-HP-14:
+    status: approved
+    name: Turbo / Intercooler / Vacuum Hose Leak
+    stage2_choices:
+    - Pipe leaking
+    - Other problem
+    confirmation_test: Smoke test or boost test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-HP-15:
+    status: approved
+    name: Hose Burst with Rapid Fluid Loss / Overheating Risk
+    stage2_choices:
+    - Pipe leaking
+    - Water or coolant leaking
+    - Smoke coming
+    confirmation_test: Inspection.
+    danger_phrases:
+    - heavy steam
+    - red temperature
+    safety_trigger_options:
+    - question: hose_leak-q03
+      option: Heavy steam, or the needle is in the red
+    - question: hose_leak-q06
+      option: Very fast, it is spraying out
+  F16-HP-16:
+    status: approved
+    name: Rat-Bitten Coolant / Washer / Vacuum Hoses  [NEW - India]
+    stage2_choices:
+    - Pipe leaking
+    - Water or coolant leaking
+    confirmation_test: Inspection for bite marks.
+    danger_phrases:
+    - coolant lost
+    safety_trigger_options: []
+  F16-HP-17:
+    status: approved
+    name: Plain Water / Wrong Coolant Used (Corrosion and Leaks)  [NEW - India]
+    stage2_choices:
+    - Water or coolant leaking
+    - Other problem
+    confirmation_test: Inspection of the coolant and radiator.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-HP-18:
+    status: approved
+    name: Clear Water Dripping Under Car With AC ON (Normal Condensation)  [NEW - India]
+    stage2_choices:
+    - Water or coolant leaking
+    confirmation_test: Visual check and coolant level check.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: hose_leak-s-F16-HP-01
+  status: approved
+  fault: F16-HP-01
+  risk_level: low
+  stop_driving_trigger: Stop if the temperature rises or there is steam.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: NO.
+- id: hose_leak-s-F16-HP-02
+  status: approved
+  fault: F16-HP-02
+  risk_level: medium
+  stop_driving_trigger: Stop if the temperature rises.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature. If it rises, stop and call for a tow.
+  towing_recommendation: If the temperature rises.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: If temperature rises.
+- id: hose_leak-s-F16-HP-03
+  status: approved
+  fault: F16-HP-03
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the leak is fuel or brake fluid.
+  roadside_action: Find out which fluid it is from a safe distance. No smoking near a fuel smell. If it is fuel
+    or brake fluid, do not drive. Call for a tow.
+  towing_recommendation: Yes, if it is fuel or brake fluid.
+  source_text:
+    safety_precautions: • No smoking near fuel smell.
+    if_towing_needed: YES if fuel or brake fluid.
+- id: hose_leak-s-F16-HP-04
+  status: approved
+  fault: F16-HP-04
+  risk_level: high
+  stop_driving_trigger: 'Stop: fast coolant loss or steam.'
+  roadside_action: Stop, switch off the engine and let it cool. Never open a hot radiator or coolant cap, and do
+    not touch hot hoses. Call for help.
+  towing_recommendation: Yes, if no hose is available at the roadside.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: YES if no roadside hose.
+- id: hose_leak-s-F16-HP-05
+  status: approved
+  fault: F16-HP-05
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine overheats.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature.
+  towing_recommendation: If overheating.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: If overheating.
+- id: hose_leak-s-F16-HP-06
+  status: approved
+  fault: F16-HP-06
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine overheats.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature.
+  towing_recommendation: If overheating.
+  source_text:
+    safety_precautions: '• Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+
+      • Use proper lift / stands.'
+    if_towing_needed: If overheating.
+- id: hose_leak-s-F16-HP-07
+  status: approved
+  fault: F16-HP-07
+  risk_level: low
+  stop_driving_trigger: Stop if the temperature rises or there is steam.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: NO.
+- id: hose_leak-s-F16-HP-08
+  status: approved
+  fault: F16-HP-08
+  risk_level: low
+  stop_driving_trigger: Stop if the temperature rises or there is steam.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: NO.
+- id: hose_leak-s-F16-HP-09
+  status: approved
+  fault: F16-HP-09
+  risk_level: low
+  stop_driving_trigger: Stop if the temperature rises or there is steam.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: NO.
+- id: hose_leak-s-F16-HP-10
+  status: approved
+  fault: F16-HP-10
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine overheats.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature.
+  towing_recommendation: If overheating.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: If overheating.
+- id: hose_leak-s-F16-HP-11
+  status: approved
+  fault: F16-HP-11
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine overheats.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Keep away from the belts.
+    Top up only when cold.
+  towing_recommendation: If overheating.
+  source_text:
+    safety_precautions: '• Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+
+      • Engine OFF near belts.'
+    if_towing_needed: If overheating.
+- id: hose_leak-s-F16-HP-12
+  status: approved
+  fault: F16-HP-12
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: fuel leak.'
+  roadside_action: Do not start the engine. No smoking or flames. Move away from the car and call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Fire risk.
+
+      • Relieve fuel pressure as per manual.'
+    if_towing_needed: YES.
+- id: hose_leak-s-F16-HP-13
+  status: approved
+  fault: F16-HP-13
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: brake fluid leak.'
+  roadside_action: Do not drive. Put on the hazard lights and call for a tow. Do not touch the fluid with bare hands.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Brake fluid: wear gloves/eye protection.'
+    if_towing_needed: YES.
+- id: hose_leak-s-F16-HP-14
+  status: approved
+  fault: F16-HP-14
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not touch the hot turbo pipes. Drive gently to a garage.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Turbo pipes very hot.
+    if_towing_needed: NO.
+- id: hose_leak-s-F16-HP-15
+  status: approved
+  fault: F16-HP-15
+  risk_level: high
+  stop_driving_trigger: 'Stop: burst hose with overheating.'
+  roadside_action: Stop, switch off the engine and stand away from the steam. Never open a hot radiator or coolant
+    cap, and do not touch hot hoses. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+
+      • Steam burns.'
+    if_towing_needed: YES.
+- id: hose_leak-s-F16-HP-16
+  status: approved
+  fault: F16-HP-16
+  risk_level: medium
+  stop_driving_trigger: Stop if coolant is lost.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. If the coolant level is
+    very low, do not drive. Call a mechanic.
+  towing_recommendation: If coolant was lost.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: If coolant lost.
+- id: hose_leak-s-F16-HP-17
+  status: approved
+  fault: F16-HP-17
+  risk_level: low
+  stop_driving_trigger: Stop if the temperature rises or there is steam.
+  roadside_action: Never open a hot radiator or coolant cap, and do not touch hot hoses. Top up coolant only when
+    the engine is cold, and drive to a garage watching the temperature.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never open a hot radiator or tank cap. Never touch hot hoses or pipes.
+    if_towing_needed: NO.
+- id: hose_leak-s-F16-HP-18
+  status: approved
+  fault: F16-HP-18
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Clear water with no smell, only with the AC on, is normal. Check the coolant level is fine.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.

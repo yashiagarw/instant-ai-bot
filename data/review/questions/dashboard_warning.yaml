@@ -1,0 +1,1574 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category dashboard_warning
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: dashboard_warning
+category_name: Dashboard warnings (EPC, ESP, ABS, EPS)
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:31:56+00:00'
+  run_id: claude-code-dashboard_warning
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: dashboard_warning-main
+  status: approved
+  stage: 2
+  text: Gaadi mein kya dikkat aa rahi hai?
+  choice_source: file
+  options:
+  - label: Petrol khatam ho gaya
+    effects: []
+    safety_trigger: false
+  - label: Petrol hai, par gaadi start nahi ho rahi
+    effects: []
+    safety_trigger: false
+  - label: Gaadi chalti chalti band ho gayi
+    effects: []
+    safety_trigger: false
+  - label: ABS light aa rahi hai
+    effects:
+    - fault: F10-DW-02
+      effect: supports
+      strength: strong
+    - fault: F10-DW-08
+      effect: supports
+      strength: strong
+    - fault: F10-DW-09
+      effect: supports
+      strength: strong
+    - fault: F10-DW-10
+      effect: supports
+      strength: strong
+    - fault: F10-DW-11
+      effect: supports
+      strength: strong
+    - fault: F10-DW-26
+      effect: supports
+      strength: strong
+    - fault: F10-DW-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: EPS light aa rahi hai
+    effects:
+    - fault: F10-DW-03
+      effect: supports
+      strength: strong
+    - fault: F10-DW-16
+      effect: supports
+      strength: strong
+    - fault: F10-DW-17
+      effect: supports
+      strength: strong
+    - fault: F10-DW-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: EPC light aa rahi hai
+    effects:
+    - fault: F10-DW-05
+      effect: supports
+      strength: strong
+    - fault: F10-DW-13
+      effect: supports
+      strength: strong
+    - fault: F10-DW-20
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: ESP / ESC light aa rahi hai
+    effects:
+    - fault: F10-DW-06
+      effect: supports
+      strength: strong
+    - fault: F10-DW-07
+      effect: supports
+      strength: strong
+    - fault: F10-DW-14
+      effect: supports
+      strength: strong
+    - fault: F10-DW-15
+      effect: supports
+      strength: strong
+    - fault: F10-DW-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Bahut saari warning lights aa rahi hain
+    effects:
+    - fault: F10-DW-04
+      effect: supports
+      strength: strong
+    - fault: F10-DW-18
+      effect: supports
+      strength: strong
+    - fault: F10-DW-19
+      effect: supports
+      strength: strong
+    - fault: F10-DW-27
+      effect: supports
+      strength: strong
+    - fault: F10-DW-28
+      effect: supports
+      strength: strong
+    - fault: F10-DW-31
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Brake warning light aa rahi hai
+    effects:
+    - fault: F10-DW-12
+      effect: supports
+      strength: strong
+    - fault: F10-DW-13
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F10-DW-01
+      effect: supports
+      strength: strong
+    - fault: F10-DW-07
+      effect: supports
+      strength: strong
+    - fault: F10-DW-21
+      effect: supports
+      strength: strong
+    - fault: F10-DW-22
+      effect: supports
+      strength: strong
+    - fault: F10-DW-23
+      effect: supports
+      strength: strong
+    - fault: F10-DW-24
+      effect: supports
+      strength: strong
+    - fault: F10-DW-25
+      effect: supports
+      strength: strong
+    - fault: F10-DW-29
+      effect: supports
+      strength: strong
+    - fault: F10-DW-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q01
+  status: approved
+  stage: 3
+  text: Is the light red or yellow?
+  source_faults:
+  - F10-DW-01
+  - F10-DW-02
+  - F10-DW-12
+  - F10-DW-21
+  - F10-DW-22
+  - F10-DW-23
+  - F10-DW-24
+  - F10-DW-29
+  - F10-DW-30
+  merged_from:
+  - 'F10-DW-01 (stages_text): Light red hai ya yellow?'
+  - 'F10-DW-01 (stages_text): Which symbol? Colour?'
+  options:
+  - label: Red
+    effects:
+    - fault: F10-DW-12
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-22
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-23
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-24
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-01
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: Yellow or orange
+    effects:
+    - fault: F10-DW-01
+      effect: supports
+      strength: weak
+    - fault: F10-DW-02
+      effect: supports
+      strength: weak
+    - fault: F10-DW-21
+      effect: supports
+      strength: weak
+    - fault: F10-DW-29
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Green or blue
+    effects:
+    - fault: F10-DW-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q02
+  status: approved
+  stage: 3
+  text: Is the red oil light on, or do you hear ticking or knocking from the engine?
+  source_faults:
+  - F10-DW-23
+  merged_from:
+  - 'F10-DW-23 (stages_text): Red oil light? Any noise?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-23
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F10-DW-23
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q03
+  status: approved
+  stage: 3
+  text: Is the temperature needle high, or do you see steam?
+  source_faults:
+  - F10-DW-24
+  merged_from:
+  - 'F10-DW-24 (stages_text): Needle high? Steam? Fan running?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-24
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F10-DW-24
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q04
+  status: approved
+  stage: 3
+  text: How does the brake pedal feel?
+  source_faults:
+  - F10-DW-02
+  - F10-DW-10
+  - F10-DW-12
+  - F10-DW-26
+  merged_from:
+  - 'F10-DW-12 (stages_text): Pedal feels normal?'
+  - 'F10-DW-02 (stages_text): Brake pedal normal?'
+  - 'F10-DW-10 (stages_text): Brakes normal?'
+  options:
+  - label: Soft, or it goes down further than normal
+    effects:
+    - fault: F10-DW-12
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: Normal
+    effects:
+    - fault: F10-DW-02
+      effect: supports
+      strength: weak
+    - fault: F10-DW-10
+      effect: supports
+      strength: weak
+    - fault: F10-DW-26
+      effect: supports
+      strength: weak
+    - fault: F10-DW-12
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q05
+  status: approved
+  stage: 3
+  text: Can you see brake fluid leaking near a wheel?
+  source_faults:
+  - F10-DW-12
+  merged_from:
+  - 'F10-DW-12 (stages_text): Any leak?'
+  - 'F10-DW-12 (symptoms): Leak at wheel'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-12
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q06
+  status: approved
+  stage: 3
+  text: Is the handbrake fully released?
+  source_faults:
+  - F10-DW-12
+  - F10-DW-30
+  merged_from:
+  - 'F10-DW-12 (stages_text): Handbrake down?'
+  - 'F10-DW-30 (symptoms): Handbrake symbol'
+  options:
+  - label: It was still on, and the light went off when I released it
+    effects:
+    - fault: F10-DW-30
+      effect: supports
+      strength: strong
+    - fault: F10-DW-12
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Yes, it is fully down
+    effects:
+    - fault: F10-DW-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q07
+  status: approved
+  stage: 3
+  text: How is the steering?
+  source_faults:
+  - F10-DW-03
+  - F10-DW-14
+  - F10-DW-16
+  - F10-DW-17
+  - F10-DW-18
+  - F10-DW-22
+  merged_from:
+  - 'F10-DW-03 (stages_text): Is steering heavy now?'
+  - 'F10-DW-03 (stages_text): Fine after restart?'
+  - 'F10-DW-16 (stages_text): Is steering heavy all the time?'
+  - 'F10-DW-17 (stages_text): Pulls to one side?'
+  options:
+  - label: Very heavy all the time, even after restarting
+    effects:
+    - fault: F10-DW-16
+      effect: supports
+      strength: strong
+    - fault: F10-DW-03
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Heavy, but fine after restarting
+    effects:
+    - fault: F10-DW-03
+      effect: supports
+      strength: strong
+    - fault: F10-DW-18
+      effect: supports
+      strength: weak
+    - fault: F10-DW-22
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It pulls or feels uneven
+    effects:
+    - fault: F10-DW-17
+      effect: supports
+      strength: strong
+    - fault: F10-DW-14
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Normal
+    effects:
+    - fault: F10-DW-03
+      effect: rules_out
+      strength: moderate
+    - fault: F10-DW-16
+      effect: rules_out
+      strength: strong
+    - fault: F10-DW-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q08
+  status: approved
+  stage: 3
+  text: Is the light steady, or blinking?
+  source_faults:
+  - F10-DW-01
+  - F10-DW-02
+  - F10-DW-06
+  - F10-DW-07
+  - F10-DW-21
+  merged_from:
+  - 'F10-DW-01 (stages_text): Light continuously jal rahi hai ya blink kar rahi hai?'
+  - 'F10-DW-06 (stages_text): Steady or blinking?'
+  - 'F10-DW-07 (stages_text): Steady or blinking?'
+  - 'F10-DW-21 (stages_text): Steady or blinking?'
+  options:
+  - label: The engine light is blinking
+    effects:
+    - fault: F10-DW-21
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The ESP or traction light blinks only on a slippery or loose road
+    effects:
+    - fault: F10-DW-06
+      effect: rules_out
+      strength: moderate
+    - fault: F10-DW-07
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Steady
+    effects:
+    - fault: F10-DW-06
+      effect: supports
+      strength: weak
+    - fault: F10-DW-07
+      effect: supports
+      strength: weak
+    - fault: F10-DW-02
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q09
+  status: approved
+  stage: 3
+  text: Has the car lost power, or will the engine not rev up?
+  source_faults:
+  - F10-DW-01
+  - F10-DW-05
+  - F10-DW-20
+  - F10-DW-21
+  merged_from:
+  - 'F10-DW-05 (stages_text): Does engine speed rise when you press?'
+  - 'F10-DW-01 (stages_text): Pickup kam ho gaya hai?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-05
+      effect: supports
+      strength: strong
+    - fault: F10-DW-20
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-21
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q10
+  status: approved
+  stage: 3
+  text: Does the warning go away after you switch the engine off and restart?
+  source_faults:
+  - F10-DW-03
+  - F10-DW-05
+  - F10-DW-16
+  - F10-DW-20
+  merged_from:
+  - 'F10-DW-20 (stages_text): Restart helps?'
+  - 'F10-DW-05 (symptoms): Restart helps'
+  - 'F10-DW-03 (symptoms): Fine after restart'
+  options:
+  - label: Yes, for some time
+    effects:
+    - fault: F10-DW-05
+      effect: supports
+      strength: weak
+    - fault: F10-DW-20
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-16
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q11
+  status: approved
+  stage: 3
+  text: Do the brake lights at the back work properly?
+  source_faults:
+  - F10-DW-05
+  - F10-DW-13
+  merged_from:
+  - 'F10-DW-13 (stages_text): Do brake lights work?'
+  - 'F10-DW-05 (stages_text): Brake lights working?'
+  options:
+  - label: No, or they stay on all the time
+    effects:
+    - fault: F10-DW-13
+      effect: supports
+      strength: strong
+    - fault: F10-DW-05
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q12
+  status: approved
+  stage: 3
+  text: (Automatic car) Does the gear lever get stuck in P?
+  source_faults:
+  - F10-DW-13
+  merged_from:
+  - 'F10-DW-13 (stages_text): Gear stuck in P?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q13
+  status: approved
+  stage: 3
+  text: Was any work done on the car just before the light came on?
+  source_faults:
+  - F10-DW-02
+  - F10-DW-04
+  - F10-DW-06
+  - F10-DW-08
+  - F10-DW-14
+  - F10-DW-15
+  - F10-DW-18
+  - F10-DW-19
+  - F10-DW-25
+  - F10-DW-26
+  - F10-DW-27
+  - F10-DW-31
+  merged_from:
+  - 'F10-DW-26 (stages_text): What work was done just before?'
+  - 'F10-DW-27 (stages_text): Battery changed or jump done?'
+  - 'F10-DW-14 (stages_text): Alignment or battery work recently?'
+  - 'F10-DW-15 (stages_text): Body or seat repair done?'
+  - 'F10-DW-31 (stages_text): Any accessory fitted recently?'
+  - 'F10-DW-02 (stages_text): After pothole or wheel work?'
+  options:
+  - label: Battery change or jump-start
+    effects:
+    - fault: F10-DW-27
+      effect: supports
+      strength: strong
+    - fault: F10-DW-18
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-04
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-14
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Tyre, brake, wheel or suspension work
+    effects:
+    - fault: F10-DW-26
+      effect: supports
+      strength: strong
+    - fault: F10-DW-08
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-02
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Wheel alignment
+    effects:
+    - fault: F10-DW-14
+      effect: supports
+      strength: strong
+    - fault: F10-DW-06
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Body or seat repair
+    effects:
+    - fault: F10-DW-15
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-25
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A new accessory was fitted (lights, music, alarm, camera)
+    effects:
+    - fault: F10-DW-31
+      effect: supports
+      strength: strong
+    - fault: F10-DW-19
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No work done
+    effects:
+    - fault: F10-DW-26
+      effect: rules_out
+      strength: moderate
+    - fault: F10-DW-27
+      effect: rules_out
+      strength: moderate
+    - fault: F10-DW-31
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q14
+  status: approved
+  stage: 3
+  text: Did the light come on after a car wash or heavy rain?
+  source_faults:
+  - F10-DW-04
+  - F10-DW-11
+  - F10-DW-19
+  - F10-DW-28
+  merged_from:
+  - 'F10-DW-28 (stages_text): After car wash or rain?'
+  - 'F10-DW-11 (stages_text): After rain?'
+  - 'F10-DW-19 (stages_text): Water entered?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-28
+      effect: supports
+      strength: strong
+    - fault: F10-DW-11
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-19
+      effect: supports
+      strength: weak
+    - fault: F10-DW-04
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-28
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q15
+  status: approved
+  stage: 3
+  text: Does the ABS light come and go over bumps?
+  source_faults:
+  - F10-DW-02
+  - F10-DW-08
+  merged_from:
+  - 'F10-DW-08 (stages_text): Light on bumps?'
+  - 'F10-DW-02 (symptoms): Comes and goes'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-08
+      effect: supports
+      strength: strong
+    - fault: F10-DW-02
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q16
+  status: approved
+  stage: 3
+  text: Is there a humming or grinding noise from one wheel, or was the ABS sensor already replaced without fixing
+    it?
+  source_faults:
+  - F10-DW-09
+  merged_from:
+  - 'F10-DW-09 (stages_text): Wheel noise?'
+  - 'F10-DW-09 (stages_text): Sensor changed already?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-09
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q17
+  status: approved
+  stage: 3
+  text: Is the speedometer working?
+  source_faults:
+  - F10-DW-04
+  - F10-DW-11
+  - F10-DW-19
+  merged_from:
+  - 'F10-DW-11 (stages_text): Speedometer working?'
+  - 'F10-DW-19 (symptoms): Gauges drop'
+  - 'F10-DW-04 (symptoms): Speedometer odd'
+  options:
+  - label: No, it stops or acts strangely
+    effects:
+    - fault: F10-DW-11
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-19
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-04
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'Yes'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q18
+  status: approved
+  stage: 3
+  text: Was the battery weak, the car parked for a long time, or does it start slowly?
+  source_faults:
+  - F10-DW-03
+  - F10-DW-04
+  - F10-DW-18
+  - F10-DW-27
+  merged_from:
+  - 'F10-DW-18 (stages_text): Jump start or long parking recently?'
+  - 'F10-DW-18 (stages_text): Battery age?'
+  - 'F10-DW-03 (stages_text): Battery weak recently?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-18
+      effect: supports
+      strength: strong
+    - fault: F10-DW-04
+      effect: supports
+      strength: moderate
+    - fault: F10-DW-03
+      effect: supports
+      strength: weak
+    - fault: F10-DW-27
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-18
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q19
+  status: approved
+  stage: 3
+  text: Is the red battery light on while driving?
+  source_faults:
+  - F10-DW-22
+  merged_from:
+  - 'F10-DW-22 (stages_text): Red battery light while driving?'
+  - 'F10-DW-22 (stages_text): Belt noise?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-22
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-22
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q20
+  status: approved
+  stage: 3
+  text: Is the airbag light on? Is the horn or are the steering buttons not working?
+  source_faults:
+  - F10-DW-25
+  merged_from:
+  - 'F10-DW-25 (stages_text): Horn working?'
+  - 'F10-DW-25 (stages_text): Seat moved/removed recently?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-25
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-25
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q21
+  status: approved
+  stage: 3
+  text: Is it a tyre symbol with an exclamation mark (!)?
+  source_faults:
+  - F10-DW-29
+  merged_from:
+  - 'F10-DW-29 (stages_text): Tyre symbol with ''!''?'
+  - 'F10-DW-29 (stages_text): Filled air already?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-29
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: dashboard_warning-q22
+  status: approved
+  stage: 3
+  text: Is it a reminder symbol (seat belt, door open, service due, washer fluid) and the car drives normally?
+  source_faults:
+  - F10-DW-30
+  merged_from:
+  - 'F10-DW-30 (stages_text): Can you send a photo?'
+  - 'F10-DW-30 (symptoms): Car drives normally'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-DW-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-DW-30
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F10-DW-01:
+    status: approved
+    name: One Dashboard Warning Light Came ON
+    stage2_choices:
+    - Other problem
+    confirmation_test: Identify the symbol and scan.
+    danger_phrases:
+    - red light
+    safety_trigger_options:
+    - question: dashboard_warning-q01
+      option: Red
+  F10-DW-02:
+    status: approved
+    name: ABS Light ON - Wheel Speed Sensor Suspected
+    stage2_choices:
+    - ABS light aa rahi hai
+    confirmation_test: Live wheel speed data and wire check.
+    danger_phrases:
+    - red brake light
+    safety_trigger_options: []
+  F10-DW-03:
+    status: approved
+    name: EPS Light ON - Electric Power Steering Problem
+    stage2_choices:
+    - EPS light aa rahi hai
+    confirmation_test: Battery voltage, EPS codes and live data.
+    danger_phrases:
+    - heavy steering
+    safety_trigger_options:
+    - question: dashboard_warning-q07
+      option: Very heavy all the time, even after restarting
+  F10-DW-04:
+    status: approved
+    name: Many Warning Lights ON Together
+    stage2_choices:
+    - Bahut saari warning lights aa rahi hain
+    confirmation_test: Battery voltage and full scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-05:
+    status: approved
+    name: EPC Light + Low Power (Limp Mode)
+    stage2_choices:
+    - EPC light aa rahi hai
+    confirmation_test: Fault codes and live data.
+    danger_phrases:
+    - low power in traffic
+    safety_trigger_options: []
+  F10-DW-06:
+    status: approved
+    name: ESP / ESC Light ON (Stability Control)
+    stage2_choices:
+    - ESP / ESC light aa rahi hai
+    confirmation_test: ESP scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-07:
+    status: approved
+    name: Traction Control Light / System Fault
+    stage2_choices:
+    - ESP / ESC light aa rahi hai
+    - Other problem
+    confirmation_test: Scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-08:
+    status: approved
+    name: ABS Sensor Wire Cut / Loose Plug
+    stage2_choices:
+    - ABS light aa rahi hai
+    confirmation_test: Wiggle test and continuity check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-09:
+    status: approved
+    name: ABS Ring / Magnetic Encoder Damaged
+    stage2_choices:
+    - ABS light aa rahi hai
+    confirmation_test: Inspect the ABS ring.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-10:
+    status: approved
+    name: ABS Pump / Hydraulic Unit Fault
+    stage2_choices:
+    - ABS light aa rahi hai
+    confirmation_test: Power and actuator test of the ABS unit.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-11:
+    status: approved
+    name: ABS Module / Communication Fault
+    stage2_choices:
+    - ABS light aa rahi hai
+    confirmation_test: Pin tests at the ABS module.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-12:
+    status: approved
+    name: Red Brake Light / Low Brake Fluid (DANGER)
+    stage2_choices:
+    - Brake warning light aa rahi hai
+    confirmation_test: Visual check and pedal test.
+    danger_phrases:
+    - soft pedal
+    - brake fluid leak
+    safety_trigger_options:
+    - question: dashboard_warning-q01
+      option: Red
+    - question: dashboard_warning-q04
+      option: Soft, or it goes down further than normal
+    - question: dashboard_warning-q05
+      option: 'Yes'
+  F10-DW-13:
+    status: approved
+    name: Brake Light Switch Fault (Causes EPC / ABS / ESP Lights)
+    stage2_choices:
+    - EPC light aa rahi hai
+    - Brake warning light aa rahi hai
+    confirmation_test: Live data of the brake light switch.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-14:
+    status: approved
+    name: Steering Angle Sensor Fault
+    stage2_choices:
+    - ESP / ESC light aa rahi hai
+    confirmation_test: Steering angle sensor calibration.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-15:
+    status: approved
+    name: Yaw Rate / Stability Sensor Fault
+    stage2_choices:
+    - ESP / ESC light aa rahi hai
+    confirmation_test: Calibration and live data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-16:
+    status: approved
+    name: EPS Motor / Steering Assist Failed
+    stage2_choices:
+    - EPS light aa rahi hai
+    confirmation_test: EPS motor tests.
+    danger_phrases:
+    - very heavy steering
+    safety_trigger_options:
+    - question: dashboard_warning-q07
+      option: Very heavy all the time, even after restarting
+  F10-DW-17:
+    status: approved
+    name: EPS Torque Sensor / Steering Column Fault
+    stage2_choices:
+    - EPS light aa rahi hai
+    confirmation_test: Live data and calibration.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-18:
+    status: approved
+    name: Low Battery Voltage Causing Many Electronic Warnings
+    stage2_choices:
+    - Bahut saari warning lights aa rahi hain
+    confirmation_test: Battery and charging test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-19:
+    status: approved
+    name: Network (CAN) Communication / Wiring Fault
+    stage2_choices:
+    - Bahut saari warning lights aa rahi hain
+    confirmation_test: Network tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-20:
+    status: approved
+    name: Throttle / Accelerator Pedal Fault Turning On EPC
+    stage2_choices:
+    - EPC light aa rahi hai
+    confirmation_test: Live data and throttle cleaning.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-21:
+    status: approved
+    name: Check Engine Light With Low Performance
+    stage2_choices:
+    - Other problem
+    confirmation_test: Scan.
+    danger_phrases:
+    - blinking engine light
+    safety_trigger_options: []
+  F10-DW-22:
+    status: approved
+    name: Battery / Charging Warning Light
+    stage2_choices:
+    - Other problem
+    confirmation_test: Charging test.
+    danger_phrases:
+    - red battery light
+    safety_trigger_options:
+    - question: dashboard_warning-q01
+      option: Red
+  F10-DW-23:
+    status: approved
+    name: Red Engine Oil Pressure Light (STOP NOW)
+    stage2_choices:
+    - Other problem
+    confirmation_test: Oil pressure gauge test.
+    danger_phrases:
+    - red oil light
+    - knocking
+    safety_trigger_options:
+    - question: dashboard_warning-q01
+      option: Red
+    - question: dashboard_warning-q02
+      option: 'Yes'
+  F10-DW-24:
+    status: approved
+    name: Engine Temperature / Overheating Warning
+    stage2_choices:
+    - Other problem
+    confirmation_test: Cooling system tests.
+    danger_phrases:
+    - needle high
+    - steam
+    safety_trigger_options:
+    - question: dashboard_warning-q01
+      option: Red
+    - question: dashboard_warning-q03
+      option: 'Yes'
+  F10-DW-25:
+    status: approved
+    name: Airbag / SRS Warning Light
+    stage2_choices:
+    - Other problem
+    confirmation_test: SRS scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-26:
+    status: approved
+    name: ABS Light After Tyre / Brake / Suspension Work  [NEW - India]
+    stage2_choices:
+    - ABS light aa rahi hai
+    confirmation_test: Inspect the plug and wire at the wheel that was worked on.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-27:
+    status: approved
+    name: Warning Lights After Battery Change or Jump-Start  [NEW - India]
+    stage2_choices:
+    - Bahut saari warning lights aa rahi hain
+    - EPS light aa rahi hai
+    - ESP / ESC light aa rahi hai
+    confirmation_test: Reset and scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-28:
+    status: approved
+    name: Warning Lights After Car Wash or Heavy Rain  [NEW - India]
+    stage2_choices:
+    - Bahut saari warning lights aa rahi hain
+    - ABS light aa rahi hai
+    confirmation_test: Inspect the connectors.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-29:
+    status: approved
+    name: Tyre Pressure (TPMS) Warning Light  [NEW - India]
+    stage2_choices:
+    - Other problem
+    confirmation_test: Tyre pressure check.
+    danger_phrases:
+    - flat tyre
+    safety_trigger_options: []
+  F10-DW-30:
+    status: approved
+    name: Reminder Lights Mistaken for Faults (Seat Belt, Door, Service, Handbrake)  [NEW - India]
+    stage2_choices:
+    - Other problem
+    confirmation_test: Photo of the symbol.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-DW-31:
+    status: approved
+    name: Aftermarket Accessory Wiring Causing Warning Lights  [NEW - India]
+    stage2_choices:
+    - Bahut saari warning lights aa rahi hain
+    confirmation_test: Disconnect test of the accessory.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: dashboard_warning-s-F10-DW-01
+  status: approved
+  fault: F10-DW-01
+  risk_level: medium
+  stop_driving_trigger: Stop if the light is red.
+  roadside_action: If the light is red, stop in a safe place and switch off the engine. If it is yellow, drive gently
+    to a garage.
+  towing_recommendation: Depends on the light.
+  source_text:
+    safety_precautions: • Red lights - stop safely.
+    if_towing_needed: DEPENDS on the light.
+- id: dashboard_warning-s-F10-DW-02
+  status: approved
+  fault: F10-DW-02
+  risk_level: low
+  stop_driving_trigger: Stop if the red brake light is also on or the brakes feel different.
+  roadside_action: Drive carefully and keep a bigger gap, because ABS may be off. Book a scan.
+  towing_recommendation: No, if the brakes feel normal and there is no red brake light.
+  source_text:
+    safety_precautions: '• Test drive in safe place.
+
+      • Car on stands for wheel work.'
+    if_towing_needed: NO if brakes feel normal and no red brake light.
+- id: dashboard_warning-s-F10-DW-03
+  status: approved
+  fault: F10-DW-03
+  risk_level: medium
+  stop_driving_trigger: Stop if the steering is heavy.
+  roadside_action: If the steering is heavy, stop in a safe place. Check that the battery terminals are tight. If
+    it stays heavy, call for a tow.
+  towing_recommendation: Yes, if the steering stays heavy.
+  source_text:
+    safety_precautions: • Heavy steering = accident risk.
+    if_towing_needed: YES if steering stays heavy.
+- id: dashboard_warning-s-F10-DW-04
+  status: approved
+  fault: F10-DW-04
+  risk_level: medium
+  stop_driving_trigger: Stop if the brakes or steering do not feel normal.
+  roadside_action: Check the brakes and steering first. Check that the battery terminals are tight. If the car drives
+    oddly, stop and call a mechanic.
+  towing_recommendation: Depends on how the car drives.
+  source_text:
+    safety_precautions: • Check brakes/steering first.
+    if_towing_needed: DEPENDS.
+- id: dashboard_warning-s-F10-DW-05
+  status: approved
+  fault: F10-DW-05
+  risk_level: medium
+  stop_driving_trigger: Stop if you cannot keep a safe speed.
+  roadside_action: If you cannot keep a safe speed in traffic, stop in a safe place and call for help.
+  towing_recommendation: Depends on whether the car can keep a safe speed.
+  source_text:
+    safety_precautions: • Low power in traffic is risky.
+    if_towing_needed: DEPENDS.
+- id: dashboard_warning-s-F10-DW-06
+  status: approved
+  fault: F10-DW-06
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Test safely.
+    if_towing_needed: NO usually.
+- id: dashboard_warning-s-F10-DW-07
+  status: approved
+  fault: F10-DW-07
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-08
+  status: approved
+  fault: F10-DW-08
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Car on stands.
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-09
+  status: approved
+  fault: F10-DW-09
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Wheel safety.
+    if_towing_needed: NO unless noise severe.
+- id: dashboard_warning-s-F10-DW-10
+  status: approved
+  fault: F10-DW-10
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Brake system - correct bleeding.
+    if_towing_needed: NO if brakes normal.
+- id: dashboard_warning-s-F10-DW-11
+  status: approved
+  fault: F10-DW-11
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery off before unplugging.
+    if_towing_needed: NO if brakes normal.
+- id: dashboard_warning-s-F10-DW-12
+  status: approved
+  fault: F10-DW-12
+  risk_level: high
+  stop_driving_trigger: Do not drive if the pedal is soft or fluid is leaking.
+  roadside_action: If the brake pedal is soft or fluid is leaking, stop and do not drive. Call for a tow.
+  towing_recommendation: Yes, if the pedal is soft or there is a leak.
+  source_text:
+    safety_precautions: '• Brake failure risk.
+
+      • Brake fluid damages paint and eyes.'
+    if_towing_needed: YES if pedal soft or leak.
+- id: dashboard_warning-s-F10-DW-13
+  status: approved
+  fault: F10-DW-13
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-14
+  status: approved
+  fault: F10-DW-14
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-15
+  status: approved
+  fault: F10-DW-15
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Airbag area care if near seat.
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-16
+  status: approved
+  fault: F10-DW-16
+  risk_level: high
+  stop_driving_trigger: Do not drive with very heavy steering.
+  roadside_action: Stop in a safe place. Do not drive with very heavy steering. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Airbag removal steps when removing steering.
+    if_towing_needed: YES.
+- id: dashboard_warning-s-F10-DW-17
+  status: approved
+  fault: F10-DW-17
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Steering safety.
+    if_towing_needed: NO usually.
+- id: dashboard_warning-s-F10-DW-18
+  status: approved
+  fault: F10-DW-18
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery safety.
+    if_towing_needed: NO usually.
+- id: dashboard_warning-s-F10-DW-19
+  status: approved
+  fault: F10-DW-19
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Battery off.
+    if_towing_needed: DEPENDS.
+- id: dashboard_warning-s-F10-DW-20
+  status: approved
+  fault: F10-DW-20
+  risk_level: medium
+  stop_driving_trigger: Stop if you cannot keep a safe speed.
+  roadside_action: If the car loses power in traffic, stop in a safe place. Book a scan.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Ignition OFF when cleaning.
+    if_towing_needed: DEPENDS.
+- id: dashboard_warning-s-F10-DW-21
+  status: approved
+  fault: F10-DW-21
+  risk_level: medium
+  stop_driving_trigger: Slow down if the engine light is blinking.
+  roadside_action: If the engine light is blinking, slow down and drive gently to a garage. Check that the fuel
+    cap is tight.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Blinking light.
+    if_towing_needed: DEPENDS.
+- id: dashboard_warning-s-F10-DW-22
+  status: approved
+  fault: F10-DW-22
+  risk_level: medium
+  stop_driving_trigger: Stop if the battery light is on at night or on the highway.
+  roadside_action: Switch off the AC, music and extra lights. Drive straight to a garage, or call for a tow at night
+    or on a highway.
+  towing_recommendation: Depends (yes at night or on a highway).
+  source_text:
+    safety_precautions: • Belt.
+    if_towing_needed: DEPENDS (YES at night/highway).
+- id: dashboard_warning-s-F10-DW-23
+  status: approved
+  fault: F10-DW-23
+  risk_level: high
+  stop_driving_trigger: 'Stop now: red oil light.'
+  roadside_action: Stop now and switch off the engine. Do not drive while the light stays on. Call a mechanic or
+    a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Hot oil.
+    if_towing_needed: YES.
+- id: dashboard_warning-s-F10-DW-24
+  status: approved
+  fault: F10-DW-24
+  risk_level: medium
+  stop_driving_trigger: Stop if the needle is high or there is steam.
+  roadside_action: Stop, switch off the AC and let the engine cool. Do not open the radiator cap while hot.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Hot coolant burns.
+    if_towing_needed: DEPENDS.
+- id: dashboard_warning-s-F10-DW-25
+  status: approved
+  fault: F10-DW-25
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not touch any airbag parts. The airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Airbag can deploy - follow procedure.
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-26
+  status: approved
+  fault: F10-DW-26
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Car on stands.
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-27
+  status: approved
+  fault: F10-DW-27
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-28
+  status: approved
+  fault: F10-DW-28
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery off when cleaning.
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-29
+  status: approved
+  fault: F10-DW-29
+  risk_level: medium
+  stop_driving_trigger: Stop if a tyre is flat.
+  roadside_action: Check the tyre pressures and fill air. If a tyre is flat or punctured, do not drive on it.
+  towing_recommendation: No, unless the tyre is flat.
+  source_text:
+    safety_precautions: • Low tyre = blowout risk.
+    if_towing_needed: NO unless flat.
+- id: dashboard_warning-s-F10-DW-30
+  status: approved
+  fault: F10-DW-30
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Close the doors, wear seat belts, release the handbrake or refill the washer as the symbol shows.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: dashboard_warning-s-F10-DW-31
+  status: approved
+  fault: F10-DW-31
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes or steering feel different, or a red light comes on.
+  roadside_action: The car can be driven gently. Book a scan at a garage. If the brakes or steering feel different,
+    stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery off.
+    if_towing_needed: NO.

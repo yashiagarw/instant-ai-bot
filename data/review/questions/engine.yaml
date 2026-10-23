@@ -1,0 +1,1474 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category engine
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: engine
+category_name: Engine warning / performance / failure
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:35:14+00:00'
+  run_id: claude-code-engine
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: engine-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Engine light is on
+    effects:
+    - fault: F12-EN-01
+      effect: supports
+      strength: strong
+    - fault: F12-EN-05
+      effect: supports
+      strength: strong
+    - fault: F12-EN-16
+      effect: supports
+      strength: strong
+    - fault: F12-EN-18
+      effect: supports
+      strength: strong
+    - fault: F12-EN-19
+      effect: supports
+      strength: strong
+    - fault: F12-EN-25
+      effect: supports
+      strength: strong
+    - fault: F12-EN-26
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine is shaking
+    effects:
+    - fault: F12-EN-02
+      effect: supports
+      strength: strong
+    - fault: F12-EN-05
+      effect: supports
+      strength: strong
+    - fault: F12-EN-06
+      effect: supports
+      strength: strong
+    - fault: F12-EN-07
+      effect: supports
+      strength: strong
+    - fault: F12-EN-08
+      effect: supports
+      strength: strong
+    - fault: F12-EN-16
+      effect: supports
+      strength: strong
+    - fault: F12-EN-17
+      effect: supports
+      strength: strong
+    - fault: F12-EN-20
+      effect: supports
+      strength: strong
+    - fault: F12-EN-26
+      effect: supports
+      strength: strong
+    - fault: F12-EN-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine is making noise
+    effects:
+    - fault: F12-EN-03
+      effect: supports
+      strength: strong
+    - fault: F12-EN-13
+      effect: supports
+      strength: strong
+    - fault: F12-EN-14
+      effect: supports
+      strength: strong
+    - fault: F12-EN-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine stopped
+    effects:
+    - fault: F12-EN-04
+      effect: supports
+      strength: strong
+    - fault: F12-EN-09
+      effect: supports
+      strength: strong
+    - fault: F12-EN-10
+      effect: supports
+      strength: strong
+    - fault: F12-EN-15
+      effect: supports
+      strength: strong
+    - fault: F12-EN-18
+      effect: supports
+      strength: strong
+    - fault: F12-EN-23
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine is heating
+    effects:
+    - fault: F12-EN-11
+      effect: supports
+      strength: strong
+    - fault: F12-EN-21
+      effect: supports
+      strength: strong
+    - fault: F12-EN-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Fuse has blown
+    effects: []
+    safety_trigger: false
+  - label: Wiring problem
+    effects: []
+    safety_trigger: false
+  - label: Electrical burning smell
+    effects: []
+    safety_trigger: false
+  - label: Headlight not working
+    effects: []
+    safety_trigger: false
+  - label: Indicator not working
+    effects: []
+    safety_trigger: false
+  - label: Horn not working
+    effects: []
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F12-EN-02
+      effect: supports
+      strength: strong
+    - fault: F12-EN-03
+      effect: supports
+      strength: strong
+    - fault: F12-EN-07
+      effect: supports
+      strength: strong
+    - fault: F12-EN-12
+      effect: supports
+      strength: strong
+    - fault: F12-EN-13
+      effect: supports
+      strength: strong
+    - fault: F12-EN-17
+      effect: supports
+      strength: strong
+    - fault: F12-EN-19
+      effect: supports
+      strength: strong
+    - fault: F12-EN-20
+      effect: supports
+      strength: strong
+    - fault: F12-EN-21
+      effect: supports
+      strength: strong
+    - fault: F12-EN-22
+      effect: supports
+      strength: strong
+    - fault: F12-EN-24
+      effect: supports
+      strength: strong
+    - fault: F12-EN-25
+      effect: supports
+      strength: strong
+    - fault: F12-EN-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q01
+  status: approved
+  stage: 3
+  text: Is the red oil light on while the engine is running, or do you hear a loud knocking from the engine?
+  source_faults:
+  - F12-EN-01
+  - F12-EN-03
+  - F12-EN-12
+  - F12-EN-13
+  - F12-EN-14
+  merged_from:
+  - 'F12-EN-13 (AI_DIAGNOSIS_RULES): Is the red oil light on with engine running?'
+  - 'F12-EN-03 (AI_DIAGNOSIS_RULES): Is there loud knocking?'
+  - 'F12-EN-01 (stages_text): Is the oil-pressure warning on?'
+  - 'F12-EN-14 (stages_text): Is the oil light ON?'
+  options:
+  - label: The red oil light is on
+    effects:
+    - fault: F12-EN-13
+      effect: supports
+      strength: strong
+    - fault: F12-EN-12
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-03
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: Loud, deep knocking
+    effects:
+    - fault: F12-EN-03
+      effect: supports
+      strength: strong
+    - fault: F12-EN-14
+      effect: supports
+      strength: strong
+    - fault: F12-EN-13
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Both
+    effects:
+    - fault: F12-EN-13
+      effect: supports
+      strength: strong
+    - fault: F12-EN-03
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F12-EN-13
+      effect: rules_out
+      strength: strong
+    - fault: F12-EN-03
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q02
+  status: approved
+  stage: 3
+  text: Is the temperature needle high or the red temperature light on? Do you see steam?
+  source_faults:
+  - F12-EN-01
+  - F12-EN-11
+  - F12-EN-21
+  - F12-EN-28
+  merged_from:
+  - 'F12-EN-11 (AI_DIAGNOSIS_RULES): Is the needle high or red light on?'
+  - 'F12-EN-11 (stages_text): Is there steam?'
+  - 'F12-EN-01 (stages_text): Is the engine heating?'
+  options:
+  - label: Yes, with steam
+    effects:
+    - fault: F12-EN-11
+      effect: supports
+      strength: strong
+    - fault: F12-EN-21
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: Yes, the needle is high
+    effects:
+    - fault: F12-EN-11
+      effect: supports
+      strength: strong
+    - fault: F12-EN-28
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-21
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-EN-11
+      effect: rules_out
+      strength: strong
+    - fault: F12-EN-28
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q03
+  status: approved
+  stage: 3
+  text: Did the engine stop while driving through water, or after the car stood in water?
+  source_faults:
+  - F12-EN-04
+  - F12-EN-23
+  merged_from:
+  - 'F12-EN-23 (AI_DIAGNOSIS_RULES): Did the engine stop in water?'
+  - 'F12-EN-04 (stages_text): Did it stop in water?'
+  - 'F12-EN-23 (stages_text): Did you try to start it again?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-23
+      effect: supports
+      strength: strong
+    - fault: F12-EN-04
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F12-EN-23
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q04
+  status: approved
+  stage: 3
+  text: Was the wrong fuel or bad fuel filled just before the problem started?
+  source_faults:
+  - F12-EN-27
+  merged_from:
+  - 'F12-EN-27 (AI_DIAGNOSIS_RULES): Was wrong fuel filled?'
+  - 'F12-EN-27 (stages_text): Did you start the engine after?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-27
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F12-EN-27
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q05
+  status: approved
+  stage: 3
+  text: Is the engine warning light on? Is it steady or blinking?
+  source_faults:
+  - F12-EN-01
+  - F12-EN-05
+  - F12-EN-16
+  - F12-EN-18
+  - F12-EN-19
+  - F12-EN-25
+  merged_from:
+  - 'F12-EN-01 (AI_DIAGNOSIS_RULES): Is the light steady or blinking?'
+  - 'F12-EN-05 (AI_DIAGNOSIS_RULES): Is the engine light blinking?'
+  - 'F12-EN-01 (stages_text): Is the engine warning light on?'
+  options:
+  - label: Blinking
+    effects:
+    - fault: F12-EN-05
+      effect: supports
+      strength: strong
+    - fault: F12-EN-16
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Steady
+    effects:
+    - fault: F12-EN-01
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-16
+      effect: supports
+      strength: weak
+    - fault: F12-EN-18
+      effect: supports
+      strength: weak
+    - fault: F12-EN-19
+      effect: supports
+      strength: weak
+    - fault: F12-EN-25
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not on
+    effects:
+    - fault: F12-EN-01
+      effect: rules_out
+      strength: strong
+    - fault: F12-EN-05
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q06
+  status: approved
+  stage: 3
+  text: Apart from the light, does the car drive normally?
+  source_faults:
+  - F12-EN-01
+  - F12-EN-05
+  merged_from:
+  - 'F12-EN-01 (stages_text): Is the car shaking or losing power?'
+  - 'F12-EN-01 (stages_text): Is the engine running normally?'
+  options:
+  - label: Yes, it drives normally
+    effects:
+    - fault: F12-EN-01
+      effect: supports
+      strength: strong
+    - fault: F12-EN-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-EN-01
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q07
+  status: approved
+  stage: 3
+  text: When does the engine shake?
+  source_faults:
+  - F12-EN-02
+  - F12-EN-05
+  - F12-EN-06
+  - F12-EN-07
+  - F12-EN-08
+  - F12-EN-16
+  - F12-EN-17
+  - F12-EN-20
+  merged_from:
+  - 'F12-EN-08 (AI_DIAGNOSIS_RULES): When does it shake - idle, gear change, or at speed?'
+  - 'F12-EN-02 (AI_DIAGNOSIS_RULES): Does it shake only when standing or also while driving?'
+  - 'F12-EN-06 (AI_DIAGNOSIS_RULES): Only when standing?'
+  - 'F12-EN-07 (AI_DIAGNOSIS_RULES): Does it jerk only when accelerating?'
+  - 'F12-EN-16 (AI_DIAGNOSIS_RULES): Is the shaking constant?'
+  options:
+  - label: Only when standing still (idling)
+    effects:
+    - fault: F12-EN-06
+      effect: supports
+      strength: strong
+    - fault: F12-EN-08
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-02
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: When accelerating or climbing
+    effects:
+    - fault: F12-EN-07
+      effect: supports
+      strength: strong
+    - fault: F12-EN-17
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: All the time
+    effects:
+    - fault: F12-EN-16
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-05
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-20
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A clunk when changing gear, or the engine moves when revved
+    effects:
+    - fault: F12-EN-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It does not shake
+    effects:
+    - fault: F12-EN-02
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-06
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q08
+  status: approved
+  stage: 3
+  text: Is it worse with the AC on?
+  source_faults:
+  - F12-EN-02
+  - F12-EN-06
+  - F12-EN-09
+  - F12-EN-28
+  merged_from:
+  - 'F12-EN-02 (stages_text): Does it get worse with AC ON?'
+  - 'F12-EN-09 (AI_DIAGNOSIS_RULES): Does it stop when AC turns on?'
+  - 'F12-EN-06 (symptoms): Worse with AC'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-06
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-09
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-02
+      effect: supports
+      strength: weak
+    - fault: F12-EN-28
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q09
+  status: approved
+  stage: 3
+  text: Does the engine stop by itself? When?
+  source_faults:
+  - F12-EN-01
+  - F12-EN-04
+  - F12-EN-09
+  - F12-EN-10
+  - F12-EN-15
+  - F12-EN-18
+  merged_from:
+  - 'F12-EN-09 (AI_DIAGNOSIS_RULES): Does it stop when AC turns on?'
+  - 'F12-EN-10 (AI_DIAGNOSIS_RULES): Did the tachometer drop to zero?'
+  - 'F12-EN-10 (stages_text): Does it restart after cooling?'
+  - 'F12-EN-01 (stages_text): Did the engine stop suddenly?'
+  options:
+  - label: When standing still (idling), and it restarts easily
+    effects:
+    - fault: F12-EN-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: While driving, and the rpm needle drops to zero
+    effects:
+    - fault: F12-EN-10
+      effect: supports
+      strength: strong
+    - fault: F12-EN-18
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It stopped suddenly and will not turn at all
+    effects:
+    - fault: F12-EN-04
+      effect: supports
+      strength: strong
+    - fault: F12-EN-15
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: It does not stop
+    effects:
+    - fault: F12-EN-09
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-10
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-04
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q10
+  status: approved
+  stage: 3
+  text: Before it stopped, did the red oil light or temperature warning come on?
+  source_faults:
+  - F12-EN-03
+  - F12-EN-04
+  merged_from:
+  - 'F12-EN-04 (AI_DIAGNOSIS_RULES): Did the oil light or heating come before it stopped?'
+  - 'F12-EN-03 (stages_text): Did the oil or temperature light come on before?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-04
+      effect: supports
+      strength: strong
+    - fault: F12-EN-03
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q11
+  status: approved
+  stage: 3
+  text: When you turn the key, what happens?
+  source_faults:
+  - F12-EN-04
+  - F12-EN-15
+  - F12-EN-17
+  - F12-EN-18
+  - F12-EN-20
+  - F12-EN-23
+  merged_from:
+  - 'F12-EN-04 (stages_text): Does the starter click only?'
+  - 'F12-EN-15 (symptoms): Fast cranking (broken belt)'
+  - 'F12-EN-18 (symptoms): Long cranking'
+  options:
+  - label: Only a click or groan, the engine does not turn (battery is good)
+    effects:
+    - fault: F12-EN-04
+      effect: supports
+      strength: strong
+    - fault: F12-EN-23
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It turns faster than usual but does not start
+    effects:
+    - fault: F12-EN-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It turns for a long time before starting, or not at all
+    effects:
+    - fault: F12-EN-18
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-17
+      effect: supports
+      strength: weak
+    - fault: F12-EN-20
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It starts normally
+    effects:
+    - fault: F12-EN-04
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-15
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q12
+  status: approved
+  stage: 3
+  text: Does the engine restart after it cools down?
+  source_faults:
+  - F12-EN-10
+  - F12-EN-18
+  merged_from:
+  - 'F12-EN-10 (stages_text): Does it restart after cooling?'
+  - 'F12-EN-18 (stages_text): Hot start problem?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-10
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-18
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-EN-10
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q13
+  status: approved
+  stage: 3
+  text: What kind of noise is it?
+  source_faults:
+  - F12-EN-03
+  - F12-EN-14
+  - F12-EN-15
+  - F12-EN-24
+  merged_from:
+  - 'F12-EN-14 (AI_DIAGNOSIS_RULES): Is it a deep knock or a light tapping?'
+  - 'F12-EN-15 (AI_DIAGNOSIS_RULES): Is it a rattle at start or did the engine stop suddenly?'
+  - 'F12-EN-24 (AI_DIAGNOSIS_RULES): Is it a turbo engine?'
+  - 'F12-EN-24 (stages_text): Whistling sound?'
+  options:
+  - label: A deep knock that rises with engine speed
+    effects:
+    - fault: F12-EN-14
+      effect: supports
+      strength: strong
+    - fault: F12-EN-03
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Light tapping or pinging
+    effects:
+    - fault: F12-EN-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: A rattle for a few seconds after a cold start
+    effects:
+    - fault: F12-EN-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A whistle or hiss (turbo engine)
+    effects:
+    - fault: F12-EN-24
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No unusual noise
+    effects:
+    - fault: F12-EN-14
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-15
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q14
+  status: approved
+  stage: 3
+  text: Is there smoke from the exhaust? What colour?
+  source_faults:
+  - F12-EN-03
+  - F12-EN-12
+  - F12-EN-19
+  - F12-EN-20
+  - F12-EN-21
+  - F12-EN-22
+  - F12-EN-24
+  merged_from:
+  - 'F12-EN-22 (AI_DIAGNOSIS_RULES): What colour is the smoke?'
+  - 'F12-EN-21 (stages_text): White smoke?'
+  - 'F12-EN-03 (stages_text): Is there heavy smoke?'
+  options:
+  - label: White and thick
+    effects:
+    - fault: F12-EN-21
+      effect: supports
+      strength: strong
+    - fault: F12-EN-22
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Blue
+    effects:
+    - fault: F12-EN-22
+      effect: supports
+      strength: strong
+    - fault: F12-EN-20
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Black
+    effects:
+    - fault: F12-EN-22
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-19
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-24
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Heavy smoke with knocking
+    effects:
+    - fault: F12-EN-03
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: No smoke
+    effects:
+    - fault: F12-EN-22
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-21
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q15
+  status: approved
+  stage: 3
+  text: Is the engine oil or coolant level going down?
+  source_faults:
+  - F12-EN-03
+  - F12-EN-12
+  - F12-EN-20
+  - F12-EN-21
+  - F12-EN-22
+  merged_from:
+  - 'F12-EN-21 (AI_DIAGNOSIS_RULES): Is coolant going down?'
+  - 'F12-EN-22 (stages_text): Is oil or coolant going down?'
+  - 'F12-EN-20 (stages_text): Is the engine using oil?'
+  options:
+  - label: Coolant goes down, or the oil looks milky
+    effects:
+    - fault: F12-EN-21
+      effect: supports
+      strength: strong
+    - fault: F12-EN-03
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Oil goes down
+    effects:
+    - fault: F12-EN-12
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-20
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-22
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-EN-21
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q16
+  status: approved
+  stage: 3
+  text: Can you see oil spots under the car?
+  source_faults:
+  - F12-EN-12
+  merged_from:
+  - 'F12-EN-12 (AI_DIAGNOSIS_RULES): Is there oil under the car?'
+  - 'F12-EN-12 (stages_text): Did the oil light come on?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-12
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-EN-12
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q17
+  status: approved
+  stage: 3
+  text: Has the car lost a lot of power, or gone into a low-power mode?
+  source_faults:
+  - F12-EN-01
+  - F12-EN-03
+  - F12-EN-05
+  - F12-EN-19
+  - F12-EN-20
+  - F12-EN-24
+  merged_from:
+  - 'F12-EN-19 (AI_DIAGNOSIS_RULES): Is power low?'
+  - 'F12-EN-01 (stages_text): Has the car lost power?'
+  - 'F12-EN-24 (symptoms): Limp mode'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-19
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-24
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-03
+      effect: supports
+      strength: weak
+    - fault: F12-EN-05
+      effect: supports
+      strength: weak
+    - fault: F12-EN-20
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-EN-24
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q18
+  status: approved
+  stage: 3
+  text: When were the spark plugs and the air filter last changed?
+  source_faults:
+  - F12-EN-07
+  - F12-EN-17
+  - F12-EN-19
+  merged_from:
+  - 'F12-EN-17 (AI_DIAGNOSIS_RULES): When were plugs last changed?'
+  - 'F12-EN-07 (stages_text): When were spark plugs changed?'
+  - 'F12-EN-19 (stages_text): When was air filter changed?'
+  options:
+  - label: A long time ago, or never
+    effects:
+    - fault: F12-EN-17
+      effect: supports
+      strength: strong
+    - fault: F12-EN-19
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Recently
+    effects:
+    - fault: F12-EN-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q19
+  status: approved
+  stage: 3
+  text: Was a new spark plug or coil already fitted, but the misfire stayed?
+  source_faults:
+  - F12-EN-16
+  - F12-EN-17
+  - F12-EN-20
+  merged_from:
+  - 'F12-EN-20 (AI_DIAGNOSIS_RULES): Does misfire stay after new plug/coil?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-20
+      effect: supports
+      strength: strong
+    - fault: F12-EN-16
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q20
+  status: approved
+  stage: 3
+  text: Did the shaking start after rain or a car wash?
+  source_faults:
+  - F12-EN-16
+  merged_from:
+  - 'F12-EN-16 (stages_text): Did it start after rain or washing?'
+  - 'F12-EN-16 (symptoms): Misfire worse when hot or wet'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-16
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q21
+  status: approved
+  stage: 3
+  text: Is it a CNG car, and does the problem happen only on CNG?
+  source_faults:
+  - F12-EN-06
+  - F12-EN-17
+  - F12-EN-26
+  merged_from:
+  - 'F12-EN-26 (AI_DIAGNOSIS_RULES): Is it only on CNG?'
+  - 'F12-EN-06 (stages_text): Is it a CNG car?'
+  - 'F12-EN-17 (stages_text): Is it a CNG car?'
+  options:
+  - label: Yes, only on CNG
+    effects:
+    - fault: F12-EN-26
+      effect: supports
+      strength: strong
+    - fault: F12-EN-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: CNG car, but it happens on petrol too
+    effects:
+    - fault: F12-EN-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not a CNG car
+    effects:
+    - fault: F12-EN-26
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q22
+  status: approved
+  stage: 3
+  text: Can you smell gas?
+  source_faults:
+  - F12-EN-26
+  merged_from:
+  - 'F12-EN-26 (stages_text): Any gas smell?'
+  - 'F12-EN-26 (symptoms): Gas smell (danger)'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-26
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q23
+  status: approved
+  stage: 3
+  text: Does the engine heat up only in traffic, and is it normal on the highway?
+  source_faults:
+  - F12-EN-11
+  - F12-EN-21
+  - F12-EN-28
+  merged_from:
+  - 'F12-EN-28 (AI_DIAGNOSIS_RULES): Does it heat only in traffic?'
+  - 'F12-EN-28 (stages_text): Does the fan run with AC ON?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-EN-28
+      effect: supports
+      strength: strong
+    - fault: F12-EN-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No, it heats on the highway too
+    effects:
+    - fault: F12-EN-28
+      effect: rules_out
+      strength: moderate
+    - fault: F12-EN-11
+      effect: supports
+      strength: moderate
+    - fault: F12-EN-21
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: engine-q24
+  status: approved
+  stage: 3
+  text: Can a mechanic's scanner connect to the engine computer? Was there a jump-start or water entry before this?
+  source_faults:
+  - F12-EN-25
+  merged_from:
+  - 'F12-EN-25 (AI_DIAGNOSIS_RULES): Does the scanner connect?'
+  - 'F12-EN-25 (stages_text): Was there a jump start or water entry?'
+  options:
+  - label: The scanner cannot connect
+    effects:
+    - fault: F12-EN-25
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: There was a jump-start or water entry
+    effects:
+    - fault: F12-EN-25
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-EN-25
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F12-EN-01:
+    status: approved
+    name: Engine Warning Light Only
+    stage2_choices:
+    - Engine light is on
+    confirmation_test: OBD scan and check the system named by the code.
+    danger_phrases:
+    - blinking light
+    - red warning
+    safety_trigger_options: []
+  F12-EN-02:
+    status: approved
+    name: Rough Idle / Performance Drop
+    stage2_choices:
+    - Engine is shaking
+    - Other problem
+    confirmation_test: Scan, live data, plug and coil check, air leak check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-03:
+    status: approved
+    name: Major Engine Component Fault
+    stage2_choices:
+    - Engine is making noise
+    - Other problem
+    confirmation_test: Compression, leak-down and strip inspection.
+    danger_phrases:
+    - loud knocking
+    - heavy smoke
+    safety_trigger_options:
+    - question: engine-q01
+      option: Both
+    - question: engine-q01
+      option: Loud, deep knocking
+    - question: engine-q01
+      option: The red oil light is on
+    - question: engine-q10
+      option: 'Yes'
+    - question: engine-q13
+      option: A deep knock that rises with engine speed
+    - question: engine-q14
+      option: Heavy smoke with knocking
+  F12-EN-04:
+    status: approved
+    name: Engine Seizure / Complete Failure
+    stage2_choices:
+    - Engine stopped
+    confirmation_test: Hand-turn test with the spark plugs out.
+    danger_phrases:
+    - engine locked
+    safety_trigger_options:
+    - question: engine-q03
+      option: 'Yes'
+    - question: engine-q09
+      option: It stopped suddenly and will not turn at all
+    - question: engine-q10
+      option: 'Yes'
+  F12-EN-05:
+    status: approved
+    name: Check Engine Light Flashing / Severe Misfire
+    stage2_choices:
+    - Engine light is on
+    - Engine is shaking
+    confirmation_test: Scan and coil swap test.
+    danger_phrases:
+    - blinking light
+    - heavy shaking
+    safety_trigger_options:
+    - question: engine-q05
+      option: Blinking
+  F12-EN-06:
+    status: approved
+    name: Engine Misfire at Idle
+    stage2_choices:
+    - Engine is shaking
+    confirmation_test: Live data and air leak test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-07:
+    status: approved
+    name: Engine Misfire During Acceleration
+    stage2_choices:
+    - Engine is shaking
+    - Other problem
+    confirmation_test: Road test, plug and coil check, fuel pressure.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-08:
+    status: approved
+    name: Engine Shaking / Excessive Vibration
+    stage2_choices:
+    - Engine is shaking
+    confirmation_test: Engine mount inspection and scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-09:
+    status: approved
+    name: Engine Stalling While Idling
+    stage2_choices:
+    - Engine stopped
+    confirmation_test: Throttle inspection and live data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-10:
+    status: approved
+    name: Engine Stalling While Driving
+    stage2_choices:
+    - Engine stopped
+    confirmation_test: Scan, crank signal and fuel pressure.
+    danger_phrases:
+    - keeps stopping
+    safety_trigger_options: []
+  F12-EN-11:
+    status: approved
+    name: Engine Overheating / Temperature Warning
+    stage2_choices:
+    - Engine is heating
+    confirmation_test: Cooling pressure test and fan test.
+    danger_phrases:
+    - steam
+    - gauge stays high
+    safety_trigger_options:
+    - question: engine-q02
+      option: Yes, with steam
+  F12-EN-12:
+    status: approved
+    name: Low Engine Oil Level / Oil Leak
+    stage2_choices:
+    - Other problem
+    confirmation_test: Trace the leak and track the oil level.
+    danger_phrases:
+    - oil light on
+    safety_trigger_options:
+    - question: engine-q01
+      option: The red oil light is on
+  F12-EN-13:
+    status: approved
+    name: Low Engine Oil Pressure Warning
+    stage2_choices:
+    - Other problem
+    - Engine is making noise
+    confirmation_test: Mechanical oil pressure gauge test.
+    danger_phrases:
+    - red oil light
+    - knocking
+    safety_trigger_options:
+    - question: engine-q01
+      option: Both
+    - question: engine-q01
+      option: Loud, deep knocking
+    - question: engine-q01
+      option: The red oil light is on
+  F12-EN-14:
+    status: approved
+    name: Engine Knocking / Abnormal Internal Noise
+    stage2_choices:
+    - Engine is making noise
+    confirmation_test: Stethoscope, oil check and scan.
+    danger_phrases:
+    - deep knocking
+    safety_trigger_options:
+    - question: engine-q01
+      option: Loud, deep knocking
+    - question: engine-q13
+      option: A deep knock that rises with engine speed
+  F12-EN-15:
+    status: approved
+    name: Timing Belt / Chain Fault
+    stage2_choices:
+    - Engine is making noise
+    - Engine stopped
+    confirmation_test: Scan cam/crank correlation and inspect the timing belt or chain.
+    danger_phrases:
+    - engine stopped suddenly
+    safety_trigger_options:
+    - question: engine-q09
+      option: It stopped suddenly and will not turn at all
+  F12-EN-16:
+    status: approved
+    name: Ignition Coil Failure
+    stage2_choices:
+    - Engine is shaking
+    - Engine light is on
+    confirmation_test: Coil swap test.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: engine-q05
+      option: Blinking
+  F12-EN-17:
+    status: approved
+    name: Spark Plug Wear / Ignition Fault
+    stage2_choices:
+    - Other problem
+    - Engine is shaking
+    confirmation_test: Spark plug inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-18:
+    status: approved
+    name: Engine Sensor Fault - Crankshaft / Camshaft
+    stage2_choices:
+    - Engine stopped
+    - Engine light is on
+    confirmation_test: Crank / cam sensor signal test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-19:
+    status: approved
+    name: Air Intake / MAF / MAP Sensor Fault
+    stage2_choices:
+    - Other problem
+    - Engine light is on
+    confirmation_test: Live data of the air sensor.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-20:
+    status: approved
+    name: Engine Compression Loss
+    stage2_choices:
+    - Engine is shaking
+    - Other problem
+    confirmation_test: Compression and leak-down tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-21:
+    status: approved
+    name: Head Gasket Failure Suspected
+    stage2_choices:
+    - Engine is heating
+    - Other problem
+    confirmation_test: Block (combustion gas) test and pressure test.
+    danger_phrases:
+    - white smoke
+    - milky oil
+    safety_trigger_options:
+    - question: engine-q02
+      option: Yes, with steam
+  F12-EN-22:
+    status: approved
+    name: Excessive Exhaust Smoke
+    stage2_choices:
+    - Other problem
+    confirmation_test: Smoke colour, oil and coolant levels, and tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-23:
+    status: approved
+    name: Engine Water Ingress / Hydrolock Risk
+    stage2_choices:
+    - Engine stopped
+    confirmation_test: Spark plugs out and hand-turn test.
+    danger_phrases:
+    - stopped in water
+    safety_trigger_options:
+    - question: engine-q03
+      option: 'Yes'
+  F12-EN-24:
+    status: approved
+    name: Turbocharger / Boost System Fault
+    stage2_choices:
+    - Other problem
+    confirmation_test: Boost data and hose check.
+    danger_phrases:
+    - heavy smoke
+    safety_trigger_options: []
+  F12-EN-25:
+    status: approved
+    name: Engine ECU / Control-System Fault
+    stage2_choices:
+    - Other problem
+    - Engine light is on
+    confirmation_test: Power, ground and CAN tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-EN-26:
+    status: approved
+    name: CNG Car - Misfire / Engine Light on CNG  [NEW - India]
+    stage2_choices:
+    - Engine light is on
+    - Engine is shaking
+    confirmation_test: Plug and coil check and CNG system test.
+    danger_phrases:
+    - gas smell
+    safety_trigger_options:
+    - question: engine-q22
+      option: 'Yes'
+  F12-EN-27:
+    status: approved
+    name: Engine Problem After Wrong / Bad Fuel Filled  [NEW - India]
+    stage2_choices:
+    - Other problem
+    - Engine is shaking
+    confirmation_test: Fuel sample.
+    danger_phrases:
+    - wrong fuel
+    safety_trigger_options:
+    - question: engine-q04
+      option: 'Yes'
+  F12-EN-28:
+    status: approved
+    name: Engine Heating in Summer Traffic Jam (Fan / AC Load)  [NEW - India]
+    stage2_choices:
+    - Engine is heating
+    confirmation_test: Cooling fan test and radiator inspection.
+    danger_phrases:
+    - boiling
+    safety_trigger_options: []
+safety_rules: []

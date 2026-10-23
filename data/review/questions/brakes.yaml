@@ -1,0 +1,2025 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category brakes
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: brakes
+category_name: Brakes, pads and fluid
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:19:26+00:00'
+  run_id: claude-code-brakes
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: brakes-main
+  status: approved
+  stage: 2
+  text: What problem are you facing? (Gaadi mein kya dikkat aa rahi hai?)
+  choice_source: file
+  options:
+  - label: Belt is making noise (belt se awaaz)
+    effects: []
+    safety_trigger: false
+  - label: Belt is broken (belt toot gayi)
+    effects: []
+    safety_trigger: false
+  - label: Battery warning light is on
+    effects: []
+    safety_trigger: false
+  - label: Engine is heating (gaadi garam)
+    effects: []
+    safety_trigger: false
+  - label: Brake is making noise
+    effects:
+    - fault: F11-BR-01
+      effect: supports
+      strength: strong
+    - fault: F11-BR-05
+      effect: supports
+      strength: strong
+    - fault: F11-BR-06
+      effect: supports
+      strength: strong
+    - fault: F11-BR-07
+      effect: supports
+      strength: strong
+    - fault: F11-BR-08
+      effect: supports
+      strength: strong
+    - fault: F11-BR-12
+      effect: supports
+      strength: strong
+    - fault: F11-BR-22
+      effect: supports
+      strength: strong
+    - fault: F11-BR-28
+      effect: supports
+      strength: strong
+    - fault: F11-BR-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Brake pedal feels soft
+    effects:
+    - fault: F11-BR-02
+      effect: supports
+      strength: strong
+    - fault: F11-BR-04
+      effect: supports
+      strength: strong
+    - fault: F11-BR-13
+      effect: supports
+      strength: strong
+    - fault: F11-BR-14
+      effect: supports
+      strength: strong
+    - fault: F11-BR-17
+      effect: supports
+      strength: strong
+    - fault: F11-BR-18
+      effect: supports
+      strength: strong
+    - fault: F11-BR-24
+      effect: supports
+      strength: strong
+    - fault: F11-BR-31
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Brake is not working properly (brake kam)
+    effects:
+    - fault: F11-BR-02
+      effect: supports
+      strength: strong
+    - fault: F11-BR-03
+      effect: supports
+      strength: strong
+    - fault: F11-BR-06
+      effect: supports
+      strength: strong
+    - fault: F11-BR-09
+      effect: supports
+      strength: strong
+    - fault: F11-BR-10
+      effect: supports
+      strength: strong
+    - fault: F11-BR-11
+      effect: supports
+      strength: strong
+    - fault: F11-BR-14
+      effect: supports
+      strength: strong
+    - fault: F11-BR-15
+      effect: supports
+      strength: strong
+    - fault: F11-BR-16
+      effect: supports
+      strength: strong
+    - fault: F11-BR-19
+      effect: supports
+      strength: strong
+    - fault: F11-BR-20
+      effect: supports
+      strength: strong
+    - fault: F11-BR-22
+      effect: supports
+      strength: strong
+    - fault: F11-BR-23
+      effect: supports
+      strength: strong
+    - fault: F11-BR-24
+      effect: supports
+      strength: strong
+    - fault: F11-BR-25
+      effect: supports
+      strength: strong
+    - fault: F11-BR-26
+      effect: supports
+      strength: strong
+    - fault: F11-BR-27
+      effect: supports
+      strength: strong
+    - fault: F11-BR-29
+      effect: supports
+      strength: strong
+    - fault: F11-BR-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Brake fluid is leaking (brake oil leak)
+    effects:
+    - fault: F11-BR-04
+      effect: supports
+      strength: strong
+    - fault: F11-BR-13
+      effect: supports
+      strength: strong
+    - fault: F11-BR-20
+      effect: supports
+      strength: strong
+    - fault: F11-BR-21
+      effect: supports
+      strength: strong
+    - fault: F11-BR-23
+      effect: supports
+      strength: strong
+    - fault: F11-BR-31
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Brake is not working at all (brake fail)
+    effects:
+    - fault: F11-BR-04
+      effect: supports
+      strength: strong
+    - fault: F11-BR-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F11-BR-01
+      effect: supports
+      strength: strong
+    - fault: F11-BR-26
+      effect: supports
+      strength: strong
+    - fault: F11-BR-29
+      effect: supports
+      strength: strong
+    - fault: F11-BR-31
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q01
+  status: approved
+  stage: 3
+  text: Right now, is the car stopped in a safe place?
+  source_faults:
+  - F11-BR-04
+  - F11-BR-17
+  merged_from:
+  - 'F11-BR-04 (stages_text): Is your car stopped in a safe place?'
+  - 'F11-BR-04 (stages_text): Is the car moving or stopped now? Are you safe?'
+  - 'F11-BR-17 (stages_text): Is the car stopped safely?'
+  options:
+  - label: No, the car is still moving and the brakes are not working
+    effects:
+    - fault: F11-BR-04
+      effect: supports
+      strength: strong
+    - fault: F11-BR-17
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Yes, I have stopped safely
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q02
+  status: approved
+  stage: 3
+  text: When you press the brake pedal, how does it feel?
+  source_faults:
+  - F11-BR-01
+  - F11-BR-02
+  - F11-BR-03
+  - F11-BR-04
+  - F11-BR-05
+  - F11-BR-07
+  - F11-BR-13
+  - F11-BR-15
+  - F11-BR-16
+  - F11-BR-17
+  - F11-BR-18
+  - F11-BR-20
+  - F11-BR-21
+  - F11-BR-23
+  - F11-BR-24
+  - F11-BR-26
+  - F11-BR-31
+  merged_from:
+  - 'F11-BR-02 (stages_text): Is the brake pedal soft or hard?'
+  - 'F11-BR-03 (stages_text): Is the pedal soft, hard or normal?'
+  - 'F11-BR-15 (stages_text): Is the pedal very hard?'
+  - 'F11-BR-26 (stages_text): Is pedal normal?'
+  - 'F11-BR-01 (stages_text): Is the pedal normal?'
+  options:
+  - label: Soft or spongy
+    effects:
+    - fault: F11-BR-02
+      effect: supports
+      strength: strong
+    - fault: F11-BR-18
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-13
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-24
+      effect: supports
+      strength: weak
+    - fault: F11-BR-31
+      effect: supports
+      strength: weak
+    - fault: F11-BR-23
+      effect: supports
+      strength: weak
+    - fault: F11-BR-20
+      effect: supports
+      strength: weak
+    - fault: F11-BR-21
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: Very hard, I have to push with a lot of force
+    effects:
+    - fault: F11-BR-15
+      effect: supports
+      strength: strong
+    - fault: F11-BR-16
+      effect: supports
+      strength: strong
+    - fault: F11-BR-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It goes down to the floor
+    effects:
+    - fault: F11-BR-04
+      effect: supports
+      strength: strong
+    - fault: F11-BR-17
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: Normal
+    effects:
+    - fault: F11-BR-01
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-05
+      effect: supports
+      strength: weak
+    - fault: F11-BR-07
+      effect: supports
+      strength: weak
+    - fault: F11-BR-26
+      effect: supports
+      strength: weak
+    - fault: F11-BR-02
+      effect: rules_out
+      strength: moderate
+    - fault: F11-BR-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q03
+  status: approved
+  stage: 3
+  text: If you hold the brake pedal down steadily (for example at a traffic signal), does it slowly sink?
+  source_faults:
+  - F11-BR-14
+  - F11-BR-17
+  merged_from:
+  - 'F11-BR-14 (stages_text): Does the pedal sink when you hold it?'
+  - 'F11-BR-14 (symptoms): Pedal sinks slowly at traffic signal'
+  - 'F11-BR-17 (stages_text): Does the pedal touch the floor?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-14
+      effect: supports
+      strength: strong
+    - fault: F11-BR-17
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F11-BR-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q04
+  status: approved
+  stage: 3
+  text: If you press the pedal a few times quickly, does it become firmer?
+  source_faults:
+  - F11-BR-02
+  - F11-BR-17
+  - F11-BR-18
+  merged_from:
+  - 'F11-BR-18 (stages_text): Does pumping make it firm?'
+  - 'F11-BR-02 (symptoms): Pedal firms up after pumping (air)'
+  - 'F11-BR-17 (symptoms): Need to pump'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-18
+      effect: supports
+      strength: strong
+    - fault: F11-BR-02
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q05
+  status: approved
+  stage: 3
+  text: Is the car taking longer to stop than before?
+  source_faults:
+  - F11-BR-03
+  - F11-BR-05
+  - F11-BR-06
+  - F11-BR-09
+  - F11-BR-19
+  - F11-BR-22
+  - F11-BR-24
+  - F11-BR-30
+  merged_from:
+  - 'F11-BR-03 (stages_text): Does it take much longer to stop?'
+  - 'F11-BR-06 (stages_text): Is the car stopping properly?'
+  - 'F11-BR-30 (stages_text): Is braking weaker than before?'
+  options:
+  - label: Yes, much longer
+    effects:
+    - fault: F11-BR-03
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-06
+      effect: supports
+      strength: weak
+    - fault: F11-BR-09
+      effect: supports
+      strength: weak
+    - fault: F11-BR-19
+      effect: supports
+      strength: weak
+    - fault: F11-BR-30
+      effect: supports
+      strength: weak
+    - fault: F11-BR-24
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: A little longer
+    effects:
+    - fault: F11-BR-03
+      effect: supports
+      strength: weak
+    - fault: F11-BR-05
+      effect: supports
+      strength: weak
+    - fault: F11-BR-09
+      effect: supports
+      strength: weak
+    - fault: F11-BR-22
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F11-BR-03
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q06
+  status: approved
+  stage: 3
+  text: Can you see brake fluid leaking? Where?
+  source_faults:
+  - F11-BR-02
+  - F11-BR-13
+  - F11-BR-14
+  - F11-BR-18
+  - F11-BR-20
+  - F11-BR-21
+  - F11-BR-23
+  merged_from:
+  - 'F11-BR-13 (stages_text): Where is the fluid - near a wheel or under the bonnet?'
+  - 'F11-BR-02 (stages_text): Any fluid under the car?'
+  - 'F11-BR-21 (stages_text): Is fluid dripping under the car?'
+  - 'F11-BR-14 (stages_text): Any fluid leak outside?'
+  options:
+  - label: Near a wheel, or on the inner side of a tyre
+    effects:
+    - fault: F11-BR-13
+      effect: supports
+      strength: strong
+    - fault: F11-BR-20
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-23
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Dripping under the car, along the middle
+    effects:
+    - fault: F11-BR-21
+      effect: supports
+      strength: strong
+    - fault: F11-BR-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Under the bonnet, near the brake fluid tank
+    effects:
+    - fault: F11-BR-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No leak
+    effects:
+    - fault: F11-BR-14
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-18
+      effect: supports
+      strength: weak
+    - fault: F11-BR-13
+      effect: rules_out
+      strength: strong
+    - fault: F11-BR-21
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q07
+  status: approved
+  stage: 3
+  text: Is the inner side of a rear tyre wet?
+  source_faults:
+  - F11-BR-23
+  merged_from:
+  - 'F11-BR-23 (stages_text): Is the inner side of a rear tyre wet?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-23
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F11-BR-23
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q08
+  status: approved
+  stage: 3
+  text: Which brake warning light is on?
+  source_faults:
+  - F11-BR-01
+  - F11-BR-02
+  - F11-BR-04
+  - F11-BR-05
+  - F11-BR-13
+  - F11-BR-17
+  - F11-BR-26
+  merged_from:
+  - 'F11-BR-01 (stages_text): Which light is on - pad symbol or red BRAKE?'
+  - 'F11-BR-26 (stages_text): Is only ABS light ON, or red BRAKE light too?'
+  - 'F11-BR-02 (symptoms): Red brake warning light'
+  options:
+  - label: Pad wear symbol
+    effects:
+    - fault: F11-BR-01
+      effect: supports
+      strength: strong
+    - fault: F11-BR-05
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Only the ABS light
+    effects:
+    - fault: F11-BR-26
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Red BRAKE light
+    effects:
+    - fault: F11-BR-02
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-13
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-17
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-04
+      effect: supports
+      strength: weak
+    - fault: F11-BR-26
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: No warning light
+    effects:
+    - fault: F11-BR-01
+      effect: rules_out
+      strength: moderate
+    - fault: F11-BR-26
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q09
+  status: approved
+  stage: 3
+  text: What kind of noise do the brakes make?
+  source_faults:
+  - F11-BR-01
+  - F11-BR-05
+  - F11-BR-06
+  - F11-BR-07
+  - F11-BR-08
+  - F11-BR-12
+  - F11-BR-22
+  - F11-BR-23
+  - F11-BR-28
+  - F11-BR-30
+  merged_from:
+  - 'F11-BR-01 (stages_text): Do you hear squealing or grinding?'
+  - 'F11-BR-06 (stages_text): Is the grinding loud?'
+  - 'F11-BR-07 (stages_text): Does it squeal all the time or only mornings?'
+  - 'F11-BR-05 (stages_text): Any squeal?'
+  options:
+  - label: A high squeal
+    effects:
+    - fault: F11-BR-07
+      effect: supports
+      strength: strong
+    - fault: F11-BR-05
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-01
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-12
+      effect: supports
+      strength: weak
+    - fault: F11-BR-30
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Grinding or metal-on-metal
+    effects:
+    - fault: F11-BR-06
+      effect: supports
+      strength: strong
+    - fault: F11-BR-08
+      effect: supports
+      strength: strong
+    - fault: F11-BR-28
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: A squeak from the rear
+    effects:
+    - fault: F11-BR-22
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-23
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No noise
+    effects:
+    - fault: F11-BR-07
+      effect: rules_out
+      strength: moderate
+    - fault: F11-BR-06
+      effect: rules_out
+      strength: moderate
+    - fault: F11-BR-08
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q10
+  status: approved
+  stage: 3
+  text: Does the noise come only on the first few stops in the morning or after the car was parked, and then go
+    away?
+  source_faults:
+  - F11-BR-06
+  - F11-BR-07
+  - F11-BR-08
+  - F11-BR-28
+  merged_from:
+  - 'F11-BR-07 (stages_text): Does it squeal all the time or only mornings?'
+  - 'F11-BR-28 (stages_text): Does noise go away after a few stops?'
+  - 'F11-BR-28 (stages_text): How long was the car parked?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-28
+      effect: supports
+      strength: strong
+    - fault: F11-BR-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No, it stays
+    effects:
+    - fault: F11-BR-28
+      effect: rules_out
+      strength: moderate
+    - fault: F11-BR-06
+      effect: supports
+      strength: weak
+    - fault: F11-BR-08
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q11
+  status: approved
+  stage: 3
+  text: Do you hear the grinding only when braking, or also while driving?
+  source_faults:
+  - F11-BR-06
+  - F11-BR-08
+  merged_from:
+  - 'F11-BR-08 (stages_text): Only when braking or also while driving?'
+  options:
+  - label: Only when braking
+    effects:
+    - fault: F11-BR-08
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-06
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Also while driving without braking
+    effects:
+    - fault: F11-BR-08
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q12
+  status: approved
+  stage: 3
+  text: Were the brake pads changed recently?
+  source_faults:
+  - F11-BR-05
+  - F11-BR-06
+  - F11-BR-07
+  - F11-BR-30
+  merged_from:
+  - 'F11-BR-07 (stages_text): Were pads changed recently?'
+  - 'F11-BR-30 (stages_text): Were pads changed recently? Where?'
+  - 'F11-BR-05 (stages_text): When were pads last changed?'
+  options:
+  - label: Yes, and the brakes are weaker or dustier since then
+    effects:
+    - fault: F11-BR-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Yes, and now they squeal
+    effects:
+    - fault: F11-BR-07
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-30
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No, not for a long time
+    effects:
+    - fault: F11-BR-05
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-06
+      effect: supports
+      strength: weak
+    - fault: F11-BR-30
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q13
+  status: approved
+  stage: 3
+  text: Does the steering wheel or the brake pedal shake when you brake?
+  source_faults:
+  - F11-BR-06
+  - F11-BR-09
+  - F11-BR-10
+  merged_from:
+  - 'F11-BR-10 (stages_text): Does the steering shake when braking?'
+  - 'F11-BR-10 (stages_text): From high speed only?'
+  - 'F11-BR-09 (stages_text): Any vibration when braking?'
+  options:
+  - label: Yes, mostly when braking from high speed
+    effects:
+    - fault: F11-BR-10
+      effect: supports
+      strength: strong
+    - fault: F11-BR-09
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Yes, always when braking
+    effects:
+    - fault: F11-BR-09
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-06
+      effect: supports
+      strength: weak
+    - fault: F11-BR-10
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F11-BR-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q14
+  status: approved
+  stage: 3
+  text: Does the car pull to one side when you brake?
+  source_faults:
+  - F11-BR-11
+  - F11-BR-12
+  - F11-BR-20
+  - F11-BR-23
+  - F11-BR-25
+  merged_from:
+  - 'F11-BR-25 (stages_text): Which side does it pull to?'
+  - 'F11-BR-20 (stages_text): Does the car pull to one side?'
+  - 'F11-BR-11 (symptoms): Pull to one side'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-25
+      effect: supports
+      strength: strong
+    - fault: F11-BR-11
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-20
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-23
+      effect: supports
+      strength: weak
+    - fault: F11-BR-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F11-BR-25
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q15
+  status: approved
+  stage: 3
+  text: Are the tyre pressures equal on both sides?
+  source_faults:
+  - F11-BR-25
+  merged_from:
+  - 'F11-BR-25 (stages_text): Are tyre pressures equal?'
+  options:
+  - label: No, they are different
+    effects:
+    - fault: F11-BR-25
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'Yes'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q16
+  status: approved
+  stage: 3
+  text: After driving, is one wheel much hotter than the others, or is there a burning smell from a wheel?
+  source_faults:
+  - F11-BR-11
+  - F11-BR-12
+  - F11-BR-20
+  - F11-BR-29
+  merged_from:
+  - 'F11-BR-11 (stages_text): Is one wheel hotter than others?'
+  - 'F11-BR-11 (stages_text): Burning smell?'
+  - 'F11-BR-12 (symptoms): One wheel a little hotter'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-11
+      effect: supports
+      strength: strong
+    - fault: F11-BR-29
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-20
+      effect: supports
+      strength: weak
+    - fault: F11-BR-12
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F11-BR-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q17
+  status: approved
+  stage: 3
+  text: Is the car on a hill or ghat road, with smoke or a burning smell from the wheels?
+  source_faults:
+  - F11-BR-03
+  - F11-BR-19
+  - F11-BR-24
+  merged_from:
+  - 'F11-BR-24 (stages_text): Are you on a hill or ghat road?'
+  - 'F11-BR-24 (stages_text): Is there smoke or burning smell?'
+  - 'F11-BR-19 (stages_text): Do brakes feel weak on long downhills?'
+  options:
+  - label: Yes, with smoke or a burning smell
+    effects:
+    - fault: F11-BR-24
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: The brakes feel weak on long downhills
+    effects:
+    - fault: F11-BR-24
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-19
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F11-BR-24
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q18
+  status: approved
+  stage: 3
+  text: Is the pedal very hard only when the engine is running? (A hard pedal with the engine off is normal.)
+  source_faults:
+  - F11-BR-15
+  - F11-BR-16
+  merged_from:
+  - 'F11-BR-16 (stages_text): Is the engine running?'
+  - 'F11-BR-16 (stages_text): Did it become hard suddenly?'
+  - 'F11-BR-16 (symptoms): Normal with engine OFF (that is normal)'
+  options:
+  - label: Yes, hard even with the engine running
+    effects:
+    - fault: F11-BR-16
+      effect: supports
+      strength: strong
+    - fault: F11-BR-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No, only with the engine off
+    effects:
+    - fault: F11-BR-16
+      effect: rules_out
+      strength: strong
+    - fault: F11-BR-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q19
+  status: approved
+  stage: 3
+  text: Do you hear a hissing sound when you press the brake pedal?
+  source_faults:
+  - F11-BR-15
+  - F11-BR-16
+  merged_from:
+  - 'F11-BR-15 (stages_text): Hissing sound?'
+  - 'F11-BR-16 (symptoms): Hiss'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-15
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-16
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q20
+  status: approved
+  stage: 3
+  text: Was any brake work done recently, or did the brake fluid run low?
+  source_faults:
+  - F11-BR-18
+  merged_from:
+  - 'F11-BR-18 (stages_text): Was brake work done recently?'
+  - 'F11-BR-18 (symptoms): Fluid ran low'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-18
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F11-BR-18
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q21
+  status: approved
+  stage: 3
+  text: When was the brake fluid last changed?
+  source_faults:
+  - F11-BR-19
+  merged_from:
+  - 'F11-BR-19 (stages_text): When was brake fluid last changed?'
+  - 'F11-BR-19 (symptoms): No change in 2+ years'
+  options:
+  - label: More than 2 years ago, or never
+    effects:
+    - fault: F11-BR-19
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Within the last 2 years
+    effects:
+    - fault: F11-BR-19
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q22
+  status: approved
+  stage: 3
+  text: Did you drive through water just before this started?
+  source_faults:
+  - F11-BR-03
+  - F11-BR-27
+  merged_from:
+  - 'F11-BR-27 (stages_text): Did you drive through water?'
+  - 'F11-BR-27 (stages_text): Are brakes still weak after a few stops?'
+  options:
+  - label: Yes, and the brakes got better after a few stops
+    effects:
+    - fault: F11-BR-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Yes, and the brakes are still weak
+    effects:
+    - fault: F11-BR-27
+      effect: supports
+      strength: moderate
+    - fault: F11-BR-03
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F11-BR-27
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q23
+  status: approved
+  stage: 3
+  text: Was the car parked for a long time with the handbrake on, and now it will not move or feels like a brake
+    is stuck?
+  source_faults:
+  - F11-BR-28
+  - F11-BR-29
+  merged_from:
+  - 'F11-BR-29 (stages_text): Was the car parked long with handbrake ON?'
+  - 'F11-BR-29 (stages_text): Is the lever fully down?'
+  - 'F11-BR-29 (symptoms): Car won''t move'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-29
+      effect: supports
+      strength: strong
+    - fault: F11-BR-28
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F11-BR-29
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q24
+  status: approved
+  stage: 3
+  text: Does the handbrake lever go up very high, or does the car roll on a slope with the handbrake on?
+  source_faults:
+  - F11-BR-22
+  merged_from:
+  - 'F11-BR-22 (stages_text): Does the handbrake lever go very high?'
+  - 'F11-BR-22 (stages_text): Does the car roll on a slope with handbrake on?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-22
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F11-BR-22
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q25
+  status: approved
+  stage: 3
+  text: Can you see a brake hose that is wet, cracked or bulging, or a rusty brake pipe?
+  source_faults:
+  - F11-BR-20
+  - F11-BR-21
+  merged_from:
+  - 'F11-BR-20 (stages_text): Is the hose wet or bulging?'
+  - 'F11-BR-21 (symptoms): Rusty pipes'
+  - 'F11-BR-21 (stages_text): Do you live near the sea?'
+  options:
+  - label: A wet, cracked or bulging hose
+    effects:
+    - fault: F11-BR-20
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A rusty or dented pipe
+    effects:
+    - fault: F11-BR-21
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q26
+  status: approved
+  stage: 3
+  text: Was anything other than brake fluid (for example engine oil) poured into the brake fluid tank?
+  source_faults:
+  - F11-BR-31
+  merged_from:
+  - 'F11-BR-31 (stages_text): What exactly was poured in?'
+  - 'F11-BR-31 (stages_text): Have you driven since then?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-31
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F11-BR-31
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q27
+  status: approved
+  stage: 3
+  text: Did a mechanic say one brake pad is much more worn than the other?
+  source_faults:
+  - F11-BR-11
+  - F11-BR-12
+  merged_from:
+  - 'F11-BR-12 (stages_text): Is one pad more worn than the other?'
+  - 'F11-BR-11 (symptoms): Uneven pad wear'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-12
+      effect: supports
+      strength: strong
+    - fault: F11-BR-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q28
+  status: approved
+  stage: 3
+  text: Did a mechanic measure the brake disc and say it is below the limit?
+  source_faults:
+  - F11-BR-09
+  merged_from:
+  - 'F11-BR-09 (stages_text): Did the mechanic measure the disc?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: brakes-q29
+  status: approved
+  stage: 3
+  text: Did the problem start suddenly?
+  source_faults:
+  - F11-BR-01
+  - F11-BR-03
+  - F11-BR-04
+  - F11-BR-05
+  - F11-BR-13
+  - F11-BR-19
+  - F11-BR-20
+  merged_from:
+  - 'F11-BR-01 (stages_text): Did the problem start suddenly?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F11-BR-04
+      effect: supports
+      strength: weak
+    - fault: F11-BR-13
+      effect: supports
+      strength: weak
+    - fault: F11-BR-20
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No, it got worse slowly
+    effects:
+    - fault: F11-BR-03
+      effect: supports
+      strength: weak
+    - fault: F11-BR-05
+      effect: supports
+      strength: weak
+    - fault: F11-BR-19
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F11-BR-01:
+    status: approved
+    name: Brake Pad Wear Warning
+    stage2_choices:
+    - Brake is making noise
+    - Other problem
+    confirmation_test: Measure pad thickness.
+    danger_phrases: []
+    safety_trigger_options: []
+  F11-BR-02:
+    status: approved
+    name: Spongy Brake Pedal / Low Brake Fluid
+    stage2_choices:
+    - Brake pedal feels soft
+    - Brake is not working properly (brake kam)
+    confirmation_test: Leak inspection, bleed and pedal test.
+    danger_phrases:
+    - soft pedal
+    - pedal sinking
+    safety_trigger_options:
+    - question: brakes-q02
+      option: Soft or spongy
+    - question: brakes-q08
+      option: Red BRAKE light
+  F11-BR-03:
+    status: approved
+    name: Reduced Braking Performance
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Inspection and pedal tests.
+    danger_phrases:
+    - cannot stop safely
+    safety_trigger_options:
+    - question: brakes-q05
+      option: Yes, much longer
+    - question: brakes-q22
+      option: Yes, and the brakes are still weak
+  F11-BR-04:
+    status: approved
+    name: Complete Brake Failure
+    stage2_choices:
+    - Brake is not working at all (brake fail)
+    - Brake pedal feels soft
+    - Brake fluid is leaking (brake oil leak)
+    confirmation_test: Full hydraulic inspection at a workshop.
+    danger_phrases:
+    - pedal to floor
+    - no braking
+    - large fluid leak
+    safety_trigger_options:
+    - question: brakes-q01
+      option: No, the car is still moving and the brakes are not working
+    - question: brakes-q02
+      option: It goes down to the floor
+    - question: brakes-q08
+      option: Red BRAKE light
+  F11-BR-05:
+    status: approved
+    name: Brake Pads Worn Thin
+    stage2_choices:
+    - Brake is making noise
+    confirmation_test: Measure pad thickness.
+    danger_phrases: []
+    safety_trigger_options: []
+  F11-BR-06:
+    status: approved
+    name: Brake Pads Completely Worn - Metal Contact
+    stage2_choices:
+    - Brake is making noise
+    - Brake is not working properly (brake kam)
+    confirmation_test: Wheel-off inspection.
+    danger_phrases:
+    - weak stopping
+    safety_trigger_options:
+    - question: brakes-q05
+      option: Yes, much longer
+    - question: brakes-q09
+      option: Grinding or metal-on-metal
+  F11-BR-07:
+    status: approved
+    name: Brake Squealing / High-Pitched Noise
+    stage2_choices:
+    - Brake is making noise
+    confirmation_test: Wheel-off check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F11-BR-08:
+    status: approved
+    name: Brake Grinding Noise
+    stage2_choices:
+    - Brake is making noise
+    confirmation_test: Wheel-off inspection.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: brakes-q09
+      option: Grinding or metal-on-metal
+  F11-BR-09:
+    status: approved
+    name: Brake Disc / Rotor Worn Below Limit
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Measure disc thickness with a micrometer.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: brakes-q05
+      option: Yes, much longer
+  F11-BR-10:
+    status: approved
+    name: Brake Judder / Steering Vibration During Braking
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Disc run-out and thickness measurement.
+    danger_phrases: []
+    safety_trigger_options: []
+  F11-BR-11:
+    status: approved
+    name: Brake Caliper Seized / Sticking
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Wheel spin test and caliper piston test.
+    danger_phrases:
+    - burning smell
+    safety_trigger_options:
+    - question: brakes-q16
+      option: 'Yes'
+  F11-BR-12:
+    status: approved
+    name: Brake Caliper Slider Pin Stuck
+    stage2_choices:
+    - Brake is making noise
+    confirmation_test: Caliper slide pin check.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: brakes-q16
+      option: 'Yes'
+  F11-BR-13:
+    status: approved
+    name: Brake Fluid Leakage
+    stage2_choices:
+    - Brake fluid is leaking (brake oil leak)
+    - Brake pedal feels soft
+    confirmation_test: Trace the leak.
+    danger_phrases:
+    - fluid leak
+    - soft pedal
+    safety_trigger_options:
+    - question: brakes-q02
+      option: Soft or spongy
+    - question: brakes-q08
+      option: Red BRAKE light
+  F11-BR-14:
+    status: approved
+    name: Brake Master Cylinder Internal Failure
+    stage2_choices:
+    - Brake pedal feels soft
+    - Brake is not working properly (brake kam)
+    confirmation_test: Pedal hold test and isolation test.
+    danger_phrases:
+    - pedal sinking
+    safety_trigger_options:
+    - question: brakes-q03
+      option: 'Yes'
+  F11-BR-15:
+    status: approved
+    name: Brake Booster / Vacuum Assist Fault
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Booster test and vacuum measurement.
+    danger_phrases:
+    - very hard pedal
+    safety_trigger_options: []
+  F11-BR-16:
+    status: approved
+    name: Brake Pedal Hard / Excessive Effort
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Booster and vacuum test.
+    danger_phrases:
+    - hard pedal with engine running
+    safety_trigger_options: []
+  F11-BR-17:
+    status: approved
+    name: Brake Pedal Sinks Toward Floor
+    stage2_choices:
+    - Brake pedal feels soft
+    - Brake is not working at all (brake fail)
+    confirmation_test: Leak check and pedal hold test.
+    danger_phrases:
+    - pedal sinking
+    - pedal to floor
+    safety_trigger_options:
+    - question: brakes-q01
+      option: No, the car is still moving and the brakes are not working
+    - question: brakes-q02
+      option: It goes down to the floor
+    - question: brakes-q03
+      option: 'Yes'
+    - question: brakes-q08
+      option: Red BRAKE light
+  F11-BR-18:
+    status: approved
+    name: Air in Brake Hydraulic System
+    stage2_choices:
+    - Brake pedal feels soft
+    confirmation_test: 'Bleed and recheck: pedal firm after bleeding and no leak.'
+    danger_phrases:
+    - very soft pedal
+    safety_trigger_options:
+    - question: brakes-q02
+      option: Soft or spongy
+  F11-BR-19:
+    status: approved
+    name: Old / Moisture-Contaminated Brake Fluid
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Brake fluid tester.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: brakes-q05
+      option: Yes, much longer
+  F11-BR-20:
+    status: approved
+    name: Brake Hose Cracked / Swollen / Restricted
+    stage2_choices:
+    - Brake fluid is leaking (brake oil leak)
+    - Brake is not working properly (brake kam)
+    confirmation_test: Visual and pressure check of the hose.
+    danger_phrases:
+    - leaking hose
+    safety_trigger_options:
+    - question: brakes-q02
+      option: Soft or spongy
+    - question: brakes-q16
+      option: 'Yes'
+  F11-BR-21:
+    status: approved
+    name: Brake Pipe Corrosion / Damage
+    stage2_choices:
+    - Brake fluid is leaking (brake oil leak)
+    confirmation_test: Brake pipe inspection.
+    danger_phrases:
+    - fluid dripping
+    safety_trigger_options:
+    - question: brakes-q02
+      option: Soft or spongy
+  F11-BR-22:
+    status: approved
+    name: Rear Drum Brake Shoe Wear
+    stage2_choices:
+    - Brake is making noise
+    - Brake is not working properly (brake kam)
+    confirmation_test: Drum-off inspection.
+    danger_phrases:
+    - car rolls on slope
+    safety_trigger_options:
+    - question: brakes-q24
+      option: 'Yes'
+  F11-BR-23:
+    status: approved
+    name: Rear Wheel Cylinder Leakage
+    stage2_choices:
+    - Brake fluid is leaking (brake oil leak)
+    - Brake is not working properly (brake kam)
+    confirmation_test: Drum-off check.
+    danger_phrases:
+    - fluid low
+    - soft pedal
+    safety_trigger_options:
+    - question: brakes-q02
+      option: Soft or spongy
+  F11-BR-24:
+    status: approved
+    name: Brake Overheating / Brake Fade
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    - Brake pedal feels soft
+    confirmation_test: Cool-down and inspection.
+    danger_phrases:
+    - smoke from wheels
+    - pedal stays soft
+    safety_trigger_options:
+    - question: brakes-q02
+      option: Soft or spongy
+    - question: brakes-q05
+      option: Yes, much longer
+    - question: brakes-q17
+      option: Yes, with smoke or a burning smell
+  F11-BR-25:
+    status: approved
+    name: Vehicle Pulling to One Side During Braking
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Inspect the brakes on both sides.
+    danger_phrases: []
+    safety_trigger_options: []
+  F11-BR-26:
+    status: approved
+    name: ABS / Electronic Brake System Fault Affecting Braking
+    stage2_choices:
+    - Other problem
+    - Brake is not working properly (brake kam)
+    confirmation_test: Scan and wheel speed sensor test.
+    danger_phrases:
+    - red BRAKE light
+    safety_trigger_options:
+    - question: brakes-q08
+      option: Red BRAKE light
+  F11-BR-27:
+    status: approved
+    name: Weak Brakes After Driving Through Waterlogged Road  [NEW - India]
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    confirmation_test: Dry-out stops; inspection if the brakes stay weak.
+    danger_phrases:
+    - brakes stay weak
+    safety_trigger_options:
+    - question: brakes-q22
+      option: Yes, and the brakes are still weak
+  F11-BR-28:
+    status: approved
+    name: Rusty Discs / Grinding After Long Parking  [NEW - India]
+    stage2_choices:
+    - Brake is making noise
+    confirmation_test: Observe for a few stops, then inspect.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: brakes-q09
+      option: Grinding or metal-on-metal
+  F11-BR-29:
+    status: approved
+    name: Handbrake / Rear Brake Stuck After Long Parking  [NEW - India]
+    stage2_choices:
+    - Other problem
+    - Brake is not working properly (brake kam)
+    confirmation_test: Wheel spin test.
+    danger_phrases:
+    - burning smell
+    safety_trigger_options:
+    - question: brakes-q16
+      option: 'Yes'
+  F11-BR-30:
+    status: approved
+    name: Poor-Quality / Duplicate Brake Pads (Noise, Dust, Weak Braking)  [NEW - India]
+    stage2_choices:
+    - Brake is not working properly (brake kam)
+    - Brake is making noise
+    confirmation_test: Pad inspection.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: brakes-q05
+      option: Yes, much longer
+  F11-BR-31:
+    status: approved
+    name: Wrong Fluid Added to Brake Reservoir (Engine Oil / Mixed Types)  [NEW - India]
+    stage2_choices:
+    - Brake pedal feels soft
+    - Brake fluid is leaking (brake oil leak)
+    - Other problem
+    confirmation_test: Fluid check and seal inspection.
+    danger_phrases:
+    - wrong fluid added
+    safety_trigger_options:
+    - question: brakes-q02
+      option: Soft or spongy
+    - question: brakes-q26
+      option: 'Yes'
+safety_rules:
+- id: brakes-s-F11-BR-01
+  status: approved
+  fault: F11-BR-01
+  risk_level: low
+  stop_driving_trigger: Stop if the pedal is soft, sinks, or the car does not brake.
+  roadside_action: The car can be driven gently. Book a brake check soon. If the pedal becomes soft, sinks or the
+    car does not stop well, stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Use jack stands - never only a jack.
+
+      • Pump pedal firm before driving.'
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-02
+  status: approved
+  fault: F11-BR-02
+  risk_level: high
+  stop_driving_trigger: Do not drive with a soft pedal.
+  roadside_action: Do not drive the car. Put on the hazard lights, keep the car parked with the handbrake on, and
+    call for a tow.
+  towing_recommendation: Yes. Do not drive with a soft pedal.
+  source_text:
+    safety_precautions: '• Brake fluid damages paint and eyes - wear gloves/glasses.
+
+      • Use only the specified fluid.'
+    if_towing_needed: YES - do not drive with a soft pedal.
+- id: brakes-s-F11-BR-03
+  status: approved
+  fault: F11-BR-03
+  risk_level: medium
+  stop_driving_trigger: Stop if the car cannot stop safely.
+  roadside_action: Drive slowly and keep a big gap. If the car cannot stop safely, park it and call for a tow.
+  towing_recommendation: Yes, if the car cannot stop safely.
+  source_text:
+    safety_precautions: • Use stands.
+    if_towing_needed: Depends - YES if car cannot stop safely.
+- id: brakes-s-F11-BR-04
+  status: approved
+  fault: F11-BR-04
+  risk_level: high
+  stop_driving_trigger: Never drive with brake failure.
+  roadside_action: Stay calm. Keep pressing the pedal and pull the handbrake slowly. Change down gears to slow the
+    car, steer to the side of the road and put on the hazard lights. Once stopped, do not drive. Call for a tow.
+  towing_recommendation: Yes, always.
+  source_text:
+    safety_precautions: • Never drive with confirmed brake failure.
+    if_towing_needed: YES - always.
+- id: brakes-s-F11-BR-05
+  status: approved
+  fault: F11-BR-05
+  risk_level: low
+  stop_driving_trigger: Stop if the pedal is soft, sinks, or the car does not brake.
+  roadside_action: The car can be driven gently. Book a brake check soon. If the pedal becomes soft, sinks or the
+    car does not stop well, stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Stands.
+
+      • Pedal firm before driving.'
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-06
+  status: approved
+  fault: F11-BR-06
+  risk_level: medium
+  stop_driving_trigger: Stop if the stopping is weak.
+  roadside_action: Drive slowly to a garage. If the stopping is weak, do not drive. Call for a tow.
+  towing_recommendation: Yes, if stopping is weak.
+  source_text:
+    safety_precautions: • Stands; pedal firm before moving.
+    if_towing_needed: Depends - YES if stopping is weak.
+- id: brakes-s-F11-BR-07
+  status: approved
+  fault: F11-BR-07
+  risk_level: low
+  stop_driving_trigger: Stop if the pedal is soft, sinks, or the car does not brake.
+  roadside_action: The car can be driven gently. Book a brake check soon. If the pedal becomes soft, sinks or the
+    car does not stop well, stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Brake dust - avoid breathing it.
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-08
+  status: approved
+  fault: F11-BR-08
+  risk_level: medium
+  stop_driving_trigger: Stop if the car does not stop well.
+  roadside_action: Drive slowly and get the brakes checked straight away. If stopping is weak, call for a tow.
+  towing_recommendation: Depends on how well the car stops.
+  source_text:
+    safety_precautions: • Stands.
+    if_towing_needed: Depends.
+- id: brakes-s-F11-BR-09
+  status: approved
+  fault: F11-BR-09
+  risk_level: low
+  stop_driving_trigger: Stop if the pedal is soft, sinks, or the car does not brake.
+  roadside_action: The car can be driven gently. Book a brake check soon. If the pedal becomes soft, sinks or the
+    car does not stop well, stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Stands; torque settings from manual.
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-10
+  status: approved
+  fault: F11-BR-10
+  risk_level: low
+  stop_driving_trigger: Stop if the pedal is soft, sinks, or the car does not brake.
+  roadside_action: The car can be driven gently. Book a brake check soon. If the pedal becomes soft, sinks or the
+    car does not stop well, stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Stands.
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-11
+  status: approved
+  fault: F11-BR-11
+  risk_level: medium
+  stop_driving_trigger: Stop if a wheel is smoking or the car pulls hard.
+  roadside_action: Stop and let the brakes cool. Do not touch the hot wheel. If the wheel stays very hot or smokes,
+    call a mechanic.
+  towing_recommendation: Depends on whether the wheel keeps dragging.
+  source_text:
+    safety_precautions: • Hot brakes - burns.
+    if_towing_needed: Depends.
+- id: brakes-s-F11-BR-12
+  status: approved
+  fault: F11-BR-12
+  risk_level: low
+  stop_driving_trigger: Stop if the pedal is soft, sinks, or the car does not brake.
+  roadside_action: The car can be driven gently. Book a brake check soon. If the pedal becomes soft, sinks or the
+    car does not stop well, stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Stands.
+
+      • Use only brake grease.'
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-13
+  status: approved
+  fault: F11-BR-13
+  risk_level: high
+  stop_driving_trigger: Do not drive with a brake fluid leak.
+  roadside_action: Do not drive the car. Put on the hazard lights, keep the car parked with the handbrake on, and
+    call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Gloves/glasses.
+    if_towing_needed: YES.
+- id: brakes-s-F11-BR-14
+  status: approved
+  fault: F11-BR-14
+  risk_level: high
+  stop_driving_trigger: Do not drive with a sinking pedal.
+  roadside_action: Do not drive the car. Put on the hazard lights, keep the car parked with the handbrake on, and
+    call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Fluid on paint - wash with water.
+    if_towing_needed: YES.
+- id: brakes-s-F11-BR-15
+  status: approved
+  fault: F11-BR-15
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the pedal is very hard.
+  roadside_action: If the pedal is very hard, do not drive. Call for a tow.
+  towing_recommendation: Yes, if the pedal is very hard.
+  source_text:
+    safety_precautions: • Pedal must work before road test.
+    if_towing_needed: YES - if pedal very hard.
+- id: brakes-s-F11-BR-16
+  status: approved
+  fault: F11-BR-16
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the pedal is hard with the engine running.
+  roadside_action: If the pedal is hard with the engine running, do not drive. Call for a tow.
+  towing_recommendation: Yes, if the pedal is hard with the engine running.
+  source_text:
+    safety_precautions: • Test only in safe area.
+    if_towing_needed: YES if hard with engine running.
+- id: brakes-s-F11-BR-17
+  status: approved
+  fault: F11-BR-17
+  risk_level: high
+  stop_driving_trigger: Never drive with a sinking pedal.
+  roadside_action: Do not drive the car. Put on the hazard lights, keep the car parked with the handbrake on, and
+    call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Never drive with sinking pedal.
+    if_towing_needed: YES.
+- id: brakes-s-F11-BR-18
+  status: approved
+  fault: F11-BR-18
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the pedal is very soft.
+  roadside_action: If the pedal is very soft, do not drive. Call for a tow. Otherwise go straight to the workshop
+    that did the brake work.
+  towing_recommendation: Yes, if the pedal is very soft.
+  source_text:
+    safety_precautions: • Keep reservoir from running dry while bleeding.
+    if_towing_needed: YES if pedal very soft.
+- id: brakes-s-F11-BR-19
+  status: approved
+  fault: F11-BR-19
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes fade or the pedal is soft.
+  roadside_action: Avoid long downhill drives and book a brake fluid change.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fluid is harmful - gloves.
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-20
+  status: approved
+  fault: F11-BR-20
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the hose is leaking.
+  roadside_action: If the hose is leaking, do not drive. Call for a tow.
+  towing_recommendation: Yes, if leaking.
+  source_text:
+    safety_precautions: • New sealing washers.
+    if_towing_needed: YES if leaking.
+- id: brakes-s-F11-BR-21
+  status: approved
+  fault: F11-BR-21
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the pipe is leaking.
+  roadside_action: If fluid is dripping, do not drive. Call for a tow.
+  towing_recommendation: Yes, if leaking.
+  source_text:
+    safety_precautions: • Correct flare tool only.
+    if_towing_needed: YES if leaking.
+- id: brakes-s-F11-BR-22
+  status: approved
+  fault: F11-BR-22
+  risk_level: medium
+  stop_driving_trigger: Do not rely on the handbrake on a slope.
+  roadside_action: Park on flat ground and leave the car in gear (or P). Book a brake check.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Brake dust - do not blow with air.
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-23
+  status: approved
+  fault: F11-BR-23
+  risk_level: medium
+  stop_driving_trigger: Stop if the pedal is soft or the brakes are weak.
+  roadside_action: If the pedal is soft or the brakes are weak, do not drive. Call for a tow.
+  towing_recommendation: Depends on how the brakes work.
+  source_text:
+    safety_precautions: • Gloves.
+    if_towing_needed: Depends.
+- id: brakes-s-F11-BR-24
+  status: approved
+  fault: F11-BR-24
+  risk_level: medium
+  stop_driving_trigger: Stop if there is smoke or the pedal stays soft.
+  roadside_action: Pull over safely and let the brakes cool for at least 30 minutes. Do not touch the wheels. Use
+    a low gear downhill. If the pedal stays soft, call for a tow.
+  towing_recommendation: Yes, if the pedal stays soft.
+  source_text:
+    safety_precautions: • Hot brakes burn.
+    if_towing_needed: Depends - YES if pedal stays soft.
+- id: brakes-s-F11-BR-25
+  status: approved
+  fault: F11-BR-25
+  risk_level: low
+  stop_driving_trigger: Stop if the pull is strong.
+  roadside_action: Drive slowly to a garage. If the pull is strong, stop and call a mechanic.
+  towing_recommendation: No, unless severe.
+  source_text:
+    safety_precautions: • Test in safe area.
+    if_towing_needed: NO - unless severe.
+- id: brakes-s-F11-BR-26
+  status: approved
+  fault: F11-BR-26
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the red BRAKE light is also on.
+  roadside_action: If only the ABS light is on, drive gently and get it checked. If the red BRAKE light is also
+    on, do not drive. Call for a tow.
+  towing_recommendation: Yes, if the red BRAKE light is also on.
+  source_text:
+    safety_precautions: • Do not open ABS unit lines without proper bleed.
+    if_towing_needed: YES if red BRAKE light also ON.
+- id: brakes-s-F11-BR-27
+  status: approved
+  fault: F11-BR-27
+  risk_level: medium
+  stop_driving_trigger: Stop if the brakes stay weak.
+  roadside_action: Drive slowly and brake gently a few times to dry the brakes. If they stay weak, stop and call
+    for a tow.
+  towing_recommendation: No, unless the brakes stay weak.
+  source_text:
+    safety_precautions: • Test in safe area.
+    if_towing_needed: NO - unless brakes stay weak.
+- id: brakes-s-F11-BR-28
+  status: approved
+  fault: F11-BR-28
+  risk_level: low
+  stop_driving_trigger: Stop if the noise does not go away and the brakes feel weak.
+  roadside_action: Brake gently for the first few stops. If the noise stays, book a brake check.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Stands.
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-29
+  status: approved
+  fault: F11-BR-29
+  risk_level: medium
+  stop_driving_trigger: Do not force the car to move.
+  roadside_action: Do not force the car with the engine. Put wheel blocks in place, then call a mechanic.
+  towing_recommendation: Depends on whether the brake frees up.
+  source_text:
+    safety_precautions: • Chock wheels before releasing.
+    if_towing_needed: Depends.
+- id: brakes-s-F11-BR-30
+  status: approved
+  fault: F11-BR-30
+  risk_level: low
+  stop_driving_trigger: Stop if the brakes feel weak.
+  roadside_action: The car can be driven gently. Book a brake check soon. If the pedal becomes soft, sinks or the
+    car does not stop well, stop and call a mechanic.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Stands.
+    if_towing_needed: NO.
+- id: brakes-s-F11-BR-31
+  status: approved
+  fault: F11-BR-31
+  risk_level: high
+  stop_driving_trigger: Do not drive.
+  roadside_action: Do not drive the car. Put on the hazard lights, keep the car parked with the handbrake on, and
+    call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Do not drive.
+    if_towing_needed: YES.

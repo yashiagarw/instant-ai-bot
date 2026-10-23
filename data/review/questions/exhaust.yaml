@@ -1,0 +1,948 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category exhaust
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: exhaust
+category_name: Exhaust / silencer
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:37:33+00:00'
+  run_id: claude-code-exhaust
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: exhaust-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Screen not working
+    effects: []
+    safety_trigger: false
+  - label: Music not working
+    effects: []
+    safety_trigger: false
+  - label: Camera not working
+    effects: []
+    safety_trigger: false
+  - label: Airbag warning
+    effects: []
+    safety_trigger: false
+  - label: Pipe leaking
+    effects: []
+    safety_trigger: false
+  - label: Water or coolant leaking
+    effects: []
+    safety_trigger: false
+  - label: Silencer noise
+    effects:
+    - fault: F16-EX-01
+      effect: supports
+      strength: strong
+    - fault: F16-EX-02
+      effect: supports
+      strength: strong
+    - fault: F16-EX-03
+      effect: supports
+      strength: strong
+    - fault: F16-EX-04
+      effect: supports
+      strength: strong
+    - fault: F16-EX-05
+      effect: supports
+      strength: strong
+    - fault: F16-EX-06
+      effect: supports
+      strength: strong
+    - fault: F16-EX-07
+      effect: supports
+      strength: strong
+    - fault: F16-EX-08
+      effect: supports
+      strength: strong
+    - fault: F16-EX-09
+      effect: supports
+      strength: strong
+    - fault: F16-EX-10
+      effect: supports
+      strength: strong
+    - fault: F16-EX-11
+      effect: supports
+      strength: strong
+    - fault: F16-EX-12
+      effect: supports
+      strength: strong
+    - fault: F16-EX-13
+      effect: supports
+      strength: strong
+    - fault: F16-EX-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Smoke coming
+    effects:
+    - fault: F16-EX-14
+      effect: supports
+      strength: strong
+    - fault: F16-EX-15
+      effect: supports
+      strength: strong
+    - fault: F16-EX-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Burning smell
+    effects: []
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F16-EX-04
+      effect: supports
+      strength: strong
+    - fault: F16-EX-10
+      effect: supports
+      strength: strong
+    - fault: F16-EX-11
+      effect: supports
+      strength: strong
+    - fault: F16-EX-14
+      effect: supports
+      strength: strong
+    - fault: F16-EX-15
+      effect: supports
+      strength: strong
+    - fault: F16-EX-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q01
+  status: approved
+  stage: 3
+  text: Can you smell exhaust inside the car? Does anyone feel a headache, dizzy, sick or sleepy?
+  source_faults:
+  - F16-EX-01
+  - F16-EX-04
+  - F16-EX-15
+  merged_from:
+  - 'F16-EX-15 (stages_text): Is anyone feeling unwell?'
+  - 'F16-EX-04 (stages_text): Does anyone feel headache or dizzy?'
+  - 'F16-EX-01 (stages_text): Can you smell exhaust inside the car?'
+  options:
+  - label: Yes, someone feels unwell
+    effects:
+    - fault: F16-EX-15
+      effect: supports
+      strength: strong
+    - fault: F16-EX-04
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: There is an exhaust smell inside, but nobody feels unwell
+    effects:
+    - fault: F16-EX-04
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-15
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-EX-15
+      effect: rules_out
+      strength: strong
+    - fault: F16-EX-04
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q02
+  status: approved
+  stage: 3
+  text: Is any part of the exhaust hanging down or touching the road?
+  source_faults:
+  - F16-EX-01
+  - F16-EX-03
+  - F16-EX-06
+  - F16-EX-13
+  merged_from:
+  - 'F16-EX-03 (stages_text): Is it touching the road?'
+  - 'F16-EX-01 (stages_text): Is any part hanging?'
+  - 'F16-EX-01 (stages_text): Is any pipe hanging?'
+  options:
+  - label: Yes, it is dragging or touching the road
+    effects:
+    - fault: F16-EX-03
+      effect: supports
+      strength: strong
+    - fault: F16-EX-13
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: It hangs lower than before
+    effects:
+    - fault: F16-EX-06
+      effect: supports
+      strength: strong
+    - fault: F16-EX-03
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-EX-03
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q03
+  status: approved
+  stage: 3
+  text: Did the car go through deep water, and now it stalls or will not start?
+  source_faults:
+  - F16-EX-16
+  merged_from:
+  - 'F16-EX-16 (stages_text): Did the car go in deep water?'
+  - 'F16-EX-16 (symptoms): Water from tailpipe'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-EX-16
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F16-EX-16
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q04
+  status: approved
+  stage: 3
+  text: Did the noise start after hitting a speed breaker, pothole or rock?
+  source_faults:
+  - F16-EX-01
+  - F16-EX-03
+  - F16-EX-06
+  - F16-EX-13
+  merged_from:
+  - 'F16-EX-01 (stages_text): Did the car hit a speed breaker?'
+  - 'F16-EX-13 (stages_text): Is anything leaking?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-EX-13
+      effect: supports
+      strength: strong
+    - fault: F16-EX-03
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-06
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-EX-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q05
+  status: approved
+  stage: 3
+  text: What kind of sound is it?
+  source_faults:
+  - F16-EX-01
+  - F16-EX-02
+  - F16-EX-03
+  - F16-EX-05
+  - F16-EX-06
+  - F16-EX-07
+  - F16-EX-08
+  - F16-EX-09
+  - F16-EX-10
+  - F16-EX-12
+  - F16-EX-17
+  merged_from:
+  - 'F16-EX-02 (stages_text): Do you hear puffing?'
+  - 'F16-EX-07 (stages_text): Is it metallic buzz?'
+  - 'F16-EX-06 (stages_text): Does it knock on bumps?'
+  - 'F16-EX-01 (stages_text): Is the exhaust rattling?'
+  options:
+  - label: Puffing or ticking
+    effects:
+    - fault: F16-EX-02
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-05
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-10
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-09
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A metallic buzz at some engine speeds
+    effects:
+    - fault: F16-EX-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A knock or thud underneath on bumps or when starting
+    effects:
+    - fault: F16-EX-06
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-12
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A rattle at the back
+    effects:
+    - fault: F16-EX-01
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-06
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: The whole exhaust is just much louder
+    effects:
+    - fault: F16-EX-08
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-03
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q06
+  status: approved
+  stage: 3
+  text: Where does the sound come from?
+  source_faults:
+  - F16-EX-01
+  - F16-EX-02
+  - F16-EX-05
+  - F16-EX-07
+  - F16-EX-08
+  - F16-EX-09
+  - F16-EX-10
+  - F16-EX-12
+  merged_from:
+  - 'F16-EX-09 (stages_text): Is the sound from the front?'
+  - 'F16-EX-01 (stages_text): Is the sound coming from the front or rear?'
+  options:
+  - label: The front, near the engine
+    effects:
+    - fault: F16-EX-09
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-10
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Under the middle of the car
+    effects:
+    - fault: F16-EX-02
+      effect: supports
+      strength: weak
+    - fault: F16-EX-05
+      effect: supports
+      strength: weak
+    - fault: F16-EX-07
+      effect: supports
+      strength: weak
+    - fault: F16-EX-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: The back (silencer)
+    effects:
+    - fault: F16-EX-01
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-08
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q07
+  status: approved
+  stage: 3
+  text: Is the ticking loudest when the engine is cold, and quieter when warm?
+  source_faults:
+  - F16-EX-02
+  - F16-EX-05
+  - F16-EX-10
+  merged_from:
+  - 'F16-EX-10 (stages_text): Is it ticking when cold?'
+  - 'F16-EX-02 (symptoms): Louder cold'
+  - 'F16-EX-05 (symptoms): Louder when cold'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-EX-10
+      effect: supports
+      strength: strong
+    - fault: F16-EX-05
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-02
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-EX-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q08
+  status: approved
+  stage: 3
+  text: Can you see rust holes in the silencer, or black soot marks on a pipe or joint?
+  source_faults:
+  - F16-EX-02
+  - F16-EX-05
+  - F16-EX-08
+  merged_from:
+  - 'F16-EX-08 (stages_text): Is the hole big?'
+  - 'F16-EX-05 (stages_text): Is the noise at a joint?'
+  - 'F16-EX-02 (symptoms): Soot marks'
+  options:
+  - label: Rust holes in the silencer
+    effects:
+    - fault: F16-EX-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Soot marks at a joint
+    effects:
+    - fault: F16-EX-05
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Soot near a crack in a pipe
+    effects:
+    - fault: F16-EX-02
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Nothing visible
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q09
+  status: approved
+  stage: 3
+  text: Is there a rotten-egg smell, low power, or a failed PUC (pollution) test?
+  source_faults:
+  - F16-EX-01
+  - F16-EX-11
+  - F16-EX-17
+  merged_from:
+  - 'F16-EX-11 (stages_text): Is there rotten egg smell?'
+  - 'F16-EX-11 (symptoms): PUC fail'
+  - 'F16-EX-01 (stages_text): Does the car have less power?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-EX-11
+      effect: supports
+      strength: strong
+    - fault: F16-EX-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-EX-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q10
+  status: approved
+  stage: 3
+  text: (Diesel car) Is the DPF light on? Is the car used mostly for short trips?
+  source_faults:
+  - F16-EX-14
+  merged_from:
+  - 'F16-EX-14 (stages_text): Mostly short trips?'
+  - 'F16-EX-14 (symptoms): DPF light'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-EX-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-EX-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q11
+  status: approved
+  stage: 3
+  text: Is the engine warning light on?
+  source_faults:
+  - F16-EX-01
+  - F16-EX-10
+  - F16-EX-11
+  - F16-EX-14
+  - F16-EX-17
+  merged_from:
+  - 'F16-EX-01 (stages_text): Is there an engine warning?'
+  - 'F16-EX-10 (symptoms): Engine light'
+  - 'F16-EX-11 (symptoms): Engine light'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-EX-10
+      effect: supports
+      strength: weak
+    - fault: F16-EX-11
+      effect: supports
+      strength: moderate
+    - fault: F16-EX-14
+      effect: supports
+      strength: weak
+    - fault: F16-EX-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: exhaust-q12
+  status: approved
+  stage: 3
+  text: Was the exhaust modified or an aftermarket silencer fitted?
+  source_faults:
+  - F16-EX-17
+  merged_from:
+  - 'F16-EX-17 (stages_text): Was the exhaust modified?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-EX-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-EX-17
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F16-EX-01:
+    status: approved
+    name: Silencer Noise
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection on a lift.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-02:
+    status: approved
+    name: Minor Exhaust Pipe Crack
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection of the pipe.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-03:
+    status: approved
+    name: Broken Silencer - Hanging / Loud
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection of the hanger and joints.
+    danger_phrases:
+    - part hanging
+    - dragging
+    safety_trigger_options:
+    - question: exhaust-q02
+      option: Yes, it is dragging or touching the road
+  F16-EX-04:
+    status: approved
+    name: Exhaust System Fault - Fumes Risk
+    stage2_choices:
+    - Other problem
+    - Silencer noise
+    confirmation_test: Exhaust leak inspection.
+    danger_phrases:
+    - headache
+    - dizziness
+    safety_trigger_options:
+    - question: exhaust-q01
+      option: Yes, someone feels unwell
+  F16-EX-05:
+    status: approved
+    name: Exhaust Joint / Gasket Leak
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection of the joint.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-06:
+    status: approved
+    name: Exhaust Hanger / Rubber Mount Broken
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection of the hangers.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-07:
+    status: approved
+    name: Exhaust Heat Shield Rattling
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Tap test of the heat shield.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-08:
+    status: approved
+    name: Silencer Rust / Corrosion / Hole
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection of the silencer.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-09:
+    status: approved
+    name: Exhaust Flex Pipe Leak
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection of the flex pipe.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-10:
+    status: approved
+    name: Exhaust Manifold Leak
+    stage2_choices:
+    - Silencer noise
+    - Other problem
+    confirmation_test: Inspection of the manifold.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-11:
+    status: approved
+    name: Catalytic Converter Damage / Restriction
+    stage2_choices:
+    - Other problem
+    - Silencer noise
+    confirmation_test: Back-pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-12:
+    status: approved
+    name: Exhaust Pipe Striking Underbody
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection of hangers and mounts.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-EX-13:
+    status: approved
+    name: Excessive Exhaust Noise After Road Impact
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection after the impact.
+    danger_phrases:
+    - dragging
+    - leaking
+    safety_trigger_options:
+    - question: exhaust-q02
+      option: Yes, it is dragging or touching the road
+  F16-EX-14:
+    status: approved
+    name: Diesel DPF / Exhaust Aftertreatment Warning
+    stage2_choices:
+    - Other problem
+    - Smoke coming
+    confirmation_test: Scan (DPF).
+    danger_phrases:
+    - red warning
+    safety_trigger_options: []
+  F16-EX-15:
+    status: approved
+    name: Exhaust Fumes Entering Cabin / Suspected Carbon Monoxide Risk
+    stage2_choices:
+    - Other problem
+    - Smoke coming
+    confirmation_test: Inspection for an exhaust leak into the cabin.
+    danger_phrases:
+    - headache
+    - dizziness
+    - nausea
+    - sleepiness
+    safety_trigger_options:
+    - question: exhaust-q01
+      option: Yes, someone feels unwell
+  F16-EX-16:
+    status: approved
+    name: Water in Exhaust / Silencer After Waterlogging  [NEW - India]
+    stage2_choices:
+    - Other problem
+    - Smoke coming
+    confirmation_test: Workshop inspection.
+    danger_phrases:
+    - deep water
+    safety_trigger_options:
+    - question: exhaust-q03
+      option: 'Yes'
+  F16-EX-17:
+    status: approved
+    name: Modified / Aftermarket Loud Silencer  [NEW - India]
+    stage2_choices:
+    - Silencer noise
+    confirmation_test: Inspection of the modified exhaust.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: exhaust-s-F16-EX-01
+  status: approved
+  fault: F16-EX-01
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-02
+  status: approved
+  fault: F16-EX-02
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-03
+  status: approved
+  fault: F16-EX-03
+  risk_level: medium
+  stop_driving_trigger: Stop if a part is hanging or dragging.
+  roadside_action: Stop in a safe place and switch on the hazard lights. Do not crawl under the car. Do not touch
+    the exhaust, it stays very hot after driving. Call for help.
+  towing_recommendation: Yes, if it cannot be secured.
+  source_text:
+    safety_precautions: '• Exhaust parts are very hot - do not touch after driving.
+
+      • Use lift or stands, never only a jack.'
+    if_towing_needed: YES if cannot be secured.
+- id: exhaust-s-F16-EX-04
+  status: approved
+  fault: F16-EX-04
+  risk_level: high
+  stop_driving_trigger: Stop if anyone feels unwell.
+  roadside_action: Open the windows, stop the car and get everyone out into fresh air. Never run the engine in a
+    closed space. Call for a tow if anyone feels unwell.
+  towing_recommendation: Yes, if people feel unwell.
+  source_text:
+    safety_precautions: '• Never run the engine in a closed garage or space.
+
+      • Exhaust parts are very hot - do not touch after driving.'
+    if_towing_needed: YES if people feel unwell.
+- id: exhaust-s-F16-EX-05
+  status: approved
+  fault: F16-EX-05
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-06
+  status: approved
+  fault: F16-EX-06
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-07
+  status: approved
+  fault: F16-EX-07
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-08
+  status: approved
+  fault: F16-EX-08
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-09
+  status: approved
+  fault: F16-EX-09
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-10
+  status: approved
+  fault: F16-EX-10
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-11
+  status: approved
+  fault: F16-EX-11
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-12
+  status: approved
+  fault: F16-EX-12
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.
+- id: exhaust-s-F16-EX-13
+  status: approved
+  fault: F16-EX-13
+  risk_level: medium
+  stop_driving_trigger: Stop if anything is dragging or leaking.
+  roadside_action: Stop and check from a safe place that nothing is dragging or leaking. Do not crawl under the
+    car. Do not touch the exhaust, it stays very hot after driving.
+  towing_recommendation: If dragging or leaking.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: If dragging/leaking.
+- id: exhaust-s-F16-EX-14
+  status: approved
+  fault: F16-EX-14
+  risk_level: low
+  stop_driving_trigger: Stop if there is low-power mode with a red warning.
+  roadside_action: Follow the owner's manual advice for the DPF light. Do not touch the hot exhaust.
+  towing_recommendation: If low-power mode with a red warning.
+  source_text:
+    safety_precautions: • DPF very hot during regen.
+    if_towing_needed: If limp + red warning.
+- id: exhaust-s-F16-EX-15
+  status: approved
+  fault: F16-EX-15
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: exhaust fumes inside the car.'
+  roadside_action: Stop, switch off the engine and get everyone out into fresh air. Do not drive the car. Call for
+    a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Never run the engine in a closed garage or space.
+    if_towing_needed: YES.
+- id: exhaust-s-F16-EX-16
+  status: approved
+  fault: F16-EX-16
+  risk_level: high
+  stop_driving_trigger: Do not crank a flooded engine.
+  roadside_action: Do not try to start the engine. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Do not crank a flooded engine.
+    if_towing_needed: YES.
+- id: exhaust-s-F16-EX-17
+  status: approved
+  fault: F16-EX-17
+  risk_level: low
+  stop_driving_trigger: Stop if you smell exhaust inside the car or a part is dragging.
+  roadside_action: Do not touch the exhaust, it stays very hot after driving. The car can be driven to a garage.
+    If you smell exhaust inside, open the windows and stop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust parts are very hot - do not touch after driving.
+    if_towing_needed: NO.

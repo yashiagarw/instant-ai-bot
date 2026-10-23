@@ -1,0 +1,2031 @@
+category: cooling
+loaded_at: '2026-10-23T19:12:27+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question cooling-main:
+    id: cooling-main
+    status: approved
+    stage: 2
+    text: What is the main problem?
+    choice_source: proposed
+    options:
+    - label: Coolant is a little low
+      effects:
+      - fault: F02-OH-01
+        effect: supports
+        strength: strong
+      - fault: F02-OH-03
+        effect: supports
+        strength: strong
+      - fault: F02-OH-06
+        effect: supports
+        strength: strong
+      - fault: F02-OH-09
+        effect: supports
+        strength: strong
+      - fault: F02-OH-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Needle is going up
+      effects:
+      - fault: F02-OH-02
+        effect: supports
+        strength: strong
+      - fault: F02-OH-04
+        effect: supports
+        strength: strong
+      - fault: F02-OH-07
+        effect: supports
+        strength: strong
+      - fault: F02-OH-08
+        effect: supports
+        strength: strong
+      - fault: F02-OH-09
+        effect: supports
+        strength: strong
+      - fault: F02-OH-10
+        effect: supports
+        strength: strong
+      - fault: F02-OH-11
+        effect: supports
+        strength: strong
+      - fault: F02-OH-12
+        effect: supports
+        strength: strong
+      - fault: F02-OH-14
+        effect: supports
+        strength: strong
+      - fault: F02-OH-15
+        effect: supports
+        strength: strong
+      - fault: F02-OH-17
+        effect: supports
+        strength: strong
+      - fault: F02-OH-18
+        effect: supports
+        strength: strong
+      - fault: F02-OH-20
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: I see a leak
+      effects:
+      - fault: F02-OH-03
+        effect: supports
+        strength: strong
+      - fault: F02-OH-07
+        effect: supports
+        strength: strong
+      - fault: F02-OH-10
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Fan not working
+      effects:
+      - fault: F02-OH-04
+        effect: supports
+        strength: strong
+      - fault: F02-OH-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Car overheated badly
+      effects:
+      - fault: F02-OH-05
+        effect: supports
+        strength: strong
+      - fault: F02-OH-19
+        effect: supports
+        strength: strong
+      - fault: F02-OH-20
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Other
+      effects:
+      - fault: F02-OH-13
+        effect: supports
+        strength: strong
+      - fault: F02-OH-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q01:
+    id: cooling-q01
+    status: approved
+    stage: 3
+    text: Right now, is the temperature needle in the red zone, or do you see steam or a lot of liquid coming out?
+    source_faults:
+    - F02-OH-02
+    - F02-OH-05
+    - F02-OH-07
+    - F02-OH-09
+    merged_from:
+    - 'F02-OH-05 (stages_text): Is the temperature needle in the red zone? Do you see steam or a lot of liquid coming
+      out?'
+    - 'F02-OH-02 (stages_text): Is the temperature needle in the red zone? Do you see steam or a lot of liquid coming
+      out?'
+    - 'F02-OH-07 (stages_text): Is the temperature needle in the red zone? Do you see steam or a lot of liquid coming
+      out?'
+    - 'F02-OH-09 (stages_text): Is the temperature needle in the red zone? Do you see steam or a lot of liquid coming
+      out?'
+    options:
+    - label: The needle is in the red zone
+      effects:
+      - fault: F02-OH-05
+        effect: supports
+        strength: strong
+      - fault: F02-OH-02
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: Steam
+      effects:
+      - fault: F02-OH-05
+        effect: supports
+        strength: strong
+      - fault: F02-OH-07
+        effect: supports
+        strength: weak
+      - fault: F02-OH-09
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: A lot of liquid is coming out
+      effects:
+      - fault: F02-OH-07
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-05
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: None of these
+      effects:
+      - fault: F02-OH-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q02:
+    id: cooling-q02
+    status: approved
+    stage: 3
+    text: When does the temperature needle go up?
+    source_faults:
+    - F02-OH-01
+    - F02-OH-02
+    - F02-OH-03
+    - F02-OH-04
+    - F02-OH-06
+    - F02-OH-08
+    - F02-OH-10
+    - F02-OH-11
+    - F02-OH-12
+    - F02-OH-17
+    - F02-OH-18
+    merged_from:
+    - 'F02-OH-02 (stages_text): (1) Needle goes up in traffic, (2) on the highway, (3) soon after start'
+    - 'F02-OH-04 (stages_text): Does the needle rise in slow traffic and with AC on? Or soon after starting?'
+    - 'F02-OH-11 (stages_text): Does the needle rise only in traffic?'
+    - 'F02-OH-12 (stages_text): Does the engine get hot soon after starting?'
+    - 'F02-OH-17 (stages_text): Does it overheat with the AC on or in traffic?'
+    - 'F02-OH-18 (stages_text): Does it overheat soon after start?'
+    - 'F02-OH-08 (stages_text): Does it overheat more in hot weather or on hills?'
+    - 'F02-OH-10 (stages_text): Does the needle rise even on the highway?'
+    - 'F02-OH-01 (stages_text): Does the needle stay normal in traffic, on highway and with AC on?'
+    options:
+    - label: In slow traffic or when standing, or with the AC on
+      effects:
+      - fault: F02-OH-11
+        effect: supports
+        strength: strong
+      - fault: F02-OH-17
+        effect: supports
+        strength: strong
+      - fault: F02-OH-04
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-08
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Soon after starting, even on short drives
+      effects:
+      - fault: F02-OH-12
+        effect: supports
+        strength: strong
+      - fault: F02-OH-18
+        effect: supports
+        strength: strong
+      - fault: F02-OH-04
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: At all speeds, even on the highway
+      effects:
+      - fault: F02-OH-12
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-10
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-18
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: On hills or on very hot days
+      effects:
+      - fault: F02-OH-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It does not go up
+      effects:
+      - fault: F02-OH-01
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-03
+        effect: supports
+        strength: weak
+      - fault: F02-OH-06
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q03:
+    id: cooling-q03
+    status: approved
+    stage: 3
+    text: Does the needle come down when you drive faster?
+    source_faults:
+    - F02-OH-02
+    - F02-OH-04
+    - F02-OH-10
+    - F02-OH-11
+    - F02-OH-12
+    - F02-OH-17
+    merged_from:
+    - 'F02-OH-02 (stages_text): Does the needle go down when you drive faster?'
+    - 'F02-OH-17 (stages_text): Does it fall at speed?'
+    - 'F02-OH-11 (symptoms): Needle falls at speed'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-11
+        effect: supports
+        strength: strong
+      - fault: F02-OH-17
+        effect: supports
+        strength: strong
+      - fault: F02-OH-04
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-12
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q04:
+    id: cooling-q04
+    status: approved
+    stage: 3
+    text: When the engine was fully cold (parked for 3 hours or more), was the coolant level in the tank below MIN?
+    source_faults:
+    - F02-OH-01
+    - F02-OH-02
+    - F02-OH-15
+    - F02-OH-18
+    merged_from:
+    - 'F02-OH-01 (stages_text): Did you check the coolant tank when the engine was fully cold? Is the level below
+      MIN?'
+    - 'F02-OH-15 (stages_text): Did you check the coolant tank when the engine was fully cold? Is the level below
+      MIN?'
+    - 'F02-OH-18 (stages_text): Did you check the coolant tank when the engine was fully cold? Is the level below
+      MIN?'
+    options:
+    - label: Yes, below MIN
+      effects:
+      - fault: F02-OH-01
+        effect: supports
+        strength: strong
+      - fault: F02-OH-15
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-18
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No, it was between MIN and MAX
+      effects:
+      - fault: F02-OH-01
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q05:
+    id: cooling-q05
+    status: approved
+    stage: 3
+    text: Has the coolant level gone down more than once, so that you have to top it up often?
+    source_faults:
+    - F02-OH-01
+    - F02-OH-03
+    - F02-OH-06
+    - F02-OH-07
+    - F02-OH-09
+    - F02-OH-16
+    merged_from:
+    - 'F02-OH-06 (stages_text): Has the level gone down more than once? Can you see any wet patch or coloured liquid
+      under the car?'
+    - 'F02-OH-06 (stages_text): How often do you top up?'
+    - 'F02-OH-03 (stages_text): Has the level gone down more than once? Can you see any wet patch or coloured liquid
+      under the car?'
+    - 'F02-OH-09 (stages_text): Has the level gone down more than once? Can you see any wet patch or coloured liquid
+      under the car?'
+    - 'F02-OH-16 (stages_text): Has the level gone down more than once? Can you see any wet patch or coloured liquid
+      under the car?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-06
+        effect: supports
+        strength: strong
+      - fault: F02-OH-03
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-09
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-16
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-07
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No, this is the first time
+      effects:
+      - fault: F02-OH-06
+        effect: rules_out
+        strength: moderate
+      - fault: F02-OH-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q06:
+    id: cooling-q06
+    status: approved
+    stage: 3
+    text: Can you see a wet patch or coloured liquid (green, pink, orange or blue) under the car? Look from a safe
+      distance.
+    source_faults:
+    - F02-OH-03
+    - F02-OH-06
+    - F02-OH-07
+    - F02-OH-10
+    merged_from:
+    - 'F02-OH-03 (stages_text): Do you see liquid under the car? What colour? Does it smell sweet?'
+    - 'F02-OH-07 (stages_text): Do you see coolant dripping from the front hoses or radiator?'
+    - 'F02-OH-06 (stages_text): Has the level gone down more than once? Can you see any wet patch or coloured liquid
+      under the car?'
+    options:
+    - label: A few drops or a small patch
+      effects:
+      - fault: F02-OH-03
+        effect: supports
+        strength: strong
+      - fault: F02-OH-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Dripping at the front, from the hoses or radiator
+      effects:
+      - fault: F02-OH-07
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: No liquid under the car
+      effects:
+      - fault: F02-OH-06
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-03
+        effect: rules_out
+        strength: moderate
+      - fault: F02-OH-07
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q07:
+    id: cooling-q07
+    status: approved
+    stage: 3
+    text: Do you hear a whining noise, or see a leak, near the front of the engine?
+    source_faults:
+    - F02-OH-07
+    - F02-OH-10
+    merged_from:
+    - 'F02-OH-10 (stages_text): Do you hear a whining noise or see a leak near the front of the engine?'
+    options:
+    - label: A whining or grinding noise
+      effects:
+      - fault: F02-OH-10
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: A leak near the front of the engine
+      effects:
+      - fault: F02-OH-10
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-07
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q08:
+    id: cooling-q08
+    status: approved
+    stage: 3
+    text: Do you smell something sweet near the engine?
+    source_faults:
+    - F02-OH-01
+    - F02-OH-02
+    - F02-OH-03
+    - F02-OH-06
+    - F02-OH-07
+    merged_from:
+    - 'F02-OH-03 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    - 'F02-OH-06 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    - 'F02-OH-07 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    - 'F02-OH-02 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-03
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-06
+        effect: supports
+        strength: weak
+      - fault: F02-OH-07
+        effect: supports
+        strength: weak
+      - fault: F02-OH-01
+        effect: supports
+        strength: weak
+      - fault: F02-OH-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q09:
+    id: cooling-q09
+    status: approved
+    stage: 3
+    text: Is the heater blowing cold air while the engine is hot?
+    source_faults:
+    - F02-OH-02
+    - F02-OH-04
+    - F02-OH-10
+    - F02-OH-12
+    - F02-OH-14
+    - F02-OH-15
+    - F02-OH-18
+    merged_from:
+    - 'F02-OH-15 (stages_text): Is the heater cold while the engine is hot?'
+    - 'F02-OH-14 (stages_text): Is the heater cold?'
+    - 'F02-OH-02 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-15
+        effect: supports
+        strength: strong
+      - fault: F02-OH-14
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-18
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-12
+        effect: supports
+        strength: weak
+      - fault: F02-OH-10
+        effect: supports
+        strength: weak
+      - fault: F02-OH-02
+        effect: supports
+        strength: weak
+      - fault: F02-OH-04
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-15
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q10:
+    id: cooling-q10
+    status: approved
+    stage: 3
+    text: After the engine warms up, is the exhaust smoke white and thick?
+    source_faults:
+    - F02-OH-05
+    - F02-OH-06
+    - F02-OH-16
+    - F02-OH-19
+    merged_from:
+    - 'F02-OH-05 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    - 'F02-OH-16 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    - 'F02-OH-06 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    - 'F02-OH-19 (symptoms): White smoke'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-05
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-16
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-19
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-06
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q11:
+    id: cooling-q11
+    status: approved
+    stage: 3
+    text: Is the engine shaking, losing power or knocking?
+    source_faults:
+    - F02-OH-05
+    - F02-OH-19
+    merged_from:
+    - 'F02-OH-05 (stages_text): Do you see steam, smell something sweet, or see any warning light? Is the engine
+      shaking, losing power or making a new noise? Is the exhaust smoke white and thick after warm-up? Is the heater
+      blowing cold air?'
+    - 'F02-OH-19 (symptoms): Misfire'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-05
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-19
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q12:
+    id: cooling-q12
+    status: approved
+    stage: 3
+    text: Does the engine oil look milky, or is coolant mixing with the oil?
+    source_faults:
+    - F02-OH-05
+    - F02-OH-16
+    - F02-OH-19
+    merged_from:
+    - 'F02-OH-16 (stages_text): Is the oil milky or is coolant mixing with it?'
+    - 'F02-OH-05 (symptoms): Milky-looking oil'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-16
+        effect: supports
+        strength: strong
+      - fault: F02-OH-19
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-16
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q13:
+    id: cooling-q13
+    status: approved
+    stage: 3
+    text: Was coolant filled, or a radiator, thermostat or water pump job done recently?
+    source_faults:
+    - F02-OH-01
+    - F02-OH-03
+    - F02-OH-14
+    merged_from:
+    - 'F02-OH-14 (stages_text): Did the problem start after a coolant change or repair?'
+    - 'F02-OH-14 (stages_text): Was coolant filled, or a radiator, thermostat, water pump or other engine work done
+      recently?'
+    - 'F02-OH-01 (stages_text): Was coolant filled, or a radiator, thermostat, water pump or other engine work done
+      recently?'
+    - 'F02-OH-03 (stages_text): Was coolant filled, or a radiator, thermostat, water pump or other engine work done
+      recently?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-14
+        effect: supports
+        strength: strong
+      - fault: F02-OH-01
+        effect: supports
+        strength: weak
+      - fault: F02-OH-03
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q14:
+    id: cooling-q14
+    status: approved
+    stage: 3
+    text: Do you hear a gurgling sound from the engine or the dashboard?
+    source_faults:
+    - F02-OH-14
+    - F02-OH-15
+    merged_from:
+    - 'F02-OH-14 (symptoms): Gurgling sound'
+    - 'F02-OH-15 (symptoms): Gurgling'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-14
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-15
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q15:
+    id: cooling-q15
+    status: approved
+    stage: 3
+    text: Does coolant push out of the coolant tank, especially when the engine is hot?
+    source_faults:
+    - F02-OH-05
+    - F02-OH-09
+    merged_from:
+    - 'F02-OH-09 (stages_text): Does coolant push out of the tank?'
+    - 'F02-OH-09 (stages_text): Does it happen after the engine gets hot?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-09
+        effect: supports
+        strength: strong
+      - fault: F02-OH-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-09
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q16:
+    id: cooling-q16
+    status: approved
+    stage: 3
+    text: Does the front of the radiator look dirty, blocked or bent?
+    source_faults:
+    - F02-OH-08
+    merged_from:
+    - 'F02-OH-08 (stages_text): Does the radiator look dirty or blocked? Does the car overheat in traffic?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-08
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q17:
+    id: cooling-q17
+    status: approved
+    stage: 3
+    text: What does the radiator fan do when the engine is hot or the AC is on?
+    source_faults:
+    - F02-OH-04
+    - F02-OH-11
+    - F02-OH-13
+    merged_from:
+    - 'F02-OH-11 (stages_text): Is the fan not running?'
+    - 'F02-OH-13 (stages_text): Does the fan act strangely?'
+    - 'F02-OH-04 (symptoms): Fan not turning when AC is on or needle is high'
+    options:
+    - label: It does not run
+      effects:
+      - fault: F02-OH-11
+        effect: supports
+        strength: strong
+      - fault: F02-OH-04
+        effect: supports
+        strength: moderate
+      - fault: F02-OH-13
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: It runs all the time
+      effects:
+      - fault: F02-OH-13
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It runs normally
+      effects:
+      - fault: F02-OH-11
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q18:
+    id: cooling-q18
+    status: approved
+    stage: 3
+    text: Does the temperature needle jump around or show odd values?
+    source_faults:
+    - F02-OH-13
+    merged_from:
+    - 'F02-OH-13 (stages_text): Does the gauge jump or show odd values?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-13
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-13
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q19:
+    id: cooling-q19
+    status: approved
+    stage: 3
+    text: Is the check engine light on?
+    source_faults:
+    - F02-OH-13
+    merged_from:
+    - 'F02-OH-13 (symptoms): Check engine light'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-13
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q20:
+    id: cooling-q20
+    status: approved
+    stage: 3
+    text: Did a test at a garage already confirm a head gasket problem?
+    source_faults:
+    - F02-OH-19
+    merged_from:
+    - 'F02-OH-19 (stages_text): Did tests confirm a head gasket problem?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-19
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-19
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q21:
+    id: cooling-q21
+    status: approved
+    stage: 3
+    text: Has the car already been repaired for overheating, and it still overheats?
+    source_faults:
+    - F02-OH-20
+    merged_from:
+    - 'F02-OH-20 (stages_text): Has it been repaired already?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-20
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F02-OH-20
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q22:
+    id: cooling-q22
+    status: approved
+    stage: 3
+    text: After the needle went into the red, did you keep driving?
+    source_faults:
+    - F02-OH-05
+    merged_from:
+    - 'F02-OH-05 (stages_text): Did it overheat while driving or when parked? How long did you drive after it overheated?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F02-OH-05
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cooling-q24:
+    id: cooling-q24
+    status: approved
+    stage: 3
+    text: Is the leak worse after driving, when the engine is hot?
+    source_faults:
+    - F02-OH-03
+    - F02-OH-07
+    merged_from:
+    - 'F02-OH-07 (stages_text): Does the leak get worse when the engine is hot?'
+    - 'F02-OH-03 (stages_text): Does the leak show only after driving, or even when parked?'
+    options:
+    - label: Yes, mostly after driving
+      effects:
+      - fault: F02-OH-07
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: It leaks even when parked and cold
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F02-OH-01:
+    status: approved
+    name: COOLANT SLIGHTLY LOW
+    stage2_choices:
+    - Coolant is a little low
+    confirmation_test: Cold coolant level check, visual leak check, and a pressure test if the level has fallen
+      before.
+    danger_phrases:
+    - needle in red
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-02:
+    status: approved
+    name: TEMPERATURE GAUGE RISING / APPROACHING RED
+    stage2_choices:
+    - Needle is going up
+    confirmation_test: Pressure test, fan circuit test, thermostat check, temperature sensor comparison and flow
+      check.
+    danger_phrases:
+    - needle in red
+    - steam
+    - heavy leak
+    - knocking
+    safety_trigger_options:
+    - question: cooling-q01
+      option: The needle is in the red zone
+  fault F02-OH-03:
+    status: approved
+    name: MINOR COOLANT LEAKAGE
+    stage2_choices:
+    - I see a leak
+    - Coolant is a little low
+    confirmation_test: Cooling-system pressure test and visual inspection (UV dye if needed).
+    danger_phrases:
+    - heavy leak
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-04:
+    status: approved
+    name: COOLING FAN / THERMOSTAT FAILURE
+    stage2_choices:
+    - Needle is going up
+    - Fan not working
+    confirmation_test: Fan circuit test, thermostat opening test and pressure test.
+    danger_phrases:
+    - needle in red
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-05:
+    status: approved
+    name: SEVERE OVERHEATING / HEAD GASKET RISK
+    stage2_choices:
+    - Car overheated badly
+    confirmation_test: Pressure test, combustion-gas test, compression and leak-down tests, and oil check.
+    danger_phrases:
+    - needle in red
+    - steam
+    - knocking
+    - white smoke
+    - milky oil
+    safety_trigger_options:
+    - question: cooling-q01
+      option: A lot of liquid is coming out
+    - question: cooling-q01
+      option: Steam
+    - question: cooling-q01
+      option: The needle is in the red zone
+    - question: cooling-q10
+      option: 'Yes'
+    - question: cooling-q11
+      option: 'Yes'
+    - question: cooling-q22
+      option: 'Yes'
+  fault F02-OH-06:
+    status: approved
+    name: COOLANT LEVEL KEEPS DROPPING WITHOUT VISIBLE LEAK
+    stage2_choices:
+    - Coolant is a little low
+    confirmation_test: Pressure test, cap test and combustion-gas test.
+    danger_phrases:
+    - needle in red
+    - white smoke
+    - knocking
+    safety_trigger_options:
+    - question: cooling-q10
+      option: 'Yes'
+  fault F02-OH-07:
+    status: approved
+    name: RADIATOR OR COOLANT HOSE LEAKAGE
+    stage2_choices:
+    - I see a leak
+    - Needle is going up
+    confirmation_test: Visual check and pressure test.
+    danger_phrases:
+    - heavy leak
+    - steam
+    - needle in red
+    safety_trigger_options:
+    - question: cooling-q01
+      option: A lot of liquid is coming out
+    - question: cooling-q01
+      option: Steam
+  fault F02-OH-08:
+    status: approved
+    name: RADIATOR BLOCKAGE / DAMAGE / POOR COOLING
+    stage2_choices:
+    - Needle is going up
+    confirmation_test: Temperature scan, flow test and pressure test.
+    danger_phrases:
+    - steam
+    - needle in red
+    safety_trigger_options: []
+  fault F02-OH-09:
+    status: approved
+    name: RADIATOR CAP / RESERVOIR CAP FAILURE
+    stage2_choices:
+    - Coolant is a little low
+    - Needle is going up
+    confirmation_test: Radiator / reservoir cap test.
+    danger_phrases:
+    - steam
+    - boil-over
+    safety_trigger_options:
+    - question: cooling-q01
+      option: Steam
+  fault F02-OH-10:
+    status: approved
+    name: WATER PUMP LEAKAGE OR FAILURE
+    stage2_choices:
+    - I see a leak
+    - Needle is going up
+    confirmation_test: Water pump leak and play check, belt check and flow test.
+    danger_phrases:
+    - belt broken
+    - heavy leak
+    - needle in red
+    safety_trigger_options: []
+  fault F02-OH-11:
+    status: approved
+    name: COOLING FAN NOT RUNNING
+    stage2_choices:
+    - Fan not working
+    - Needle is going up
+    confirmation_test: Fuse, relay, wiring, sensor and fan motor tests.
+    danger_phrases:
+    - needle in red
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-12:
+    status: approved
+    name: THERMOSTAT STUCK CLOSED / NOT OPENING CORRECTLY
+    stage2_choices:
+    - Needle is going up
+    confirmation_test: Thermostat opening test.
+    danger_phrases:
+    - needle in red
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-13:
+    status: approved
+    name: COOLANT TEMPERATURE SENSOR / ELECTRICAL FAULT
+    stage2_choices:
+    - Other
+    confirmation_test: Compare with a reference thermometer and read scan data.
+    danger_phrases:
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-14:
+    status: approved
+    name: AIR TRAPPED IN COOLING SYSTEM AFTER SERVICE
+    stage2_choices:
+    - Needle is going up
+    confirmation_test: Bleed the air out and retest.
+    danger_phrases:
+    - needle in red
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-15:
+    status: approved
+    name: CABIN HEATER BLOWS COLD AIR WHILE ENGINE OVERHEATS
+    stage2_choices:
+    - Needle is going up
+    confirmation_test: Coolant level check, bleeding and water pump check.
+    danger_phrases:
+    - needle in red
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-16:
+    status: approved
+    name: COOLANT MIXING WITH ENGINE OIL / INTERNAL LEAK SUSPECTED
+    stage2_choices:
+    - Coolant is a little low
+    - Other
+    confirmation_test: Combustion-gas test, pressure test and oil analysis.
+    danger_phrases:
+    - milky oil
+    - white smoke
+    safety_trigger_options:
+    - question: cooling-q10
+      option: 'Yes'
+  fault F02-OH-17:
+    status: approved
+    name: REPEATED OVERHEATING IN TRAFFIC / WITH AC
+    stage2_choices:
+    - Needle is going up
+    confirmation_test: Fan test and radiator cleaning.
+    danger_phrases:
+    - needle in red
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-18:
+    status: approved
+    name: ENGINE OVERHEATS SOON AFTER START / SHORT DRIVE
+    stage2_choices:
+    - Needle is going up
+    confirmation_test: Coolant level, thermostat and pressure tests.
+    danger_phrases:
+    - needle in red
+    - steam
+    safety_trigger_options: []
+  fault F02-OH-19:
+    status: approved
+    name: POSSIBLE HEAD GASKET FAILURE AFTER OVERHEATING (TEST-CONFIRMED)
+    stage2_choices:
+    - Car overheated badly
+    confirmation_test: Confirm the head gasket fault with tests before any work.
+    danger_phrases:
+    - white smoke
+    - milky oil
+    safety_trigger_options:
+    - question: cooling-q10
+      option: 'Yes'
+    - question: cooling-q11
+      option: 'Yes'
+  fault F02-OH-20:
+    status: approved
+    name: MULTIPLE COOLING FAULTS / UNCERTAIN OVERHEATING CAUSE
+    stage2_choices:
+    - Needle is going up
+    - Car overheated badly
+    confirmation_test: Staged tests, one fault at a time.
+    danger_phrases:
+    - needle in red
+    safety_trigger_options: []
+  safety_rule cooling-s-F02-OH-01:
+    id: cooling-s-F02-OH-01
+    status: approved
+    fault: F02-OH-01
+    risk_level: low
+    stop_driving_trigger: Stop if the needle goes to red, steam appears or coolant is leaking quickly.
+    roadside_action: Top up only through the coolant tank when the engine is cold, and not above MAX. Never open
+      the cap on a hot engine.
+    towing_recommendation: Not usually. Needed if the needle goes to red, steam appears or coolant is leaking quickly.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not add coolant to a hot engine.
+
+        • Do not fill above MAX.'
+      if_towing_needed: '• Towing is NOT usually needed for slightly low coolant.
+
+        • Towing is needed if the needle goes to red, steam appears, or coolant is leaking quickly.
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-02:
+    id: cooling-s-F02-OH-02
+    status: approved
+    fault: F02-OH-02
+    risk_level: medium
+    stop_driving_trigger: Stop if the needle is in the red or the warning stays on, there is steam or a heavy leak,
+      the coolant level falls fast, or there is knocking.
+    roadside_action: Stop in a safe place and switch off the engine. Do not open the radiator or coolant cap while
+      the engine is hot. Let it cool for 30 to 60 minutes. Keep hands away from the fan and belts.
+    towing_recommendation: If the needle is in the red or the warning stays on, steam or heavy leak, coolant falling
+      fast, knocking, or the engine cannot keep a safe temperature.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not ask the customer to repeat the overheating as a test.
+
+        • If the needle was in red, treat as possible engine damage until checked.'
+      if_towing_needed: '• Needle in red zone or warning still showing
+
+        • Steam or heavy leak
+
+        • Coolant level falls fast
+
+        • Knocking or serious noise
+
+        • Engine cannot keep a safe temperature
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-03:
+    id: cooling-s-F02-OH-03
+    status: approved
+    fault: F02-OH-03
+    risk_level: low
+    stop_driving_trigger: Stop if the leak is heavy or fast, the level falls rapidly, or the needle is in the red
+      or there is steam.
+    roadside_action: Do not touch spilled coolant and keep animals away from it (it is poisonous). Get the leak
+      checked soon.
+    towing_recommendation: If there is a heavy or fast leak, the level falls rapidly, the needle is in the red or
+      there is steam, or it overheated more than once after a repair.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Collect spilled coolant. It is poisonous to animals.'
+      if_towing_needed: '• Heavy or fast leak
+
+        • Level falls rapidly
+
+        • Needle in red or steam present
+
+        • Car has overheated more than once after a repair
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-04:
+    id: cooling-s-F02-OH-04
+    status: approved
+    fault: F02-OH-04
+    risk_level: medium
+    stop_driving_trigger: Stop if the needle is in the red or the warning stays on, or there is steam or a coolant
+      leak.
+    roadside_action: Stop in a safe place and switch off the engine. Do not open the radiator or coolant cap while
+      the engine is hot. Let it cool for 30 to 60 minutes. Keep hands away from the fan and belts.
+    towing_recommendation: If the needle is in the red or the warning stays on, it has overheated more than once,
+      there is steam or a leak, or the engine cannot keep a safe temperature.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Keep hands away from the fan during tests; it can start suddenly.'
+      if_towing_needed: '• Needle in red or warning still on
+
+        • Car has overheated more than once
+
+        • Steam or coolant leak
+
+        • Engine cannot keep a safe temperature
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-05:
+    id: cooling-s-F02-OH-05
+    status: approved
+    fault: F02-OH-05
+    risk_level: high
+    stop_driving_trigger: 'Do not drive: always tow after severe overheating.'
+    roadside_action: Switch off the engine and move away from the car. Stay back from steam. Do not open the radiator
+      cap and do not restart the engine. Call for a tow.
+    towing_recommendation: Always after severe overheating, and if the needle is in the red, there is steam, a heavy
+      leak, knocking, white smoke with milky oil, or head damage is suspected.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Treat steam as dangerous. Stay back.
+
+        • Do not run the engine to test if it knocks.'
+      if_towing_needed: '• ALWAYS tow after severe overheating
+
+        • Needle in red, steam or heavy leak
+
+        • Knocking or severe misfire
+
+        • White smoke with milky oil
+
+        • Head gasket or head damage suspected
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-06:
+    id: cooling-s-F02-OH-06
+    status: approved
+    fault: F02-OH-06
+    risk_level: medium
+    stop_driving_trigger: Stop if the level falls fast, there is white smoke with overheating, the needle is in
+      the red, or there is knocking.
+    roadside_action: Do not open the cap when the engine is hot. Book a pressure test.
+    towing_recommendation: If the level falls fast, white smoke with overheating, the needle is in the red, or knocking.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not open the cap when hot.'
+      if_towing_needed: '• Level falls fast
+
+        • White smoke with overheating
+
+        • Needle in red
+
+        • Knocking
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-07:
+    id: cooling-s-F02-OH-07
+    status: approved
+    fault: F02-OH-07
+    risk_level: medium
+    stop_driving_trigger: Stop if there is a heavy leak, the needle is in the red, steam, or the level falls quickly.
+    roadside_action: Stop and switch off the engine. Do not touch hot hoses or open the cap. Call a mechanic.
+    towing_recommendation: If there is a heavy leak, the needle is in the red, steam, or the level falls quickly.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not touch hot hoses.'
+      if_towing_needed: '• Heavy leak
+
+        • Needle in red
+
+        • Steam
+
+        • Level falls quickly
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-08:
+    id: cooling-s-F02-OH-08
+    status: approved
+    fault: F02-OH-08
+    risk_level: medium
+    stop_driving_trigger: Stop if it overheats repeatedly, there is steam, or the needle is in the red.
+    roadside_action: Stop in a safe place and switch off the engine. Do not open the radiator or coolant cap while
+      the engine is hot. Let it cool for 30 to 60 minutes. Keep hands away from the fan and belts.
+    towing_recommendation: If it overheats repeatedly, there is steam, or the needle is in the red.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not use harsh acid cleaners unless the maker says so.'
+      if_towing_needed: '• Overheating repeatedly
+
+        • Steam
+
+        • Needle in red
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-09:
+    id: cooling-s-F02-OH-09
+    status: approved
+    fault: F02-OH-09
+    risk_level: medium
+    stop_driving_trigger: Stop if coolant boils over with the needle in the red, there is steam, or heavy loss.
+    roadside_action: Open the cap only when the engine is cold. Call a mechanic.
+    towing_recommendation: If there is boil-over with the needle in the red, steam, or heavy loss.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Open the cap only when cold.'
+      if_towing_needed: '• Boil-over with red needle
+
+        • Steam
+
+        • Heavy loss
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-10:
+    id: cooling-s-F02-OH-10
+    status: approved
+    fault: F02-OH-10
+    risk_level: medium
+    stop_driving_trigger: Stop if the belt is broken, there is a heavy leak, or the needle is in the red.
+    roadside_action: Switch off the engine and keep away from the belts. Call a mechanic.
+    towing_recommendation: If the belt is broken, there is a heavy leak, or the needle is in the red.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not work near moving belts.'
+      if_towing_needed: '• Belt broken
+
+        • Heavy leak
+
+        • Needle in red
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-11:
+    id: cooling-s-F02-OH-11
+    status: approved
+    fault: F02-OH-11
+    risk_level: medium
+    stop_driving_trigger: Stop if the needle is in the red, it overheats repeatedly, or there is steam.
+    roadside_action: Stop and switch off the engine. Keep hands away from the fan, because it can start suddenly.
+      Call a mechanic.
+    towing_recommendation: If the needle is in the red, it overheats repeatedly, or there is steam.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Keep hands away from the fan.'
+      if_towing_needed: '• Needle in red
+
+        • Repeated overheating
+
+        • Steam
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-12:
+    id: cooling-s-F02-OH-12
+    status: approved
+    fault: F02-OH-12
+    risk_level: medium
+    stop_driving_trigger: Stop if the needle is in the red, there is steam, or it overheats repeatedly.
+    roadside_action: Stop in a safe place and switch off the engine. Do not open the radiator or coolant cap while
+      the engine is hot. Let it cool for 30 to 60 minutes. Keep hands away from the fan and belts.
+    towing_recommendation: If the needle is in the red, there is steam, or it overheats repeatedly.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not open a hot system.'
+      if_towing_needed: '• Needle in red
+
+        • Steam
+
+        • Repeated overheating
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-13:
+    id: cooling-s-F02-OH-13
+    status: approved
+    fault: F02-OH-13
+    risk_level: low
+    stop_driving_trigger: Stop if the engine is really overheating or there is steam.
+    roadside_action: Treat a high reading as real until a mechanic checks it. Do not unplug the sensor when the
+      engine is hot.
+    towing_recommendation: If the engine is really overheating or there is steam.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not unplug the sensor when hot.'
+      if_towing_needed: '• Real overheating
+
+        • Steam
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-14:
+    id: cooling-s-F02-OH-14
+    status: approved
+    fault: F02-OH-14
+    risk_level: low
+    stop_driving_trigger: Stop if the needle is in the red or there is steam.
+    roadside_action: Do not open the bleed screw or cap when the engine is hot. Ask the workshop that did the service
+      to bleed the system.
+    towing_recommendation: If the needle is in the red or there is steam.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not open the bleed screw when hot.'
+      if_towing_needed: '• Needle in red
+
+        • Steam
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-15:
+    id: cooling-s-F02-OH-15
+    status: approved
+    fault: F02-OH-15
+    risk_level: medium
+    stop_driving_trigger: Stop if the needle is in the red or there is steam.
+    roadside_action: Do not open the heater hoses or cap when the engine is hot. Call a mechanic.
+    towing_recommendation: If the needle is in the red or there is steam.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not open the heater hose when hot.'
+      if_towing_needed: '• Needle in red
+
+        • Steam
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-16:
+    id: cooling-s-F02-OH-16
+    status: approved
+    fault: F02-OH-16
+    risk_level: medium
+    stop_driving_trigger: Stop if there is milky oil, white smoke, overheating or falling coolant.
+    roadside_action: Do not drive. Call a mechanic for tests.
+    towing_recommendation: If there is milky oil, white smoke, overheating or falling coolant.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Dispose of contaminated oil properly.'
+      if_towing_needed: '• Milky oil
+
+        • White smoke
+
+        • Overheating
+
+        • Falling coolant
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-17:
+    id: cooling-s-F02-OH-17
+    status: approved
+    fault: F02-OH-17
+    risk_level: medium
+    stop_driving_trigger: Stop if the needle is in the red or there is steam.
+    roadside_action: Stop and switch off the engine. Keep hands away from the fan. Call a mechanic.
+    towing_recommendation: If the needle is in the red or there is steam.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Keep hands away from the fan.'
+      if_towing_needed: '• Red needle
+
+        • Steam
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-18:
+    id: cooling-s-F02-OH-18
+    status: approved
+    fault: F02-OH-18
+    risk_level: medium
+    stop_driving_trigger: Stop if the needle is in the red, there is steam, or it overheats repeatedly.
+    roadside_action: Stop and let the engine cool. Do not try to make it overheat again to test it. Call a mechanic.
+    towing_recommendation: If the needle is in the red, there is steam, or it overheats repeatedly.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not repeat the overheating as a test.'
+      if_towing_needed: '• Red needle
+
+        • Steam
+
+        • Repeated overheating
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-19:
+    id: cooling-s-F02-OH-19
+    status: approved
+    fault: F02-OH-19
+    risk_level: high
+    stop_driving_trigger: 'Do not drive: always tow.'
+    roadside_action: Do not drive the car. Call for a tow.
+    towing_recommendation: Always.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Use the maker''s torque values.'
+      if_towing_needed: '• Always tow
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'
+  safety_rule cooling-s-F02-OH-20:
+    id: cooling-s-F02-OH-20
+    status: approved
+    fault: F02-OH-20
+    risk_level: medium
+    stop_driving_trigger: Stop if it overheats repeatedly or the needle is in the red.
+    roadside_action: Stop in a safe place and switch off the engine. Do not open the radiator or coolant cap while
+      the engine is hot. Let it cool for 30 to 60 minutes. Keep hands away from the fan and belts.
+    towing_recommendation: If it overheats repeatedly or the needle is in the red.
+    source_text:
+      safety_precautions: '• Never open a hot, pressurised cooling system. Never remove the cap to ''check'' if
+        the engine is hot.
+
+        • Let the engine cool fully (usually 30 to 60 minutes or more) before any work on the system.
+
+        • Keep hands, hair and clothes away from moving fans and belts. Some fans start by themselves.
+
+        • Wear eye protection and gloves. Do not let coolant touch hot engine parts.
+
+        • Collect used coolant in a container and dispose of it properly. Coolant is poisonous to people and animals.
+
+        • Never work under the car when it is held only by a jack. Use axle stands or a ramp.
+
+        • Never leave the engine running unattended during tests. Follow the maker''s workshop manual.
+
+        • Do not road-test a car with unresolved severe overheating. A falling gauge does not prove the car is safe.
+
+        • Do not replace many parts at once.'
+      if_towing_needed: '• Repeated overheating
+
+        • Red needle
+
+        A roadside technician may INSPECT the car, but only a proper check decides if it is safe to drive.
+
+        TOWING FEE NOTE: No fixed fee is stated. Planning assumption (estimate): city flat-bed or hook tow, up to
+        20 km, daytime, normal road access, about Rs 1,500 to Rs 3,500 depending on city and car size. Confirm the
+        exact rate with the recovery provider.'

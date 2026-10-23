@@ -1,0 +1,1010 @@
+category: underbody
+loaded_at: '2026-10-23T19:47:53+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question underbody-main:
+    id: underbody-main
+    status: approved
+    stage: 2
+    text: What problem are you facing?
+    choice_source: file
+    options:
+    - label: Key is hard to turn
+      effects: []
+      safety_trigger: false
+    - label: Key is stuck
+      effects: []
+      safety_trigger: false
+    - label: Key not detected
+      effects: []
+      safety_trigger: false
+    - label: Ignition not working
+      effects: []
+      safety_trigger: false
+    - label: Something is loose under the car
+      effects:
+      - fault: F13-UB-01
+        effect: supports
+        strength: strong
+      - fault: F13-UB-02
+        effect: supports
+        strength: strong
+      - fault: F13-UB-05
+        effect: supports
+        strength: strong
+      - fault: F13-UB-06
+        effect: supports
+        strength: strong
+      - fault: F13-UB-07
+        effect: supports
+        strength: strong
+      - fault: F13-UB-08
+        effect: supports
+        strength: strong
+      - fault: F13-UB-09
+        effect: supports
+        strength: strong
+      - fault: F13-UB-10
+        effect: supports
+        strength: strong
+      - fault: F13-UB-11
+        effect: supports
+        strength: strong
+      - fault: F13-UB-13
+        effect: supports
+        strength: strong
+      - fault: F13-UB-14
+        effect: supports
+        strength: strong
+      - fault: F13-UB-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Bottom cover is hanging
+      effects:
+      - fault: F13-UB-02
+        effect: supports
+        strength: strong
+      - fault: F13-UB-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Something is touching the road
+      effects:
+      - fault: F13-UB-03
+        effect: supports
+        strength: strong
+      - fault: F13-UB-04
+        effect: supports
+        strength: strong
+      - fault: F13-UB-08
+        effect: supports
+        strength: strong
+      - fault: F13-UB-09
+        effect: supports
+        strength: strong
+      - fault: F13-UB-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Push-start button not working
+      effects: []
+      safety_trigger: false
+    - label: Car makes a clicking sound
+      effects: []
+      safety_trigger: false
+    - label: Starter motor not working
+      effects: []
+      safety_trigger: false
+    - label: Other problem
+      effects:
+      - fault: F13-UB-07
+        effect: supports
+        strength: strong
+      - fault: F13-UB-11
+        effect: supports
+        strength: strong
+      - fault: F13-UB-12
+        effect: supports
+        strength: strong
+      - fault: F13-UB-13
+        effect: supports
+        strength: strong
+      - fault: F13-UB-14
+        effect: supports
+        strength: strong
+      - fault: F13-UB-15
+        effect: supports
+        strength: strong
+      - fault: F13-UB-16
+        effect: supports
+        strength: strong
+      - fault: F13-UB-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q01:
+    id: underbody-q01
+    status: approved
+    stage: 3
+    text: Do you smell fuel, see fluid leaking (look without going under the car), or does the brake pedal feel
+      soft?
+    source_faults:
+    - F13-UB-01
+    - F13-UB-11
+    - F13-UB-14
+    - F13-UB-15
+    merged_from:
+    - 'F13-UB-15 (stages_text): What is leaking - oil, fuel or brake fluid?'
+    - 'F13-UB-14 (stages_text): Any fuel smell or fluid drops?'
+    - 'F13-UB-01 (stages_text): Can you see any fluid leaking without going under the car?'
+    options:
+    - label: Fuel smell
+      effects:
+      - fault: F13-UB-15
+        effect: supports
+        strength: strong
+      - fault: F13-UB-14
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Fluid drops or a puddle
+      effects:
+      - fault: F13-UB-15
+        effect: supports
+        strength: strong
+      - fault: F13-UB-11
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-14
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: Soft brake pedal
+      effects:
+      - fault: F13-UB-14
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-15
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F13-UB-15
+        effect: rules_out
+        strength: strong
+      - fault: F13-UB-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q02:
+    id: underbody-q02
+    status: approved
+    stage: 3
+    text: Is something touching the road? Any sparks or smoke?
+    source_faults:
+    - F13-UB-02
+    - F13-UB-03
+    - F13-UB-04
+    - F13-UB-08
+    merged_from:
+    - 'F13-UB-03 (stages_text): Is the part touching the road?'
+    - 'F13-UB-03 (stages_text): Any sparks or smoke?'
+    - 'F13-UB-02 (stages_text): Is it touching the road?'
+    options:
+    - label: Yes, with sparks or smoke
+      effects:
+      - fault: F13-UB-03
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Yes, it is scraping the road
+      effects:
+      - fault: F13-UB-03
+        effect: supports
+        strength: strong
+      - fault: F13-UB-02
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-04
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-08
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F13-UB-03
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q03:
+    id: underbody-q03
+    status: approved
+    stage: 3
+    text: What is hanging or loose under the car?
+    source_faults:
+    - F13-UB-01
+    - F13-UB-02
+    - F13-UB-04
+    - F13-UB-05
+    - F13-UB-06
+    - F13-UB-07
+    - F13-UB-08
+    - F13-UB-09
+    - F13-UB-10
+    - F13-UB-13
+    - F13-UB-14
+    merged_from:
+    - 'F13-UB-04 (stages_text): Is it hanging or fully off?'
+    - 'F13-UB-09 (stages_text): Is the lower bumper hanging?'
+    - 'F13-UB-06 (stages_text): Is it flapping near a wheel?'
+    - 'F13-UB-08 (stages_text): Is the exhaust touching the road?'
+    options:
+    - label: 'The engine bottom cover: sagging'
+      effects:
+      - fault: F13-UB-02
+        effect: supports
+        strength: strong
+      - fault: F13-UB-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'The engine bottom cover: fully off or hanging badly'
+      effects:
+      - fault: F13-UB-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The lower edge of the bumper
+      effects:
+      - fault: F13-UB-09
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: A plastic liner near a wheel, flapping or rubbing
+      effects:
+      - fault: F13-UB-10
+        effect: supports
+        strength: strong
+      - fault: F13-UB-01
+        effect: supports
+        strength: strong
+      - fault: F13-UB-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The exhaust pipe hangs low
+      effects:
+      - fault: F13-UB-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: A pipe (fuel or brake) is hanging
+      effects:
+      - fault: F13-UB-14
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Nothing visible
+      effects:
+      - fault: F13-UB-13
+        effect: supports
+        strength: weak
+      - fault: F13-UB-07
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q04:
+    id: underbody-q04
+    status: approved
+    stage: 3
+    text: Does it scrape when you turn the steering?
+    source_faults:
+    - F13-UB-01
+    - F13-UB-10
+    merged_from:
+    - 'F13-UB-01 (stages_text): Does it scrape when turning?'
+    - 'F13-UB-10 (symptoms): Rubbing noise'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-UB-01
+        effect: supports
+        strength: strong
+      - fault: F13-UB-10
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-UB-01
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q05:
+    id: underbody-q05
+    status: approved
+    stage: 3
+    text: What kind of sound do you hear?
+    source_faults:
+    - F13-UB-01
+    - F13-UB-02
+    - F13-UB-03
+    - F13-UB-05
+    - F13-UB-06
+    - F13-UB-07
+    - F13-UB-08
+    - F13-UB-12
+    - F13-UB-13
+    - F13-UB-17
+    merged_from:
+    - 'F13-UB-07 (stages_text): Is it a tinny sound at idle?'
+    - 'F13-UB-13 (stages_text): Does handling feel normal?'
+    - 'F13-UB-01 (stages_text): Do you hear scraping?'
+    options:
+    - label: A tinny metal rattle at idle or some engine speeds
+      effects:
+      - fault: F13-UB-07
+        effect: supports
+        strength: strong
+      - fault: F13-UB-13
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: A rattle or buzz at speed or on rough roads
+      effects:
+      - fault: F13-UB-13
+        effect: supports
+        strength: strong
+      - fault: F13-UB-05
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Flapping, especially in rain
+      effects:
+      - fault: F13-UB-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: A knocking under the car
+      effects:
+      - fault: F13-UB-08
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-12
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Scraping
+      effects:
+      - fault: F13-UB-03
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-17
+        effect: supports
+        strength: weak
+      - fault: F13-UB-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q06:
+    id: underbody-q06
+    status: approved
+    stage: 3
+    text: Did the car hit a speed breaker or pothole just before this?
+    source_faults:
+    - F13-UB-01
+    - F13-UB-02
+    - F13-UB-04
+    - F13-UB-11
+    - F13-UB-12
+    merged_from:
+    - 'F13-UB-11 (stages_text): Any leak, warning light or steering pull?'
+    - 'F13-UB-01 (stages_text): Did the car hit a speed breaker or pothole?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-UB-11
+        effect: supports
+        strength: strong
+      - fault: F13-UB-12
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-02
+        effect: supports
+        strength: weak
+      - fault: F13-UB-04
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-UB-11
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q07:
+    id: underbody-q07
+    status: approved
+    stage: 3
+    text: After the hit, is there a warning light, or does the car pull or steer oddly?
+    source_faults:
+    - F13-UB-01
+    - F13-UB-11
+    - F13-UB-15
+    merged_from:
+    - 'F13-UB-11 (stages_text): Any leak, warning light or steering pull?'
+    - 'F13-UB-01 (stages_text): Does the car pull or steer abnormally?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-UB-11
+        effect: supports
+        strength: strong
+      - fault: F13-UB-15
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F13-UB-11
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q08:
+    id: underbody-q08
+    status: approved
+    stage: 3
+    text: Was a service or underbody work done recently?
+    source_faults:
+    - F13-UB-01
+    - F13-UB-02
+    - F13-UB-05
+    merged_from:
+    - 'F13-UB-02 (stages_text): Was service done recently?'
+    - 'F13-UB-01 (stages_text): Was any underbody work done recently?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-UB-02
+        effect: supports
+        strength: moderate
+      - fault: F13-UB-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q09:
+    id: underbody-q09
+    status: approved
+    stage: 3
+    text: Can you smell exhaust inside the car?
+    source_faults:
+    - F13-UB-08
+    merged_from:
+    - 'F13-UB-08 (stages_text): Any smell inside?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-UB-08
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q10:
+    id: underbody-q10
+    status: approved
+    stage: 3
+    text: Is the metal engine guard bent, or touching the engine?
+    source_faults:
+    - F13-UB-12
+    merged_from:
+    - 'F13-UB-12 (stages_text): Is the guard touching the engine?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-UB-12
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-UB-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q11:
+    id: underbody-q11
+    status: approved
+    stage: 3
+    text: Was an aftermarket heavy engine guard fitted?
+    source_faults:
+    - F13-UB-12
+    - F13-UB-16
+    merged_from:
+    - 'F13-UB-16 (stages_text): When was the guard fitted?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-UB-16
+        effect: supports
+        strength: strong
+      - fault: F13-UB-12
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-UB-16
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question underbody-q12:
+    id: underbody-q12
+    status: approved
+    stage: 3
+    text: Does it scrape on speed breakers or ramps only when the car is fully loaded?
+    source_faults:
+    - F13-UB-17
+    merged_from:
+    - 'F13-UB-17 (stages_text): Does it scrape only when full?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-UB-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-UB-17
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F13-UB-01:
+    status: approved
+    name: Mudguard / Fender Liner Loose or Rubbing
+    stage2_choices:
+    - Something is loose under the car
+    confirmation_test: Visual check on a lift.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-02:
+    status: approved
+    name: Bottom Cover / Engine Undertray Loose
+    stage2_choices:
+    - Bottom cover is hanging
+    - Something is loose under the car
+    confirmation_test: Lift inspection.
+    danger_phrases:
+    - dragging
+    safety_trigger_options:
+    - question: underbody-q02
+      option: Yes, it is scraping the road
+  fault F13-UB-03:
+    status: approved
+    name: Part Striking Road While Driving
+    stage2_choices:
+    - Something is touching the road
+    confirmation_test: Inspection.
+    danger_phrases:
+    - sparks
+    - smoke
+    - dragging
+    safety_trigger_options:
+    - question: underbody-q02
+      option: Yes, it is scraping the road
+    - question: underbody-q02
+      option: Yes, with sparks or smoke
+  fault F13-UB-04:
+    status: approved
+    name: Complete Underguard / Undertray Detached
+    stage2_choices:
+    - Bottom cover is hanging
+    - Something is touching the road
+    confirmation_test: Inspection.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: underbody-q02
+      option: Yes, it is scraping the road
+  fault F13-UB-05:
+    status: approved
+    name: Broken Underbody Clips / Fasteners
+    stage2_choices:
+    - Something is loose under the car
+    confirmation_test: Inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-06:
+    status: approved
+    name: Loose Splash Shield
+    stage2_choices:
+    - Something is loose under the car
+    confirmation_test: Inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-07:
+    status: approved
+    name: Loose Exhaust Heat Shield
+    stage2_choices:
+    - Something is loose under the car
+    - Other problem
+    confirmation_test: Tap test of the heat shield.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-08:
+    status: approved
+    name: Loose Exhaust Pipe / Exhaust Hanger
+    stage2_choices:
+    - Something is loose under the car
+    - Something is touching the road
+    confirmation_test: Inspection of the exhaust hangers.
+    danger_phrases:
+    - exhaust smell inside
+    safety_trigger_options:
+    - question: underbody-q02
+      option: Yes, it is scraping the road
+    - question: underbody-q09
+      option: 'Yes'
+  fault F13-UB-09:
+    status: approved
+    name: Loose Bumper Lower Cover
+    stage2_choices:
+    - Something is loose under the car
+    - Something is touching the road
+    confirmation_test: Inspection of the lower bumper.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-10:
+    status: approved
+    name: Loose Wheel-Arch Liner
+    stage2_choices:
+    - Something is loose under the car
+    confirmation_test: Inspection of the wheel-arch liner.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-11:
+    status: approved
+    name: Underbody Damage After Speed Breaker / Pothole
+    stage2_choices:
+    - Other problem
+    - Something is loose under the car
+    confirmation_test: Lift inspection.
+    danger_phrases:
+    - leak
+    - steering pull
+    safety_trigger_options:
+    - question: underbody-q01
+      option: Fluid drops or a puddle
+    - question: underbody-q07
+      option: 'Yes'
+  fault F13-UB-12:
+    status: approved
+    name: Engine Guard / Skid Plate Bent or Damaged
+    stage2_choices:
+    - Other problem
+    confirmation_test: Inspection of the engine guard.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-13:
+    status: approved
+    name: Underbody Panel Rattling / Vibration
+    stage2_choices:
+    - Something is loose under the car
+    - Other problem
+    confirmation_test: Tap test on a lift.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-14:
+    status: approved
+    name: Loose Fuel / Brake Line Retaining Clips
+    stage2_choices:
+    - Something is loose under the car
+    - Other problem
+    confirmation_test: Lift inspection of the fuel / brake pipe clips.
+    danger_phrases:
+    - fuel smell
+    - brake fluid drops
+    safety_trigger_options:
+    - question: underbody-q01
+      option: Fluid drops or a puddle
+    - question: underbody-q01
+      option: Fuel smell
+    - question: underbody-q01
+      option: Soft brake pedal
+    - question: underbody-q03
+      option: A pipe (fuel or brake) is hanging
+  fault F13-UB-15:
+    status: approved
+    name: Major Underbody Damage with Fluid Leak / Safety Risk
+    stage2_choices:
+    - Other problem
+    confirmation_test: Inspection.
+    danger_phrases:
+    - fuel smell
+    - fluid puddle
+    - soft brake pedal
+    safety_trigger_options:
+    - question: underbody-q01
+      option: Fluid drops or a puddle
+    - question: underbody-q01
+      option: Fuel smell
+    - question: underbody-q01
+      option: Soft brake pedal
+    - question: underbody-q07
+      option: 'Yes'
+  fault F13-UB-16:
+    status: approved
+    name: Aftermarket Heavy Engine Guard Rattling / Blocking Cooling or Service  [NEW - India]
+    stage2_choices:
+    - Other problem
+    - Something is loose under the car
+    confirmation_test: Inspection of the aftermarket guard.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-UB-17:
+    status: approved
+    name: Scraping on Speed Breakers / Ramps (Low Clearance, Full Load)  [NEW - India]
+    stage2_choices:
+    - Something is touching the road
+    - Other problem
+    confirmation_test: Ride height check.
+    danger_phrases: []
+    safety_trigger_options: []
+  safety_rule underbody-s-F13-UB-01:
+    id: underbody-s-F13-UB-01
+    status: approved
+    fault: F13-UB-01
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Lift or proper stands only.
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-02:
+    id: underbody-s-F13-UB-02
+    status: approved
+    fault: F13-UB-02
+    risk_level: medium
+    stop_driving_trigger: Stop if the cover is dragging.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      If the cover is dragging, call a mechanic to secure it, or a tow.
+    towing_recommendation: Depends (yes if dragging and it cannot be secured).
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: Depends - YES if dragging and cannot be secured.
+  safety_rule underbody-s-F13-UB-03:
+    id: underbody-s-F13-UB-03
+    status: approved
+    fault: F13-UB-03
+    risk_level: medium
+    stop_driving_trigger: 'Stop: a part is touching the road.'
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Do not touch the hot exhaust. Call a mechanic to secure or remove the part, or a tow.
+    towing_recommendation: Depends (yes if it cannot be secured).
+    source_text:
+      safety_precautions: '• Hot exhaust - burns.
+
+        • No crawling under on road.'
+      if_towing_needed: Depends - YES if cannot be secured.
+  safety_rule underbody-s-F13-UB-04:
+    id: underbody-s-F13-UB-04
+    status: approved
+    fault: F13-UB-04
+    risk_level: medium
+    stop_driving_trigger: Stop if the cover is hanging or dragging.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Call a mechanic to remove or secure it.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: Depends.
+  safety_rule underbody-s-F13-UB-05:
+    id: underbody-s-F13-UB-05
+    status: approved
+    fault: F13-UB-05
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-06:
+    id: underbody-s-F13-UB-06
+    status: approved
+    fault: F13-UB-06
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-07:
+    id: underbody-s-F13-UB-07
+    status: approved
+    fault: F13-UB-07
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Exhaust very hot.
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-08:
+    id: underbody-s-F13-UB-08
+    status: approved
+    fault: F13-UB-08
+    risk_level: medium
+    stop_driving_trigger: Stop if the exhaust touches the road or you smell exhaust inside.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Do not touch the hot exhaust. If you smell exhaust inside, open the windows and stop.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: '• Hot exhaust.
+
+        • Exhaust fumes are poisonous.'
+      if_towing_needed: Depends.
+  safety_rule underbody-s-F13-UB-09:
+    id: underbody-s-F13-UB-09
+    status: approved
+    fault: F13-UB-09
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • -
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-10:
+    id: underbody-s-F13-UB-10
+    status: approved
+    fault: F13-UB-10
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-11:
+    id: underbody-s-F13-UB-11
+    status: approved
+    fault: F13-UB-11
+    risk_level: medium
+    stop_driving_trigger: Stop if there is a leak, a warning light or the steering pulls.
+    roadside_action: Check for leaks and warnings from a safe position. If there is a leak or steering problem,
+      call for a tow.
+    towing_recommendation: Depends (yes if there is a leak or steering issue).
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: Depends - YES if leak or steering issue.
+  safety_rule underbody-s-F13-UB-12:
+    id: underbody-s-F13-UB-12
+    status: approved
+    fault: F13-UB-12
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-13:
+    id: underbody-s-F13-UB-13
+    status: approved
+    fault: F13-UB-13
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-14:
+    id: underbody-s-F13-UB-14
+    status: approved
+    fault: F13-UB-14
+    risk_level: high
+    stop_driving_trigger: Do not drive if you smell fuel or see brake fluid.
+    roadside_action: If you smell fuel or see fluid drops, switch off, keep flames away and do not drive. Call for
+      a tow.
+    towing_recommendation: Yes, if there is a leak or fuel smell.
+    source_text:
+      safety_precautions: '• Fuel: no flames.
+
+        • Brake: pedal check.'
+      if_towing_needed: YES if leak or fuel smell.
+  safety_rule underbody-s-F13-UB-15:
+    id: underbody-s-F13-UB-15
+    status: approved
+    fault: F13-UB-15
+    risk_level: high
+    stop_driving_trigger: 'Do not drive: underbody damage with a leak.'
+    roadside_action: Switch off the engine. No smoking or flames. Do not drive. Call for a tow.
+    towing_recommendation: Yes.
+    source_text:
+      safety_precautions: • Fire risk.
+      if_towing_needed: YES.
+  safety_rule underbody-s-F13-UB-16:
+    id: underbody-s-F13-UB-16
+    status: approved
+    fault: F13-UB-16
+    risk_level: low
+    stop_driving_trigger: Stop if a part drags, a tyre rubs, or you smell fuel or see a leak.
+    roadside_action: Stop in a safe place. Do not go under the car at the roadside and do not trust a jack alone.
+      Drive slowly to a garage if nothing is dragging.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Lift only.
+      if_towing_needed: NO.
+  safety_rule underbody-s-F13-UB-17:
+    id: underbody-s-F13-UB-17
+    status: approved
+    fault: F13-UB-17
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Slow down at speed breakers and ramps, and avoid overloading.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • -
+      if_towing_needed: NO.

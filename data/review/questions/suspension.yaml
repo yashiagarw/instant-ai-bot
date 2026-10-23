@@ -1,0 +1,1373 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category suspension
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: suspension
+category_name: Suspension / shock absorber / noise
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:47:00+00:00'
+  run_id: claude-code-suspension
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: suspension-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Side mirror problem
+    effects: []
+    safety_trigger: false
+  - label: Car inspection
+    effects: []
+    safety_trigger: false
+  - label: Suspension noise
+    effects:
+    - fault: F14-SU-01
+      effect: supports
+      strength: strong
+    - fault: F17-SU-01
+      effect: supports
+      strength: strong
+    - fault: F14-SU-02
+      effect: supports
+      strength: strong
+    - fault: F17-SU-02
+      effect: supports
+      strength: strong
+    - fault: F14-SU-03
+      effect: supports
+      strength: strong
+    - fault: F17-SU-03
+      effect: supports
+      strength: strong
+    - fault: F14-SU-04
+      effect: supports
+      strength: strong
+    - fault: F17-SU-04
+      effect: supports
+      strength: strong
+    - fault: F14-SU-05
+      effect: supports
+      strength: strong
+    - fault: F17-SU-05
+      effect: supports
+      strength: strong
+    - fault: F14-SU-06
+      effect: supports
+      strength: strong
+    - fault: F17-SU-06
+      effect: supports
+      strength: strong
+    - fault: F14-SU-07
+      effect: supports
+      strength: strong
+    - fault: F17-SU-07
+      effect: supports
+      strength: strong
+    - fault: F14-SU-08
+      effect: supports
+      strength: strong
+    - fault: F17-SU-08
+      effect: supports
+      strength: strong
+    - fault: F14-SU-09
+      effect: supports
+      strength: strong
+    - fault: F17-SU-09
+      effect: supports
+      strength: strong
+    - fault: F14-SU-10
+      effect: supports
+      strength: strong
+    - fault: F17-SU-10
+      effect: supports
+      strength: strong
+    - fault: F14-SU-11
+      effect: supports
+      strength: strong
+    - fault: F17-SU-11
+      effect: supports
+      strength: strong
+    - fault: F14-SU-12
+      effect: supports
+      strength: strong
+    - fault: F17-SU-12
+      effect: supports
+      strength: strong
+    - fault: F14-SU-15
+      effect: supports
+      strength: strong
+    - fault: F17-SU-16
+      effect: supports
+      strength: strong
+    - fault: F14-SU-16
+      effect: supports
+      strength: strong
+    - fault: F17-SU-17
+      effect: supports
+      strength: strong
+    - fault: F17-SU-13
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Door problem
+    effects: []
+    safety_trigger: false
+  - label: Bonnet / boot problem
+    effects: []
+    safety_trigger: false
+  - label: Window problem
+    effects: []
+    safety_trigger: false
+  - label: Wiper problem
+    effects: []
+    safety_trigger: false
+  - label: Sunroof problem
+    effects: []
+    safety_trigger: false
+  - label: Other
+    effects:
+    - fault: F14-SU-03
+      effect: supports
+      strength: strong
+    - fault: F17-SU-03
+      effect: supports
+      strength: strong
+    - fault: F14-SU-04
+      effect: supports
+      strength: strong
+    - fault: F17-SU-04
+      effect: supports
+      strength: strong
+    - fault: F14-SU-05
+      effect: supports
+      strength: strong
+    - fault: F17-SU-05
+      effect: supports
+      strength: strong
+    - fault: F14-SU-06
+      effect: supports
+      strength: strong
+    - fault: F17-SU-06
+      effect: supports
+      strength: strong
+    - fault: F14-SU-09
+      effect: supports
+      strength: strong
+    - fault: F17-SU-09
+      effect: supports
+      strength: strong
+    - fault: F14-SU-12
+      effect: supports
+      strength: strong
+    - fault: F17-SU-12
+      effect: supports
+      strength: strong
+    - fault: F14-SU-13
+      effect: supports
+      strength: strong
+    - fault: F17-SU-15
+      effect: supports
+      strength: strong
+    - fault: F14-SU-14
+      effect: supports
+      strength: strong
+    - fault: F17-SU-14
+      effect: supports
+      strength: strong
+    - fault: F14-SU-15
+      effect: supports
+      strength: strong
+    - fault: F17-SU-16
+      effect: supports
+      strength: strong
+    - fault: F14-SU-16
+      effect: supports
+      strength: strong
+    - fault: F17-SU-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Gear problem
+    effects: []
+    safety_trigger: false
+  - label: Remote / key problem
+    effects: []
+    safety_trigger: false
+  - label: Car locked
+    effects: []
+    safety_trigger: false
+  - label: CNG problem
+    effects: []
+    safety_trigger: false
+  - label: Diesel delivery
+    effects: []
+    safety_trigger: false
+  - label: AdBlue warning
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q01
+  status: approved
+  stage: 3
+  text: Is the car leaning, is a wheel tilted, or did you hear a loud bang?
+  source_faults:
+  - F14-SU-04
+  - F14-SU-09
+  - F14-SU-12
+  - F14-SU-15
+  - F17-SU-04
+  - F17-SU-09
+  - F17-SU-12
+  - F17-SU-16
+  merged_from:
+  - 'F14-SU-04 (AI_DIAGNOSIS_RULES): Is the car leaning or wheel tilted?'
+  - 'F14-SU-15 (AI_DIAGNOSIS_RULES): Is the wheel tilted or steering crooked?'
+  - 'F17-SU-04 (stages_text): Is the car leaning or wheel tilted?'
+  options:
+  - label: The car leans or a wheel is tilted
+    effects:
+    - fault: F14-SU-04
+      effect: supports
+      strength: strong
+    - fault: F17-SU-04
+      effect: supports
+      strength: strong
+    - fault: F14-SU-15
+      effect: supports
+      strength: strong
+    - fault: F17-SU-16
+      effect: supports
+      strength: strong
+    - fault: F14-SU-12
+      effect: supports
+      strength: weak
+    - fault: F17-SU-12
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: A loud bang, and now the steering is crooked
+    effects:
+    - fault: F14-SU-15
+      effect: supports
+      strength: strong
+    - fault: F17-SU-16
+      effect: supports
+      strength: strong
+    - fault: F14-SU-04
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-04
+      effect: supports
+      strength: moderate
+    - fault: F14-SU-09
+      effect: supports
+      strength: weak
+    - fault: F17-SU-09
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F14-SU-04
+      effect: rules_out
+      strength: strong
+    - fault: F17-SU-04
+      effect: rules_out
+      strength: strong
+    - fault: F14-SU-15
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q02
+  status: approved
+  stage: 3
+  text: Did the car hit a big pothole or a kerb just before this started?
+  source_faults:
+  - F14-SU-01
+  - F14-SU-04
+  - F14-SU-09
+  - F14-SU-13
+  - F14-SU-15
+  - F17-SU-04
+  - F17-SU-09
+  - F17-SU-15
+  - F17-SU-16
+  merged_from:
+  - 'F14-SU-01 (stages_text): Did the car hit a big pothole?'
+  - 'F14-SU-09 (AI_DIAGNOSIS_RULES): Did the car hit a kerb?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-SU-15
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-16
+      effect: supports
+      strength: moderate
+    - fault: F14-SU-09
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-09
+      effect: supports
+      strength: moderate
+    - fault: F14-SU-04
+      effect: supports
+      strength: weak
+    - fault: F17-SU-04
+      effect: supports
+      strength: weak
+    - fault: F14-SU-13
+      effect: supports
+      strength: weak
+    - fault: F17-SU-15
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-SU-15
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q03
+  status: approved
+  stage: 3
+  text: When do you hear the noise?
+  source_faults:
+  - F14-SU-01
+  - F14-SU-02
+  - F14-SU-03
+  - F14-SU-07
+  - F14-SU-08
+  - F14-SU-09
+  - F14-SU-10
+  - F14-SU-11
+  - F17-SU-01
+  - F17-SU-02
+  - F17-SU-03
+  - F17-SU-07
+  - F17-SU-08
+  - F17-SU-09
+  - F17-SU-10
+  - F17-SU-11
+  merged_from:
+  - 'F14-SU-01 (AI_DIAGNOSIS_RULES): Is the noise from the front or rear?'
+  - 'F14-SU-02 (AI_DIAGNOSIS_RULES): Does the noise change with speed?'
+  - 'F14-SU-07 (AI_DIAGNOSIS_RULES): Is the knock at low speed?'
+  - 'F14-SU-11 (AI_DIAGNOSIS_RULES): Does it creak when turning steering?'
+  - 'F14-SU-08 (AI_DIAGNOSIS_RULES): Is there a clunk on braking?'
+  options:
+  - label: A knock over speed breakers or rough roads at low speed
+    effects:
+    - fault: F14-SU-01
+      effect: supports
+      strength: strong
+    - fault: F17-SU-01
+      effect: supports
+      strength: strong
+    - fault: F14-SU-07
+      effect: supports
+      strength: strong
+    - fault: F17-SU-07
+      effect: supports
+      strength: strong
+    - fault: F14-SU-03
+      effect: supports
+      strength: weak
+    - fault: F17-SU-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A hum or grinding that gets louder with speed
+    effects:
+    - fault: F14-SU-02
+      effect: supports
+      strength: strong
+    - fault: F17-SU-02
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A creak when turning the steering, or while parking
+    effects:
+    - fault: F14-SU-11
+      effect: supports
+      strength: strong
+    - fault: F17-SU-11
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A clunk when braking
+    effects:
+    - fault: F14-SU-08
+      effect: supports
+      strength: strong
+    - fault: F17-SU-08
+      effect: supports
+      strength: strong
+    - fault: F14-SU-09
+      effect: supports
+      strength: weak
+    - fault: F17-SU-09
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A knock when turning
+    effects:
+    - fault: F14-SU-10
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-10
+      effect: supports
+      strength: moderate
+    - fault: F14-SU-02
+      effect: supports
+      strength: weak
+    - fault: F17-SU-02
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No noise
+    effects:
+    - fault: F14-SU-01
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-01
+      effect: rules_out
+      strength: moderate
+    - fault: F14-SU-02
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-02
+      effect: rules_out
+      strength: moderate
+    - fault: F14-SU-07
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-07
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q04
+  status: approved
+  stage: 3
+  text: Is the noise from the front or the rear?
+  source_faults:
+  - F14-SU-01
+  - F14-SU-11
+  - F17-SU-11
+  - F17-SU-13
+  merged_from:
+  - 'F14-SU-01 (AI_DIAGNOSIS_RULES): Is the noise from the front or rear?'
+  - 'F17-SU-13 (stages_text): Is the noise from the rear?'
+  options:
+  - label: Front
+    effects:
+    - fault: F17-SU-13
+      effect: rules_out
+      strength: moderate
+    - fault: F14-SU-11
+      effect: supports
+      strength: weak
+    - fault: F17-SU-11
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Rear
+    effects:
+    - fault: F17-SU-13
+      effect: supports
+      strength: strong
+    - fault: F14-SU-11
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q05
+  status: approved
+  stage: 3
+  text: Does the steering shake? At what speed?
+  source_faults:
+  - F14-SU-01
+  - F14-SU-07
+  - F14-SU-14
+  - F17-SU-01
+  - F17-SU-07
+  - F17-SU-14
+  merged_from:
+  - 'F14-SU-14 (AI_DIAGNOSIS_RULES): At what speed does it shake?'
+  - 'F14-SU-01 (stages_text): Does the steering shake?'
+  options:
+  - label: At higher speed
+    effects:
+    - fault: F14-SU-14
+      effect: supports
+      strength: strong
+    - fault: F17-SU-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Only when braking
+    effects:
+    - fault: F14-SU-14
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-SU-14
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-14
+      effect: rules_out
+      strength: moderate
+    - fault: F14-SU-01
+      effect: supports
+      strength: weak
+    - fault: F17-SU-01
+      effect: supports
+      strength: weak
+    - fault: F14-SU-07
+      effect: supports
+      strength: weak
+    - fault: F17-SU-07
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q06
+  status: approved
+  stage: 3
+  text: Does the steering feel loose or wander, so you keep correcting it?
+  source_faults:
+  - F14-SU-08
+  - F14-SU-10
+  - F17-SU-08
+  - F17-SU-10
+  merged_from:
+  - 'F14-SU-10 (AI_DIAGNOSIS_RULES): Does the steering wander?'
+  options:
+  - label: Yes, it feels very loose
+    effects:
+    - fault: F14-SU-10
+      effect: supports
+      strength: strong
+    - fault: F17-SU-10
+      effect: supports
+      strength: strong
+    - fault: F14-SU-08
+      effect: supports
+      strength: weak
+    - fault: F17-SU-08
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: A little
+    effects:
+    - fault: F14-SU-10
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-10
+      effect: supports
+      strength: moderate
+    - fault: F14-SU-08
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-08
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-SU-10
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q07
+  status: approved
+  stage: 3
+  text: Does the car pull to one side?
+  source_faults:
+  - F14-SU-01
+  - F14-SU-08
+  - F14-SU-09
+  - F14-SU-12
+  - F14-SU-13
+  - F17-SU-08
+  - F17-SU-09
+  - F17-SU-12
+  - F17-SU-15
+  merged_from:
+  - 'F14-SU-13 (AI_DIAGNOSIS_RULES): Is the car pulling to one side?'
+  - 'F14-SU-01 (stages_text): Is the car pulling to one side?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-SU-13
+      effect: supports
+      strength: strong
+    - fault: F17-SU-15
+      effect: supports
+      strength: strong
+    - fault: F14-SU-09
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-09
+      effect: supports
+      strength: moderate
+    - fault: F14-SU-08
+      effect: supports
+      strength: weak
+    - fault: F17-SU-08
+      effect: supports
+      strength: weak
+    - fault: F14-SU-12
+      effect: supports
+      strength: weak
+    - fault: F17-SU-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-SU-13
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q08
+  status: approved
+  stage: 3
+  text: After a bump, does the car bounce more than once? Is one side worse?
+  source_faults:
+  - F14-SU-01
+  - F14-SU-03
+  - F14-SU-05
+  - F14-SU-06
+  - F17-SU-03
+  - F17-SU-05
+  - F17-SU-06
+  merged_from:
+  - 'F14-SU-06 (AI_DIAGNOSIS_RULES): Does it bounce more than once?'
+  - 'F14-SU-01 (stages_text): Does the car bounce too much?'
+  options:
+  - label: Yes, the whole car bounces
+    effects:
+    - fault: F14-SU-06
+      effect: supports
+      strength: strong
+    - fault: F17-SU-06
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Yes, one side bounces more
+    effects:
+    - fault: F14-SU-03
+      effect: supports
+      strength: strong
+    - fault: F17-SU-03
+      effect: supports
+      strength: strong
+    - fault: F14-SU-05
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-05
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-SU-06
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-06
+      effect: rules_out
+      strength: moderate
+    - fault: F14-SU-03
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-03
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q09
+  status: approved
+  stage: 3
+  text: Can you see oil on a shock absorber (the tube near the wheel)?
+  source_faults:
+  - F14-SU-03
+  - F14-SU-05
+  - F17-SU-03
+  - F17-SU-05
+  - F17-SU-13
+  merged_from:
+  - 'F14-SU-05 (AI_DIAGNOSIS_RULES): Is fluid leaking from a shock absorber?'
+  - 'F14-SU-03 (AI_DIAGNOSIS_RULES): Is fluid leaking from the shock?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-SU-05
+      effect: supports
+      strength: strong
+    - fault: F17-SU-05
+      effect: supports
+      strength: strong
+    - fault: F14-SU-03
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-03
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-13
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-SU-05
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q10
+  status: approved
+  stage: 3
+  text: Is one corner of the car lower than the others?
+  source_faults:
+  - F14-SU-01
+  - F14-SU-04
+  - F14-SU-12
+  - F17-SU-04
+  - F17-SU-12
+  merged_from:
+  - 'F14-SU-12 (AI_DIAGNOSIS_RULES): Is one corner lower?'
+  - 'F14-SU-01 (stages_text): Is one side lower?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-SU-12
+      effect: supports
+      strength: strong
+    - fault: F17-SU-12
+      effect: supports
+      strength: strong
+    - fault: F14-SU-04
+      effect: supports
+      strength: weak
+    - fault: F17-SU-04
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-SU-12
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-12
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q11
+  status: approved
+  stage: 3
+  text: Does it scrape on speed breakers only when the car is fully loaded?
+  source_faults:
+  - F14-SU-16
+  - F17-SU-13
+  - F17-SU-17
+  merged_from:
+  - 'F14-SU-16 (AI_DIAGNOSIS_RULES): Does it scrape only with full load?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-SU-16
+      effect: supports
+      strength: strong
+    - fault: F17-SU-17
+      effect: supports
+      strength: strong
+    - fault: F17-SU-13
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-SU-16
+      effect: rules_out
+      strength: moderate
+    - fault: F17-SU-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: suspension-q12
+  status: approved
+  stage: 3
+  text: Are the tyre pressures equal, and was any tyre work done recently?
+  source_faults:
+  - F14-SU-13
+  - F14-SU-14
+  - F17-SU-14
+  - F17-SU-15
+  merged_from:
+  - 'F14-SU-13 (symptoms): Tyre wear'
+  - 'F14-SU-14 (symptoms): After tyre work'
+  options:
+  - label: Tyre work was done recently
+    effects:
+    - fault: F14-SU-14
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: The pressures are different
+    effects:
+    - fault: F14-SU-13
+      effect: supports
+      strength: moderate
+    - fault: F17-SU-15
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F14-SU-01:
+    status: approved
+    name: Minor Noise Over Speed Breakers
+    stage2_choices: &id001
+    - Suspension noise
+    confirmation_test: Lift inspection and play test.
+    danger_phrases: &id002 []
+    safety_trigger_options: []
+  F17-SU-01:
+    status: approved
+    name: Minor Noise While Driving (Over Bumps / Speed Breakers)
+    stage2_choices: *id001
+    confirmation_test: Lift inspection and play test.
+    danger_phrases: *id002
+    safety_trigger_options: []
+  F14-SU-02:
+    status: approved
+    name: Disturbing Noise While Driving
+    stage2_choices: &id003
+    - Suspension noise
+    confirmation_test: Road test and lift test.
+    danger_phrases: &id004
+    - severe grinding
+    safety_trigger_options: []
+  F17-SU-02:
+    status: approved
+    name: Disturbing Noise While Driving
+    stage2_choices: *id003
+    confirmation_test: Road test and lift test.
+    danger_phrases: *id004
+    safety_trigger_options: []
+  F14-SU-03:
+    status: approved
+    name: Shock Absorber Fault - One Side
+    stage2_choices: &id005
+    - Suspension noise
+    - Other
+    confirmation_test: Bounce test and leak check.
+    danger_phrases: &id006 []
+    safety_trigger_options: []
+  F17-SU-03:
+    status: approved
+    name: Shock Absorber Fault - One Side
+    stage2_choices: *id005
+    confirmation_test: Bounce test and leak check.
+    danger_phrases: *id006
+    safety_trigger_options: []
+  F14-SU-04:
+    status: approved
+    name: Suspension Component Broken
+    stage2_choices: &id007
+    - Suspension noise
+    - Other
+    confirmation_test: Inspection.
+    danger_phrases: &id008
+    - car leaning
+    - wheel tilted
+    - loud bang
+    safety_trigger_options:
+    - question: suspension-q01
+      option: A loud bang, and now the steering is crooked
+    - question: suspension-q01
+      option: The car leans or a wheel is tilted
+  F17-SU-04:
+    status: approved
+    name: Suspension Component Broken
+    stage2_choices: *id007
+    confirmation_test: Inspection.
+    danger_phrases: *id008
+    safety_trigger_options:
+    - question: suspension-q01
+      option: A loud bang, and now the steering is crooked
+    - question: suspension-q01
+      option: The car leans or a wheel is tilted
+  F14-SU-05:
+    status: approved
+    name: Shock Absorber Oil Leakage
+    stage2_choices: &id009
+    - Suspension noise
+    - Other
+    confirmation_test: Visual check and bounce test.
+    danger_phrases: &id010 []
+    safety_trigger_options: []
+  F17-SU-05:
+    status: approved
+    name: Shock Absorber Oil Leakage
+    stage2_choices: *id009
+    confirmation_test: Visual check and bounce test.
+    danger_phrases: *id010
+    safety_trigger_options: []
+  F14-SU-06:
+    status: approved
+    name: Excessive Bouncing After Bumps
+    stage2_choices: &id011
+    - Other
+    - Suspension noise
+    confirmation_test: Bounce test.
+    danger_phrases: &id012 []
+    safety_trigger_options: []
+  F17-SU-06:
+    status: approved
+    name: Excessive Bouncing After Speed Breakers
+    stage2_choices: *id011
+    confirmation_test: Bounce test.
+    danger_phrases: *id012
+    safety_trigger_options: []
+  F14-SU-07:
+    status: approved
+    name: Stabilizer Link / Anti-Roll Bar Link Noise
+    stage2_choices: &id013
+    - Suspension noise
+    confirmation_test: Shake test of the link.
+    danger_phrases: &id014 []
+    safety_trigger_options: []
+  F17-SU-07:
+    status: approved
+    name: Stabilizer Link / Anti-Roll Bar Link Noise
+    stage2_choices: *id013
+    confirmation_test: Shake test of the link.
+    danger_phrases: *id014
+    safety_trigger_options: []
+  F14-SU-08:
+    status: approved
+    name: Suspension Bush Worn / Cracked
+    stage2_choices: &id015
+    - Suspension noise
+    confirmation_test: Play test of the bushes.
+    danger_phrases: &id016 []
+    safety_trigger_options:
+    - question: suspension-q06
+      option: Yes, it feels very loose
+  F17-SU-08:
+    status: approved
+    name: Suspension Bush Worn / Cracked
+    stage2_choices: *id015
+    confirmation_test: Play test of the bushes.
+    danger_phrases: *id016
+    safety_trigger_options:
+    - question: suspension-q06
+      option: Yes, it feels very loose
+  F14-SU-09:
+    status: approved
+    name: Control Arm / Lower Arm Fault
+    stage2_choices: &id017
+    - Suspension noise
+    - Other
+    confirmation_test: Inspection and wheel alignment check.
+    danger_phrases: &id018
+    - badly bent
+    safety_trigger_options:
+    - question: suspension-q01
+      option: A loud bang, and now the steering is crooked
+  F17-SU-09:
+    status: approved
+    name: Control Arm / Lower Arm Fault
+    stage2_choices: *id017
+    confirmation_test: Inspection and wheel alignment check.
+    danger_phrases: *id018
+    safety_trigger_options:
+    - question: suspension-q01
+      option: A loud bang, and now the steering is crooked
+  F14-SU-10:
+    status: approved
+    name: Ball Joint Loose / Worn
+    stage2_choices: &id019
+    - Suspension noise
+    confirmation_test: Ball joint play test.
+    danger_phrases: &id020
+    - very loose
+    safety_trigger_options:
+    - question: suspension-q06
+      option: Yes, it feels very loose
+  F17-SU-10:
+    status: approved
+    name: Ball Joint Loose / Worn
+    stage2_choices: *id019
+    confirmation_test: Ball joint play test.
+    danger_phrases: *id020
+    safety_trigger_options:
+    - question: suspension-q06
+      option: Yes, it feels very loose
+  F14-SU-11:
+    status: approved
+    name: Strut Mount / Bearing Noise
+    stage2_choices: &id021
+    - Suspension noise
+    confirmation_test: Hand feel and inspection of the strut mount.
+    danger_phrases: &id022 []
+    safety_trigger_options: []
+  F17-SU-11:
+    status: approved
+    name: Strut Mount / Bearing Noise
+    stage2_choices: *id021
+    confirmation_test: Hand feel and inspection of the strut mount.
+    danger_phrases: *id022
+    safety_trigger_options: []
+  F14-SU-12:
+    status: approved
+    name: Coil Spring Broken / Sagging
+    stage2_choices: &id023
+    - Suspension noise
+    - Other
+    confirmation_test: Ride height and visual check.
+    danger_phrases: &id024
+    - tyre rubbing
+    safety_trigger_options:
+    - question: suspension-q01
+      option: The car leans or a wheel is tilted
+  F17-SU-12:
+    status: approved
+    name: Coil Spring Broken / Sagging
+    stage2_choices: *id023
+    confirmation_test: Ride height and visual check.
+    danger_phrases: *id024
+    safety_trigger_options:
+    - question: suspension-q01
+      option: The car leans or a wheel is tilted
+  F14-SU-13:
+    status: approved
+    name: Car Pulling to One Side / Uneven Ride Height
+    stage2_choices: &id025
+    - Other
+    confirmation_test: Tyre pressure and wheel alignment check.
+    danger_phrases: &id026 []
+    safety_trigger_options: []
+  F17-SU-15:
+    status: approved
+    name: Uneven Ride Height / Vehicle Pulling
+    stage2_choices: *id025
+    confirmation_test: Tyre pressure and wheel alignment check.
+    danger_phrases: *id026
+    safety_trigger_options: []
+  F14-SU-14:
+    status: approved
+    name: Steering / Wheel Vibration - Suspension-Related Suspected
+    stage2_choices: &id027
+    - Other
+    confirmation_test: Wheel balance and inspection.
+    danger_phrases: &id028 []
+    safety_trigger_options: []
+  F17-SU-14:
+    status: approved
+    name: Steering Wheel Vibration - Suspension Suspected
+    stage2_choices: *id027
+    confirmation_test: Wheel balance and inspection.
+    danger_phrases: *id028
+    safety_trigger_options: []
+  F14-SU-15:
+    status: approved
+    name: Severe Suspension Damage After Pothole / Road Impact
+    stage2_choices: &id029
+    - Other
+    - Suspension noise
+    confirmation_test: Inspection after the impact.
+    danger_phrases: &id030
+    - wheel tilted
+    - steering crooked
+    safety_trigger_options:
+    - question: suspension-q01
+      option: A loud bang, and now the steering is crooked
+    - question: suspension-q01
+      option: The car leans or a wheel is tilted
+  F17-SU-16:
+    status: approved
+    name: Severe Suspension Damage After Pothole / Road Impact
+    stage2_choices: *id029
+    confirmation_test: Inspection after the impact.
+    danger_phrases: *id030
+    safety_trigger_options:
+    - question: suspension-q01
+      option: A loud bang, and now the steering is crooked
+    - question: suspension-q01
+      option: The car leans or a wheel is tilted
+  F14-SU-16:
+    status: approved
+    name: Underbody Scraping / Low Car With Full Load (Speed Breakers)  [NEW - India]
+    stage2_choices: &id031
+    - Other
+    - Suspension noise
+    confirmation_test: Ride height check.
+    danger_phrases: &id032 []
+    safety_trigger_options: []
+  F17-SU-17:
+    status: approved
+    name: Underbody Scraping / Low Car With Full Load (Speed Breakers)  [NEW - India]
+    stage2_choices: *id031
+    confirmation_test: Ride height check.
+    danger_phrases: *id032
+    safety_trigger_options: []
+  F17-SU-13:
+    status: approved
+    name: Rear Suspension Noise / Shock Fault
+    stage2_choices:
+    - Suspension noise
+    confirmation_test: Bounce test and lift inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: suspension-s-F17-SU-01
+  status: approved
+  fault: F17-SU-01
+  risk_level: low
+  stop_driving_trigger: Stop if the car leans, a wheel tilts or the steering feels wrong.
+  roadside_action: Cross speed breakers slowly and get the car inspected.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Lift or stands - never only a jack.
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-02
+  status: approved
+  fault: F17-SU-02
+  risk_level: medium
+  stop_driving_trigger: Stop if the grinding is severe.
+  roadside_action: Drive slowly to a garage. If the grinding is loud, stop and call for a tow.
+  towing_recommendation: If grinding is severe.
+  source_text:
+    safety_precautions: • Lift safely.
+    if_towing_needed: If grinding severe.
+- id: suspension-s-F17-SU-03
+  status: approved
+  fault: F17-SU-03
+  risk_level: low
+  stop_driving_trigger: Stop if the car leans or feels unstable.
+  roadside_action: Cross speed breakers slowly and get the car inspected.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Spring compressor only by trained mechanic.
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-04
+  status: approved
+  fault: F17-SU-04
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: broken suspension part.'
+  roadside_action: Stop in a safe place, switch on the hazard lights, and call for a tow. Do not drive.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Do not drive.
+    if_towing_needed: YES.
+- id: suspension-s-F17-SU-05
+  status: approved
+  fault: F17-SU-05
+  risk_level: low
+  stop_driving_trigger: Stop if the car feels unstable.
+  roadside_action: Cross speed breakers slowly and get the car inspected. Make sure the oil is not brake fluid.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Spring compressor trained only.
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-06
+  status: approved
+  fault: F17-SU-06
+  risk_level: low
+  stop_driving_trigger: Stop if the car feels unstable.
+  roadside_action: Cross speed breakers slowly and get the car inspected.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-07
+  status: approved
+  fault: F17-SU-07
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Cross speed breakers slowly and get the car inspected.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-08
+  status: approved
+  fault: F17-SU-08
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Cross speed breakers slowly and get the car inspected.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-09
+  status: approved
+  fault: F17-SU-09
+  risk_level: medium
+  stop_driving_trigger: Stop if the arm is badly bent or the steering is off-centre.
+  roadside_action: Drive slowly. If the steering is crooked or the car pulls hard, stop and call for a tow.
+  towing_recommendation: If badly bent.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: If badly bent.
+- id: suspension-s-F17-SU-10
+  status: approved
+  fault: F17-SU-10
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the ball joint is very loose.
+  roadside_action: If the steering feels very loose, do not drive. Call for a tow.
+  towing_recommendation: Yes, if very loose.
+  source_text:
+    safety_precautions: • Very loose = tow.
+    if_towing_needed: YES if very loose.
+- id: suspension-s-F17-SU-11
+  status: approved
+  fault: F17-SU-11
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Cross speed breakers slowly and get the car inspected.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Spring compressor trained only.
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-12
+  status: approved
+  fault: F17-SU-12
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the broken spring can touch the tyre.
+  roadside_action: If a spring is broken near the tyre, do not drive. Call for a tow.
+  towing_recommendation: If the tyre is at risk.
+  source_text:
+    safety_precautions: • Spring compressor trained only.
+    if_towing_needed: If tyre at risk.
+- id: suspension-s-F17-SU-13
+  status: approved
+  fault: F17-SU-13
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Secure any loose items in the boot. Cross speed breakers slowly and get the car inspected.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Lift or stands only.
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-14
+  status: approved
+  fault: F17-SU-14
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Drive at a lower speed and get the wheel balance checked.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-15
+  status: approved
+  fault: F17-SU-15
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Check the tyre pressures, then get the wheel alignment checked.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: suspension-s-F17-SU-16
+  status: approved
+  fault: F17-SU-16
+  risk_level: high
+  stop_driving_trigger: Do not drive with a tilted wheel or crooked steering.
+  roadside_action: If a wheel is tilted or the steering is crooked, do not drive. Fit the spare only if the suspension
+    looks OK; otherwise call for a tow.
+  towing_recommendation: Yes, if the wheel is tilted or the steering is wrong.
+  source_text:
+    safety_precautions: • Do not drive with tilted wheel.
+    if_towing_needed: YES if tilt / steering wrong.
+- id: suspension-s-F17-SU-17
+  status: approved
+  fault: F17-SU-17
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Cross speed breakers slowly and at an angle. Avoid overloading.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.

@@ -1,0 +1,1998 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category pickup_throttle
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: pickup_throttle
+category_name: Pickup / throttle / acceleration
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:49:50+00:00'
+  run_id: claude-code-pickup_throttle
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: pickup_throttle-main
+  status: approved
+  stage: 2
+  text: Gaadi mein kya dikkat aa rahi hai?
+  choice_source: file
+  options:
+  - label: Gaadi start nahi ho rahi
+    effects: []
+    safety_trigger: false
+  - label: Self ho rahi hai, par engine start nahi hota
+    effects: []
+    safety_trigger: false
+  - label: Gaadi chalti chalti band ho gayi
+    effects:
+    - fault: F09-AP-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Pickup kam hai
+    effects:
+    - fault: F09-AP-01
+      effect: supports
+      strength: strong
+    - fault: F09-AP-02
+      effect: supports
+      strength: strong
+    - fault: F09-AP-03
+      effect: supports
+      strength: strong
+    - fault: F09-AP-05
+      effect: supports
+      strength: strong
+    - fault: F09-AP-06
+      effect: supports
+      strength: strong
+    - fault: F09-AP-10
+      effect: supports
+      strength: strong
+    - fault: F09-AP-11
+      effect: supports
+      strength: strong
+    - fault: F09-AP-12
+      effect: supports
+      strength: strong
+    - fault: F09-AP-13
+      effect: supports
+      strength: strong
+    - fault: F09-AP-16
+      effect: supports
+      strength: strong
+    - fault: F09-AP-17
+      effect: supports
+      strength: strong
+    - fault: F09-AP-18
+      effect: supports
+      strength: strong
+    - fault: F09-AP-19
+      effect: supports
+      strength: strong
+    - fault: F09-AP-20
+      effect: supports
+      strength: strong
+    - fault: F09-AP-22
+      effect: supports
+      strength: strong
+    - fault: F09-AP-23
+      effect: supports
+      strength: strong
+    - fault: F09-AP-24
+      effect: supports
+      strength: strong
+    - fault: F09-AP-25
+      effect: supports
+      strength: strong
+    - fault: F09-AP-26
+      effect: supports
+      strength: strong
+    - fault: F09-AP-27
+      effect: supports
+      strength: strong
+    - fault: F09-AP-28
+      effect: supports
+      strength: strong
+    - fault: F09-AP-29
+      effect: supports
+      strength: strong
+    - fault: F09-AP-30
+      effect: supports
+      strength: strong
+    - fault: F09-AP-31
+      effect: supports
+      strength: strong
+    - fault: F09-AP-32
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Accelerator kaam nahi kar raha
+    effects:
+    - fault: F09-AP-02
+      effect: supports
+      strength: strong
+    - fault: F09-AP-04
+      effect: supports
+      strength: strong
+    - fault: F09-AP-05
+      effect: supports
+      strength: strong
+    - fault: F09-AP-07
+      effect: supports
+      strength: strong
+    - fault: F09-AP-08
+      effect: supports
+      strength: strong
+    - fault: F09-AP-26
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Race badh rahi hai par speed nahi
+    effects:
+    - fault: F09-AP-05
+      effect: supports
+      strength: strong
+    - fault: F09-AP-15
+      effect: supports
+      strength: strong
+    - fault: F09-AP-31
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Gaadi jerk maar rahi hai
+    effects:
+    - fault: F09-AP-09
+      effect: supports
+      strength: strong
+    - fault: F09-AP-13
+      effect: supports
+      strength: strong
+    - fault: F09-AP-14
+      effect: supports
+      strength: strong
+    - fault: F09-AP-20
+      effect: supports
+      strength: strong
+    - fault: F09-AP-21
+      effect: supports
+      strength: strong
+    - fault: F09-AP-24
+      effect: supports
+      strength: strong
+    - fault: F09-AP-33
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine warning light aa rahi hai
+    effects:
+    - fault: F09-AP-03
+      effect: supports
+      strength: strong
+    - fault: F09-AP-07
+      effect: supports
+      strength: strong
+    - fault: F09-AP-08
+      effect: supports
+      strength: strong
+    - fault: F09-AP-09
+      effect: supports
+      strength: strong
+    - fault: F09-AP-10
+      effect: supports
+      strength: strong
+    - fault: F09-AP-17
+      effect: supports
+      strength: strong
+    - fault: F09-AP-19
+      effect: supports
+      strength: strong
+    - fault: F09-AP-21
+      effect: supports
+      strength: strong
+    - fault: F09-AP-22
+      effect: supports
+      strength: strong
+    - fault: F09-AP-25
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other issue
+    effects:
+    - fault: F09-AP-06
+      effect: supports
+      strength: strong
+    - fault: F09-AP-12
+      effect: supports
+      strength: strong
+    - fault: F09-AP-30
+      effect: supports
+      strength: strong
+    - fault: F09-AP-31
+      effect: supports
+      strength: strong
+    - fault: F09-AP-33
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q01
+  status: approved
+  stage: 3
+  text: Did the car lose power suddenly while driving? Is there smoke, a burning smell, or a temperature / oil warning?
+  source_faults:
+  - F09-AP-05
+  - F09-AP-15
+  - F09-AP-16
+  - F09-AP-17
+  merged_from:
+  - 'F09-AP-16 (stages_text): Kya aap safe jagah par hain? Koi smoke, fuel smell ya burning smell hai? Oil pressure
+    ya temperature warning aayi thi?'
+  - 'F09-AP-16 (stages_text): Are you in a safe place? Any temperature or oil warning? Any smoke or smell? Did it
+    stop fully?'
+  - 'F09-AP-05 (stages_text): Any burning smell?'
+  options:
+  - label: Yes, sudden power loss with smoke, burning smell or a warning
+    effects:
+    - fault: F09-AP-16
+      effect: supports
+      strength: strong
+    - fault: F09-AP-15
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: Yes, sudden power loss, no warning
+    effects:
+    - fault: F09-AP-16
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-17
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q02
+  status: approved
+  stage: 3
+  text: When you press the accelerator, does the engine sound rise?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-04
+  - F09-AP-05
+  - F09-AP-07
+  - F09-AP-11
+  - F09-AP-15
+  - F09-AP-28
+  - F09-AP-31
+  merged_from:
+  - 'F09-AP-04 (stages_text): Does engine sound change at all when you press?'
+  - 'F09-AP-05 (stages_text): When you press, does engine sound rise?'
+  - 'F09-AP-15 (stages_text): Does engine sound rise but speed not?'
+  - 'F09-AP-01 (stages_text): Accelerator dabane par engine ki awaaz badhti hai?'
+  options:
+  - label: No, the engine stays at idle
+    effects:
+    - fault: F09-AP-04
+      effect: supports
+      strength: strong
+    - fault: F09-AP-07
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-05
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Yes, but the car does not speed up
+    effects:
+    - fault: F09-AP-15
+      effect: supports
+      strength: strong
+    - fault: F09-AP-05
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-31
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Yes, the car speeds up but slowly
+    effects:
+    - fault: F09-AP-01
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-11
+      effect: supports
+      strength: weak
+    - fault: F09-AP-28
+      effect: supports
+      strength: weak
+    - fault: F09-AP-04
+      effect: rules_out
+      strength: moderate
+    - fault: F09-AP-15
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q03
+  status: approved
+  stage: 3
+  text: Is the floor mat near or under the accelerator pedal?
+  source_faults:
+  - F09-AP-02
+  - F09-AP-04
+  merged_from:
+  - 'F09-AP-02 (stages_text): Is the floor mat near the pedal?'
+  - 'F09-AP-04 (stages_text): Is the floor mat near the pedal?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-02
+      effect: supports
+      strength: weak
+    - fault: F09-AP-04
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q04
+  status: approved
+  stage: 3
+  text: Is the handbrake fully down? Is one wheel hot after driving?
+  source_faults:
+  - F09-AP-05
+  - F09-AP-27
+  merged_from:
+  - 'F09-AP-27 (stages_text): Handbrake fully down?'
+  - 'F09-AP-27 (stages_text): One wheel hot?'
+  - 'F09-AP-05 (stages_text): Is the handbrake down?'
+  options:
+  - label: The handbrake was up, or one wheel is hot
+    effects:
+    - fault: F09-AP-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-27
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q05
+  status: approved
+  stage: 3
+  text: Is there a burning smell, especially uphill?
+  source_faults:
+  - F09-AP-15
+  - F09-AP-27
+  - F09-AP-28
+  merged_from:
+  - 'F09-AP-15 (stages_text): Burning smell?'
+  - 'F09-AP-28 (stages_text): Burning smell?'
+  - 'F09-AP-27 (symptoms): Burning smell'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-15
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-27
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-28
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q06
+  status: approved
+  stage: 3
+  text: Is the engine warning light on? Steady or blinking?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-03
+  - F09-AP-07
+  - F09-AP-08
+  - F09-AP-09
+  - F09-AP-10
+  - F09-AP-13
+  - F09-AP-14
+  - F09-AP-17
+  - F09-AP-21
+  - F09-AP-22
+  - F09-AP-25
+  - F09-AP-28
+  - F09-AP-29
+  - F09-AP-30
+  - F09-AP-31
+  - F09-AP-32
+  merged_from:
+  - 'F09-AP-03 (stages_text): Is the engine light ON? Steady or blinking?'
+  - 'F09-AP-14 (stages_text): Is the engine light blinking?'
+  - 'F09-AP-21 (stages_text): Is the engine light blinking?'
+  - 'F09-AP-01 (stages_text): Engine light jal rahi hai?'
+  options:
+  - label: Blinking
+    effects:
+    - fault: F09-AP-21
+      effect: supports
+      strength: strong
+    - fault: F09-AP-14
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-13
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-03
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: Steady
+    effects:
+    - fault: F09-AP-03
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-08
+      effect: supports
+      strength: weak
+    - fault: F09-AP-09
+      effect: supports
+      strength: weak
+    - fault: F09-AP-10
+      effect: supports
+      strength: weak
+    - fault: F09-AP-22
+      effect: supports
+      strength: weak
+    - fault: F09-AP-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A different warning (EPC, gearbox, DPF)
+    effects:
+    - fault: F09-AP-07
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-31
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-25
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-17
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No warning light
+    effects:
+    - fault: F09-AP-01
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-28
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-29
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-30
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-32
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-03
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q07
+  status: approved
+  stage: 3
+  text: Is the speed limited, and can the car go faster than walking speed?
+  source_faults:
+  - F09-AP-05
+  - F09-AP-07
+  - F09-AP-17
+  - F09-AP-30
+  - F09-AP-31
+  merged_from:
+  - 'F09-AP-07 (stages_text): Can the car go above walking speed?'
+  - 'F09-AP-17 (stages_text): Is speed limited?'
+  - 'F09-AP-30 (stages_text): Speed stops at one number?'
+  options:
+  - label: It barely goes faster than walking speed
+    effects:
+    - fault: F09-AP-07
+      effect: supports
+      strength: strong
+    - fault: F09-AP-05
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Speed is limited, with a warning message
+    effects:
+    - fault: F09-AP-17
+      effect: supports
+      strength: strong
+    - fault: F09-AP-31
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Speed stops at one number, with an ECO or limiter symbol
+    effects:
+    - fault: F09-AP-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-17
+      effect: rules_out
+      strength: moderate
+    - fault: F09-AP-30
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q08
+  status: approved
+  stage: 3
+  text: Does restarting the engine fix it for a while?
+  source_faults:
+  - F09-AP-02
+  - F09-AP-08
+  - F09-AP-17
+  - F09-AP-26
+  merged_from:
+  - 'F09-AP-17 (stages_text): Does restart fix it?'
+  - 'F09-AP-08 (symptoms): Restart fixes it for some time'
+  - 'F09-AP-26 (symptoms): Returns after restart'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-17
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-08
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-26
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-02
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q09
+  status: approved
+  stage: 3
+  text: Does the power cut suddenly at random, especially on bumps or after rain?
+  source_faults:
+  - F09-AP-08
+  - F09-AP-26
+  merged_from:
+  - 'F09-AP-08 (stages_text): Does power cut suddenly sometimes?'
+  - 'F09-AP-26 (stages_text): Does it happen on bumps?'
+  - 'F09-AP-08 (stages_text): Did the floor get wet?'
+  options:
+  - label: On bumps
+    effects:
+    - fault: F09-AP-26
+      effect: supports
+      strength: strong
+    - fault: F09-AP-08
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: After rain or the floor got wet
+    effects:
+    - fault: F09-AP-08
+      effect: supports
+      strength: strong
+    - fault: F09-AP-26
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-08
+      effect: rules_out
+      strength: moderate
+    - fault: F09-AP-26
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q10
+  status: approved
+  stage: 3
+  text: Is the response delayed or jumpy when you press the pedal?
+  source_faults:
+  - F09-AP-02
+  - F09-AP-09
+  - F09-AP-13
+  merged_from:
+  - 'F09-AP-02 (stages_text): Is the delay every time or sometimes?'
+  - 'F09-AP-13 (stages_text): Does it pause then pick up?'
+  - 'F09-AP-09 (stages_text): Jerks at light pedal?'
+  options:
+  - label: A delay, then a sudden jump
+    effects:
+    - fault: F09-AP-02
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A pause, then it picks up
+    effects:
+    - fault: F09-AP-13
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Jerks when pressing lightly
+    effects:
+    - fault: F09-AP-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-02
+      effect: rules_out
+      strength: moderate
+    - fault: F09-AP-13
+      effect: rules_out
+      strength: moderate
+    - fault: F09-AP-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q11
+  status: approved
+  stage: 3
+  text: Does the car jerk or shake when accelerating?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-14
+  - F09-AP-21
+  - F09-AP-33
+  merged_from:
+  - 'F09-AP-14 (stages_text): Any knock sound when starting to move?'
+  - 'F09-AP-01 (stages_text): Gaadi jerk maar rahi hai?'
+  - 'F09-AP-33 (stages_text): Knock when starting to move?'
+  options:
+  - label: Yes, with a knock when starting to move
+    effects:
+    - fault: F09-AP-33
+      effect: supports
+      strength: strong
+    - fault: F09-AP-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Yes, the engine shakes
+    effects:
+    - fault: F09-AP-21
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-14
+      effect: rules_out
+      strength: moderate
+    - fault: F09-AP-21
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q12
+  status: approved
+  stage: 3
+  text: Is the idle rough, or does it go up and down, or stall at signals?
+  source_faults:
+  - F09-AP-03
+  - F09-AP-06
+  - F09-AP-09
+  - F09-AP-12
+  merged_from:
+  - 'F09-AP-06 (stages_text): Does idle shake or go up and down?'
+  - 'F09-AP-06 (stages_text): Does it stall at signals?'
+  - 'F09-AP-03 (stages_text): Is idle rough?'
+  - 'F09-AP-09 (stages_text): Idle unstable?'
+  - 'F09-AP-12 (stages_text): Idle too high?'
+  options:
+  - label: Rough, or goes up and down
+    effects:
+    - fault: F09-AP-06
+      effect: supports
+      strength: strong
+    - fault: F09-AP-09
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Too high, with a hissing sound
+    effects:
+    - fault: F09-AP-12
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Stalls at signals
+    effects:
+    - fault: F09-AP-06
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Normal
+    effects:
+    - fault: F09-AP-06
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q13
+  status: approved
+  stage: 3
+  text: Is there black smoke from the exhaust?
+  source_faults:
+  - F09-AP-10
+  - F09-AP-18
+  - F09-AP-19
+  merged_from:
+  - 'F09-AP-10 (stages_text): Any black smoke?'
+  - 'F09-AP-18 (stages_text): Black smoke?'
+  - 'F09-AP-19 (stages_text): Black smoke at idle?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-10
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-18
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-19
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-19
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q14
+  status: approved
+  stage: 3
+  text: When was the air filter last changed? Do you drive on dusty roads?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-10
+  - F09-AP-11
+  merged_from:
+  - 'F09-AP-11 (stages_text): When was air filter changed?'
+  - 'F09-AP-11 (stages_text): Do you drive on dusty roads?'
+  - 'F09-AP-10 (stages_text): Air filter changed recently?'
+  options:
+  - label: A long time ago, or dusty roads
+    effects:
+    - fault: F09-AP-11
+      effect: supports
+      strength: strong
+    - fault: F09-AP-01
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Recently
+    effects:
+    - fault: F09-AP-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q15
+  status: approved
+  stage: 3
+  text: Is the car weak mainly at high speed, or uphill?
+  source_faults:
+  - F09-AP-11
+  - F09-AP-15
+  - F09-AP-20
+  - F09-AP-23
+  - F09-AP-28
+  merged_from:
+  - 'F09-AP-20 (stages_text): Is it worse at high speed or uphill?'
+  - 'F09-AP-23 (stages_text): Is the car weak only at high speed?'
+  - 'F09-AP-15 (stages_text): Worse uphill?'
+  options:
+  - label: At high speed; it gets worse as revs rise
+    effects:
+    - fault: F09-AP-23
+      effect: supports
+      strength: strong
+    - fault: F09-AP-20
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-11
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Uphill or at full pedal
+    effects:
+    - fault: F09-AP-20
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-28
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-15
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: All the time
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q16
+  status: approved
+  stage: 3
+  text: Is it only on a steep hill with a full car and the AC on?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-28
+  merged_from:
+  - 'F09-AP-28 (stages_text): Steep hill?'
+  - 'F09-AP-28 (stages_text): Full load and AC?'
+  - 'F09-AP-01 (stages_text): Is the car fully loaded?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-28
+      effect: supports
+      strength: strong
+    - fault: F09-AP-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-28
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q17
+  status: approved
+  stage: 3
+  text: Is it weak only when the AC is on? Any shaking or stalling with the AC?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-06
+  - F09-AP-32
+  merged_from:
+  - 'F09-AP-32 (stages_text): Only with AC?'
+  - 'F09-AP-32 (stages_text): Shaking or stalling?'
+  - 'F09-AP-01 (stages_text): Is it only with AC ON?'
+  options:
+  - label: Only slower with the AC, no shaking
+    effects:
+    - fault: F09-AP-32
+      effect: supports
+      strength: strong
+    - fault: F09-AP-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: With the AC it shakes or stalls
+    effects:
+    - fault: F09-AP-06
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-32
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-32
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q18
+  status: approved
+  stage: 3
+  text: Are you driving at high altitude (for example Ladakh or Spiti)?
+  source_faults:
+  - F09-AP-29
+  merged_from:
+  - 'F09-AP-29 (stages_text): What altitude?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-29
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q19
+  status: approved
+  stage: 3
+  text: Is it a diesel or turbo-petrol car? Do you hear a hiss or whistle when power drops?
+  source_faults:
+  - F09-AP-12
+  - F09-AP-18
+  merged_from:
+  - 'F09-AP-18 (stages_text): Diesel or turbo petrol?'
+  - 'F09-AP-18 (stages_text): Hissing sound?'
+  - 'F09-AP-12 (stages_text): Hissing sound?'
+  options:
+  - label: Turbo engine, with a hiss and power loss at higher revs
+    effects:
+    - fault: F09-AP-18
+      effect: supports
+      strength: strong
+    - fault: F09-AP-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A hiss at idle
+    effects:
+    - fault: F09-AP-12
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No hiss
+    effects:
+    - fault: F09-AP-18
+      effect: rules_out
+      strength: moderate
+    - fault: F09-AP-12
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q20
+  status: approved
+  stage: 3
+  text: (Diesel) Is the DPF light on, and is the car used mostly in the city?
+  source_faults:
+  - F09-AP-19
+  - F09-AP-25
+  merged_from:
+  - 'F09-AP-25 (stages_text): DPF light ON?'
+  - 'F09-AP-25 (stages_text): Mostly city driving?'
+  - 'F09-AP-19 (stages_text): Mostly city driving?'
+  options:
+  - label: DPF light on
+    effects:
+    - fault: F09-AP-25
+      effect: supports
+      strength: strong
+    - fault: F09-AP-19
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No DPF light, but mostly city driving
+    effects:
+    - fault: F09-AP-19
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No / not a diesel
+    effects:
+    - fault: F09-AP-25
+      effect: rules_out
+      strength: moderate
+    - fault: F09-AP-19
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q21
+  status: approved
+  stage: 3
+  text: Does it happen only on CNG? Any gas smell?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-24
+  merged_from:
+  - 'F09-AP-24 (stages_text): Is the problem only on CNG?'
+  - 'F09-AP-24 (stages_text): Any gas smell?'
+  - 'F09-AP-01 (stages_text): Problem petrol aur CNG dono mein hoti hai?'
+  options:
+  - label: Only on CNG
+    effects:
+    - fault: F09-AP-24
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Gas smell
+    effects:
+    - fault: F09-AP-24
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Not a CNG car, or both fuels
+    effects:
+    - fault: F09-AP-24
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q22
+  status: approved
+  stage: 3
+  text: Is the fuel level usually low, or did you fill fuel at a new place?
+  source_faults:
+  - F09-AP-20
+  merged_from:
+  - 'F09-AP-20 (stages_text): Fuel level usually low?'
+  - 'F09-AP-20 (stages_text): Where do you fill fuel?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-20
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q23
+  status: approved
+  stage: 3
+  text: Is it worse in the rain? Any fuel smell?
+  source_faults:
+  - F09-AP-13
+  - F09-AP-21
+  merged_from:
+  - 'F09-AP-21 (stages_text): Worse in rain?'
+  - 'F09-AP-21 (stages_text): Any fuel smell?'
+  options:
+  - label: Worse in rain
+    effects:
+    - fault: F09-AP-21
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Fuel smell
+    effects:
+    - fault: F09-AP-21
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-13
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q24
+  status: approved
+  stage: 3
+  text: Has mileage dropped, or did the car fail its pollution test?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-10
+  - F09-AP-22
+  merged_from:
+  - 'F09-AP-22 (stages_text): Mileage dropped?'
+  - 'F09-AP-10 (stages_text): Mileage dropped?'
+  - 'F09-AP-22 (symptoms): Failed pollution test'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-22
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-10
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q25
+  status: approved
+  stage: 3
+  text: Was there a flood or a long misfire before this?
+  source_faults:
+  - F09-AP-23
+  merged_from:
+  - 'F09-AP-23 (stages_text): Was there flood or misfire before?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-23
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q26
+  status: approved
+  stage: 3
+  text: (Automatic or AMT) Is it stuck in one gear with high revs, maybe after long traffic?
+  source_faults:
+  - F09-AP-31
+  merged_from:
+  - 'F09-AP-31 (stages_text): Automatic type?'
+  - 'F09-AP-31 (stages_text): Warning message?'
+  - 'F09-AP-31 (stages_text): Long traffic?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-31
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F09-AP-31
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q27
+  status: approved
+  stage: 3
+  text: Was any work done on the car recently (service, cleaning, parts)?
+  source_faults:
+  - F09-AP-01
+  - F09-AP-03
+  - F09-AP-11
+  - F09-AP-12
+  merged_from:
+  - 'F09-AP-03 (stages_text): Any work done recently?'
+  - 'F09-AP-12 (stages_text): Recent service?'
+  - 'F09-AP-01 (stages_text): When was the last service?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-12
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No, and the service is overdue
+    effects:
+    - fault: F09-AP-01
+      effect: supports
+      strength: moderate
+    - fault: F09-AP-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: pickup_throttle-q28
+  status: approved
+  stage: 3
+  text: Have you seen rats near the car?
+  source_faults:
+  - F09-AP-26
+  merged_from:
+  - 'F09-AP-26 (stages_text): Rats seen near car?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F09-AP-26
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F09-AP-01:
+    status: approved
+    name: Slight Pickup Lag (Car Slow to Gain Speed)
+    stage2_choices:
+    - Pickup kam hai
+    confirmation_test: Air filter and spark plug check, then a test drive.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-02:
+    status: approved
+    name: Accelerator Not Smooth (Jumpy or Delayed Response)
+    stage2_choices:
+    - Accelerator kaam nahi kar raha
+    - Pickup kam hai
+    confirmation_test: 'Live data: pedal % against throttle %.'
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-03:
+    status: approved
+    name: Low Pickup Because of Sensor or Throttle Body
+    stage2_choices:
+    - Pickup kam hai
+    - Engine warning light aa rahi hai
+    confirmation_test: Live data and wiring test.
+    danger_phrases:
+    - blinking light
+    - heavy shaking
+    safety_trigger_options:
+    - question: pickup_throttle-q06
+      option: Blinking
+  F09-AP-04:
+    status: approved
+    name: Accelerator Not Working (Pedal Gives No Response)
+    stage2_choices:
+    - Accelerator kaam nahi kar raha
+    confirmation_test: Live data and wiring test.
+    danger_phrases:
+    - no accelerator in traffic
+    safety_trigger_options:
+    - question: pickup_throttle-q02
+      option: No, the engine stays at idle
+  F09-AP-05:
+    status: approved
+    name: No Acceleration at All (Engine Runs, Car Will Not Gain Speed)
+    stage2_choices:
+    - Accelerator kaam nahi kar raha
+    - Race badh rahi hai par speed nahi
+    - Pickup kam hai
+    confirmation_test: Rev test and scan.
+    danger_phrases:
+    - car will not gain speed
+    safety_trigger_options:
+    - question: pickup_throttle-q02
+      option: No, the engine stays at idle
+    - question: pickup_throttle-q07
+      option: It barely goes faster than walking speed
+  F09-AP-06:
+    status: approved
+    name: Dirty Throttle Body (Carbon Build-up)
+    stage2_choices:
+    - Pickup kam hai
+    - Other issue
+    confirmation_test: Visual check of the throttle and idle data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-07:
+    status: approved
+    name: Electronic Throttle Motor Failed
+    stage2_choices:
+    - Accelerator kaam nahi kar raha
+    - Engine warning light aa rahi hai
+    confirmation_test: Scanner actuator test and wiring test.
+    danger_phrases:
+    - walking speed only
+    safety_trigger_options:
+    - question: pickup_throttle-q02
+      option: No, the engine stays at idle
+    - question: pickup_throttle-q07
+      option: It barely goes faster than walking speed
+  F09-AP-08:
+    status: approved
+    name: Accelerator Pedal Sensor Fault
+    stage2_choices:
+    - Accelerator kaam nahi kar raha
+    - Engine warning light aa rahi hai
+    confirmation_test: Live data sweep and wiggle test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-09:
+    status: approved
+    name: Throttle Position Sensor Fault
+    stage2_choices:
+    - Gaadi jerk maar rahi hai
+    - Engine warning light aa rahi hai
+    confirmation_test: Live data and meter test of the throttle position sensor.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-10:
+    status: approved
+    name: Air Sensor Fault (MAF or MAP Sensor)
+    stage2_choices:
+    - Pickup kam hai
+    - Engine warning light aa rahi hai
+    confirmation_test: Live data and air leak check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-11:
+    status: approved
+    name: Air Filter Blocked (Not Enough Air)
+    stage2_choices:
+    - Pickup kam hai
+    confirmation_test: Visual check of the air filter.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-12:
+    status: approved
+    name: Air Leak in Intake Hose (Vacuum Leak)
+    stage2_choices:
+    - Pickup kam hai
+    - Other issue
+    confirmation_test: Smoke test for an air leak.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-13:
+    status: approved
+    name: Engine Hesitates When Pressing Accelerator
+    stage2_choices:
+    - Pickup kam hai
+    - Gaadi jerk maar rahi hai
+    confirmation_test: Misfire data and fuel pressure.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: pickup_throttle-q06
+      option: Blinking
+  F09-AP-14:
+    status: approved
+    name: Car Jerks When Pressing Accelerator
+    stage2_choices:
+    - Gaadi jerk maar rahi hai
+    confirmation_test: Misfire data and engine mount check.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: pickup_throttle-q06
+      option: Blinking
+  F09-AP-15:
+    status: approved
+    name: Engine Sound Rises But Car Does Not Speed Up
+    stage2_choices:
+    - Race badh rahi hai par speed nahi
+    confirmation_test: Road test and clutch / gearbox check.
+    danger_phrases:
+    - strong burning smell
+    safety_trigger_options:
+    - question: pickup_throttle-q01
+      option: Yes, sudden power loss with smoke, burning smell or a warning
+  F09-AP-16:
+    status: approved
+    name: Sudden Loss of Engine Power While Driving
+    stage2_choices:
+    - Gaadi chalti chalti band ho gayi
+    - Pickup kam hai
+    confirmation_test: Scan and targeted tests.
+    danger_phrases:
+    - temperature high
+    - smoke
+    safety_trigger_options:
+    - question: pickup_throttle-q01
+      option: Yes, sudden power loss with smoke, burning smell or a warning
+  F09-AP-17:
+    status: approved
+    name: Limp Mode / Reduced Power Mode
+    stage2_choices:
+    - Pickup kam hai
+    - Engine warning light aa rahi hai
+    confirmation_test: Scanner.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-18:
+    status: approved
+    name: Turbo Not Giving Power (Boost Leak / Underboost)
+    stage2_choices:
+    - Pickup kam hai
+    confirmation_test: Boost data and pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-19:
+    status: approved
+    name: EGR Valve Stuck / Carbon Build-up
+    stage2_choices:
+    - Pickup kam hai
+    - Engine warning light aa rahi hai
+    confirmation_test: Live data and EGR inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-20:
+    status: approved
+    name: Fuel Not Coming Properly (Weak Pickup)
+    stage2_choices:
+    - Pickup kam hai
+    - Gaadi jerk maar rahi hai
+    confirmation_test: Fuel pressure under load.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-21:
+    status: approved
+    name: Misfire When Accelerating
+    stage2_choices:
+    - Gaadi jerk maar rahi hai
+    - Engine warning light aa rahi hai
+    confirmation_test: Coil swap test.
+    danger_phrases:
+    - blinking light
+    safety_trigger_options:
+    - question: pickup_throttle-q06
+      option: Blinking
+  F09-AP-22:
+    status: approved
+    name: Oxygen Sensor Fault Affecting Running
+    stage2_choices:
+    - Engine warning light aa rahi hai
+    - Pickup kam hai
+    confirmation_test: Oxygen sensor live data and heater test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-23:
+    status: approved
+    name: Blocked Exhaust / Catalytic Converter
+    stage2_choices:
+    - Pickup kam hai
+    confirmation_test: Exhaust back pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-24:
+    status: approved
+    name: CNG Mode Weak Pickup / Petrol-CNG Switching Problem
+    stage2_choices:
+    - Pickup kam hai
+    - Gaadi jerk maar rahi hai
+    confirmation_test: CNG pressure test and kit scan.
+    danger_phrases:
+    - gas smell
+    safety_trigger_options:
+    - question: pickup_throttle-q21
+      option: Gas smell
+  F09-AP-25:
+    status: approved
+    name: Diesel DPF Blocked (Soot Filter) - Power Loss
+    stage2_choices:
+    - Pickup kam hai
+    - Engine warning light aa rahi hai
+    confirmation_test: DPF data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-26:
+    status: approved
+    name: Accelerator Pedal Wiring / Connector Loose (Comes and Goes)
+    stage2_choices:
+    - Accelerator kaam nahi kar raha
+    - Pickup kam hai
+    confirmation_test: Wiggle test of the pedal wiring.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-27:
+    status: approved
+    name: Brakes Rubbing / Handbrake Stuck - Feels Like Low Pickup  [NEW - India]
+    stage2_choices:
+    - Pickup kam hai
+    confirmation_test: Wheel spin test.
+    danger_phrases:
+    - hot wheel
+    safety_trigger_options: []
+  F09-AP-28:
+    status: approved
+    name: Weak Pickup on Hills or Full Load (Normal or Fault?)  [NEW - India]
+    stage2_choices:
+    - Pickup kam hai
+    confirmation_test: Road test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-29:
+    status: approved
+    name: Power Loss at High Altitude (Ladakh / Spiti / Hills)  [NEW - India]
+    stage2_choices:
+    - Pickup kam hai
+    confirmation_test: Compare at a lower altitude.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-30:
+    status: approved
+    name: Eco Mode / Speed Limit Setting ON - Feels Like Low Pickup  [NEW - India]
+    stage2_choices:
+    - Pickup kam hai
+    - Other issue
+    confirmation_test: Switch the setting off.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-31:
+    status: approved
+    name: Automatic / AMT Stuck in One Gear (Gearbox Safety Mode)  [NEW - India]
+    stage2_choices:
+    - Pickup kam hai
+    - Race badh rahi hai par speed nahi
+    - Other issue
+    confirmation_test: Gearbox scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-32:
+    status: approved
+    name: AC Makes Small Car Weak (Normal or Fault?)  [NEW - India]
+    stage2_choices:
+    - Pickup kam hai
+    confirmation_test: Compare with and without the AC.
+    danger_phrases: []
+    safety_trigger_options: []
+  F09-AP-33:
+    status: approved
+    name: Broken Engine Mount - Feels Like Jerk or Knock  [NEW - India]
+    stage2_choices:
+    - Gaadi jerk maar rahi hai
+    - Other issue
+    confirmation_test: Engine movement check.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: pickup_throttle-s-F09-AP-01
+  status: approved
+  fault: F09-AP-01
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Engine off before opening air box.
+
+      • Hot engine parts - be careful.'
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-02
+  status: approved
+  fault: F09-AP-02
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Ignition OFF before touching throttle plate (it can move and cut fingers).
+
+      • Do not spray cleaner into hot engine.'
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-03
+  status: approved
+  fault: F09-AP-03
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine light blinks and the engine shakes badly.
+  roadside_action: If the engine light blinks and the engine shakes badly, stop safely and call for a tow. Otherwise
+    drive gently to a garage.
+  towing_recommendation: No usually. Yes if the engine light blinks and the engine shakes badly.
+  source_text:
+    safety_precautions: '• Ignition OFF when unplugging sensors.
+
+      • Hot engine parts.'
+    if_towing_needed: NO usually. YES if engine light blinks and engine shakes badly.
+- id: pickup_throttle-s-F09-AP-04
+  status: approved
+  fault: F09-AP-04
+  risk_level: high
+  stop_driving_trigger: Do not drive in traffic without the accelerator.
+  roadside_action: Move to a safe place and switch on the hazard lights. Check the floor mat is not under the pedal.
+    Do not drive in traffic without the accelerator; call for a tow.
+  towing_recommendation: Yes, if it cannot be fixed on the road.
+  source_text:
+    safety_precautions: '• Do not drive in traffic without accelerator.
+
+      • Ignition OFF before touching throttle plate.'
+    if_towing_needed: YES if not fixable on road.
+- id: pickup_throttle-s-F09-AP-05
+  status: approved
+  fault: F09-AP-05
+  risk_level: high
+  stop_driving_trigger: Do not stay in a running lane if the car cannot gain speed.
+  roadside_action: Get out of the running lane if you can, switch on the hazard lights, and call for roadside help
+    or a tow.
+  towing_recommendation: Yes, if the cause is not fixed on the road.
+  source_text:
+    safety_precautions: '• Do not stay in a running lane.
+
+      • Hot parts.'
+    if_towing_needed: YES if cause not fixed on road.
+- id: pickup_throttle-s-F09-AP-06
+  status: approved
+  fault: F09-AP-06
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Ignition OFF.
+
+      • Cleaner is flammable - no flame.
+
+      • Wear gloves.'
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-07
+  status: approved
+  fault: F09-AP-07
+  risk_level: medium
+  stop_driving_trigger: Stop if the car cannot go faster than walking speed.
+  roadside_action: If the car cannot go faster than walking speed, move to a safe place and call for a tow.
+  towing_recommendation: Depends (tow if the car cannot go above walking speed).
+  source_text:
+    safety_precautions: • Ignition OFF before touching plate.
+    if_towing_needed: DEPENDS. Tow if car cannot go above walking speed.
+- id: pickup_throttle-s-F09-AP-08
+  status: approved
+  fault: F09-AP-08
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Ignition OFF to unplug.
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-09
+  status: approved
+  fault: F09-AP-09
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Ignition OFF.
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-10
+  status: approved
+  fault: F09-AP-10
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Do not touch MAF wire inside.
+
+      • Ignition OFF.'
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-11
+  status: approved
+  fault: F09-AP-11
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Engine off.
+
+      • Do not let dirt fall into the intake pipe.'
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-12
+  status: approved
+  fault: F09-AP-12
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Hot engine.
+
+      • Do not use flame to find leaks.'
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-13
+  status: approved
+  fault: F09-AP-13
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Fuel system has pressure - release safely.
+
+      • No flame.'
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-14
+  status: approved
+  fault: F09-AP-14
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Stand to the side when checking mounts with engine revving.
+
+      • Handbrake ON.'
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-15
+  status: approved
+  fault: F09-AP-15
+  risk_level: medium
+  stop_driving_trigger: Stop if the car will not climb or the burning smell is strong.
+  roadside_action: Avoid hills and heavy loads. If the car will not climb or the smell is strong, stop and call
+    for a tow.
+  towing_recommendation: Depends (yes if the car will not climb or the smell is strong).
+  source_text:
+    safety_precautions: • Gearbox is heavy - use jack/lift.
+    if_towing_needed: DEPENDS. YES if car will not climb or smell is strong.
+- id: pickup_throttle-s-F09-AP-16
+  status: approved
+  fault: F09-AP-16
+  risk_level: high
+  stop_driving_trigger: 'Stop safely: sudden loss of power.'
+  roadside_action: Move out of the road lane and switch on the hazard lights. Do not touch the hot turbo or exhaust.
+    If there is smoke or a temperature or oil warning, do not restart; call for a tow.
+  towing_recommendation: Yes on a highway if power does not return safely.
+  source_text:
+    safety_precautions: '• Stay off the road lane.
+
+      • Hot turbo and exhaust - do not touch.'
+    if_towing_needed: YES on highway if power does not return safely.
+- id: pickup_throttle-s-F09-AP-17
+  status: approved
+  fault: F09-AP-17
+  risk_level: medium
+  stop_driving_trigger: Stop if power is too low to drive safely.
+  roadside_action: Drive slowly to a garage for a scan. On a highway, call for a tow.
+  towing_recommendation: Depends (tow on a highway).
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: DEPENDS. Tow on highway.
+- id: pickup_throttle-s-F09-AP-18
+  status: approved
+  fault: F09-AP-18
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Turbo very hot.
+
+      • Never run engine with intake pipe off (debris risk).'
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-19
+  status: approved
+  fault: F09-AP-19
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Hot exhaust parts.
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-20
+  status: approved
+  fault: F09-AP-20
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Fuel under pressure.
+
+      • No sparks or smoking.'
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-21
+  status: approved
+  fault: F09-AP-21
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• High voltage from coil.
+
+      • Hot engine.'
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-22
+  status: approved
+  fault: F09-AP-22
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Exhaust is hot.
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-23
+  status: approved
+  fault: F09-AP-23
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Very hot exhaust.
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-24
+  status: approved
+  fault: F09-AP-24
+  risk_level: medium
+  stop_driving_trigger: Stop if you smell gas.
+  roadside_action: 'If you smell gas: switch off, no flames, get out and call for help. Otherwise switch to petrol
+    and drive to a garage.'
+  towing_recommendation: No; yes if there is a gas smell.
+  source_text:
+    safety_precautions: '• Gas leak = fire risk.
+
+      • Leak test after work.'
+    if_towing_needed: NO; YES if gas smell.
+- id: pickup_throttle-s-F09-AP-25
+  status: approved
+  fault: F09-AP-25
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Follow the owner's manual advice for the DPF light, in an open area away from anything that can
+    burn.
+  towing_recommendation: No usually.
+  source_text:
+    safety_precautions: • Regeneration makes exhaust very hot - open area, nothing flammable near.
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-26
+  status: approved
+  fault: F09-AP-26
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery negative off before wire repair.
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-27
+  status: approved
+  fault: F09-AP-27
+  risk_level: medium
+  stop_driving_trigger: Stop if a wheel is very hot or smoking.
+  roadside_action: Release the handbrake fully. If a wheel is very hot, stop and let it cool; do not touch it. Call
+    a mechanic.
+  towing_recommendation: No usually.
+  source_text:
+    safety_precautions: • Hot brakes.
+    if_towing_needed: NO usually.
+- id: pickup_throttle-s-F09-AP-28
+  status: approved
+  fault: F09-AP-28
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Hill start - use handbrake.
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-29
+  status: approved
+  fault: F09-AP-29
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Drive carefully on mountain roads. Power should return at lower altitude.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Mountain roads - drive carefully.
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-30
+  status: approved
+  fault: F09-AP-30
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: When parked, switch off the ECO mode or speed limiter.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Adjust settings only when parked.
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-31
+  status: approved
+  fault: F09-AP-31
+  risk_level: medium
+  stop_driving_trigger: Stop if the gearbox overheats or stays stuck.
+  roadside_action: Stop in a safe place and let the gearbox cool. If it stays stuck in one gear, call for a flatbed
+    tow.
+  towing_recommendation: Depends (flatbed).
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: DEPENDS (flatbed).
+- id: pickup_throttle-s-F09-AP-32
+  status: approved
+  fault: F09-AP-32
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: pickup_throttle-s-F09-AP-33
+  status: approved
+  fault: F09-AP-33
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, smoke, or the car cannot keep a safe speed.
+  roadside_action: Drive gently to a garage. Stop if a red warning, smoke or a burning smell appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Engine must be supported.
+    if_towing_needed: NO.

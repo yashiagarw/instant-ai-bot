@@ -1,0 +1,1012 @@
+category: cng
+loaded_at: '2026-10-23T19:30:39+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question cng-main:
+    id: cng-main
+    status: approved
+    stage: 2
+    text: What problem are you facing?
+    choice_source: file
+    options:
+    - label: Gear problem
+      effects: []
+      safety_trigger: false
+    - label: Remote / key problem
+      effects: []
+      safety_trigger: false
+    - label: Car locked
+      effects: []
+      safety_trigger: false
+    - label: Suspension noise
+      effects: []
+      safety_trigger: false
+    - label: CNG problem
+      effects:
+      - fault: F17-CG-01
+        effect: supports
+        strength: strong
+      - fault: F17-CG-02
+        effect: supports
+        strength: strong
+      - fault: F17-CG-03
+        effect: supports
+        strength: strong
+      - fault: F17-CG-04
+        effect: supports
+        strength: strong
+      - fault: F17-CG-05
+        effect: supports
+        strength: strong
+      - fault: F17-CG-06
+        effect: supports
+        strength: strong
+      - fault: F17-CG-07
+        effect: supports
+        strength: strong
+      - fault: F17-CG-08
+        effect: supports
+        strength: strong
+      - fault: F17-CG-09
+        effect: supports
+        strength: strong
+      - fault: F17-CG-10
+        effect: supports
+        strength: strong
+      - fault: F17-CG-11
+        effect: supports
+        strength: strong
+      - fault: F17-CG-12
+        effect: supports
+        strength: strong
+      - fault: F17-CG-13
+        effect: supports
+        strength: strong
+      - fault: F17-CG-14
+        effect: supports
+        strength: strong
+      - fault: F17-CG-15
+        effect: supports
+        strength: strong
+      - fault: F17-CG-16
+        effect: supports
+        strength: strong
+      - fault: F17-CG-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Diesel delivery
+      effects: []
+      safety_trigger: false
+    - label: AdBlue warning
+      effects: []
+      safety_trigger: false
+    - label: Other
+      effects:
+      - fault: F17-CG-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q01:
+    id: cng-q01
+    status: approved
+    stage: 3
+    text: Can you smell gas, or hear a hissing sound of gas leaking?
+    source_faults:
+    - F17-CG-01
+    - F17-CG-03
+    - F17-CG-04
+    - F17-CG-09
+    - F17-CG-14
+    merged_from:
+    - 'F17-CG-04 (stages_text): Can you smell gas or hear gas leaking?'
+    - 'F17-CG-01 (stages_text): Is there any gas smell?'
+    - 'F17-CG-03 (stages_text): Can you smell gas?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-04
+        effect: supports
+        strength: strong
+      - fault: F17-CG-14
+        effect: supports
+        strength: moderate
+      - fault: F17-CG-09
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F17-CG-04
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q02:
+    id: cng-q02
+    status: approved
+    stage: 3
+    text: Is gas leaking or hissing while the CNG is being filled?
+    source_faults:
+    - F17-CG-04
+    - F17-CG-14
+    merged_from:
+    - 'F17-CG-14 (stages_text): Is gas leaking during filling?'
+    - 'F17-CG-04 (symptoms): Smell after filling'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-14
+        effect: supports
+        strength: strong
+      - fault: F17-CG-04
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F17-CG-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q03:
+    id: cng-q03
+    status: approved
+    stage: 3
+    text: Is the CNG filling cap missing or cracked, or did the station refuse to fill?
+    source_faults:
+    - F17-CG-01
+    - F17-CG-15
+    merged_from:
+    - 'F17-CG-01 (symptoms): Cap missing'
+    - 'F17-CG-01 (symptoms): Filling refused'
+    - 'F17-CG-15 (symptoms): Filling refused'
+    options:
+    - label: The filling cap is missing or cracked
+      effects:
+      - fault: F17-CG-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The station refused to fill because the cylinder test or certificate is due
+      effects:
+      - fault: F17-CG-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F17-CG-01
+        effect: rules_out
+        strength: moderate
+      - fault: F17-CG-15
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q04:
+    id: cng-q04
+    status: approved
+    stage: 3
+    text: Does the car run normally on petrol?
+    source_faults:
+    - F17-CG-02
+    - F17-CG-03
+    - F17-CG-07
+    - F17-CG-10
+    - F17-CG-11
+    merged_from:
+    - 'F17-CG-03 (stages_text): Does it run normally on petrol?'
+    - 'F17-CG-02 (symptoms): Petrol OK'
+    - 'F17-CG-07 (symptoms): Petrol normal'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-07
+        effect: supports
+        strength: weak
+      - fault: F17-CG-10
+        effect: supports
+        strength: weak
+      - fault: F17-CG-02
+        effect: supports
+        strength: weak
+      - fault: F17-CG-03
+        effect: supports
+        strength: weak
+      - fault: F17-CG-11
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No, it has problems on petrol too
+      effects:
+      - fault: F17-CG-07
+        effect: rules_out
+        strength: moderate
+      - fault: F17-CG-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q05:
+    id: cng-q05
+    status: approved
+    stage: 3
+    text: Does the car stay on petrol and not change over to CNG?
+    source_faults:
+    - F17-CG-02
+    - F17-CG-03
+    - F17-CG-06
+    - F17-CG-12
+    - F17-CG-13
+    merged_from:
+    - 'F17-CG-03 (stages_text): Is the car not switching to CNG?'
+    - 'F17-CG-03 (symptoms): Stays on petrol'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-03
+        effect: supports
+        strength: strong
+      - fault: F17-CG-13
+        effect: supports
+        strength: moderate
+      - fault: F17-CG-02
+        effect: supports
+        strength: moderate
+      - fault: F17-CG-06
+        effect: supports
+        strength: weak
+      - fault: F17-CG-12
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No, it runs on CNG
+      effects:
+      - fault: F17-CG-03
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q06:
+    id: cng-q06
+    status: approved
+    stage: 3
+    text: When you press the CNG button, does its light change?
+    source_faults:
+    - F17-CG-02
+    - F17-CG-03
+    - F17-CG-16
+    merged_from:
+    - 'F17-CG-02 (stages_text): Does the switch light change?'
+    - 'F17-CG-02 (symptoms): No response'
+    options:
+    - label: No response, or no light
+      effects:
+      - fault: F17-CG-02
+        effect: supports
+        strength: strong
+      - fault: F17-CG-16
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: The light blinks
+      effects:
+      - fault: F17-CG-03
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Yes, it changes normally
+      effects:
+      - fault: F17-CG-02
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q07:
+    id: cng-q07
+    status: approved
+    stage: 3
+    text: What does the CNG level indicator show?
+    source_faults:
+    - F17-CG-05
+    - F17-CG-06
+    - F17-CG-12
+    merged_from:
+    - 'F17-CG-05 (stages_text): Does the car still run on CNG?'
+    - 'F17-CG-06 (stages_text): Is there petrol in the tank?'
+    - 'F17-CG-05 (symptoms): Jumping'
+    - 'F17-CG-06 (symptoms): Low/empty indicator'
+    options:
+    - label: Empty or low
+      effects:
+      - fault: F17-CG-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: No reading, stuck, or jumping, but the car runs on CNG
+      effects:
+      - fault: F17-CG-05
+        effect: supports
+        strength: strong
+      - fault: F17-CG-12
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Normal
+      effects:
+      - fault: F17-CG-06
+        effect: rules_out
+        strength: moderate
+      - fault: F17-CG-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q08:
+    id: cng-q08
+    status: approved
+    stage: 3
+    text: Does the engine jerk, misfire or lose power only when running on CNG?
+    source_faults:
+    - F17-CG-07
+    - F17-CG-09
+    - F17-CG-10
+    - F17-CG-11
+    - F17-CG-17
+    merged_from:
+    - 'F17-CG-07 (stages_text): Only on CNG?'
+    - 'F17-CG-10 (stages_text): Misfire only on CNG?'
+    - 'F17-CG-09 (stages_text): Is power low only on CNG?'
+    options:
+    - label: It jerks or misfires
+      effects:
+      - fault: F17-CG-07
+        effect: supports
+        strength: strong
+      - fault: F17-CG-10
+        effect: supports
+        strength: moderate
+      - fault: F17-CG-11
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: It feels weak, especially on the highway
+      effects:
+      - fault: F17-CG-09
+        effect: supports
+        strength: moderate
+      - fault: F17-CG-11
+        effect: supports
+        strength: moderate
+      - fault: F17-CG-17
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F17-CG-07
+        effect: rules_out
+        strength: moderate
+      - fault: F17-CG-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q09:
+    id: cng-q09
+    status: approved
+    stage: 3
+    text: Does the engine stop exactly when it changes over to CNG?
+    source_faults:
+    - F17-CG-08
+    - F17-CG-09
+    - F17-CG-13
+    merged_from:
+    - 'F17-CG-08 (stages_text): Does it stop exactly at changeover?'
+    - 'F17-CG-13 (symptoms): Stall'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-08
+        effect: supports
+        strength: strong
+      - fault: F17-CG-09
+        effect: supports
+        strength: weak
+      - fault: F17-CG-13
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F17-CG-08
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q10:
+    id: cng-q10
+    status: approved
+    stage: 3
+    text: Does the car switch back to petrol by itself at random times?
+    source_faults:
+    - F17-CG-12
+    - F17-CG-16
+    merged_from:
+    - 'F17-CG-12 (stages_text): Does it switch to petrol randomly?'
+    - 'F17-CG-16 (symptoms): Random switch'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-12
+        effect: supports
+        strength: strong
+      - fault: F17-CG-16
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F17-CG-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q11:
+    id: cng-q11
+    status: approved
+    stage: 3
+    text: Do you hear a clicking sound from the CNG kit?
+    source_faults:
+    - F17-CG-10
+    - F17-CG-13
+    merged_from:
+    - 'F17-CG-13 (stages_text): Do you hear clicking?'
+    - 'F17-CG-10 (symptoms): Ticking'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-13
+        effect: supports
+        strength: moderate
+      - fault: F17-CG-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q12:
+    id: cng-q12
+    status: approved
+    stage: 3
+    text: When was the CNG kit last serviced?
+    source_faults:
+    - F17-CG-11
+    - F17-CG-16
+    - F17-CG-17
+    merged_from:
+    - 'F17-CG-11 (stages_text): When was the CNG kit serviced?'
+    options:
+    - label: A long time ago, it is overdue
+      effects:
+      - fault: F17-CG-11
+        effect: supports
+        strength: strong
+      - fault: F17-CG-17
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Recently
+      effects:
+      - fault: F17-CG-11
+        effect: rules_out
+        strength: moderate
+      - fault: F17-CG-16
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q13:
+    id: cng-q13
+    status: approved
+    stage: 3
+    text: When was the CNG cylinder last tested, and has it been in an accident?
+    source_faults:
+    - F17-CG-15
+    merged_from:
+    - 'F17-CG-15 (stages_text): When was the cylinder last tested?'
+    - 'F17-CG-15 (symptoms): After accident'
+    options:
+    - label: The test is overdue, or there is rust or accident damage
+      effects:
+      - fault: F17-CG-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Tested recently, no damage
+      effects:
+      - fault: F17-CG-15
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q14:
+    id: cng-q14
+    status: approved
+    stage: 3
+    text: Have rats damaged any wiring?
+    source_faults:
+    - F17-CG-16
+    merged_from:
+    - 'F17-CG-16 (stages_text): Any rat damage?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q15:
+    id: cng-q15
+    status: approved
+    stage: 3
+    text: Was the CNG kit fitted after purchase (retrofit), and is it approved and written in the RC?
+    source_faults:
+    - F17-CG-17
+    merged_from:
+    - 'F17-CG-17 (stages_text): Is the kit approved and in RC?'
+    options:
+    - label: It is a retrofit kit
+      effects:
+      - fault: F17-CG-17
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It is a company-fitted kit
+      effects:
+      - fault: F17-CG-17
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question cng-q16:
+    id: cng-q16
+    status: approved
+    stage: 3
+    text: Is the engine warning light on?
+    source_faults:
+    - F17-CG-03
+    - F17-CG-07
+    - F17-CG-08
+    - F17-CG-10
+    - F17-CG-12
+    - F17-CG-16
+    merged_from:
+    - 'F17-CG-03 (stages_text): Is any warning light showing?'
+    - 'F17-CG-07 (symptoms): Engine light'
+    - 'F17-CG-12 (symptoms): Code'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F17-CG-07
+        effect: supports
+        strength: weak
+      - fault: F17-CG-08
+        effect: supports
+        strength: weak
+      - fault: F17-CG-12
+        effect: supports
+        strength: weak
+      - fault: F17-CG-16
+        effect: supports
+        strength: weak
+      - fault: F17-CG-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F17-CG-01:
+    status: approved
+    name: CNG Filling Cap Missing / Damaged
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Visual check and leak check.
+    danger_phrases:
+    - gas smell
+    safety_trigger_options: []
+  fault F17-CG-02:
+    status: approved
+    name: CNG Button / Selector Switch Issue
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Switch test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-03:
+    status: approved
+    name: Car Not Shifting to CNG Mode
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Scan and tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-04:
+    status: approved
+    name: CNG Leak / Safety Fault
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Approved leak test by a technician.
+    danger_phrases:
+    - gas smell
+    - hissing
+    safety_trigger_options:
+    - question: cng-q01
+      option: 'Yes'
+    - question: cng-q02
+      option: 'Yes'
+  fault F17-CG-05:
+    status: approved
+    name: CNG Level Indicator Not Working
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Scan data of the level sensor.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-06:
+    status: approved
+    name: CNG Cylinder Empty / Low Gas
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Refill the gas.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-07:
+    status: approved
+    name: CNG Mode Jerking / Misfiring
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Scan and ignition check.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-08:
+    status: approved
+    name: Engine Stalling When Switching to CNG
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Scan and live data.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-09:
+    status: approved
+    name: CNG Regulator / Reducer Fault
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Regulator pressure test.
+    danger_phrases:
+    - leak
+    safety_trigger_options:
+    - question: cng-q01
+      option: 'Yes'
+  fault F17-CG-10:
+    status: approved
+    name: CNG Injector / Injector Rail Fault
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Injector test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-11:
+    status: approved
+    name: CNG Filter Blocked / Service Due
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Filter inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-12:
+    status: approved
+    name: CNG Pressure Sensor Fault
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Pressure sensor signal test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-13:
+    status: approved
+    name: CNG Solenoid Valve Fault
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Solenoid and relay electrical tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-14:
+    status: approved
+    name: CNG Filling Valve / Receptacle Fault
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Leak test at the filling valve.
+    danger_phrases:
+    - gas leaking during filling
+    safety_trigger_options:
+    - question: cng-q01
+      option: 'Yes'
+    - question: cng-q02
+      option: 'Yes'
+  fault F17-CG-15:
+    status: approved
+    name: CNG Cylinder / High-Pressure Line Inspection Required
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Approved cylinder inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-16:
+    status: approved
+    name: CNG ECU / Wiring / Calibration Fault
+    stage2_choices:
+    - CNG problem
+    confirmation_test: Scan and wiring test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F17-CG-17:
+    status: approved
+    name: Low Pickup / Mileage on Retrofit CNG Kit  [NEW - India]
+    stage2_choices:
+    - CNG problem
+    - Other
+    confirmation_test: Scan and kit inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  safety_rule cng-s-F17-CG-01:
+    id: cng-s-F17-CG-01
+    status: approved
+    fault: F17-CG-01
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: 'Do not fill CNG without the cap. Keep the port clean. If you smell gas: Stop safely and switch
+      off the engine if it is safe. No smoking, flames or sparks. Everyone move away from the car and call qualified
+      CNG help or 112.'
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-02:
+    id: cng-s-F17-CG-02
+    status: approved
+    fault: F17-CG-02
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-03:
+    id: cng-s-F17-CG-03
+    status: approved
+    fault: F17-CG-03
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-04:
+    id: cng-s-F17-CG-04
+    status: approved
+    fault: F17-CG-04
+    risk_level: high
+    stop_driving_trigger: 'Do not drive: gas smell or hissing.'
+    roadside_action: Stop safely and switch off the engine if it is safe. No smoking, flames or sparks. Everyone
+      move away from the car and call qualified CNG help or 112. Do not drive the car. Call for a tow.
+    towing_recommendation: Yes.
+    source_text:
+      safety_precautions: '• Gas smell / hiss: stop safely, switch off if safe, no flames or sparks, everyone move
+        away, call qualified CNG help / 112.
+
+        • Never loosen CNG pipes or test leaks with a flame.'
+      if_towing_needed: YES.
+  safety_rule cng-s-F17-CG-05:
+    id: cng-s-F17-CG-05
+    status: approved
+    fault: F17-CG-05
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-06:
+    id: cng-s-F17-CG-06
+    status: approved
+    fault: F17-CG-06
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Switch to petrol and drive to a CNG station. Get out of the car while it is filled.
+    towing_recommendation: Only if both CNG and petrol are empty.
+    source_text:
+      safety_precautions: • Get out of car during filling.
+      if_towing_needed: If both fuels empty.
+  safety_rule cng-s-F17-CG-07:
+    id: cng-s-F17-CG-07
+    status: approved
+    fault: F17-CG-07
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-08:
+    id: cng-s-F17-CG-08
+    status: approved
+    fault: F17-CG-08
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-09:
+    id: cng-s-F17-CG-09
+    status: approved
+    fault: F17-CG-09
+    risk_level: medium
+    stop_driving_trigger: Stop if there is a gas smell or leak.
+    roadside_action: 'If there is a gas smell or leak: Stop safely and switch off the engine if it is safe. No smoking,
+      flames or sparks. Everyone move away from the car and call qualified CNG help or 112. Otherwise switch to
+      petrol and get the kit checked.'
+    towing_recommendation: Yes, if leaking.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: If leaking.
+  safety_rule cng-s-F17-CG-10:
+    id: cng-s-F17-CG-10
+    status: approved
+    fault: F17-CG-10
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-11:
+    id: cng-s-F17-CG-11
+    status: approved
+    fault: F17-CG-11
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-12:
+    id: cng-s-F17-CG-12
+    status: approved
+    fault: F17-CG-12
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-13:
+    id: cng-s-F17-CG-13
+    status: approved
+    fault: F17-CG-13
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-14:
+    id: cng-s-F17-CG-14
+    status: approved
+    fault: F17-CG-14
+    risk_level: high
+    stop_driving_trigger: Stop filling at once if gas leaks.
+    roadside_action: Stop filling and move away from the car. Stop safely and switch off the engine if it is safe.
+      No smoking, flames or sparks. Everyone move away from the car and call qualified CNG help or 112.
+    towing_recommendation: Yes, if leaking.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: If leaking.
+  safety_rule cng-s-F17-CG-15:
+    id: cng-s-F17-CG-15
+    status: approved
+    fault: F17-CG-15
+    risk_level: medium
+    stop_driving_trigger: Do not use CNG until the cylinder is inspected.
+    roadside_action: Run on petrol only, and get the cylinder inspected at an approved centre.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-16:
+    id: cng-s-F17-CG-16
+    status: approved
+    fault: F17-CG-16
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.
+  safety_rule cng-s-F17-CG-17:
+    id: cng-s-F17-CG-17
+    status: approved
+    fault: F17-CG-17
+    risk_level: low
+    stop_driving_trigger: Stop at once if you smell gas or hear hissing.
+    roadside_action: Do not loosen any CNG pipes. If there is no gas smell, you can switch to petrol and drive to
+      a CNG workshop.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never loosen CNG pipes or test leaks with a flame.
+      if_towing_needed: NO.

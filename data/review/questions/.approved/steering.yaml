@@ -1,0 +1,1361 @@
+category: steering
+loaded_at: '2026-10-23T19:51:25+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question steering-main:
+    id: steering-main
+    status: approved
+    stage: 2
+    text: What is the problem with the steering?
+    choice_source: proposed
+    options:
+    - label: Steering is very heavy or stuck
+      effects:
+      - fault: F03-ST-01
+        effect: supports
+        strength: strong
+      - fault: F03-ST-04
+        effect: supports
+        strength: strong
+      - fault: F03-ST-07
+        effect: supports
+        strength: strong
+      - fault: F03-ST-12
+        effect: supports
+        strength: strong
+      - fault: F03-ST-16
+        effect: supports
+        strength: strong
+      - fault: F03-ST-19
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Steering wheel is locked (car parked)
+      effects:
+      - fault: F03-ST-02
+        effect: supports
+        strength: strong
+      - fault: F03-ST-17
+        effect: supports
+        strength: strong
+      - fault: F03-ST-18
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Steering became heavy while driving
+      effects:
+      - fault: F03-ST-03
+        effect: supports
+        strength: strong
+      - fault: F03-ST-05
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Noise from the steering
+      effects:
+      - fault: F03-ST-08
+        effect: supports
+        strength: strong
+      - fault: F03-ST-14
+        effect: supports
+        strength: strong
+      - fault: F03-ST-15
+        effect: supports
+        strength: strong
+      - fault: F03-ST-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Steering wheel shakes or vibrates
+      effects:
+      - fault: F03-ST-09
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Steering feels loose
+      effects:
+      - fault: F03-ST-10
+        effect: supports
+        strength: strong
+      - fault: F03-ST-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Steering does not return to centre
+      effects:
+      - fault: F03-ST-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Power-steering oil low or leaking
+      effects:
+      - fault: F03-ST-12
+        effect: supports
+        strength: strong
+      - fault: F03-ST-13
+        effect: supports
+        strength: strong
+      - fault: F03-ST-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: EPS warning light
+      effects:
+      - fault: F03-ST-05
+        effect: supports
+        strength: strong
+      - fault: F03-ST-11
+        effect: supports
+        strength: strong
+      - fault: F03-ST-19
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Other
+      effects:
+      - fault: F03-ST-15
+        effect: supports
+        strength: strong
+      - fault: F03-ST-20
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q01:
+    id: steering-q01
+    status: approved
+    stage: 3
+    text: Is the car parked or moving right now?
+    source_faults:
+    - F03-ST-01
+    - F03-ST-02
+    - F03-ST-03
+    - F03-ST-05
+    - F03-ST-17
+    - F03-ST-18
+    merged_from:
+    - 'F03-ST-01 (stages_text): Is the car parked or moving right now?'
+    - 'F03-ST-03 (stages_text): Is the car still moving? Can you stop safely now?'
+    - 'F03-ST-05 (stages_text): Is the car parked or moving right now?'
+    options:
+    - label: Moving, and the steering just became heavy
+      effects:
+      - fault: F03-ST-03
+        effect: supports
+        strength: strong
+      - fault: F03-ST-05
+        effect: supports
+        strength: strong
+      - fault: F03-ST-01
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: Parked
+      effects:
+      - fault: F03-ST-02
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-17
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-18
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-03
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q02:
+    id: steering-q02
+    status: approved
+    stage: 3
+    text: Is the wheel completely stuck, or just very heavy?
+    source_faults:
+    - F03-ST-01
+    - F03-ST-02
+    - F03-ST-04
+    - F03-ST-07
+    - F03-ST-11
+    - F03-ST-12
+    - F03-ST-17
+    - F03-ST-18
+    - F03-ST-19
+    merged_from:
+    - 'F03-ST-01 (stages_text): Is the wheel completely stuck, or just very heavy?'
+    - 'F03-ST-02 (stages_text): Is the car parked and the wheel locked with no movement at all?'
+    options:
+    - label: Completely stuck, while the car is parked with the key out
+      effects:
+      - fault: F03-ST-02
+        effect: supports
+        strength: strong
+      - fault: F03-ST-17
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-18
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Completely stuck while trying to drive
+      effects:
+      - fault: F03-ST-01
+        effect: supports
+        strength: strong
+      - fault: F03-ST-07
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: Very heavy, but it turns
+      effects:
+      - fault: F03-ST-01
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-04
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-19
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-11
+        effect: supports
+        strength: weak
+      - fault: F03-ST-12
+        effect: supports
+        strength: weak
+      - fault: F03-ST-02
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: It turns normally
+      effects:
+      - fault: F03-ST-01
+        effect: rules_out
+        strength: moderate
+      - fault: F03-ST-02
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q03:
+    id: steering-q03
+    status: approved
+    stage: 3
+    text: Was the wheel turned after you took out the key?
+    source_faults:
+    - F03-ST-02
+    merged_from:
+    - 'F03-ST-02 (stages_text): Was the wheel turned after you took out the key?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-02
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F03-ST-02
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q04:
+    id: steering-q04
+    status: approved
+    stage: 3
+    text: When you try to start, do the dashboard lights come on and does the key fob work? Does the engine crank?
+    source_faults:
+    - F03-ST-02
+    - F03-ST-17
+    - F03-ST-18
+    merged_from:
+    - 'F03-ST-17 (stages_text): Do lights and fob work?'
+    - 'F03-ST-17 (stages_text): Does the car crank?'
+    - 'F03-ST-02 (stages_text): Do dashboard lights come on? Is the key fob battery weak?'
+    options:
+    - label: The lights are weak, or the fob battery is weak
+      effects:
+      - fault: F03-ST-17
+        effect: supports
+        strength: strong
+      - fault: F03-ST-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The lights are fine but the key will not turn
+      effects:
+      - fault: F03-ST-18
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Everything works
+      effects:
+      - fault: F03-ST-17
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q05:
+    id: steering-q05
+    status: approved
+    stage: 3
+    text: Does a spare key work?
+    source_faults:
+    - F03-ST-02
+    - F03-ST-18
+    merged_from:
+    - 'F03-ST-18 (stages_text): Does a spare key work?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-18
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F03-ST-18
+        effect: supports
+        strength: weak
+      - fault: F03-ST-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q06:
+    id: steering-q06
+    status: approved
+    stage: 3
+    text: Is the steering heavy only when parking or turning slowly?
+    source_faults:
+    - F03-ST-01
+    - F03-ST-04
+    - F03-ST-11
+    - F03-ST-12
+    merged_from:
+    - 'F03-ST-04 (stages_text): Is it heavy only when parking or turning slowly?'
+    options:
+    - label: Yes, and easier at speed
+      effects:
+      - fault: F03-ST-04
+        effect: supports
+        strength: strong
+      - fault: F03-ST-12
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No, heavy all the time
+      effects:
+      - fault: F03-ST-01
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-11
+        effect: supports
+        strength: weak
+      - fault: F03-ST-04
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q07:
+    id: steering-q07
+    status: approved
+    stage: 3
+    text: Did the heaviness come and go, or did it stay?
+    source_faults:
+    - F03-ST-01
+    - F03-ST-03
+    - F03-ST-05
+    - F03-ST-11
+    merged_from:
+    - 'F03-ST-05 (stages_text): Did the heaviness come and go, or stay?'
+    - 'F03-ST-05 (symptoms): may return after restart'
+    options:
+    - label: It comes and goes, or is fine after a restart
+      effects:
+      - fault: F03-ST-05
+        effect: supports
+        strength: strong
+      - fault: F03-ST-11
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It stays
+      effects:
+      - fault: F03-ST-03
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q08:
+    id: steering-q08
+    status: approved
+    stage: 3
+    text: Is it hard to turn in only one direction?
+    source_faults:
+    - F03-ST-07
+    - F03-ST-15
+    merged_from:
+    - 'F03-ST-07 (stages_text): Which direction is hard, left or right?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-07
+        effect: supports
+        strength: strong
+      - fault: F03-ST-15
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No, both directions
+      effects:
+      - fault: F03-ST-07
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q09:
+    id: steering-q09
+    status: approved
+    stage: 3
+    text: Does it bind or feel notchy at the same angle each time?
+    source_faults:
+    - F03-ST-15
+    - F03-ST-16
+    merged_from:
+    - 'F03-ST-16 (stages_text): Does it bind at the same angle?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-16
+        effect: supports
+        strength: strong
+      - fault: F03-ST-15
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F03-ST-16
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q10:
+    id: steering-q10
+    status: approved
+    stage: 3
+    text: Did it start after a battery problem, a jump-start, or a battery change?
+    source_faults:
+    - F03-ST-04
+    - F03-ST-11
+    - F03-ST-19
+    merged_from:
+    - 'F03-ST-19 (stages_text): Was there a battery problem?'
+    - 'F03-ST-19 (stages_text): Was it jump-started?'
+    - 'F03-ST-04 (stages_text): Did it start after a battery problem or slowly?'
+    - 'F03-ST-11 (stages_text): Did it start after a battery change or repair?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-19
+        effect: supports
+        strength: strong
+      - fault: F03-ST-04
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-11
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F03-ST-19
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q11:
+    id: steering-q11
+    status: approved
+    stage: 3
+    text: Is there a warning light? Is it steady or flashing?
+    source_faults:
+    - F03-ST-03
+    - F03-ST-04
+    - F03-ST-05
+    - F03-ST-11
+    - F03-ST-19
+    merged_from:
+    - 'F03-ST-11 (stages_text): Is the light steady or flashing, and is steering heavy?'
+    - 'F03-ST-05 (stages_text): Is the EPS light on or flashing?'
+    - 'F03-ST-03 (stages_text): Any EPS, battery or other warning light? Any noise or leak?'
+    options:
+    - label: EPS light steady
+      effects:
+      - fault: F03-ST-11
+        effect: supports
+        strength: strong
+      - fault: F03-ST-03
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-19
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: EPS light flashing
+      effects:
+      - fault: F03-ST-05
+        effect: supports
+        strength: strong
+      - fault: F03-ST-11
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Battery light
+      effects:
+      - fault: F03-ST-19
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-03
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-04
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: No warning light
+      effects:
+      - fault: F03-ST-11
+        effect: rules_out
+        strength: strong
+      - fault: F03-ST-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q12:
+    id: steering-q12
+    status: approved
+    stage: 3
+    text: Is the engine slow to start, or are the lights dim?
+    source_faults:
+    - F03-ST-04
+    - F03-ST-11
+    - F03-ST-19
+    merged_from:
+    - 'F03-ST-04 (stages_text): Any warning light, slow starting or dim lights?'
+    - 'F03-ST-11 (stages_text): Any other lights or starting problems?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-04
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-19
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q13:
+    id: steering-q13
+    status: approved
+    stage: 3
+    text: Does your car have oil (hydraulic) power steering? Is the fluid low, or is there oil under the car?
+    source_faults:
+    - F03-ST-12
+    - F03-ST-13
+    - F03-ST-14
+    merged_from:
+    - 'F03-ST-12 (stages_text): Is your car hydraulic or electric steering?'
+    - 'F03-ST-12 (stages_text): Any whine or oil marks?'
+    - 'F03-ST-13 (stages_text): What colour is the liquid and where is it?'
+    options:
+    - label: Oil is leaking under the car
+      effects:
+      - fault: F03-ST-13
+        effect: supports
+        strength: strong
+      - fault: F03-ST-12
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: The fluid level is low, no leak seen
+      effects:
+      - fault: F03-ST-12
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Electric steering, or the fluid is fine
+      effects:
+      - fault: F03-ST-12
+        effect: rules_out
+        strength: moderate
+      - fault: F03-ST-13
+        effect: rules_out
+        strength: moderate
+      - fault: F03-ST-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q14:
+    id: steering-q14
+    status: approved
+    stage: 3
+    text: Do you hear a whine when turning the steering?
+    source_faults:
+    - F03-ST-12
+    - F03-ST-14
+    merged_from:
+    - 'F03-ST-14 (stages_text): Is there a whine and when?'
+    - 'F03-ST-14 (stages_text): Is fluid low or foamy?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-14
+        effect: supports
+        strength: strong
+      - fault: F03-ST-12
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F03-ST-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q15:
+    id: steering-q15
+    status: approved
+    stage: 3
+    text: When do you hear a click, knock or grinding?
+    source_faults:
+    - F03-ST-08
+    - F03-ST-10
+    - F03-ST-15
+    - F03-ST-16
+    merged_from:
+    - 'F03-ST-08 (stages_text): When does the noise happen: left, right, full lock or bumps?'
+    - 'F03-ST-10 (stages_text): Any clunk or noise?'
+    options:
+    - label: When turning, or at full lock
+      effects:
+      - fault: F03-ST-08
+        effect: supports
+        strength: strong
+      - fault: F03-ST-15
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Over bumps
+      effects:
+      - fault: F03-ST-08
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: At the same steering angle
+      effects:
+      - fault: F03-ST-16
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: No noise
+      effects:
+      - fault: F03-ST-08
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q16:
+    id: steering-q16
+    status: approved
+    stage: 3
+    text: Does the steering wheel move a lot before the car reacts? Does the car wander?
+    source_faults:
+    - F03-ST-08
+    - F03-ST-10
+    - F03-ST-15
+    merged_from:
+    - 'F03-ST-10 (stages_text): How much does the wheel move before the car reacts?'
+    - 'F03-ST-10 (stages_text): Is it getting worse?'
+    options:
+    - label: Yes, a lot
+      effects:
+      - fault: F03-ST-10
+        effect: supports
+        strength: strong
+      - fault: F03-ST-08
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-15
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: A little
+      effects:
+      - fault: F03-ST-10
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F03-ST-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q17:
+    id: steering-q17
+    status: approved
+    stage: 3
+    text: Does the steering wheel shake? At what speed, or when braking?
+    source_faults:
+    - F03-ST-09
+    merged_from:
+    - 'F03-ST-09 (stages_text): At what speed does it shake, and does it happen when braking?'
+    options:
+    - label: At certain speeds
+      effects:
+      - fault: F03-ST-09
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: When braking
+      effects:
+      - fault: F03-ST-09
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F03-ST-09
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q18:
+    id: steering-q18
+    status: approved
+    stage: 3
+    text: After a turn, does the wheel stay turned instead of coming back to centre?
+    source_faults:
+    - F03-ST-06
+    merged_from:
+    - 'F03-ST-06 (stages_text): Does the wheel stay turned after a corner?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F03-ST-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q19:
+    id: steering-q19
+    status: approved
+    stage: 3
+    text: Did the car hit a pothole, have an accident, or get a tyre change before this started?
+    source_faults:
+    - F03-ST-06
+    - F03-ST-07
+    - F03-ST-08
+    - F03-ST-09
+    merged_from:
+    - 'F03-ST-06 (stages_text): Any recent pothole, accident or tyre change?'
+    - 'F03-ST-07 (stages_text): Any impact or pothole before this started?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-06
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-07
+        effect: supports
+        strength: moderate
+      - fault: F03-ST-09
+        effect: supports
+        strength: weak
+      - fault: F03-ST-08
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question steering-q20:
+    id: steering-q20
+    status: approved
+    stage: 3
+    text: Did a mechanic already suspect the steering rack, after testing the joints and mounts?
+    source_faults:
+    - F03-ST-15
+    merged_from:
+    - 'F03-ST-15 (stages_text): What tests have been done?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F03-ST-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F03-ST-01:
+    status: approved
+    name: Handle Jam / Steering Wheel Stiff or Jammed
+    stage2_choices:
+    - Steering is very heavy or stuck
+    confirmation_test: Warning-light check, battery voltage, scan, fluid check (hydraulic) and a look at the joints
+      and rack.
+    danger_phrases:
+    - wheel jammed while driving
+    safety_trigger_options:
+    - question: steering-q01
+      option: Moving, and the steering just became heavy
+    - question: steering-q02
+      option: Completely stuck while trying to drive
+  fault F03-ST-02:
+    status: approved
+    name: Handle Locked / Steering Wheel Lock (Parked)
+    stage2_choices:
+    - Steering wheel is locked (car parked)
+    confirmation_test: Release the lock with the correct method.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F03-ST-03:
+    status: approved
+    name: Power Steering Failure While Driving
+    stage2_choices:
+    - Steering became heavy while driving
+    confirmation_test: Scan and voltage test.
+    danger_phrases:
+    - power steering lost while driving
+    safety_trigger_options:
+    - question: steering-q01
+      option: Moving, and the steering just became heavy
+  fault F03-ST-04:
+    status: approved
+    name: Steering Heavy When Parking or at Low Speed
+    stage2_choices:
+    - Steering is very heavy or stuck
+    confirmation_test: Battery and charging test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F03-ST-05:
+    status: approved
+    name: Steering Suddenly Heavy While Driving (EPS Sensor / Module Fault)
+    stage2_choices:
+    - Steering became heavy while driving
+    - EPS warning light
+    confirmation_test: Scan and live data.
+    danger_phrases:
+    - sudden heavy steering
+    safety_trigger_options:
+    - question: steering-q01
+      option: Moving, and the steering just became heavy
+  fault F03-ST-06:
+    status: approved
+    name: Steering Wheel Does Not Return to Centre
+    stage2_choices:
+    - Steering does not return to centre
+    confirmation_test: Inspection and wheel alignment check.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F03-ST-07:
+    status: approved
+    name: Steering Hard to Turn in One Direction
+    stage2_choices:
+    - Steering is very heavy or stuck
+    confirmation_test: Hand-feel test, scan and inspection.
+    danger_phrases:
+    - jam
+    safety_trigger_options:
+    - question: steering-q02
+      option: Completely stuck while trying to drive
+  fault F03-ST-08:
+    status: approved
+    name: Clicking, Knocking or Grinding Noise from Steering
+    stage2_choices:
+    - Noise from the steering
+    confirmation_test: Inspection of tie-rod ends, mounts and joints.
+    danger_phrases:
+    - loose parts
+    safety_trigger_options:
+    - question: steering-q16
+      option: Yes, a lot
+  fault F03-ST-09:
+    status: approved
+    name: Steering Wheel Vibrates or Shakes
+    stage2_choices:
+    - Steering wheel shakes or vibrates
+    confirmation_test: Road test and inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F03-ST-10:
+    status: approved
+    name: Excessive Free Play / Loose Steering
+    stage2_choices:
+    - Steering feels loose
+    confirmation_test: Steering play test.
+    danger_phrases:
+    - very loose
+    safety_trigger_options:
+    - question: steering-q16
+      option: Yes, a lot
+  fault F03-ST-11:
+    status: approved
+    name: EPS Warning Light On
+    stage2_choices:
+    - EPS warning light
+    confirmation_test: Scan.
+    danger_phrases:
+    - heavy steering
+    safety_trigger_options: []
+  fault F03-ST-12:
+    status: approved
+    name: Hydraulic Power-Steering Fluid Low
+    stage2_choices:
+    - Power-steering oil low or leaking
+    - Steering is very heavy or stuck
+    confirmation_test: Leak check.
+    danger_phrases:
+    - very low fluid
+    safety_trigger_options:
+    - question: steering-q13
+      option: Oil is leaking under the car
+  fault F03-ST-13:
+    status: approved
+    name: Power-Steering Fluid Leaking
+    stage2_choices:
+    - Power-steering oil low or leaking
+    confirmation_test: Leak inspection.
+    danger_phrases:
+    - active leak
+    safety_trigger_options:
+    - question: steering-q13
+      option: Oil is leaking under the car
+  fault F03-ST-14:
+    status: approved
+    name: Power-Steering Pump Noise / Suspected Pump Failure
+    stage2_choices:
+    - Noise from the steering
+    - Power-steering oil low or leaking
+    confirmation_test: Fluid and belt check, pump inspection.
+    danger_phrases:
+    - belt broken
+    safety_trigger_options: []
+  fault F03-ST-15:
+    status: approved
+    name: Steering Rack or Pinion Problem Suspected
+    stage2_choices:
+    - Other
+    - Noise from the steering
+    - Steering feels loose
+    confirmation_test: Separate tests of the rack, joints and mounts.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: steering-q16
+      option: Yes, a lot
+  fault F03-ST-16:
+    status: approved
+    name: Steering Column or Universal-Joint Binding
+    stage2_choices:
+    - Steering is very heavy or stuck
+    - Noise from the steering
+    confirmation_test: Inspection of the steering column joints.
+    danger_phrases:
+    - strong binding
+    safety_trigger_options: []
+  fault F03-ST-17:
+    status: approved
+    name: Steering Wheel Remains Locked When Starting the Car
+    stage2_choices:
+    - Steering wheel is locked (car parked)
+    confirmation_test: Check the battery and key fob.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F03-ST-18:
+    status: approved
+    name: Steering Wheel Does Not Unlock With the Correct Key or Start Procedure
+    stage2_choices:
+    - Steering wheel is locked (car parked)
+    confirmation_test: Inspect the key and lock; try the spare key.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F03-ST-19:
+    status: approved
+    name: Steering Stiff After Battery Discharge or Electrical Failure
+    stage2_choices:
+    - Steering is very heavy or stuck
+    - EPS warning light
+    confirmation_test: Battery voltage test.
+    danger_phrases:
+    - heavy steering
+    safety_trigger_options: []
+  fault F03-ST-20:
+    status: approved
+    name: Multiple Steering Symptoms or Uncertain Steering Fault
+    stage2_choices:
+    - Other
+    confirmation_test: Full steering diagnostic.
+    danger_phrases: []
+    safety_trigger_options: []
+  safety_rule steering-s-F03-ST-01:
+    id: steering-s-F03-ST-01
+    status: approved
+    fault: F03-ST-01
+    risk_level: high
+    stop_driving_trigger: Do not drive if the wheel is jammed or heavy and control is uncertain.
+    roadside_action: Slow down smoothly, hold the wheel firmly with both hands, switch on the hazard lights and
+      stop in a safe place. Do not drive on. Call for a tow.
+    towing_recommendation: Yes, if the wheel is jammed or heavy and control is uncertain.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing needed if the wheel is jammed or heavy and control is uncertain, because you may
+        not be able to steer away from danger.
+  safety_rule steering-s-F03-ST-02:
+    id: steering-s-F03-ST-02
+    status: approved
+    fault: F03-ST-02
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Gently turn the steering wheel left and right while turning the key or pressing start. Do not
+      force it.
+    towing_recommendation: Not normally. Only if the lock stays stuck after proper checks.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing normally not needed. Tow only if the lock stays stuck after proper checks and the
+        car cannot be moved safely.
+  safety_rule steering-s-F03-ST-03:
+    id: steering-s-F03-ST-03
+    status: approved
+    fault: F03-ST-03
+    risk_level: high
+    stop_driving_trigger: 'Do not drive on: power steering failed while driving.'
+    roadside_action: Slow down smoothly, hold the wheel firmly with both hands, switch on the hazard lights and
+      stop in a safe place. Do not drive on. Call for a tow.
+    towing_recommendation: Yes; power help may drop again without warning.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing is the safe choice because power help may drop again without warning.
+  safety_rule steering-s-F03-ST-04:
+    id: steering-s-F03-ST-04
+    status: approved
+    fault: F03-ST-04
+    risk_level: medium
+    stop_driving_trigger: Stop if the steering suddenly becomes much heavier.
+    roadside_action: Drive gently to a garage. If the steering suddenly becomes much heavier, stop and call for
+      a tow.
+    towing_recommendation: Not usually, unless it suddenly becomes much heavier.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing not usually needed if steering is safe at normal speed; tow if it suddenly becomes
+        much heavier.
+  safety_rule steering-s-F03-ST-05:
+    id: steering-s-F03-ST-05
+    status: approved
+    fault: F03-ST-05
+    risk_level: high
+    stop_driving_trigger: 'Do not drive on: the assist can drop again.'
+    roadside_action: Slow down smoothly, hold the wheel firmly with both hands, switch on the hazard lights and
+      stop in a safe place. Do not drive on. Call for a tow.
+    towing_recommendation: Yes; the assist can drop again without warning.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing advised because the assist can drop again without warning.
+  safety_rule steering-s-F03-ST-06:
+    id: steering-s-F03-ST-06
+    status: approved
+    fault: F03-ST-06
+    risk_level: low
+    stop_driving_trigger: Stop if the steering feels unsafe.
+    roadside_action: Drive slowly to a garage for an alignment check.
+    towing_recommendation: Not usually, unless the steering feels unsafe.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing not usually needed unless steering feels unsafe.
+  safety_rule steering-s-F03-ST-07:
+    id: steering-s-F03-ST-07
+    status: approved
+    fault: F03-ST-07
+    risk_level: medium
+    stop_driving_trigger: Do not drive if it jams in either direction.
+    roadside_action: Do not force the steering lock or any part. Do not go under the car. If it jams, stop and call
+      for a tow.
+    towing_recommendation: Yes, if it jams in either direction.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if it is a jam in either direction.
+  safety_rule steering-s-F03-ST-08:
+    id: steering-s-F03-ST-08
+    status: approved
+    fault: F03-ST-08
+    risk_level: medium
+    stop_driving_trigger: Stop if parts feel loose or the steering feels unsafe.
+    roadside_action: Drive slowly to a garage. If the steering feels loose or unsafe, stop and call for a tow.
+    towing_recommendation: Only if parts are loose or the steering feels unsafe.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing needed only if parts are loose or steering feels unsafe.
+  safety_rule steering-s-F03-ST-09:
+    id: steering-s-F03-ST-09
+    status: approved
+    fault: F03-ST-09
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Drive at a lower speed and get the wheels and tyres checked.
+    towing_recommendation: Not usually.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing not usually needed.
+  safety_rule steering-s-F03-ST-10:
+    id: steering-s-F03-ST-10
+    status: approved
+    fault: F03-ST-10
+    risk_level: high
+    stop_driving_trigger: Do not drive if the steering is very loose.
+    roadside_action: If the steering is very loose, do not drive. Call for a tow.
+    towing_recommendation: Yes, if parts are very loose.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Towing if parts are very loose.
+  safety_rule steering-s-F03-ST-11:
+    id: steering-s-F03-ST-11
+    status: approved
+    fault: F03-ST-11
+    risk_level: medium
+    stop_driving_trigger: Do not drive if the steering is heavy or control is uncertain.
+    roadside_action: 'If the steering is heavy: Slow down smoothly, hold the wheel firmly with both hands, switch
+      on the hazard lights and stop in a safe place. Do not drive on. Call for a tow.'
+    towing_recommendation: Yes, if steering is heavy or control uncertain.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if steering is heavy or control uncertain.
+  safety_rule steering-s-F03-ST-12:
+    id: steering-s-F03-ST-12
+    status: approved
+    fault: F03-ST-12
+    risk_level: medium
+    stop_driving_trigger: Do not drive if the fluid is very low and the steering is heavy.
+    roadside_action: Do not add fluid yourself. If the steering is heavy, call for a tow.
+    towing_recommendation: Yes, if the level is very low and steering is heavy.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if level is very low and steering is heavy.
+  safety_rule steering-s-F03-ST-13:
+    id: steering-s-F03-ST-13
+    status: approved
+    fault: F03-ST-13
+    risk_level: medium
+    stop_driving_trigger: Do not drive while it is leaking actively.
+    roadside_action: Do not add fluid. If oil is actively leaking, do not drive; call for a tow.
+    towing_recommendation: Yes, if leaking actively.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if leaking actively.
+  safety_rule steering-s-F03-ST-14:
+    id: steering-s-F03-ST-14
+    status: approved
+    fault: F03-ST-14
+    risk_level: medium
+    stop_driving_trigger: Do not drive if the belt is broken and the steering is heavy.
+    roadside_action: Keep away from the belts. If the steering is heavy, call for a tow.
+    towing_recommendation: Yes, if the belt is broken and steering is heavy.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if belt is broken and steering is heavy.
+  safety_rule steering-s-F03-ST-15:
+    id: steering-s-F03-ST-15
+    status: approved
+    fault: F03-ST-15
+    risk_level: medium
+    stop_driving_trigger: Stop if the steering feels unsafe.
+    roadside_action: Drive slowly to a garage, or call for a tow if the steering feels unsafe.
+    towing_recommendation: Yes, if steering is unsafe.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if steering unsafe.
+  safety_rule steering-s-F03-ST-16:
+    id: steering-s-F03-ST-16
+    status: approved
+    fault: F03-ST-16
+    risk_level: medium
+    stop_driving_trigger: Do not drive if the binding is strong.
+    roadside_action: Do not force the steering lock or any part. Do not go under the car. If the binding is strong,
+      call for a tow.
+    towing_recommendation: Yes, if binding is strong.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if binding is strong.
+  safety_rule steering-s-F03-ST-17:
+    id: steering-s-F03-ST-17
+    status: approved
+    fault: F03-ST-17
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Change the key fob battery or get the car battery checked. Do not force the steering lock or
+      any part. Do not go under the car.
+    towing_recommendation: Yes, if it will not release.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if it will not release.
+  safety_rule steering-s-F03-ST-18:
+    id: steering-s-F03-ST-18
+    status: approved
+    fault: F03-ST-18
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Try the spare key. Do not force the steering lock or any part. Do not go under the car.
+    towing_recommendation: Yes, if the car cannot be moved.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if cannot move.
+  safety_rule steering-s-F03-ST-19:
+    id: steering-s-F03-ST-19
+    status: approved
+    fault: F03-ST-19
+    risk_level: medium
+    stop_driving_trigger: Do not drive if the steering stays heavy.
+    roadside_action: Get the battery checked or charged. If the steering stays heavy, call for a tow.
+    towing_recommendation: Yes, if heavy.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if heavy.
+  safety_rule steering-s-F03-ST-20:
+    id: steering-s-F03-ST-20
+    status: approved
+    fault: F03-ST-20
+    risk_level: medium
+    stop_driving_trigger: Stop if the steering feels unsafe.
+    roadside_action: If the steering feels unsafe, stop and call for a tow. Otherwise get a full steering check.
+    towing_recommendation: Yes, if unsafe.
+    source_text:
+      safety_precautions: Park on flat ground, hazard lights on, handbrake on. Use axle stands, never a jack alone.
+        Disconnect battery before touching EPS wiring (follow maker procedure; airbag wiring is in the column).
+        Keep hands away from belts. Do not test-drive a car with doubtful steering. Do not bypass or force the steering
+        lock.
+      if_towing_needed: Tow if unsafe.

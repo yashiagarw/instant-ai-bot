@@ -1,0 +1,1239 @@
+category: electrical
+loaded_at: '2026-10-23T19:34:25+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question electrical-main:
+    id: electrical-main
+    status: approved
+    stage: 2
+    text: What problem are you facing?
+    choice_source: file
+    options:
+    - label: Engine light is on
+      effects: []
+      safety_trigger: false
+    - label: Engine is shaking
+      effects: []
+      safety_trigger: false
+    - label: Engine is making noise
+      effects: []
+      safety_trigger: false
+    - label: Engine stopped
+      effects:
+      - fault: F12-EL-07
+        effect: supports
+        strength: strong
+      - fault: F12-EL-11
+        effect: supports
+        strength: strong
+      - fault: F12-EL-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Engine is heating
+      effects: []
+      safety_trigger: false
+    - label: Fuse has blown
+      effects:
+      - fault: F12-EL-01
+        effect: supports
+        strength: strong
+      - fault: F12-EL-04
+        effect: supports
+        strength: strong
+      - fault: F12-EL-06
+        effect: supports
+        strength: strong
+      - fault: F12-EL-13
+        effect: supports
+        strength: strong
+      - fault: F12-EL-19
+        effect: supports
+        strength: strong
+      - fault: F12-EL-20
+        effect: supports
+        strength: strong
+      - fault: F12-EL-27
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Wiring problem
+      effects:
+      - fault: F12-EL-02
+        effect: supports
+        strength: strong
+      - fault: F12-EL-03
+        effect: supports
+        strength: strong
+      - fault: F12-EL-04
+        effect: supports
+        strength: strong
+      - fault: F12-EL-05
+        effect: supports
+        strength: strong
+      - fault: F12-EL-07
+        effect: supports
+        strength: strong
+      - fault: F12-EL-08
+        effect: supports
+        strength: strong
+      - fault: F12-EL-09
+        effect: supports
+        strength: strong
+      - fault: F12-EL-10
+        effect: supports
+        strength: strong
+      - fault: F12-EL-16
+        effect: supports
+        strength: strong
+      - fault: F12-EL-17
+        effect: supports
+        strength: strong
+      - fault: F12-EL-18
+        effect: supports
+        strength: strong
+      - fault: F12-EL-20
+        effect: supports
+        strength: strong
+      - fault: F12-EL-21
+        effect: supports
+        strength: strong
+      - fault: F12-EL-23
+        effect: supports
+        strength: strong
+      - fault: F12-EL-24
+        effect: supports
+        strength: strong
+      - fault: F12-EL-26
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Electrical burning smell
+      effects:
+      - fault: F12-EL-05
+        effect: supports
+        strength: strong
+      - fault: F12-EL-19
+        effect: supports
+        strength: strong
+      - fault: F12-EL-25
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Headlight not working
+      effects: []
+      safety_trigger: false
+    - label: Indicator not working
+      effects: []
+      safety_trigger: false
+    - label: Horn not working
+      effects: []
+      safety_trigger: false
+    - label: Other problem
+      effects:
+      - fault: F12-EL-10
+        effect: supports
+        strength: strong
+      - fault: F12-EL-11
+        effect: supports
+        strength: strong
+      - fault: F12-EL-12
+        effect: supports
+        strength: strong
+      - fault: F12-EL-13
+        effect: supports
+        strength: strong
+      - fault: F12-EL-14
+        effect: supports
+        strength: strong
+      - fault: F12-EL-15
+        effect: supports
+        strength: strong
+      - fault: F12-EL-17
+        effect: supports
+        strength: strong
+      - fault: F12-EL-18
+        effect: supports
+        strength: strong
+      - fault: F12-EL-21
+        effect: supports
+        strength: strong
+      - fault: F12-EL-22
+        effect: supports
+        strength: strong
+      - fault: F12-EL-23
+        effect: supports
+        strength: strong
+      - fault: F12-EL-24
+        effect: supports
+        strength: strong
+      - fault: F12-EL-26
+        effect: supports
+        strength: strong
+      - fault: F12-EL-27
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q01:
+    id: electrical-q01
+    status: approved
+    stage: 3
+    text: Right now, is there smoke, sparks, fire or a burning plastic smell?
+    source_faults:
+    - F12-EL-01
+    - F12-EL-04
+    - F12-EL-05
+    - F12-EL-19
+    - F12-EL-25
+    - F12-EL-27
+    merged_from:
+    - 'F12-EL-25 (AI_DIAGNOSIS_RULES): Is there smoke or fire now?'
+    - 'F12-EL-05 (AI_DIAGNOSIS_RULES): Is there smoke or burning smell now?'
+    - 'F12-EL-19 (AI_DIAGNOSIS_RULES): Is it still smoking or smelling?'
+    - 'F12-EL-01 (stages_text): Is there any burning smell?'
+    options:
+    - label: Smoke, sparks or fire
+      effects:
+      - fault: F12-EL-25
+        effect: supports
+        strength: strong
+      - fault: F12-EL-05
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-19
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: A burning plastic smell only
+      effects:
+      - fault: F12-EL-25
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-19
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-04
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-05
+        effect: supports
+        strength: weak
+      - fault: F12-EL-27
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F12-EL-25
+        effect: rules_out
+        strength: strong
+      - fault: F12-EL-19
+        effect: rules_out
+        strength: moderate
+      - fault: F12-EL-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q02:
+    id: electrical-q02
+    status: approved
+    stage: 3
+    text: Can you see melted plastic, or brown or black marks, on the fuse box or a plug?
+    source_faults:
+    - F12-EL-01
+    - F12-EL-05
+    - F12-EL-19
+    merged_from:
+    - 'F12-EL-19 (symptoms): Melted plastic'
+    - 'F12-EL-05 (symptoms): Melted insulation'
+    - 'F12-EL-01 (stages_text): Can you see damaged wiring?'
+    options:
+    - label: Melted fuse box or plug
+      effects:
+      - fault: F12-EL-19
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Burnt or cut wiring under the bonnet
+      effects:
+      - fault: F12-EL-05
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F12-EL-19
+        effect: rules_out
+        strength: moderate
+      - fault: F12-EL-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q03:
+    id: electrical-q03
+    status: approved
+    stage: 3
+    text: How many electrical items have stopped working?
+    source_faults:
+    - F12-EL-01
+    - F12-EL-02
+    - F12-EL-04
+    - F12-EL-05
+    - F12-EL-06
+    - F12-EL-07
+    - F12-EL-10
+    - F12-EL-13
+    - F12-EL-17
+    - F12-EL-18
+    - F12-EL-27
+    merged_from:
+    - 'F12-EL-01 (stages_text): Is only one item affected?'
+    - 'F12-EL-01 (stages_text): Are multiple items affected?'
+    - 'F12-EL-01 (AI_DIAGNOSIS_RULES): Which item stopped working?'
+    - 'F12-EL-18 (AI_DIAGNOSIS_RULES): Which functions stopped?'
+    options:
+    - label: Only one item
+      effects:
+      - fault: F12-EL-01
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-02
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-13
+        effect: supports
+        strength: weak
+      - fault: F12-EL-06
+        effect: supports
+        strength: weak
+      - fault: F12-EL-04
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Many items at once
+      effects:
+      - fault: F12-EL-04
+        effect: supports
+        strength: strong
+      - fault: F12-EL-05
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-17
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-18
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-10
+        effect: supports
+        strength: weak
+      - fault: F12-EL-27
+        effect: supports
+        strength: weak
+      - fault: F12-EL-01
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Everything is dead
+      effects:
+      - fault: F12-EL-27
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-07
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-05
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q04:
+    id: electrical-q04
+    status: approved
+    stage: 3
+    text: Has the same fuse blown again? When does it blow?
+    source_faults:
+    - F12-EL-01
+    - F12-EL-04
+    - F12-EL-06
+    - F12-EL-08
+    - F12-EL-21
+    merged_from:
+    - 'F12-EL-06 (AI_DIAGNOSIS_RULES): When does it blow - when switching on, in rain, on bumps?'
+    - 'F12-EL-01 (AI_DIAGNOSIS_RULES): Did the fuse blow again?'
+    - 'F12-EL-01 (stages_text): Did the fuse blow again?'
+    options:
+    - label: It blows as soon as the item is switched on
+      effects:
+      - fault: F12-EL-06
+        effect: supports
+        strength: strong
+      - fault: F12-EL-04
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It blows in rain or on bumps
+      effects:
+      - fault: F12-EL-06
+        effect: supports
+        strength: strong
+      - fault: F12-EL-21
+        effect: supports
+        strength: weak
+      - fault: F12-EL-08
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: It blew once
+      effects:
+      - fault: F12-EL-01
+        effect: supports
+        strength: strong
+      - fault: F12-EL-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: No fuse has blown
+      effects:
+      - fault: F12-EL-01
+        effect: rules_out
+        strength: strong
+      - fault: F12-EL-06
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q05:
+    id: electrical-q05
+    status: approved
+    stage: 3
+    text: Does the item work when a wire is moved, or did it stop after a bump?
+    source_faults:
+    - F12-EL-02
+    - F12-EL-08
+    - F12-EL-21
+    merged_from:
+    - 'F12-EL-02 (AI_DIAGNOSIS_RULES): Does it work when the wire moves?'
+    - 'F12-EL-02 (stages_text): Did it stop after a bump?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-02
+        effect: supports
+        strength: strong
+      - fault: F12-EL-21
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-08
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-02
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q06:
+    id: electrical-q06
+    status: approved
+    stage: 3
+    text: When does the problem happen?
+    source_faults:
+    - F12-EL-02
+    - F12-EL-07
+    - F12-EL-08
+    - F12-EL-10
+    - F12-EL-16
+    - F12-EL-21
+    merged_from:
+    - 'F12-EL-21 (AI_DIAGNOSIS_RULES): When does it happen - bumps, rain, heat?'
+    - 'F12-EL-08 (AI_DIAGNOSIS_RULES): Is it worse in rain?'
+    - 'F12-EL-16 (AI_DIAGNOSIS_RULES): Is the fault worse when hot?'
+    options:
+    - label: In rain, or after a car wash
+      effects:
+      - fault: F12-EL-08
+        effect: supports
+        strength: strong
+      - fault: F12-EL-10
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-21
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: On bumps
+      effects:
+      - fault: F12-EL-21
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-07
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: When the engine is hot
+      effects:
+      - fault: F12-EL-16
+        effect: supports
+        strength: strong
+      - fault: F12-EL-21
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: All the time
+      effects:
+      - fault: F12-EL-21
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q07:
+    id: electrical-q07
+    status: approved
+    stage: 3
+    text: Did the car stand in water or get flooded? How deep?
+    source_faults:
+    - F12-EL-01
+    - F12-EL-08
+    - F12-EL-10
+    merged_from:
+    - 'F12-EL-10 (AI_DIAGNOSIS_RULES): Did the car stand in water? How deep?'
+    - 'F12-EL-01 (stages_text): Did the problem start after rain?'
+    options:
+    - label: Yes, deep water (above the floor)
+      effects:
+      - fault: F12-EL-10
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Wet carpets or a damp smell only
+      effects:
+      - fault: F12-EL-10
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-08
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q08:
+    id: electrical-q08
+    status: approved
+    stage: 3
+    text: Was any new accessory or a CNG kit fitted recently?
+    source_faults:
+    - F12-EL-04
+    - F12-EL-12
+    - F12-EL-17
+    - F12-EL-20
+    - F12-EL-26
+    merged_from:
+    - 'F12-EL-20 (AI_DIAGNOSIS_RULES): Was any accessory fitted recently?'
+    - 'F12-EL-17 (AI_DIAGNOSIS_RULES): Any new accessory fitted?'
+    - 'F12-EL-26 (AI_DIAGNOSIS_RULES): When was the kit fitted?'
+    - 'F12-EL-12 (AI_DIAGNOSIS_RULES): Any new device fitted?'
+    options:
+    - label: An accessory (lights, music, alarm, camera)
+      effects:
+      - fault: F12-EL-20
+        effect: supports
+        strength: strong
+      - fault: F12-EL-17
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-12
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-04
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: A CNG kit
+      effects:
+      - fault: F12-EL-26
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-20
+        effect: rules_out
+        strength: moderate
+      - fault: F12-EL-26
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q09:
+    id: electrical-q09
+    status: approved
+    stage: 3
+    text: Can you smell gas or fuel near the car?
+    source_faults:
+    - F12-EL-09
+    - F12-EL-26
+    merged_from:
+    - 'F12-EL-26 (AI_DIAGNOSIS_RULES): Gas smell?'
+    - 'F12-EL-09 (AI_DIAGNOSIS_RULES): Any fuel smell?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-26
+        effect: supports
+        strength: moderate
+      - fault: F12-EL-09
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q10:
+    id: electrical-q10
+    status: approved
+    stage: 3
+    text: Can you see chewed wires, droppings or a rat nest under the bonnet?
+    source_faults:
+    - F12-EL-09
+    merged_from:
+    - 'F12-EL-09 (AI_DIAGNOSIS_RULES): Can you see chewed wires?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-09
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-09
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q11:
+    id: electrical-q11
+    status: approved
+    stage: 3
+    text: Does the battery go flat after the car is parked overnight, although it drives fine?
+    source_faults:
+    - F12-EL-01
+    - F12-EL-12
+    - F12-EL-20
+    merged_from:
+    - 'F12-EL-12 (AI_DIAGNOSIS_RULES): Does it drain overnight?'
+    - 'F12-EL-01 (stages_text): Does the battery drain quickly?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-12
+        effect: supports
+        strength: strong
+      - fault: F12-EL-20
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q12:
+    id: electrical-q12
+    status: approved
+    stage: 3
+    text: Is the red battery light on while driving, or is there a belt squeal?
+    source_faults:
+    - F12-EL-11
+    merged_from:
+    - 'F12-EL-11 (AI_DIAGNOSIS_RULES): Is the red battery light on?'
+    - 'F12-EL-11 (stages_text): Belt squeal?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-11
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q13:
+    id: electrical-q13
+    status: approved
+    stage: 3
+    text: Was the battery changed recently, or is there white powder on the battery terminals?
+    source_faults:
+    - F12-EL-07
+    - F12-EL-18
+    merged_from:
+    - 'F12-EL-07 (AI_DIAGNOSIS_RULES): Was the battery changed recently?'
+    - 'F12-EL-07 (stages_text): Is there white powder?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-07
+        effect: supports
+        strength: strong
+      - fault: F12-EL-18
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-07
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q14:
+    id: electrical-q14
+    status: approved
+    stage: 3
+    text: Was the car jump-started recently with the cables connected the wrong way, or with sparks?
+    source_faults:
+    - F12-EL-27
+    merged_from:
+    - 'F12-EL-27 (AI_DIAGNOSIS_RULES): Were cables connected the wrong way?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-27
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-27
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q15:
+    id: electrical-q15
+    status: approved
+    stage: 3
+    text: Do the dashboard lights flicker, or do the needles drop to zero?
+    source_faults:
+    - F12-EL-01
+    - F12-EL-17
+    - F12-EL-22
+    - F12-EL-24
+    merged_from:
+    - 'F12-EL-01 (stages_text): Are dashboard lights flickering?'
+    - 'F12-EL-22 (AI_DIAGNOSIS_RULES): Is the whole dashboard dead or flickering?'
+    - 'F12-EL-17 (AI_DIAGNOSIS_RULES): Did many lights come together?'
+    options:
+    - label: The whole dashboard is dead or flickers
+      effects:
+      - fault: F12-EL-22
+        effect: supports
+        strength: strong
+      - fault: F12-EL-24
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Many warning lights come on together and the gauges drop
+      effects:
+      - fault: F12-EL-17
+        effect: supports
+        strength: strong
+      - fault: F12-EL-22
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-22
+        effect: rules_out
+        strength: moderate
+      - fault: F12-EL-17
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q16:
+    id: electrical-q16
+    status: approved
+    stage: 3
+    text: When you try to start the car, what happens?
+    source_faults:
+    - F12-EL-07
+    - F12-EL-14
+    - F12-EL-15
+    - F12-EL-24
+    merged_from:
+    - 'F12-EL-15 (AI_DIAGNOSIS_RULES): Do dashboard lights come on?'
+    - 'F12-EL-15 (stages_text): Click or no sound?'
+    - 'F12-EL-14 (AI_DIAGNOSIS_RULES): Does the dashboard light up at key ON?'
+    - 'F12-EL-24 (AI_DIAGNOSIS_RULES): Is the starter slow?'
+    options:
+    - label: The dashboard does not light up when the key is turned
+      effects:
+      - fault: F12-EL-14
+        effect: supports
+        strength: strong
+      - fault: F12-EL-07
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The dashboard lights up, but the engine does not turn (a click or no sound)
+      effects:
+      - fault: F12-EL-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The engine turns slowly
+      effects:
+      - fault: F12-EL-24
+        effect: supports
+        strength: strong
+      - fault: F12-EL-07
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It starts normally
+      effects:
+      - fault: F12-EL-14
+        effect: rules_out
+        strength: moderate
+      - fault: F12-EL-15
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q17:
+    id: electrical-q17
+    status: approved
+    stage: 3
+    text: Does the engine cut out when the key is touched or bumped?
+    source_faults:
+    - F12-EL-14
+    merged_from:
+    - 'F12-EL-14 (symptoms): Engine cuts when key is touched'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q18:
+    id: electrical-q18
+    status: approved
+    stage: 3
+    text: Do you hear clicking from the fuse box, or does an item stay on after the car is switched off?
+    source_faults:
+    - F12-EL-12
+    - F12-EL-13
+    merged_from:
+    - 'F12-EL-13 (AI_DIAGNOSIS_RULES): Do you hear clicking?'
+    - 'F12-EL-13 (symptoms): Item stays ON'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-13
+        effect: supports
+        strength: strong
+      - fault: F12-EL-12
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-13
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q19:
+    id: electrical-q19
+    status: approved
+    stage: 3
+    text: Was a sensor already replaced, but the same fault code came back?
+    source_faults:
+    - F12-EL-03
+    merged_from:
+    - 'F12-EL-03 (AI_DIAGNOSIS_RULES): Was the sensor already changed?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F12-EL-03
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-03
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question electrical-q20:
+    id: electrical-q20
+    status: approved
+    stage: 3
+    text: Is the problem with the power windows or door locks? One door or all?
+    source_faults:
+    - F12-EL-23
+    merged_from:
+    - 'F12-EL-23 (AI_DIAGNOSIS_RULES): Is it one window or all?'
+    options:
+    - label: Yes, one door
+      effects:
+      - fault: F12-EL-23
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Yes, all doors
+      effects:
+      - fault: F12-EL-23
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F12-EL-23
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F12-EL-01:
+    status: approved
+    name: Blown Fuse - Single Circuit
+    stage2_choices:
+    - Fuse has blown
+    confirmation_test: Fuse check and test of the item.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-02:
+    status: approved
+    name: Loose / Damaged Wire - Single Component
+    stage2_choices:
+    - Wiring problem
+    confirmation_test: Wiggle test and voltage drop test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-03:
+    status: approved
+    name: Sensor Circuit Wiring Fault
+    stage2_choices:
+    - Wiring problem
+    confirmation_test: Pin voltage and continuity tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-04:
+    status: approved
+    name: Short Circuit Affecting Multiple Systems
+    stage2_choices:
+    - Fuse has blown
+    - Wiring problem
+    confirmation_test: Isolation test.
+    danger_phrases:
+    - burning smell
+    - smoke
+    safety_trigger_options:
+    - question: electrical-q01
+      option: A burning plastic smell only
+  fault F12-EL-05:
+    status: approved
+    name: Major Wiring Harness Damage / Fire Risk
+    stage2_choices:
+    - Wiring problem
+    - Electrical burning smell
+    confirmation_test: Inspection and circuit tests.
+    danger_phrases:
+    - smoke
+    - burning smell
+    safety_trigger_options:
+    - question: electrical-q01
+      option: A burning plastic smell only
+    - question: electrical-q01
+      option: Smoke, sparks or fire
+    - question: electrical-q02
+      option: Burnt or cut wiring under the bonnet
+  fault F12-EL-06:
+    status: approved
+    name: Repeated Fuse Blowing
+    stage2_choices:
+    - Fuse has blown
+    confirmation_test: Isolation test and current draw.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-07:
+    status: approved
+    name: Loose Battery Terminal / Ground Connection
+    stage2_choices:
+    - Wiring problem
+    - Engine stopped
+    confirmation_test: Voltage drop test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-08:
+    status: approved
+    name: Corroded Electrical Connector
+    stage2_choices:
+    - Wiring problem
+    confirmation_test: Inspection and voltage drop test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-09:
+    status: approved
+    name: Rodent-Damaged Wiring
+    stage2_choices:
+    - Wiring problem
+    confirmation_test: Inspection.
+    danger_phrases:
+    - fuel smell
+    safety_trigger_options:
+    - question: electrical-q09
+      option: 'Yes'
+  fault F12-EL-10:
+    status: approved
+    name: Water-Damaged Electrical Wiring
+    stage2_choices:
+    - Wiring problem
+    - Other problem
+    confirmation_test: Inspection and scan.
+    danger_phrases:
+    - stood in deep water
+    safety_trigger_options:
+    - question: electrical-q07
+      option: Yes, deep water (above the floor)
+  fault F12-EL-11:
+    status: approved
+    name: Alternator Charging Circuit Fault
+    stage2_choices:
+    - Other problem
+    - Engine stopped
+    confirmation_test: Charging and voltage drop tests.
+    danger_phrases:
+    - red battery light
+    safety_trigger_options: []
+  fault F12-EL-12:
+    status: approved
+    name: Parasitic Battery Drain / Current Leakage
+    stage2_choices:
+    - Other problem
+    confirmation_test: Parasitic draw test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-13:
+    status: approved
+    name: Faulty Relay / Relay Socket
+    stage2_choices:
+    - Other problem
+    - Fuse has blown
+    confirmation_test: Relay swap test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-14:
+    status: approved
+    name: Ignition Switch Electrical Fault
+    stage2_choices:
+    - Other problem
+    - Engine stopped
+    confirmation_test: Voltage at each key position.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-15:
+    status: approved
+    name: Starter Control Wiring Fault
+    stage2_choices:
+    - Other problem
+    confirmation_test: Signal at the starter solenoid.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-16:
+    status: approved
+    name: Engine Wiring Harness Open Circuit
+    stage2_choices:
+    - Wiring problem
+    confirmation_test: Continuity test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-17:
+    status: approved
+    name: CAN Bus / Communication Wiring Fault
+    stage2_choices:
+    - Wiring problem
+    - Other problem
+    confirmation_test: CAN network tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-18:
+    status: approved
+    name: ECU / BCM Power or Ground Fault
+    stage2_choices:
+    - Wiring problem
+    - Other problem
+    confirmation_test: Voltage drop tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-19:
+    status: approved
+    name: Melted Fuse Box / Burnt Connector
+    stage2_choices:
+    - Electrical burning smell
+    - Fuse has blown
+    confirmation_test: Inspection and load test.
+    danger_phrases:
+    - melted fuse box
+    - smoke
+    safety_trigger_options:
+    - question: electrical-q01
+      option: A burning plastic smell only
+    - question: electrical-q01
+      option: Smoke, sparks or fire
+    - question: electrical-q02
+      option: Melted fuse box or plug
+  fault F12-EL-20:
+    status: approved
+    name: Aftermarket Accessory Wiring Fault
+    stage2_choices:
+    - Wiring problem
+    - Fuse has blown
+    confirmation_test: Disconnect test of the accessory.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-21:
+    status: approved
+    name: Intermittent Electrical Failure
+    stage2_choices:
+    - Wiring problem
+    - Other problem
+    confirmation_test: Wiggle test and data logging.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-22:
+    status: approved
+    name: Dashboard / Instrument Cluster Power Fault
+    stage2_choices:
+    - Other problem
+    confirmation_test: Pin tests at the instrument cluster.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-23:
+    status: approved
+    name: Electric Window / Door Lock Wiring Fault
+    stage2_choices:
+    - Other problem
+    - Wiring problem
+    confirmation_test: Power check at the window or lock motor.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-24:
+    status: approved
+    name: Main Ground Strap / Earth Fault
+    stage2_choices:
+    - Wiring problem
+    - Other problem
+    confirmation_test: Voltage drop test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F12-EL-25:
+    status: approved
+    name: Electrical Burning Smell / Smoke / Fire Risk
+    stage2_choices:
+    - Electrical burning smell
+    confirmation_test: Inspection once it is safe.
+    danger_phrases:
+    - smoke
+    - sparks
+    - fire
+    safety_trigger_options:
+    - question: electrical-q01
+      option: A burning plastic smell only
+    - question: electrical-q01
+      option: Smoke, sparks or fire
+  fault F12-EL-26:
+    status: approved
+    name: Electrical Faults After Retrofit CNG Kit Fitting  [NEW - India]
+    stage2_choices:
+    - Wiring problem
+    - Other problem
+    confirmation_test: Inspection of the CNG kit wiring.
+    danger_phrases:
+    - gas smell
+    safety_trigger_options:
+    - question: electrical-q09
+      option: 'Yes'
+  fault F12-EL-27:
+    status: approved
+    name: Damage After Wrong Jump-Start (Reverse Polarity / Sparks)  [NEW - India]
+    stage2_choices:
+    - Other problem
+    - Fuse has blown
+    confirmation_test: Main fuse and module tests.
+    danger_phrases:
+    - burnt smell
+    safety_trigger_options:
+    - question: electrical-q01
+      option: A burning plastic smell only

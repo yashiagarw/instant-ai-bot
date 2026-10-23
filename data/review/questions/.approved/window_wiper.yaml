@@ -1,0 +1,706 @@
+category: window_wiper
+loaded_at: '2026-10-23T19:48:22+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question window_wiper-main:
+    id: window_wiper-main
+    status: approved
+    stage: 2
+    text: What problem are you facing?
+    choice_source: file
+    options:
+    - label: Side mirror problem
+      effects: []
+      safety_trigger: false
+    - label: Car inspection
+      effects: []
+      safety_trigger: false
+    - label: Suspension noise
+      effects: []
+      safety_trigger: false
+    - label: Door problem
+      effects: []
+      safety_trigger: false
+    - label: Bonnet / boot problem
+      effects: []
+      safety_trigger: false
+    - label: Window problem
+      effects:
+      - fault: F14-WW-02
+        effect: supports
+        strength: strong
+      - fault: F14-WW-03
+        effect: supports
+        strength: strong
+      - fault: F14-WW-09
+        effect: supports
+        strength: strong
+      - fault: F14-WW-10
+        effect: supports
+        strength: strong
+      - fault: F14-WW-11
+        effect: supports
+        strength: strong
+      - fault: F14-WW-12
+        effect: supports
+        strength: strong
+      - fault: F14-WW-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Wiper problem
+      effects:
+      - fault: F14-WW-01
+        effect: supports
+        strength: strong
+      - fault: F14-WW-05
+        effect: supports
+        strength: strong
+      - fault: F14-WW-06
+        effect: supports
+        strength: strong
+      - fault: F14-WW-07
+        effect: supports
+        strength: strong
+      - fault: F14-WW-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Sunroof problem
+      effects:
+      - fault: F14-WW-04
+        effect: supports
+        strength: strong
+      - fault: F14-WW-13
+        effect: supports
+        strength: strong
+      - fault: F14-WW-14
+        effect: supports
+        strength: strong
+      - fault: F14-WW-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Other
+      effects:
+      - fault: F14-WW-08
+        effect: supports
+        strength: strong
+      - fault: F14-WW-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q01:
+    id: window_wiper-q01
+    status: approved
+    stage: 3
+    text: Is it raining now, and the wipers do not work so you cannot see clearly?
+    source_faults:
+    - F14-WW-01
+    - F14-WW-06
+    - F14-WW-07
+    merged_from:
+    - 'F14-WW-01 (AI_DIAGNOSIS_RULES): Are the wipers moving at all?'
+    - 'F14-WW-01 (stages_text): Is it raining now?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-WW-01
+        effect: supports
+        strength: strong
+      - fault: F14-WW-06
+        effect: supports
+        strength: moderate
+      - fault: F14-WW-07
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q02:
+    id: window_wiper-q02
+    status: approved
+    stage: 3
+    text: What do the wipers do?
+    source_faults:
+    - F14-WW-01
+    - F14-WW-05
+    - F14-WW-06
+    - F14-WW-07
+    merged_from:
+    - 'F14-WW-01 (AI_DIAGNOSIS_RULES): Are the wipers moving at all?'
+    - 'F14-WW-07 (AI_DIAGNOSIS_RULES): Does the motor run?'
+    - 'F14-WW-06 (AI_DIAGNOSIS_RULES): Does the fuse keep blowing?'
+    options:
+    - label: They do not move at all
+      effects:
+      - fault: F14-WW-01
+        effect: supports
+        strength: strong
+      - fault: F14-WW-06
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The motor hums but the wipers do not move, or one arm is loose
+      effects:
+      - fault: F14-WW-07
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: They move but leave streaks or squeak
+      effects:
+      - fault: F14-WW-05
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The wipers work fine
+      effects:
+      - fault: F14-WW-01
+        effect: rules_out
+        strength: moderate
+      - fault: F14-WW-06
+        effect: rules_out
+        strength: moderate
+      - fault: F14-WW-07
+        effect: rules_out
+        strength: moderate
+      - fault: F14-WW-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q03:
+    id: window_wiper-q03
+    status: approved
+    stage: 3
+    text: Does the wiper fuse keep blowing?
+    source_faults:
+    - F14-WW-01
+    - F14-WW-06
+    merged_from:
+    - 'F14-WW-06 (AI_DIAGNOSIS_RULES): Does the fuse keep blowing?'
+    - 'F14-WW-01 (symptoms): Fuse blown'
+    options:
+    - label: It keeps blowing
+      effects:
+      - fault: F14-WW-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It blew once
+      effects:
+      - fault: F14-WW-01
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q04:
+    id: window_wiper-q04
+    status: approved
+    stage: 3
+    text: Is the wiper rubber torn?
+    source_faults:
+    - F14-WW-05
+    merged_from:
+    - 'F14-WW-05 (AI_DIAGNOSIS_RULES): Is the rubber torn?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-WW-05
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-WW-05
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q05:
+    id: window_wiper-q05
+    status: approved
+    stage: 3
+    text: Does the washer spray water? Do you hear the pump?
+    source_faults:
+    - F14-WW-08
+    merged_from:
+    - 'F14-WW-08 (AI_DIAGNOSIS_RULES): Does the pump make sound?'
+    options:
+    - label: No spray, but the pump hums
+      effects:
+      - fault: F14-WW-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: No spray and no sound
+      effects:
+      - fault: F14-WW-08
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The washer works
+      effects:
+      - fault: F14-WW-08
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q06:
+    id: window_wiper-q06
+    status: approved
+    stage: 3
+    text: Is the window glass broken?
+    source_faults:
+    - F14-WW-01
+    - F14-WW-03
+    merged_from:
+    - 'F14-WW-03 (AI_DIAGNOSIS_RULES): Is the glass broken?'
+    - 'F14-WW-01 (stages_text): Is the glass broken?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-WW-03
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-WW-03
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q07:
+    id: window_wiper-q07
+    status: approved
+    stage: 3
+    text: When you press the window button, what happens?
+    source_faults:
+    - F14-WW-02
+    - F14-WW-09
+    - F14-WW-10
+    - F14-WW-11
+    - F14-WW-16
+    merged_from:
+    - 'F14-WW-02 (AI_DIAGNOSIS_RULES): Does the motor make a sound when you press the button?'
+    - 'F14-WW-09 (AI_DIAGNOSIS_RULES): Do you hear the motor?'
+    - 'F14-WW-10 (AI_DIAGNOSIS_RULES): Do you hear grinding?'
+    options:
+    - label: Nothing, no sound
+      effects:
+      - fault: F14-WW-09
+        effect: supports
+        strength: strong
+      - fault: F14-WW-02
+        effect: supports
+        strength: moderate
+      - fault: F14-WW-11
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The motor runs or grinds but the glass does not move, or it drops
+      effects:
+      - fault: F14-WW-10
+        effect: supports
+        strength: strong
+      - fault: F14-WW-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It moves slowly or squeaks
+      effects:
+      - fault: F14-WW-16
+        effect: supports
+        strength: strong
+      - fault: F14-WW-09
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: The window works
+      effects:
+      - fault: F14-WW-02
+        effect: rules_out
+        strength: moderate
+      - fault: F14-WW-09
+        effect: rules_out
+        strength: moderate
+      - fault: F14-WW-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q08:
+    id: window_wiper-q08
+    status: approved
+    stage: 3
+    text: Does the window work from the driver's switch but not from its own switch?
+    source_faults:
+    - F14-WW-11
+    merged_from:
+    - 'F14-WW-11 (AI_DIAGNOSIS_RULES): Does it work from the driver''s switch?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-WW-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-WW-11
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q09:
+    id: window_wiper-q09
+    status: approved
+    stage: 3
+    text: Is the window glass tilted or off its track?
+    source_faults:
+    - F14-WW-10
+    - F14-WW-12
+    merged_from:
+    - 'F14-WW-12 (AI_DIAGNOSIS_RULES): Is the glass tilted?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-WW-12
+        effect: supports
+        strength: strong
+      - fault: F14-WW-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-WW-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q10:
+    id: window_wiper-q10
+    status: approved
+    stage: 3
+    text: Is the window slow mainly in summer or dusty conditions?
+    source_faults:
+    - F14-WW-16
+    merged_from:
+    - 'F14-WW-16 (AI_DIAGNOSIS_RULES): Is it slow only in summer / dusty?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-WW-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-WW-16
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q11:
+    id: window_wiper-q11
+    status: approved
+    stage: 3
+    text: Is the sunroof stuck open, or does it make a grinding noise?
+    source_faults:
+    - F14-WW-04
+    - F14-WW-14
+    merged_from:
+    - 'F14-WW-04 (AI_DIAGNOSIS_RULES): Is it raining now?'
+    - 'F14-WW-14 (AI_DIAGNOSIS_RULES): Does it make grinding noise?'
+    options:
+    - label: Stuck open
+      effects:
+      - fault: F14-WW-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It grinds, jerks or stops halfway
+      effects:
+      - fault: F14-WW-14
+        effect: supports
+        strength: strong
+      - fault: F14-WW-04
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It works
+      effects:
+      - fault: F14-WW-04
+        effect: rules_out
+        strength: moderate
+      - fault: F14-WW-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q12:
+    id: window_wiper-q12
+    status: approved
+    stage: 3
+    text: Is water coming into the car from the sunroof?
+    source_faults:
+    - F14-WW-04
+    - F14-WW-13
+    - F14-WW-15
+    merged_from:
+    - 'F14-WW-13 (AI_DIAGNOSIS_RULES): Is water entering the car?'
+    - 'F14-WW-04 (stages_text): Is water entering the car?'
+    options:
+    - label: Yes, after rain or a wash
+      effects:
+      - fault: F14-WW-13
+        effect: supports
+        strength: strong
+      - fault: F14-WW-15
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-WW-13
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q13:
+    id: window_wiper-q13
+    status: approved
+    stage: 3
+    text: Is the sunroof glass cracked or its seal torn?
+    source_faults:
+    - F14-WW-15
+    merged_from:
+    - 'F14-WW-15 (AI_DIAGNOSIS_RULES): Is the glass cracked?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-WW-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-WW-15
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-q14:
+    id: window_wiper-q14
+    status: approved
+    stage: 3
+    text: Is there a crack or chip in the windscreen? Is it in the driver's view?
+    source_faults:
+    - F14-WW-17
+    merged_from:
+    - 'F14-WW-17 (AI_DIAGNOSIS_RULES): Is the crack in driver''s view?'
+    options:
+    - label: Yes, in the driver's view
+      effects:
+      - fault: F14-WW-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Yes, outside the driver's view
+      effects:
+      - fault: F14-WW-17
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-WW-17
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F14-WW-01:
+    status: approved
+    name: Wiper Not Working
+    stage2_choices:
+    - Wiper problem
+    confirmation_test: Fuse and power test.
+    danger_phrases:
+    - raining and cannot see
+    safety_trigger_options:
+    - question: window_wiper-q01
+      option: 'Yes'
+  fault F14-WW-02:
+    status: approved
+    name: Window Stuck Partially Open / Closed
+    stage2_choices:
+    - Window problem
+    confirmation_test: Voltage and regulator check.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-03:
+    status: approved
+    name: Broken Window Glass
+    stage2_choices:
+    - Window problem
+    confirmation_test: Visual check.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-04:
+    status: approved
+    name: Sunroof Stuck Open / Mechanism Failure
+    stage2_choices:
+    - Sunroof problem
+    confirmation_test: Inspection of the sunroof mechanism.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-05:
+    status: approved
+    name: Wiper Blade Worn / Streaking
+    stage2_choices:
+    - Wiper problem
+    confirmation_test: Visual check of the blade.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-06:
+    status: approved
+    name: Wiper Motor Not Working
+    stage2_choices:
+    - Wiper problem
+    confirmation_test: Voltage and bench test of the wiper motor.
+    danger_phrases:
+    - raining
+    safety_trigger_options:
+    - question: window_wiper-q01
+      option: 'Yes'
+  fault F14-WW-07:
+    status: approved
+    name: Wiper Linkage / Arm Broken
+    stage2_choices:
+    - Wiper problem
+    confirmation_test: Visual check of the wiper linkage.
+    danger_phrases:
+    - raining
+    safety_trigger_options:
+    - question: window_wiper-q01
+      option: 'Yes'
+  fault F14-WW-08:
+    status: approved
+    name: Windshield Washer Not Spraying
+    stage2_choices:
+    - Wiper problem
+    - Other
+    confirmation_test: Washer check sequence.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-09:
+    status: approved
+    name: Power Window Motor Failure
+    stage2_choices:
+    - Window problem
+    confirmation_test: Voltage and motor test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-10:
+    status: approved
+    name: Window Regulator / Cable Broken
+    stage2_choices:
+    - Window problem
+    confirmation_test: Trim-off inspection of the regulator.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-11:
+    status: approved
+    name: Window Switch Not Working
+    stage2_choices:
+    - Window problem
+    confirmation_test: Window switch test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-12:
+    status: approved
+    name: Window Glass Off Track / Tilted
+    stage2_choices:
+    - Window problem
+    confirmation_test: Inspection of the glass channel.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-13:
+    status: approved
+    name: Sunroof Drain Blocked / Water Leakage
+    stage2_choices:
+    - Sunroof problem
+    confirmation_test: Sunroof drain test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-14:
+    status: approved
+    name: Sunroof Motor / Track / Cable Fault
+    stage2_choices:
+    - Sunroof problem
+    confirmation_test: Inspection of the sunroof track and cable.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-15:
+    status: approved
+    name: Sunroof Glass Cracked / Seal Damaged
+    stage2_choices:
+    - Sunroof problem
+    confirmation_test: Visual check and water test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-16:
+    status: approved
+    name: Slow / Noisy Power Window Due to Dust in Channels  [NEW - India]
+    stage2_choices:
+    - Window problem
+    confirmation_test: Clean the window channels and retest.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-WW-17:
+    status: approved
+    name: Windshield Crack From Stone / ADAS Camera Calibration  [NEW - India]
+    stage2_choices:
+    - Other
+    confirmation_test: Visual check of the windscreen.
+    danger_phrases:
+    - crack in driver's view
+    safety_trigger_options: []

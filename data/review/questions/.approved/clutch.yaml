@@ -1,0 +1,1599 @@
+category: clutch
+loaded_at: '2026-10-23T19:17:32+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question clutch-main:
+    id: clutch-main
+    status: approved
+    stage: 2
+    text: What is the main problem with the clutch?
+    choice_source: proposed
+    options:
+    - label: Clutch pedal is heavy or stiff
+      effects:
+      - fault: F01-CL-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Clutch pedal is soft, loose or stays on the floor
+      effects:
+      - fault: F01-CL-03
+        effect: supports
+        strength: strong
+      - fault: F01-CL-05
+        effect: supports
+        strength: strong
+      - fault: F01-CL-07
+        effect: supports
+        strength: strong
+      - fault: F01-CL-08
+        effect: supports
+        strength: strong
+      - fault: F01-CL-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Engine revs go up but the car does not speed up
+      effects:
+      - fault: F01-CL-02
+        effect: supports
+        strength: strong
+      - fault: F01-CL-04
+        effect: supports
+        strength: strong
+      - fault: F01-CL-05
+        effect: supports
+        strength: strong
+      - fault: F01-CL-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Hard to change gears, or a gear will not go in
+      effects:
+      - fault: F01-CL-03
+        effect: supports
+        strength: strong
+      - fault: F01-CL-05
+        effect: supports
+        strength: strong
+      - fault: F01-CL-06
+        effect: supports
+        strength: strong
+      - fault: F01-CL-07
+        effect: supports
+        strength: strong
+      - fault: F01-CL-09
+        effect: supports
+        strength: strong
+      - fault: F01-CL-10
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Noise from the clutch or the pedal
+      effects:
+      - fault: F01-CL-06
+        effect: supports
+        strength: strong
+      - fault: F01-CL-12
+        effect: supports
+        strength: strong
+      - fault: F01-CL-13
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Car shakes when moving off
+      effects:
+      - fault: F01-CL-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Burning smell from the clutch
+      effects:
+      - fault: F01-CL-02
+        effect: supports
+        strength: strong
+      - fault: F01-CL-04
+        effect: supports
+        strength: strong
+      - fault: F01-CL-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Clutch fluid is leaking or keeps dropping
+      effects:
+      - fault: F01-CL-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Clutch catches too high or too low
+      effects:
+      - fault: F01-CL-04
+        effect: supports
+        strength: strong
+      - fault: F01-CL-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Other
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q01:
+    id: clutch-q01
+    status: approved
+    stage: 3
+    text: Right now, is there smoke or a strong burning smell, or can the car not move at all?
+    source_faults:
+    - F01-CL-02
+    - F01-CL-03
+    - F01-CL-04
+    - F01-CL-05
+    - F01-CL-07
+    - F01-CL-14
+    merged_from:
+    - 'F01-CL-02 (stages_text): Can you still drive: does the car still move on flat ground in low gears? Any smoke
+      or strong smell?'
+    - 'F01-CL-14 (stages_text): Can you still drive: does the car still move normally in low gears? Any smoke?'
+    - 'F01-CL-05 (stages_text): Can you still drive: is the car stuck now, and is it in traffic or a safe spot?
+      Gear stuck?'
+    options:
+    - label: Smoke or a strong burning smell
+      effects:
+      - fault: F01-CL-14
+        effect: supports
+        strength: strong
+      - fault: F01-CL-02
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-04
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: The engine runs but the car will not move
+      effects:
+      - fault: F01-CL-05
+        effect: supports
+        strength: strong
+      - fault: F01-CL-03
+        effect: supports
+        strength: weak
+      - fault: F01-CL-07
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q02:
+    id: clutch-q02
+    status: approved
+    stage: 3
+    text: Can you put the car into any gear?
+    source_faults:
+    - F01-CL-03
+    - F01-CL-05
+    - F01-CL-06
+    - F01-CL-07
+    - F01-CL-09
+    - F01-CL-10
+    merged_from:
+    - 'F01-CL-03 (stages_text): Can any gear be selected?'
+    - 'F01-CL-07 (stages_text): Can you still drive: can any gear be selected?'
+    - 'F01-CL-10 (stages_text): Can you still drive: can all gears be selected?'
+    - 'F01-CL-09 (stages_text): Can you select any gear and does the car move?'
+    options:
+    - label: No gear goes in
+      effects:
+      - fault: F01-CL-05
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-03
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-07
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-06
+        effect: supports
+        strength: weak
+      - fault: F01-CL-09
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: Some gears are hard or crunch
+      effects:
+      - fault: F01-CL-10
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-09
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-06
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: All gears go in normally
+      effects:
+      - fault: F01-CL-03
+        effect: rules_out
+        strength: moderate
+      - fault: F01-CL-07
+        effect: rules_out
+        strength: moderate
+      - fault: F01-CL-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q03:
+    id: clutch-q03
+    status: approved
+    stage: 3
+    text: How does the clutch pedal feel?
+    source_faults:
+    - F01-CL-01
+    - F01-CL-03
+    - F01-CL-05
+    - F01-CL-06
+    - F01-CL-07
+    - F01-CL-08
+    - F01-CL-09
+    - F01-CL-11
+    - F01-CL-12
+    - F01-CL-13
+    - F01-CL-15
+    - F01-CL-16
+    merged_from:
+    - 'F01-CL-05 (stages_text): pedal loose or stuck to the floor vs normal feel'
+    - 'F01-CL-06 (stages_text): pedal feel normal, loose or hard?'
+    - 'F01-CL-08 (stages_text): Clutch pedal feels soft and spongy'
+    - 'F01-CL-01 (stages_text): Clutch pedal has become very heavy'
+    options:
+    - label: Heavy or stiff
+      effects:
+      - fault: F01-CL-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Soft or spongy
+      effects:
+      - fault: F01-CL-08
+        effect: supports
+        strength: strong
+      - fault: F01-CL-15
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-16
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Loose, with no resistance at all
+      effects:
+      - fault: F01-CL-03
+        effect: supports
+        strength: strong
+      - fault: F01-CL-07
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Normal
+      effects:
+      - fault: F01-CL-06
+        effect: supports
+        strength: weak
+      - fault: F01-CL-09
+        effect: supports
+        strength: weak
+      - fault: F01-CL-11
+        effect: supports
+        strength: weak
+      - fault: F01-CL-12
+        effect: supports
+        strength: weak
+      - fault: F01-CL-13
+        effect: supports
+        strength: weak
+      - fault: F01-CL-03
+        effect: rules_out
+        strength: moderate
+      - fault: F01-CL-08
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q04:
+    id: clutch-q04
+    status: approved
+    stage: 3
+    text: When you press the clutch pedal, does it come back up by itself?
+    source_faults:
+    - F01-CL-01
+    - F01-CL-03
+    - F01-CL-07
+    - F01-CL-08
+    - F01-CL-16
+    merged_from:
+    - 'F01-CL-07 (stages_text): Does the pedal come back if you lift it with your foot?'
+    - 'F01-CL-01 (symptoms): Pedal comes back slowly, or stays down near the floor'
+    - 'F01-CL-03 (symptoms): Pedal stays on the floor or comes back slowly'
+    options:
+    - label: No, it stays on the floor
+      effects:
+      - fault: F01-CL-07
+        effect: supports
+        strength: strong
+      - fault: F01-CL-03
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-08
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: It comes back slowly
+      effects:
+      - fault: F01-CL-01
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-03
+        effect: supports
+        strength: weak
+      - fault: F01-CL-16
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Yes, normally
+      effects:
+      - fault: F01-CL-07
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q05:
+    id: clutch-q05
+    status: approved
+    stage: 3
+    text: Did the pedal feel heavy or stiff for some days before this started?
+    source_faults:
+    - F01-CL-01
+    - F01-CL-03
+    merged_from:
+    - 'F01-CL-03 (stages_text): was the pedal heavy or stiff for days before (see CL-01)?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-03
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q06:
+    id: clutch-q06
+    status: approved
+    stage: 3
+    text: Is the pedal still heavy when the engine is off?
+    source_faults:
+    - F01-CL-01
+    merged_from:
+    - 'F01-CL-01 (stages_text): Still heavy with the engine off? (heavy with engine off = cable / pedal hinge side)'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-01
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q07:
+    id: clutch-q07
+    status: approved
+    stage: 3
+    text: If you press the pedal a few times quickly, does it feel firmer?
+    source_faults:
+    - F01-CL-08
+    merged_from:
+    - 'F01-CL-08 (stages_text): Does the pedal feel firmer if you pump it? (firmer after pumping = air in the system)'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q08:
+    id: clutch-q08
+    status: approved
+    stage: 3
+    text: When you press the accelerator in a higher gear (3rd or 4th), uphill or with a full car, do the engine
+      revs go up but the speed does not?
+    source_faults:
+    - F01-CL-02
+    - F01-CL-04
+    - F01-CL-14
+    - F01-CL-16
+    merged_from:
+    - 'F01-CL-02 (stages_text): which gear and conditions? 3rd / 4th uphill, full load, AC on, after a long drive?'
+    - 'F01-CL-04 (stages_text): uphill, with passengers or luggage, in higher gears, after heavy traffic?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-02
+        effect: supports
+        strength: strong
+      - fault: F01-CL-04
+        effect: supports
+        strength: strong
+      - fault: F01-CL-14
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-16
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F01-CL-02
+        effect: rules_out
+        strength: moderate
+      - fault: F01-CL-04
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q09:
+    id: clutch-q09
+    status: approved
+    stage: 3
+    text: Where on the pedal does the clutch start to catch (bite)?
+    source_faults:
+    - F01-CL-02
+    - F01-CL-04
+    - F01-CL-08
+    - F01-CL-15
+    - F01-CL-16
+    merged_from:
+    - 'F01-CL-16 (stages_text): Clutch catches too high or too low'
+    - 'F01-CL-04 (stages_text): Clutch bites at the very top of the pedal'
+    - 'F01-CL-08 (symptoms): the point where the clutch bites may be very low or may change'
+    options:
+    - label: Very near the top
+      effects:
+      - fault: F01-CL-04
+        effect: supports
+        strength: strong
+      - fault: F01-CL-16
+        effect: supports
+        strength: strong
+      - fault: F01-CL-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Very near the floor
+      effects:
+      - fault: F01-CL-16
+        effect: supports
+        strength: strong
+      - fault: F01-CL-08
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: It changes from day to day
+      effects:
+      - fault: F01-CL-16
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-08
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-15
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Normal, in the middle
+      effects:
+      - fault: F01-CL-16
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q10:
+    id: clutch-q10
+    status: approved
+    stage: 3
+    text: Is it hard to change gears even when the engine is off?
+    source_faults:
+    - F01-CL-09
+    - F01-CL-10
+    merged_from:
+    - 'F01-CL-10 (stages_text): When: with the engine off too? Only with the engine running?'
+    - 'F01-CL-09 (stages_text): Do gears select easily with the engine off?'
+    options:
+    - label: Yes, hard even with the engine off
+      effects:
+      - fault: F01-CL-10
+        effect: supports
+        strength: strong
+      - fault: F01-CL-09
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: No, gears go in easily with the engine off
+      effects:
+      - fault: F01-CL-09
+        effect: supports
+        strength: strong
+      - fault: F01-CL-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q11:
+    id: clutch-q11
+    status: approved
+    stage: 3
+    text: With the pedal pressed fully down, does the car still creep forward?
+    source_faults:
+    - F01-CL-09
+    merged_from:
+    - 'F01-CL-09 (stages_text): Pedal pressed but the car still creeps and the gear will not go in'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-09
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F01-CL-09
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q12:
+    id: clutch-q12
+    status: approved
+    stage: 3
+    text: Does a gear jump out by itself, or the car drop into neutral?
+    source_faults:
+    - F01-CL-10
+    merged_from:
+    - 'F01-CL-10 (symptoms): Gear may pop out of gear or drop into neutral'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-10
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q13:
+    id: clutch-q13
+    status: approved
+    stage: 3
+    text: When do you hear the noise?
+    source_faults:
+    - F01-CL-01
+    - F01-CL-06
+    - F01-CL-12
+    - F01-CL-13
+    merged_from:
+    - 'F01-CL-06 (stages_text): does the noise start only when the pedal is pressed and stop when it is released?'
+    - 'F01-CL-13 (stages_text): Noise when the pedal is released, gone when I press it'
+    - 'F01-CL-12 (stages_text): Clutch pedal squeaks or creaks'
+    options:
+    - label: Only while the pedal is pressed down
+      effects:
+      - fault: F01-CL-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: When the pedal is released, and it goes away when I press it
+      effects:
+      - fault: F01-CL-13
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: A squeak or creak from the pedal itself
+      effects:
+      - fault: F01-CL-12
+        effect: supports
+        strength: strong
+      - fault: F01-CL-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No noise
+      effects:
+      - fault: F01-CL-06
+        effect: rules_out
+        strength: moderate
+      - fault: F01-CL-13
+        effect: rules_out
+        strength: moderate
+      - fault: F01-CL-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q14:
+    id: clutch-q14
+    status: approved
+    stage: 3
+    text: What kind of noise is it?
+    source_faults:
+    - F01-CL-05
+    - F01-CL-06
+    - F01-CL-12
+    - F01-CL-13
+    merged_from:
+    - 'F01-CL-06 (stages_text): Type of noise: whirring, grinding, rattle or snapping?'
+    - 'F01-CL-13 (stages_text): (whirring or rattle)'
+    options:
+    - label: Whirring
+      effects:
+      - fault: F01-CL-06
+        effect: supports
+        strength: weak
+      - fault: F01-CL-13
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Grinding or a metal rattle
+      effects:
+      - fault: F01-CL-05
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-06
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-13
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: Squeak or creak
+      effects:
+      - fault: F01-CL-12
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q15:
+    id: clutch-q15
+    status: approved
+    stage: 3
+    text: Does the squeak happen even with the engine off?
+    source_faults:
+    - F01-CL-12
+    merged_from:
+    - 'F01-CL-12 (stages_text): Does it happen with the engine off? (engine off = pedal/linkage)'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-12
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F01-CL-12
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q16:
+    id: clutch-q16
+    status: approved
+    stage: 3
+    text: Does the car shake when you move off from a standstill?
+    source_faults:
+    - F01-CL-04
+    - F01-CL-11
+    merged_from:
+    - 'F01-CL-11 (stages_text): Car shakes when I move off'
+    - 'F01-CL-11 (stages_text): only when pulling away from a standstill?'
+    - 'F01-CL-04 (stages_text): shaking when pulling away'
+    options:
+    - label: Yes, and it is hard to control
+      effects:
+      - fault: F01-CL-11
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Yes, some shaking
+      effects:
+      - fault: F01-CL-11
+        effect: supports
+        strength: strong
+      - fault: F01-CL-04
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F01-CL-11
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q17:
+    id: clutch-q17
+    status: approved
+    stage: 3
+    text: When did you notice the burning smell?
+    source_faults:
+    - F01-CL-02
+    - F01-CL-04
+    - F01-CL-14
+    merged_from:
+    - 'F01-CL-14 (stages_text): after a hill start, a traffic jam, towing or a heavy load? Does the car slip afterwards?'
+    - 'F01-CL-02 (stages_text): burning smell'
+    - 'F01-CL-04 (stages_text): burning smell'
+    options:
+    - label: Only after a hill start, heavy traffic or a heavy load, and the clutch is fine afterwards
+      effects:
+      - fault: F01-CL-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Often, and the clutch also slips
+      effects:
+      - fault: F01-CL-04
+        effect: supports
+        strength: strong
+      - fault: F01-CL-02
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-14
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No burning smell
+      effects:
+      - fault: F01-CL-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q18:
+    id: clutch-q18
+    status: approved
+    stage: 3
+    text: Is there clutch fluid leaking, or does the fluid level keep dropping? Where is it wet?
+    source_faults:
+    - F01-CL-03
+    - F01-CL-07
+    - F01-CL-08
+    - F01-CL-15
+    merged_from:
+    - 'F01-CL-15 (stages_text): wet near the pedal/inside the cabin, in the engine bay, or under the gearbox?'
+    - 'F01-CL-07 (stages_text): fluid near the pedal, engine area or under the gearbox?'
+    - 'F01-CL-08 (stages_text): low fluid level, fluid near the pedal/engine/gearbox'
+    options:
+    - label: Wet near the pedal, inside the car
+      effects:
+      - fault: F01-CL-15
+        effect: supports
+        strength: strong
+      - fault: F01-CL-07
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-08
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Wet in the engine area or under the gearbox
+      effects:
+      - fault: F01-CL-15
+        effect: supports
+        strength: strong
+      - fault: F01-CL-07
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-08
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: The level drops but I cannot see a leak
+      effects:
+      - fault: F01-CL-15
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-08
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: No leak
+      effects:
+      - fault: F01-CL-15
+        effect: rules_out
+        strength: moderate
+      - fault: F01-CL-03
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q19:
+    id: clutch-q19
+    status: approved
+    stage: 3
+    text: Is the brake fluid level also low, or does the brake pedal feel different?
+    source_faults:
+    - F01-CL-07
+    - F01-CL-15
+    merged_from:
+    - 'F01-CL-07 (stages_text): Is the brake pedal also affected or the brake fluid low?'
+    - 'F01-CL-15 (stages_text): brake fluid level also low?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-15
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-07
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q20:
+    id: clutch-q20
+    status: approved
+    stage: 3
+    text: Was any clutch, cable or fluid work done recently, or was the clutch replaced?
+    source_faults:
+    - F01-CL-08
+    - F01-CL-09
+    - F01-CL-11
+    merged_from:
+    - 'F01-CL-08 (stages_text): Any recent clutch or fluid work, or fluid top-ups? (after a repair = air)'
+    - 'F01-CL-09 (stages_text): Any recent clutch work, new clutch? (new clutch = fitting problem)'
+    - 'F01-CL-11 (stages_text): since a recent clutch change'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-08
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-09
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-11
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q21:
+    id: clutch-q21
+    status: approved
+    stage: 3
+    text: Did it get worse slowly over weeks, or happen suddenly?
+    source_faults:
+    - F01-CL-01
+    - F01-CL-03
+    - F01-CL-04
+    - F01-CL-05
+    - F01-CL-07
+    - F01-CL-08
+    merged_from:
+    - 'F01-CL-01 (stages_text): slowly over weeks or suddenly? (slowly = dry or rusty cable / hinge; sudden = stuck
+      cylinder)'
+    - 'F01-CL-08 (stages_text): slowly or suddenly?'
+    - 'F01-CL-07 (stages_text): suddenly while changing gear, or after a spongy or heavy pedal for some time?'
+    options:
+    - label: Slowly
+      effects:
+      - fault: F01-CL-04
+        effect: supports
+        strength: weak
+      - fault: F01-CL-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Suddenly
+      effects:
+      - fault: F01-CL-03
+        effect: supports
+        strength: weak
+      - fault: F01-CL-07
+        effect: supports
+        strength: weak
+      - fault: F01-CL-05
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question clutch-q22:
+    id: clutch-q22
+    status: approved
+    stage: 3
+    text: Can you see any oil or wetness under the car, between the engine and the gearbox?
+    source_faults:
+    - F01-CL-02
+    - F01-CL-11
+    merged_from:
+    - 'F01-CL-11 (stages_text): Any oil leak noticed under the car?'
+    - 'F01-CL-02 (stages_text): Any oil leak noticed? (leak = oil on the plate)'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F01-CL-11
+        effect: supports
+        strength: moderate
+      - fault: F01-CL-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F01-CL-01:
+    status: approved
+    name: Clutch feels stiff or heavy
+    stage2_choices:
+    - Clutch pedal is heavy or stiff
+    confirmation_test: Pedal feels normal after oiling, adjusting or bleeding; otherwise disconnect the cable at
+      the gearbox end and compare the effort.
+    danger_phrases:
+    - pedal will not come back
+    safety_trigger_options: []
+  fault F01-CL-02:
+    status: approved
+    name: Clutch slipping
+    stage2_choices:
+    - Engine revs go up but the car does not speed up
+    - Burning smell from the clutch
+    confirmation_test: Standing test (car does not stall) and lining thickness check with the gearbox out; recheck
+      after adjusting free play or bleeding.
+    danger_phrases:
+    - smoke
+    - strong burning smell
+    safety_trigger_options:
+    - question: clutch-q01
+      option: Smoke or a strong burning smell
+  fault F01-CL-03:
+    status: approved
+    name: Clutch cable broken
+    stage2_choices:
+    - Clutch pedal is soft, loose or stays on the floor
+    - Hard to change gears, or a gear will not go in
+    confirmation_test: See the break, or the inner wire does not move at the gearbox end when the pedal is pressed.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: clutch-q01
+      option: The engine runs but the car will not move
+    - question: clutch-q02
+      option: No gear goes in
+    - question: clutch-q04
+      option: No, it stays on the floor
+  fault F01-CL-04:
+    status: approved
+    name: Clutch plate worn out
+    stage2_choices:
+    - Engine revs go up but the car does not speed up
+    - Clutch catches too high or too low
+    - Burning smell from the clutch
+    confirmation_test: Lining thinner than the minimum, or shiny or oily, when checked with the gearbox out.
+    danger_phrases:
+    - smoke
+    - strong burning smell
+    safety_trigger_options:
+    - question: clutch-q01
+      option: Smoke or a strong burning smell
+  fault F01-CL-05:
+    status: approved
+    name: Clutch completely failed
+    stage2_choices:
+    - Clutch pedal is soft, loose or stays on the floor
+    - Hard to change gears, or a gear will not go in
+    - Engine revs go up but the car does not speed up
+    confirmation_test: Check the outside parts (cable, fluid system) first, then remove the gearbox and check the
+      clutch.
+    danger_phrases:
+    - car will not move
+    - gear stuck
+    safety_trigger_options:
+    - question: clutch-q01
+      option: The engine runs but the car will not move
+    - question: clutch-q02
+      option: No gear goes in
+    - question: clutch-q14
+      option: Grinding or a metal rattle
+  fault F01-CL-06:
+    status: approved
+    name: Noise when clutch pedal is pressed; gear will not engage
+    stage2_choices:
+    - Noise from the clutch or the pedal
+    - Hard to change gears, or a gear will not go in
+    confirmation_test: Noise only while the pedal is pressed, linkage and fluid normal; bearing checked with the
+      gearbox out.
+    danger_phrases:
+    - grinding
+    - metal rattle
+    safety_trigger_options:
+    - question: clutch-q02
+      option: No gear goes in
+    - question: clutch-q14
+      option: Grinding or a metal rattle
+  fault F01-CL-07:
+    status: approved
+    name: Clutch pedal stuck to the floor
+    stage2_choices:
+    - Clutch pedal is soft, loose or stays on the floor
+    - Hard to change gears, or a gear will not go in
+    confirmation_test: Find which part leaks or does not move (cylinders, pipe, hose, cable, return spring, pedal
+      pin).
+    danger_phrases:
+    - brake fluid dropping
+    safety_trigger_options:
+    - question: clutch-q01
+      option: The engine runs but the car will not move
+    - question: clutch-q02
+      option: No gear goes in
+    - question: clutch-q04
+      option: No, it stays on the floor
+    - question: clutch-q19
+      option: 'Yes'
+  fault F01-CL-08:
+    status: approved
+    name: Clutch pedal too soft or spongy
+    stage2_choices:
+    - Clutch pedal is soft, loose or stays on the floor
+    confirmation_test: Pedal becomes firm after bleeding; if it goes soft again quickly, the cylinder or hose is
+      at fault.
+    danger_phrases:
+    - pedal sinks to the floor
+    safety_trigger_options:
+    - question: clutch-q04
+      option: No, it stays on the floor
+  fault F01-CL-09:
+    status: approved
+    name: Clutch not disengaging (clutch drag)
+    stage2_choices:
+    - Hard to change gears, or a gear will not go in
+    confirmation_test: Correct the free play / air first; if still dragging, remove the gearbox and inspect the
+      disc, pressure plate and splines.
+    danger_phrases:
+    - car moves with the pedal pressed
+    safety_trigger_options:
+    - question: clutch-q02
+      option: No gear goes in
+    - question: clutch-q11
+      option: 'Yes'
+  fault F01-CL-10:
+    status: approved
+    name: Difficulty changing gears
+    stage2_choices:
+    - Hard to change gears, or a gear will not go in
+    confirmation_test: Engine-off versus engine-running test, gear oil and linkage checks.
+    danger_phrases:
+    - gear jumps out
+    safety_trigger_options: []
+  fault F01-CL-11:
+    status: approved
+    name: Clutch judder or vibration
+    stage2_choices:
+    - Car shakes when moving off
+    confirmation_test: Check mounts and leaks first; clutch surfaces and flywheel with the gearbox out.
+    danger_phrases:
+    - violent shaking
+    safety_trigger_options:
+    - question: clutch-q16
+      option: Yes, and it is hard to control
+  fault F01-CL-12:
+    status: approved
+    name: Clutch pedal squeaking or creaking
+    stage2_choices:
+    - Noise from the clutch or the pedal
+    confirmation_test: Noise stops after lubricating the pedal pivot and return spring.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F01-CL-13:
+    status: approved
+    name: Noise when the clutch pedal is released
+    stage2_choices:
+    - Noise from the clutch or the pedal
+    confirmation_test: Pedal-position noise test; bearing checked by hand with the gearbox out.
+    danger_phrases:
+    - metal rattle
+    - loss of drive
+    safety_trigger_options:
+    - question: clutch-q14
+      option: Grinding or a metal rattle
+  fault F01-CL-14:
+    status: approved
+    name: Clutch burning smell or overheating
+    stage2_choices:
+    - Burning smell from the clutch
+    - Engine revs go up but the car does not speed up
+    confirmation_test: Smell only after heavy use with no slipping afterwards = driving habit; repeated smell with
+      slipping = worn clutch.
+    danger_phrases:
+    - smoke
+    safety_trigger_options:
+    - question: clutch-q01
+      option: Smoke or a strong burning smell
+  fault F01-CL-15:
+    status: approved
+    name: Hydraulic clutch fluid leak
+    stage2_choices:
+    - Clutch fluid is leaking or keeps dropping
+    - Clutch pedal is soft, loose or stays on the floor
+    confirmation_test: Find the wet part; a falling level with no outside leak points to an internal leak.
+    danger_phrases:
+    - brake fluid dropping
+    - pedal sinks to the floor
+    safety_trigger_options:
+    - question: clutch-q19
+      option: 'Yes'
+  fault F01-CL-16:
+    status: approved
+    name: Clutch engages too low or too high
+    stage2_choices:
+    - Clutch catches too high or too low
+    confirmation_test: Adjustment or bleeding changes the bite point (system fault); a high bite point with slipping
+      that does not change = wear.
+    danger_phrases: []
+    safety_trigger_options: []
+  safety_rule clutch-s-F01-CL-01:
+    id: clutch-s-F01-CL-01
+    status: approved
+    fault: F01-CL-01
+    risk_level: medium
+    stop_driving_trigger: Stop if the pedal will not press fully or will not come back, no gear can be selected,
+      or fluid leaks and the pedal sinks.
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. If the pedal stays down or no gear goes in, call a mechanic.
+    towing_recommendation: If the pedal will not press fully or will not come back, no gear can be selected, or
+      fluid is leaking and the pedal sinks to the floor.
+    source_text:
+      safety_precautions: '- Wheel blocks, handbrake and neutral before any work
+
+        - Never work under a car held only by a jack; use stands
+
+        - Brake fluid (shared by some fluid clutches) is harmful; keep it off paint and skin
+
+        - Wear gloves and eye protection'
+      if_towing_needed: '- Pedal will not press fully or will not come back
+
+        - No gear can be selected
+
+        - Fluid is visibly leaking and the pedal sinks to the floor'
+  safety_rule clutch-s-F01-CL-02:
+    id: clutch-s-F01-CL-02
+    status: approved
+    fault: F01-CL-02
+    risk_level: medium
+    stop_driving_trigger: Stop if there is a strong burning smell or smoke, the car cannot move, or it slips even
+      in low gears.
+    roadside_action: Stop in a safe place and let the clutch cool. If there is smoke or the car will not move, call
+      for a tow.
+    towing_recommendation: If the car cannot move by itself, there is a strong burning smell or smoke, or the clutch
+      slips even in low gears on flat ground.
+    source_text:
+      safety_precautions: '- Do the standing test only on level ground with the handbrake fully on and people kept
+        away
+
+        - Never use the standing test on automatic, AMT or DCT cars
+
+        - Use stands if any work under the car is needed'
+      if_towing_needed: '- Car cannot move by itself
+
+        - Strong burning smell or smoke
+
+        - Clutch slips even in low gears on flat ground'
+  safety_rule clutch-s-F01-CL-03:
+    id: clutch-s-F01-CL-03
+    status: approved
+    fault: F01-CL-03
+    risk_level: medium
+    stop_driving_trigger: Do not drive if no gear can be selected.
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. Call a mechanic; a cable can often be fixed on the spot.
+    towing_recommendation: If the right cable is not available on the road, there is damage at the gearbox, or the
+      car is in an unsafe place.
+    source_text:
+      safety_precautions: '- Wheel blocks, handbrake and hazard lights
+
+        - Never work under a car held only by a jack
+
+        - Keep hands away from the pedal linkage while testing
+
+        - Do not force the gear lever'
+      if_towing_needed: '- The correct cable is not available on the road
+
+        - Damage found on the fork, bracket or gearbox cover
+
+        - Unsafe place (highway side, steep slope)
+
+        - Car with a fluid clutch, AMT or DCT where a cable is not the cause'
+  safety_rule clutch-s-F01-CL-04:
+    id: clutch-s-F01-CL-04
+    status: approved
+    fault: F01-CL-04
+    risk_level: medium
+    stop_driving_trigger: Stop if it slips badly, there is a burning smell or smoke, or gears cannot be put in.
+    roadside_action: Avoid hills and heavy loads. If there is smoke or the car barely moves, stop and call for a
+      tow.
+    towing_recommendation: If slipping badly and the car barely moves, burning smell or smoke, gears cannot be put
+      in, or unsafe road conditions.
+    source_text:
+      safety_precautions: '- Use a lift or stands and a gearbox jack; never work under a car on a jack alone
+
+        - Clutch dust may contain harmful particles; use a wet cleaner and a mask, never an air gun
+
+        - Disconnect the battery before removing the starter
+
+        - Tighten bolts to the correct level'
+      if_towing_needed: '- Slipping badly, car barely moves
+
+        - Burning smell or smoke
+
+        - Gears cannot be put in
+
+        - Unsafe road conditions'
+  safety_rule clutch-s-F01-CL-05:
+    id: clutch-s-F01-CL-05
+    status: approved
+    fault: F01-CL-05
+    risk_level: high
+    stop_driving_trigger: 'Do not drive: tow unless a mechanic finds a simple cable fault.'
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. Move away from traffic if you can do it safely, and call for a tow.
+    towing_recommendation: Always, unless the cause is a simple cable that can be fixed on the spot.
+    source_text:
+      safety_precautions: '- Use a lift or stands and a gearbox jack; never work under a car on a jack alone
+
+        - Do not use an air gun on clutch dust; use a wet cleaner and a mask
+
+        - Disconnect the battery for electrical/AMT work
+
+        - Never get past a failed clutch by starting in gear'
+      if_towing_needed: '- Always, unless the cause is a simple cable (CL-03) that can be fixed on the spot
+
+        - Fluid leak, failure inside or noisy bearing
+
+        - AMT/DCT fault
+
+        - Car in an unsafe position or on a slope'
+  safety_rule clutch-s-F01-CL-06:
+    id: clutch-s-F01-CL-06
+    status: approved
+    fault: F01-CL-06
+    risk_level: medium
+    stop_driving_trigger: Stop if no gear goes in, the noise turns into grinding or rattling, or the pedal is loose
+      or stuck.
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. Call a mechanic.
+    towing_recommendation: If a gear cannot be put in, the noise gets louder or turns into grinding, or the pedal
+      is loose or stuck to the floor.
+    source_text:
+      safety_precautions: '- Use a lift or stands and a gearbox jack; never work under a car on a jack alone
+
+        - Clutch dust may be harmful; use a wet cleaner and a mask, never an air gun
+
+        - Disconnect the battery for starter or AMT work
+
+        - Never get past a failing clutch by starting in gear'
+      if_towing_needed: '- Gear cannot be put in (towing needed)
+
+        - Noise getting louder or turning into grinding or rattling
+
+        - Pedal loose or stuck to the floor
+
+        - Car in an unsafe position or on a slope'
+  safety_rule clutch-s-F01-CL-07:
+    id: clutch-s-F01-CL-07
+    status: approved
+    fault: F01-CL-07
+    risk_level: medium
+    stop_driving_trigger: Stop if the pedal stays on the floor and no gear goes in, or the brake fluid level is
+      also dropping.
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. If the brake pedal also feels different, do not drive. Call for a tow.
+    towing_recommendation: If the pedal stays on the floor and no gear can be selected, fluid is leaking quickly,
+      or the brake fluid level is also dropping.
+    source_text:
+      safety_precautions: '- Wheel blocks, handbrake and neutral before any work
+
+        - Never work under a car held only by a jack; use stands
+
+        - Brake/clutch fluid is harmful to paint and skin; wear gloves and eye protection
+
+        - Use only the fluid type the car maker specifies; do not mix fluid types'
+      if_towing_needed: '- Pedal stays on the floor and no gear can be selected
+
+        - Fluid is leaking quickly, or the brake fluid level is also dropping
+
+        - Car in an unsafe position or on a slope
+
+        - helper cylinder is inside the gearbox gearbox cover (gearbox removal needed)'
+  safety_rule clutch-s-F01-CL-08:
+    id: clutch-s-F01-CL-08
+    status: approved
+    fault: F01-CL-08
+    risk_level: medium
+    stop_driving_trigger: Stop if the pedal sinks to the floor or the clutch does not release.
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. Get the clutch checked soon.
+    towing_recommendation: If the pedal sinks to the floor or the clutch does not release, no gear can be selected,
+      or fluid is leaking quickly.
+    source_text:
+      safety_precautions: '- Wheel blocks, handbrake and neutral before any work
+
+        - Brake/clutch fluid is harmful to paint and skin; wear gloves and eye protection
+
+        - Collect used fluid in a container and dispose of it properly
+
+        - Never work under a car held only by a jack; use stands'
+      if_towing_needed: '- Pedal sinks to the floor or the clutch does not release
+
+        - No gear can be selected
+
+        - Fluid is visibly leaking quickly
+
+        - Car in an unsafe position or on a slope'
+  safety_rule clutch-s-F01-CL-09:
+    id: clutch-s-F01-CL-09
+    status: approved
+    fault: F01-CL-09
+    risk_level: medium
+    stop_driving_trigger: Stop if the car moves by itself with the pedal pressed, or no gear can be selected.
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. Keep your foot on the brake when stopped. Call a mechanic.
+    towing_recommendation: If no gear can be selected, the car moves by itself with the pedal pressed, or there
+      is a burning smell or grinding.
+    source_text:
+      safety_precautions: '- Do the standstill test only on level ground with the handbrake on and people kept away
+
+        - Never use the standstill test on automatic, AMT or DCT cars
+
+        - Use a lift or stands and a gearbox jack for gearbox removal; never rely on a jack alone
+
+        - Clutch dust may be harmful; use a wet cleaner and a mask, never an air gun'
+      if_towing_needed: '- No gear can be selected
+
+        - The car moves by itself with the pedal pressed
+
+        - Burning smell or grinding
+
+        - Car in an unsafe position or on a slope'
+  safety_rule clutch-s-F01-CL-10:
+    id: clutch-s-F01-CL-10
+    status: approved
+    fault: F01-CL-10
+    risk_level: medium
+    stop_driving_trigger: Stop if no gear can be selected, there is loud grinding, or a gear jumps out.
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. Call a mechanic.
+    towing_recommendation: If no gear can be selected, there is loud grinding, or a gear jumps out of gear.
+    source_text:
+      safety_precautions: '- Wheel blocks, handbrake before any work
+
+        - Use stands, never a jack alone, if working under the car
+
+        - Gearbox oil can be hot; let it cool and wear gloves
+
+        - Do not force the gear lever'
+      if_towing_needed: '- No gear can be selected
+
+        - Loud grinding or a gear that jumps out of gear
+
+        - Car in an unsafe position or on a slope'
+  safety_rule clutch-s-F01-CL-11:
+    id: clutch-s-F01-CL-11
+    status: approved
+    fault: F01-CL-11
+    risk_level: medium
+    stop_driving_trigger: Stop if the shaking makes the car hard to control.
+    roadside_action: If the shaking is violent, stop in a safe place and call for a tow. Otherwise drive gently
+      to a garage.
+    towing_recommendation: If violent shaking makes the car hard to control, it slips badly or there is a burning
+      smell, or gears cannot be put in.
+    source_text:
+      safety_precautions: '- Use a lift or stands and a gearbox jack; never rely on a jack alone
+
+        - Clutch dust may be harmful; use a wet cleaner and a mask, never an air gun
+
+        - Disconnect the battery before removing the starter
+
+        - Tighten bolts to the right tightness'
+      if_towing_needed: '- Violent shaking that makes the car hard to control
+
+        - Slipping badly or burning smell/smoke
+
+        - Gears cannot be put in
+
+        - Car in an unsafe position'
+  safety_rule clutch-s-F01-CL-12:
+    id: clutch-s-F01-CL-12
+    status: approved
+    fault: F01-CL-12
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Do not put oil or grease on the pedal pad. Get it lubricated at the next service.
+    towing_recommendation: Not normally needed.
+    source_text:
+      safety_precautions: '- Keep grease and oil off the pedal pad so the foot cannot slip
+
+        - Wheel blocks and handbrake before any work
+
+        - Disconnect the battery if working near electrical parts in the pedal area
+
+        - Never work under a car held only by a jack'
+      if_towing_needed: '- Not normally needed
+
+        - Pedal becomes stuck, heavy or does not return (see CL-01 / CL-07)'
+  safety_rule clutch-s-F01-CL-13:
+    id: clutch-s-F01-CL-13
+    status: approved
+    fault: F01-CL-13
+    risk_level: medium
+    stop_driving_trigger: Stop if the noise turns into grinding or a metal rattle, or the car loses drive.
+    roadside_action: Do not force the gear lever or the pedal, and do not start the car in gear. Put on the hazard
+      lights and the handbrake. Call a mechanic.
+    towing_recommendation: If the noise gets louder or turns into grinding or rattling, a gear cannot be selected,
+      or there is loss of drive.
+    source_text:
+      safety_precautions: '- Use a lift or stands and a gearbox jack; never rely on a jack alone
+
+        - Do the noise test only with the handbrake on, wheel blocks in place and nobody near the wheels
+
+        - Clutch dust may be harmful; use a wet cleaner and a mask, never an air gun
+
+        - Never get past a failing clutch by starting in gear'
+      if_towing_needed: '- Noise getting louder or turning to grinding/rattling
+
+        - Gear cannot be selected
+
+        - Metal rattle or loss of drive
+
+        - Car in an unsafe position or on a slope'
+  safety_rule clutch-s-F01-CL-14:
+    id: clutch-s-F01-CL-14
+    status: approved
+    fault: F01-CL-14
+    risk_level: medium
+    stop_driving_trigger: Stop if there is smoke, a strong burning smell, or the car cannot move.
+    roadside_action: Stop in a safe place and let the clutch cool before driving on. Do not hold the car on the
+      clutch on hills. If there is smoke, call for a tow.
+    towing_recommendation: If there is a strong burning smell, smoke, or the car cannot move, or it slips even in
+      low gears on flat ground.
+    source_text:
+      safety_precautions: '- Let the clutch and gearbox area cool before touching anything
+
+        - Do the slip check only on level ground with the handbrake fully on and people kept away; never on AMT/DCT
+        cars
+
+        - Use a lift or stands; never rely on a jack alone
+
+        - Clutch dust may be harmful; use a wet cleaner and a mask, never an air gun'
+      if_towing_needed: '- Strong burning smell, smoke, or the car cannot move
+
+        - Clutch slips even in low gears on flat ground
+
+        - No gear can be selected
+
+        - Car in an unsafe position or on a slope'
+  safety_rule clutch-s-F01-CL-15:
+    id: clutch-s-F01-CL-15
+    status: approved
+    fault: F01-CL-15
+    risk_level: medium
+    stop_driving_trigger: Stop if fluid leaks quickly, the pedal sinks, or the brake fluid level is also dropping.
+    roadside_action: Do not touch the fluid with bare hands. If the brake fluid is also low or the pedal sinks to
+      the floor, do not drive. Call for a tow.
+    towing_recommendation: If fluid is leaking quickly, the pedal sinks to the floor, the brake fluid level is dropping
+      too, or no gear can be selected.
+    source_text:
+      safety_precautions: '- Brake/clutch fluid is harmful to paint and skin; wear gloves and eye protection and
+        clean spills at once
+
+        - Wheel blocks, handbrake and neutral before any work
+
+        - Never work under a car held only by a jack; use stands
+
+        - Dispose of used fluid properly'
+      if_towing_needed: '- Fluid leaking quickly, or the pedal sinks to the floor
+
+        - The brake fluid level is dropping too
+
+        - No gear can be selected
+
+        - Leak is inside the gearbox gearbox cover (gearbox removal needed)'
+  safety_rule clutch-s-F01-CL-16:
+    id: clutch-s-F01-CL-16
+    status: approved
+    fault: F01-CL-16
+    risk_level: low
+    stop_driving_trigger: Stop if it slips badly so the car barely moves, or no gear can be selected.
+    roadside_action: Drive gently and get the clutch checked.
+    towing_recommendation: If slipping badly so the car barely moves, no gear can be selected, or burning smell
+      or smoke.
+    source_text:
+      safety_precautions: '- Do the slip check only on level ground with the handbrake fully on and people kept
+        away; never on AMT/DCT cars
+
+        - Wheel blocks and handbrake before any work
+
+        - Use stands if any work under the car is needed
+
+        - Brake/clutch fluid is harmful to paint and skin; wear gloves and eye protection'
+      if_towing_needed: '- Slipping badly so the car barely moves
+
+        - No gear can be selected
+
+        - Burning smell or smoke
+
+        - Car in an unsafe position or on a slope'

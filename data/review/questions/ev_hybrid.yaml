@@ -1,0 +1,4236 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category ev_hybrid
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: ev_hybrid
+category_name: EV / hybrid / charging
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:53:54+00:00'
+  run_id: claude-code-ev_hybrid
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: ev_hybrid-main
+  status: approved
+  stage: 2
+  text: What problem are you facing with your electric or hybrid car?
+  choice_source: proposed
+  options:
+  - label: Charging is slow
+    effects:
+    - fault: F06-EV-01
+      effect: supports
+      strength: strong
+    - fault: F06-EV-06
+      effect: supports
+      strength: strong
+    - fault: F06-EV-07
+      effect: supports
+      strength: strong
+    - fault: F06-EV-08
+      effect: supports
+      strength: strong
+    - fault: F06-EV-09
+      effect: supports
+      strength: strong
+    - fault: F06-EV-11
+      effect: supports
+      strength: strong
+    - fault: F06-EV-12
+      effect: supports
+      strength: strong
+    - fault: F06-EV-13
+      effect: supports
+      strength: strong
+    - fault: F06-EV-32
+      effect: supports
+      strength: strong
+    - fault: F06-EV-35
+      effect: supports
+      strength: strong
+    - fault: F06-EV-54
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Charging does not start
+    effects:
+    - fault: F06-EV-02
+      effect: supports
+      strength: strong
+    - fault: F06-EV-03
+      effect: supports
+      strength: strong
+    - fault: F06-EV-14
+      effect: supports
+      strength: strong
+    - fault: F06-EV-15
+      effect: supports
+      strength: strong
+    - fault: F06-EV-17
+      effect: supports
+      strength: strong
+    - fault: F06-EV-20
+      effect: supports
+      strength: strong
+    - fault: F06-EV-21
+      effect: supports
+      strength: strong
+    - fault: F06-EV-23
+      effect: supports
+      strength: strong
+    - fault: F06-EV-24
+      effect: supports
+      strength: strong
+    - fault: F06-EV-25
+      effect: supports
+      strength: strong
+    - fault: F06-EV-28
+      effect: supports
+      strength: strong
+    - fault: F06-EV-30
+      effect: supports
+      strength: strong
+    - fault: F06-EV-34
+      effect: supports
+      strength: strong
+    - fault: F06-EV-36
+      effect: supports
+      strength: strong
+    - fault: F06-EV-37
+      effect: supports
+      strength: strong
+    - fault: F06-EV-38
+      effect: supports
+      strength: strong
+    - fault: F06-EV-39
+      effect: supports
+      strength: strong
+    - fault: F06-EV-42
+      effect: supports
+      strength: strong
+    - fault: F06-EV-52
+      effect: supports
+      strength: strong
+    - fault: F06-EV-53
+      effect: supports
+      strength: strong
+    - fault: F06-EV-60
+      effect: supports
+      strength: strong
+    - fault: F06-EV-62
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Charging starts and then stops
+    effects:
+    - fault: F06-EV-05
+      effect: supports
+      strength: strong
+    - fault: F06-EV-14
+      effect: supports
+      strength: strong
+    - fault: F06-EV-21
+      effect: supports
+      strength: strong
+    - fault: F06-EV-26
+      effect: supports
+      strength: strong
+    - fault: F06-EV-35
+      effect: supports
+      strength: strong
+    - fault: F06-EV-41
+      effect: supports
+      strength: strong
+    - fault: F06-EV-60
+      effect: supports
+      strength: strong
+    - fault: F06-EV-63
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Charging stops at a certain %
+    effects:
+    - fault: F06-EV-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Plug does not fit, lock or release
+    effects:
+    - fault: F06-EV-15
+      effect: supports
+      strength: strong
+    - fault: F06-EV-16
+      effect: supports
+      strength: strong
+    - fault: F06-EV-18
+      effect: supports
+      strength: strong
+    - fault: F06-EV-19
+      effect: supports
+      strength: strong
+    - fault: F06-EV-22
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Home charger or wallbox problem
+    effects:
+    - fault: F06-EV-02
+      effect: supports
+      strength: strong
+    - fault: F06-EV-07
+      effect: supports
+      strength: strong
+    - fault: F06-EV-17
+      effect: supports
+      strength: strong
+    - fault: F06-EV-25
+      effect: supports
+      strength: strong
+    - fault: F06-EV-26
+      effect: supports
+      strength: strong
+    - fault: F06-EV-27
+      effect: supports
+      strength: strong
+    - fault: F06-EV-28
+      effect: supports
+      strength: strong
+    - fault: F06-EV-32
+      effect: supports
+      strength: strong
+    - fault: F06-EV-33
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Public charging station problem
+    effects:
+    - fault: F06-EV-02
+      effect: supports
+      strength: strong
+    - fault: F06-EV-08
+      effect: supports
+      strength: strong
+    - fault: F06-EV-24
+      effect: supports
+      strength: strong
+    - fault: F06-EV-29
+      effect: supports
+      strength: strong
+    - fault: F06-EV-30
+      effect: supports
+      strength: strong
+    - fault: F06-EV-31
+      effect: supports
+      strength: strong
+    - fault: F06-EV-37
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: High-voltage or battery warning
+    effects:
+    - fault: F06-EV-04
+      effect: supports
+      strength: strong
+    - fault: F06-EV-12
+      effect: supports
+      strength: strong
+    - fault: F06-EV-43
+      effect: supports
+      strength: strong
+    - fault: F06-EV-44
+      effect: supports
+      strength: strong
+    - fault: F06-EV-45
+      effect: supports
+      strength: strong
+    - fault: F06-EV-46
+      effect: supports
+      strength: strong
+    - fault: F06-EV-47
+      effect: supports
+      strength: strong
+    - fault: F06-EV-49
+      effect: supports
+      strength: strong
+    - fault: F06-EV-52
+      effect: supports
+      strength: strong
+    - fault: F06-EV-55
+      effect: supports
+      strength: strong
+    - fault: F06-EV-59
+      effect: supports
+      strength: strong
+    - fault: F06-EV-65
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Car will not go into Ready mode
+    effects:
+    - fault: F06-EV-04
+      effect: supports
+      strength: strong
+    - fault: F06-EV-43
+      effect: supports
+      strength: strong
+    - fault: F06-EV-44
+      effect: supports
+      strength: strong
+    - fault: F06-EV-48
+      effect: supports
+      strength: strong
+    - fault: F06-EV-50
+      effect: supports
+      strength: strong
+    - fault: F06-EV-51
+      effect: supports
+      strength: strong
+    - fault: F06-EV-58
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Hybrid car problem
+    effects:
+    - fault: F06-EV-53
+      effect: supports
+      strength: strong
+    - fault: F06-EV-54
+      effect: supports
+      strength: strong
+    - fault: F06-EV-55
+      effect: supports
+      strength: strong
+    - fault: F06-EV-56
+      effect: supports
+      strength: strong
+    - fault: F06-EV-57
+      effect: supports
+      strength: strong
+    - fault: F06-EV-58
+      effect: supports
+      strength: strong
+    - fault: F06-EV-59
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Burning smell, heat or visible damage
+    effects:
+    - fault: F06-EV-18
+      effect: supports
+      strength: strong
+    - fault: F06-EV-33
+      effect: supports
+      strength: strong
+    - fault: F06-EV-49
+      effect: supports
+      strength: strong
+    - fault: F06-EV-64
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other
+    effects:
+    - fault: F06-EV-13
+      effect: supports
+      strength: strong
+    - fault: F06-EV-39
+      effect: supports
+      strength: strong
+    - fault: F06-EV-40
+      effect: supports
+      strength: strong
+    - fault: F06-EV-41
+      effect: supports
+      strength: strong
+    - fault: F06-EV-42
+      effect: supports
+      strength: strong
+    - fault: F06-EV-50
+      effect: supports
+      strength: strong
+    - fault: F06-EV-61
+      effect: supports
+      strength: strong
+    - fault: F06-EV-62
+      effect: supports
+      strength: strong
+    - fault: F06-EV-63
+      effect: supports
+      strength: strong
+    - fault: F06-EV-65
+      effect: supports
+      strength: strong
+    - fault: F06-EV-66
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q01
+  status: approved
+  stage: 3
+  text: Right now, is there smoke, a burning smell, melted plastic or unusual heat at the charging point, cable
+    or car?
+  source_faults:
+  - F06-EV-14
+  - F06-EV-18
+  - F06-EV-33
+  - F06-EV-35
+  - F06-EV-64
+  merged_from:
+  - 'F06-EV-64 (stages_text): Any burning smell, smoke, melted plastic, unusual heat, water, HV warning or no Ready
+    mode?'
+  - 'F06-EV-64 (stages_text): Is there smoke or flame?'
+  - 'F06-EV-18 (stages_text): Is there melted plastic, smoke or burning smell?'
+  - 'F06-EV-33 (stages_text): Is there melted plastic or burning smell?'
+  options:
+  - label: Smoke or flame
+    effects:
+    - fault: F06-EV-64
+      effect: supports
+      strength: strong
+    - fault: F06-EV-18
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-33
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Burning smell or melted plastic
+    effects:
+    - fault: F06-EV-64
+      effect: supports
+      strength: strong
+    - fault: F06-EV-18
+      effect: supports
+      strength: strong
+    - fault: F06-EV-33
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: The plug, socket or cable is very hot
+    effects:
+    - fault: F06-EV-18
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-33
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-14
+      effect: supports
+      strength: weak
+    - fault: F06-EV-35
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F06-EV-64
+      effect: rules_out
+      strength: strong
+    - fault: F06-EV-18
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-33
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q02
+  status: approved
+  stage: 3
+  text: Is there a high-voltage (HV) warning on the dashboard, or a damaged orange cable under the car?
+  source_faults:
+  - F06-EV-04
+  - F06-EV-43
+  - F06-EV-44
+  - F06-EV-49
+  merged_from:
+  - 'F06-EV-04 (stages_text): What exact message is shown?'
+  - 'F06-EV-43 (stages_text): Any smoke, smell, water or damage?'
+  - 'F06-EV-49 (stages_text): Is there an exposed orange cable?'
+  - 'F06-EV-44 (stages_text): Is there damage?'
+  options:
+  - label: HV or isolation warning
+    effects:
+    - fault: F06-EV-43
+      effect: supports
+      strength: strong
+    - fault: F06-EV-04
+      effect: supports
+      strength: strong
+    - fault: F06-EV-44
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: A damaged or exposed orange cable
+    effects:
+    - fault: F06-EV-49
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F06-EV-43
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-04
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-49
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q03
+  status: approved
+  stage: 3
+  text: Does the car go into Ready mode (ready to drive)?
+  source_faults:
+  - F06-EV-04
+  - F06-EV-43
+  - F06-EV-44
+  - F06-EV-48
+  - F06-EV-50
+  - F06-EV-51
+  - F06-EV-58
+  merged_from:
+  - 'F06-EV-04 (stages_text): Does the car go into Ready mode?'
+  - 'F06-EV-43 (stages_text): Is the car in Ready mode?'
+  - 'F06-EV-44 (stages_text): Is the car in Ready mode?'
+  options:
+  - label: 'No'
+    effects:
+    - fault: F06-EV-51
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-04
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-43
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-48
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-44
+      effect: supports
+      strength: weak
+    - fault: F06-EV-50
+      effect: supports
+      strength: weak
+    - fault: F06-EV-58
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-48
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-51
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-04
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q04
+  status: approved
+  stage: 3
+  text: When you switch on, do you hear a click from the car?
+  source_faults:
+  - F06-EV-38
+  - F06-EV-48
+  - F06-EV-51
+  merged_from:
+  - 'F06-EV-48 (stages_text): Do you hear a click?'
+  - 'F06-EV-38 (stages_text): Do you hear a click when charging starts?'
+  - 'F06-EV-51 (stages_text): Any click?'
+  options:
+  - label: No click
+    effects:
+    - fault: F06-EV-48
+      effect: supports
+      strength: strong
+    - fault: F06-EV-38
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-51
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Yes, a click
+    effects:
+    - fault: F06-EV-48
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q05
+  status: approved
+  stage: 3
+  text: Did a charging error happen just before the car stopped going into Ready mode?
+  source_faults:
+  - F06-EV-51
+  merged_from:
+  - 'F06-EV-51 (symptoms): Charging error before'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-51
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-51
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q06
+  status: approved
+  stage: 3
+  text: Is the small 12V battery weak (car slow to wake up, dim lights, or a 12V warning)?
+  source_faults:
+  - F06-EV-16
+  - F06-EV-38
+  - F06-EV-42
+  - F06-EV-50
+  - F06-EV-51
+  - F06-EV-58
+  - F06-EV-65
+  merged_from:
+  - 'F06-EV-42 (stages_text): Is the 12V battery old?'
+  - 'F06-EV-50 (stages_text): Does the car wake normally?'
+  - 'F06-EV-16 (stages_text): Is the 12V battery weak (car slow to wake)?'
+  - 'F06-EV-58 (stages_text): Do lights dim?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-42
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-50
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-58
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-65
+      effect: supports
+      strength: weak
+    - fault: F06-EV-16
+      effect: supports
+      strength: weak
+    - fault: F06-EV-38
+      effect: supports
+      strength: weak
+    - fault: F06-EV-51
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-42
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-50
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q07
+  status: approved
+  stage: 3
+  text: Which charger do you use?
+  source_faults:
+  - F06-EV-01
+  - F06-EV-07
+  - F06-EV-08
+  - F06-EV-17
+  - F06-EV-24
+  - F06-EV-25
+  - F06-EV-26
+  - F06-EV-28
+  - F06-EV-29
+  - F06-EV-31
+  - F06-EV-32
+  - F06-EV-37
+  merged_from:
+  - 'F06-EV-01 (stages_text): Which charger do you use (home wallbox, portable cable, public)? What kW is written
+    on it?'
+  options:
+  - label: Home wallbox
+    effects:
+    - fault: F06-EV-07
+      effect: supports
+      strength: weak
+    - fault: F06-EV-25
+      effect: supports
+      strength: weak
+    - fault: F06-EV-26
+      effect: supports
+      strength: weak
+    - fault: F06-EV-28
+      effect: supports
+      strength: weak
+    - fault: F06-EV-32
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Portable charging cable
+    effects:
+    - fault: F06-EV-17
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Public AC charger
+    effects:
+    - fault: F06-EV-29
+      effect: supports
+      strength: weak
+    - fault: F06-EV-31
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Public DC fast charger
+    effects:
+    - fault: F06-EV-08
+      effect: supports
+      strength: weak
+    - fault: F06-EV-24
+      effect: supports
+      strength: weak
+    - fault: F06-EV-37
+      effect: supports
+      strength: weak
+    - fault: F06-EV-29
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q08
+  status: approved
+  stage: 3
+  text: Does the car charge at another charger, or with another cable?
+  source_faults:
+  - F06-EV-02
+  - F06-EV-03
+  - F06-EV-12
+  - F06-EV-15
+  - F06-EV-17
+  - F06-EV-20
+  - F06-EV-24
+  - F06-EV-25
+  - F06-EV-29
+  - F06-EV-31
+  - F06-EV-34
+  - F06-EV-38
+  merged_from:
+  - 'F06-EV-02 (stages_text): Did you try another charging point or another cable?'
+  - 'F06-EV-15 (stages_text): Does any charger work with your car?'
+  - 'F06-EV-20 (stages_text): Does another charger or cable work?'
+  - 'F06-EV-24 (stages_text): Does it work at another station?'
+  - 'F06-EV-25 (stages_text): Does the car charge at a public charger?'
+  - 'F06-EV-31 (stages_text): Does it fail every time at that station?'
+  options:
+  - label: Yes, it works elsewhere
+    effects:
+    - fault: F06-EV-31
+      effect: supports
+      strength: strong
+    - fault: F06-EV-02
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-17
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-24
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-25
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-29
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-20
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-03
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-34
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: No, it fails at every charger
+    effects:
+    - fault: F06-EV-15
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-03
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-34
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-12
+      effect: supports
+      strength: weak
+    - fault: F06-EV-38
+      effect: supports
+      strength: weak
+    - fault: F06-EV-02
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-31
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-29
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q09
+  status: approved
+  stage: 3
+  text: Does DC fast charging work while AC charging does not, or the other way round?
+  source_faults:
+  - F06-EV-03
+  - F06-EV-15
+  - F06-EV-34
+  - F06-EV-36
+  - F06-EV-37
+  - F06-EV-38
+  - F06-EV-52
+  merged_from:
+  - 'F06-EV-03 (stages_text): Does the car charge at DC fast chargers?'
+  - 'F06-EV-36 (stages_text): Does DC charging definitely work?'
+  - 'F06-EV-37 (stages_text): Did you try more than one DC station?'
+  - 'F06-EV-34 (stages_text): Does DC fast charging work?'
+  options:
+  - label: AC fails, DC works
+    effects:
+    - fault: F06-EV-36
+      effect: supports
+      strength: strong
+    - fault: F06-EV-34
+      effect: supports
+      strength: strong
+    - fault: F06-EV-03
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: DC fails, AC works
+    effects:
+    - fault: F06-EV-37
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Both fail
+    effects:
+    - fault: F06-EV-15
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-38
+      effect: supports
+      strength: weak
+    - fault: F06-EV-52
+      effect: supports
+      strength: weak
+    - fault: F06-EV-36
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-37
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: I use only one type
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q10
+  status: approved
+  stage: 3
+  text: Where is charging slow?
+  source_faults:
+  - F06-EV-01
+  - F06-EV-07
+  - F06-EV-08
+  - F06-EV-09
+  - F06-EV-12
+  - F06-EV-13
+  - F06-EV-32
+  merged_from:
+  - 'F06-EV-01 (stages_text): Does it charge slow at every charger or only one?'
+  - 'F06-EV-07 (stages_text): What kW is the home charger rated for?'
+  - 'F06-EV-08 (stages_text): Is the speed low at every station?'
+  options:
+  - label: Slow at home, normal at public chargers
+    effects:
+    - fault: F06-EV-07
+      effect: supports
+      strength: strong
+    - fault: F06-EV-32
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Slow at public chargers, normal at home
+    effects:
+    - fault: F06-EV-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Slow everywhere
+    effects:
+    - fault: F06-EV-01
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-09
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-12
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-13
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Charging is not slow
+    effects:
+    - fault: F06-EV-01
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-07
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-08
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q11
+  status: approved
+  stage: 3
+  text: Does the car take less power than the charger's rating (for example 3 kW from a 7 kW charger)?
+  source_faults:
+  - F06-EV-01
+  - F06-EV-09
+  - F06-EV-54
+  merged_from:
+  - 'F06-EV-09 (stages_text): What kW does the cable/charger label say?'
+  - 'F06-EV-54 (stages_text): What is the car''s rated AC power?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-09
+      effect: supports
+      strength: strong
+    - fault: F06-EV-01
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-54
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q12
+  status: approved
+  stage: 3
+  text: Does charging start fast and then become very slow after a short time?
+  source_faults:
+  - F06-EV-06
+  - F06-EV-11
+  merged_from:
+  - 'F06-EV-06 (stages_text): At what battery % does the speed drop?'
+  - 'F06-EV-06 (stages_text): Is another car sharing the same charger?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-06
+      effect: supports
+      strength: strong
+    - fault: F06-EV-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-06
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q13
+  status: approved
+  stage: 3
+  text: Is it very hot or cold outside, or did you just drive fast or for a long time?
+  source_faults:
+  - F06-EV-06
+  - F06-EV-11
+  - F06-EV-14
+  - F06-EV-35
+  - F06-EV-46
+  - F06-EV-59
+  - F06-EV-63
+  merged_from:
+  - 'F06-EV-11 (stages_text): Is it very hot or cold outside?'
+  - 'F06-EV-14 (stages_text): How long did you drive before charging?'
+  - 'F06-EV-06 (stages_text): Did you drive long or is it very hot/cold outside?'
+  - 'F06-EV-35 (stages_text): Is it very hot outside?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-11
+      effect: supports
+      strength: strong
+    - fault: F06-EV-06
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-14
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-35
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-46
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-59
+      effect: supports
+      strength: weak
+    - fault: F06-EV-63
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-11
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-14
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q14
+  status: approved
+  stage: 3
+  text: Does charging start and then stop after a few minutes?
+  source_faults:
+  - F06-EV-05
+  - F06-EV-14
+  - F06-EV-26
+  - F06-EV-35
+  merged_from:
+  - 'F06-EV-05 (stages_text): Does it stop after a few minutes or at a certain %?'
+  - 'F06-EV-26 (stages_text): Does it trip immediately or after some time?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-05
+      effect: supports
+      strength: strong
+    - fault: F06-EV-26
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-14
+      effect: supports
+      strength: weak
+    - fault: F06-EV-35
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q15
+  status: approved
+  stage: 3
+  text: Does charging resume after the car or charger cools down?
+  source_faults:
+  - F06-EV-11
+  - F06-EV-14
+  - F06-EV-35
+  merged_from:
+  - 'F06-EV-35 (stages_text): Does charging resume after cooling?'
+  - 'F06-EV-14 (stages_text): Does the error clear after the car cools?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-35
+      effect: supports
+      strength: strong
+    - fault: F06-EV-14
+      effect: supports
+      strength: strong
+    - fault: F06-EV-11
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-35
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q16
+  status: approved
+  stage: 3
+  text: Does charging stop at the same battery % every time? Is a charge limit or schedule set in the car or app?
+  source_faults:
+  - F06-EV-10
+  - F06-EV-12
+  merged_from:
+  - 'F06-EV-10 (stages_text): Is a charge limit or schedule set in the car or app?'
+  - 'F06-EV-10 (stages_text): Does it stop at the same % always?'
+  options:
+  - label: Yes, a limit is set
+    effects:
+    - fault: F06-EV-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It stops at the same %, but no limit is set
+    effects:
+    - fault: F06-EV-10
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q17
+  status: approved
+  stage: 3
+  text: Does charging start only after you unplug and plug in again?
+  source_faults:
+  - F06-EV-05
+  - F06-EV-60
+  merged_from:
+  - 'F06-EV-60 (stages_text): How often?'
+  - 'F06-EV-05 (symptoms): Plug re-connect starts it again'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-60
+      effect: supports
+      strength: strong
+    - fault: F06-EV-05
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-60
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q18
+  status: approved
+  stage: 3
+  text: What happens with the plug?
+  source_faults:
+  - F06-EV-15
+  - F06-EV-16
+  - F06-EV-19
+  - F06-EV-22
+  merged_from:
+  - 'F06-EV-16 (stages_text): Does the plug lock but not release, or not lock at all?'
+  - 'F06-EV-19 (stages_text): Do you hear a click when plugging in?'
+  - 'F06-EV-22 (stages_text): What is written on the plug (Type 2 / CCS2 / other)?'
+  - 'F06-EV-15 (stages_text): Does the plug lock?'
+  options:
+  - label: It does not lock
+    effects:
+    - fault: F06-EV-16
+      effect: supports
+      strength: strong
+    - fault: F06-EV-19
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-15
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It locks but will not release
+    effects:
+    - fault: F06-EV-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It locks only sometimes
+    effects:
+    - fault: F06-EV-19
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It will not go in, or it is the wrong shape
+    effects:
+    - fault: F06-EV-22
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It locks and releases normally
+    effects:
+    - fault: F06-EV-16
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-19
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-22
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q19
+  status: approved
+  stage: 3
+  text: Looking from a safe position, do you see water, dirt, green marks, bent pins or burn marks in the socket?
+    (Do not touch the pins.)
+  source_faults:
+  - F06-EV-02
+  - F06-EV-15
+  - F06-EV-18
+  - F06-EV-21
+  - F06-EV-23
+  merged_from:
+  - 'F06-EV-21 (stages_text): Do you see water, dirt or green marks in the socket?'
+  - 'F06-EV-15 (stages_text): Do you see dirt, water or burn marks in the socket?'
+  - 'F06-EV-02 (stages_text): Is the plug or socket dirty, wet, bent or hot?'
+  options:
+  - label: Water, dirt or green marks
+    effects:
+    - fault: F06-EV-21
+      effect: supports
+      strength: strong
+    - fault: F06-EV-23
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-15
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Bent pins or burn marks
+    effects:
+    - fault: F06-EV-15
+      effect: supports
+      strength: strong
+    - fault: F06-EV-18
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F06-EV-21
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q20
+  status: approved
+  stage: 3
+  text: Did the problem start after rain, a car wash or flooding?
+  source_faults:
+  - F06-EV-19
+  - F06-EV-20
+  - F06-EV-21
+  - F06-EV-23
+  - F06-EV-44
+  - F06-EV-63
+  merged_from:
+  - 'F06-EV-23 (stages_text): Was the car flooded or only rained on?'
+  - 'F06-EV-21 (stages_text): Did you wash the car recently?'
+  - 'F06-EV-44 (stages_text): Was there water, wash or repair?'
+  options:
+  - label: The car was flooded
+    effects:
+    - fault: F06-EV-44
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-23
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: After rain or a car wash
+    effects:
+    - fault: F06-EV-23
+      effect: supports
+      strength: strong
+    - fault: F06-EV-21
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-19
+      effect: supports
+      strength: weak
+    - fault: F06-EV-20
+      effect: supports
+      strength: weak
+    - fault: F06-EV-63
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-23
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q21
+  status: approved
+  stage: 3
+  text: What does the charger or app show?
+  source_faults:
+  - F06-EV-17
+  - F06-EV-20
+  - F06-EV-24
+  - F06-EV-25
+  - F06-EV-27
+  - F06-EV-28
+  - F06-EV-29
+  - F06-EV-30
+  merged_from:
+  - 'F06-EV-17 (stages_text): What colour is the light and is there an error code in the manual?'
+  - 'F06-EV-20 (stages_text): What exact message is displayed?'
+  - 'F06-EV-29 (stages_text): Does the app show the station online?'
+  - 'F06-EV-30 (stages_text): What does the app say?'
+  - 'F06-EV-27 (stages_text): Does the wallbox show an earth error?'
+  options:
+  - label: A red or error light on the portable charger
+    effects:
+    - fault: F06-EV-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A communication or handshake error
+    effects:
+    - fault: F06-EV-20
+      effect: supports
+      strength: strong
+    - fault: F06-EV-24
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The station is offline or the screen is off
+    effects:
+    - fault: F06-EV-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: App, payment or card problem
+    effects:
+    - fault: F06-EV-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: An earth fault error on the wallbox
+    effects:
+    - fault: F06-EV-27
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No light or nothing on the wallbox
+    effects:
+    - fault: F06-EV-25
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-28
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q22
+  status: approved
+  stage: 3
+  text: Can other cars charge at that station?
+  source_faults:
+  - F06-EV-24
+  - F06-EV-29
+  - F06-EV-31
+  - F06-EV-37
+  merged_from:
+  - 'F06-EV-24 (stages_text): Can other cars charge at the same gun?'
+  - 'F06-EV-29 (stages_text): Can other cars charge there?'
+  - 'F06-EV-31 (stages_text): Do other cars charge there?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-24
+      effect: supports
+      strength: weak
+    - fault: F06-EV-37
+      effect: supports
+      strength: weak
+    - fault: F06-EV-29
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-29
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-31
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-24
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q23
+  status: approved
+  stage: 3
+  text: (Home charging) Does the breaker (MCB / RCCB) trip, or is there no power at the wallbox?
+  source_faults:
+  - F06-EV-23
+  - F06-EV-25
+  - F06-EV-26
+  - F06-EV-28
+  merged_from:
+  - 'F06-EV-26 (stages_text): Which breaker trips (MCB or RCCB)?'
+  - 'F06-EV-28 (stages_text): Does the breaker reset?'
+  - 'F06-EV-28 (stages_text): Is there power at the wallbox (any light)?'
+  options:
+  - label: It trips while charging
+    effects:
+    - fault: F06-EV-26
+      effect: supports
+      strength: strong
+    - fault: F06-EV-25
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-23
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It will not reset, or there is no power
+    effects:
+    - fault: F06-EV-28
+      effect: supports
+      strength: strong
+    - fault: F06-EV-25
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-26
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-28
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q24
+  status: approved
+  stage: 3
+  text: Do you feel a tingle or a small shock when touching the car or charger while charging?
+  source_faults:
+  - F06-EV-27
+  merged_from:
+  - 'F06-EV-27 (stages_text): Do you feel tingling when touching the car or charger?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-27
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F06-EV-27
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q25
+  status: approved
+  stage: 3
+  text: (Home charging) Does charging slow down when the AC or geyser runs?
+  source_faults:
+  - F06-EV-07
+  - F06-EV-32
+  merged_from:
+  - 'F06-EV-32 (stages_text): Does charging slow when AC or geyser runs?'
+  - 'F06-EV-07 (stages_text): Do other loads (AC, geyser) run at the same time?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-32
+      effect: supports
+      strength: strong
+    - fault: F06-EV-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-32
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q26
+  status: approved
+  stage: 3
+  text: Was there a software update, a service, a repair or an accident before this started?
+  source_faults:
+  - F06-EV-13
+  - F06-EV-39
+  - F06-EV-40
+  - F06-EV-44
+  - F06-EV-49
+  - F06-EV-62
+  merged_from:
+  - 'F06-EV-13 (stages_text): What service or update was done and when?'
+  - 'F06-EV-62 (stages_text): What was repaired and when?'
+  - 'F06-EV-40 (stages_text): When was the last update?'
+  options:
+  - label: A software update or service
+    effects:
+    - fault: F06-EV-13
+      effect: supports
+      strength: strong
+    - fault: F06-EV-40
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-39
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A repair or an accident
+    effects:
+    - fault: F06-EV-62
+      effect: supports
+      strength: strong
+    - fault: F06-EV-49
+      effect: supports
+      strength: weak
+    - fault: F06-EV-44
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-13
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-62
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q27
+  status: approved
+  stage: 3
+  text: Is a battery warning on?
+  source_faults:
+  - F06-EV-12
+  - F06-EV-35
+  - F06-EV-45
+  - F06-EV-46
+  - F06-EV-47
+  - F06-EV-52
+  - F06-EV-59
+  merged_from:
+  - 'F06-EV-45 (stages_text): What is the exact message?'
+  - 'F06-EV-12 (stages_text): Is a battery warning light on?'
+  - 'F06-EV-46 (stages_text): Is there smoke or smell?'
+  - 'F06-EV-47 (stages_text): Do you hear the pump?'
+  options:
+  - label: Battery management (BMS) or battery warning
+    effects:
+    - fault: F06-EV-45
+      effect: supports
+      strength: strong
+    - fault: F06-EV-12
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-52
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Battery temperature warning
+    effects:
+    - fault: F06-EV-46
+      effect: supports
+      strength: strong
+    - fault: F06-EV-59
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-35
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Battery cooling warning, or the pump does not run
+    effects:
+    - fault: F06-EV-47
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-45
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-46
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-47
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q28
+  status: approved
+  stage: 3
+  text: What charging message does the dashboard show?
+  source_faults:
+  - F06-EV-03
+  - F06-EV-39
+  - F06-EV-41
+  - F06-EV-52
+  merged_from:
+  - 'F06-EV-52 (stages_text): Exact message?'
+  - 'F06-EV-39 (stages_text): What message appears?'
+  - 'F06-EV-41 (stages_text): Is the port actually warm?'
+  - 'F06-EV-03 (stages_text): What is the exact dashboard message?'
+  options:
+  - label: Charging disabled for safety
+    effects:
+    - fault: F06-EV-52
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Charging system fault
+    effects:
+    - fault: F06-EV-39
+      effect: supports
+      strength: strong
+    - fault: F06-EV-03
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Port temperature high, but the port is not hot
+    effects:
+    - fault: F06-EV-41
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No message
+    effects:
+    - fault: F06-EV-52
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-39
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-41
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q29
+  status: approved
+  stage: 3
+  text: Does the dashboard show charging, but the battery % does not go up?
+  source_faults:
+  - F06-EV-61
+  merged_from:
+  - 'F06-EV-61 (stages_text): Does the battery % rise?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-61
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-61
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q30
+  status: approved
+  stage: 3
+  text: Are many warning lights on at once?
+  source_faults:
+  - F06-EV-50
+  - F06-EV-58
+  - F06-EV-65
+  merged_from:
+  - 'F06-EV-65 (stages_text): Which warnings?'
+  - 'F06-EV-58 (symptoms): Many warnings'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-65
+      effect: supports
+      strength: strong
+    - fault: F06-EV-50
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-58
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-65
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q31
+  status: approved
+  stage: 3
+  text: What kind of car is it?
+  source_faults:
+  - F06-EV-53
+  - F06-EV-54
+  - F06-EV-55
+  - F06-EV-56
+  - F06-EV-57
+  - F06-EV-58
+  - F06-EV-59
+  merged_from:
+  - 'F06-EV-53 (stages_text): Is it a plug-in hybrid?'
+  - 'F06-EV-56 (stages_text): Is it a hybrid or plug-in hybrid?'
+  - 'F06-EV-57 (stages_text): Is there a charging socket?'
+  options:
+  - label: Fully electric
+    effects:
+    - fault: F06-EV-53
+      effect: rules_out
+      strength: strong
+    - fault: F06-EV-54
+      effect: rules_out
+      strength: strong
+    - fault: F06-EV-55
+      effect: rules_out
+      strength: strong
+    - fault: F06-EV-56
+      effect: rules_out
+      strength: strong
+    - fault: F06-EV-57
+      effect: rules_out
+      strength: strong
+    - fault: F06-EV-58
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-59
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Plug-in hybrid (it has a charging socket and a petrol engine)
+    effects:
+    - fault: F06-EV-53
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-54
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-55
+      effect: supports
+      strength: weak
+    - fault: F06-EV-57
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Hybrid without a charging socket
+    effects:
+    - fault: F06-EV-57
+      effect: supports
+      strength: strong
+    - fault: F06-EV-55
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-56
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-58
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-59
+      effect: supports
+      strength: moderate
+    - fault: F06-EV-53
+      effect: rules_out
+      strength: strong
+    - fault: F06-EV-54
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q32
+  status: approved
+  stage: 3
+  text: (Hybrid) Is there a hybrid battery warning, reduced power, or is the battery cooling vent blocked?
+  source_faults:
+  - F06-EV-55
+  - F06-EV-56
+  - F06-EV-58
+  - F06-EV-59
+  merged_from:
+  - 'F06-EV-55 (stages_text): What exact message?'
+  - 'F06-EV-59 (stages_text): Is the vent blocked by items?'
+  - 'F06-EV-58 (stages_text): How old is the 12V battery?'
+  options:
+  - label: Hybrid battery warning or reduced power
+    effects:
+    - fault: F06-EV-55
+      effect: supports
+      strength: strong
+    - fault: F06-EV-56
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: The battery vent is blocked, or the fan is loud
+    effects:
+    - fault: F06-EV-59
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Many warnings and it is slow to start
+    effects:
+    - fault: F06-EV-58
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-55
+      effect: rules_out
+      strength: moderate
+    - fault: F06-EV-59
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: ev_hybrid-q33
+  status: approved
+  stage: 3
+  text: Does the charging fault happen only in hot weather or rain?
+  source_faults:
+  - F06-EV-14
+  - F06-EV-23
+  - F06-EV-63
+  merged_from:
+  - 'F06-EV-63 (stages_text): Hot or wet?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F06-EV-63
+      effect: supports
+      strength: strong
+    - fault: F06-EV-14
+      effect: supports
+      strength: weak
+    - fault: F06-EV-23
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F06-EV-63
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F06-EV-01:
+    status: approved
+    name: Charging Slower Than Expected
+    stage2_choices:
+    - Charging is slow
+    confirmation_test: Compare charger kW with the car's rated AC kW; note battery % and temperature.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-02:
+    status: approved
+    name: Charger Point / Connector Not Working
+    stage2_choices:
+    - Charging does not start
+    - Public charging station problem
+    - Home charger or wallbox problem
+    confirmation_test: Try a second compatible charger and inspect connector and inlet visually (no probing).
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-03:
+    status: approved
+    name: Onboard Charger Fault
+    stage2_choices:
+    - Charging does not start
+    confirmation_test: Read onboard charger fault codes, compare AC and DC charging, test the AC path (trained technician).
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-04:
+    status: approved
+    name: High-Voltage System Failure
+    stage2_choices:
+    - High-voltage or battery warning
+    - Car will not go into Ready mode
+    confirmation_test: Authorised technician reads codes, checks interlock and insulation with approved tools.
+    danger_phrases:
+    - HV warning
+    safety_trigger_options:
+    - question: ev_hybrid-q02
+      option: HV or isolation warning
+    - question: ev_hybrid-q03
+      option: 'No'
+  F06-EV-05:
+    status: approved
+    name: Charging Starts but Stops Repeatedly
+    stage2_choices:
+    - Charging starts and then stops
+    confirmation_test: Note when it stops (time, %, heat), inspect plug and inlet, test at a second charger.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-06:
+    status: approved
+    name: Charging Speed Drops After a Short Time
+    stage2_choices:
+    - Charging is slow
+    confirmation_test: Log kW against time and battery temperature; repeat at a different charger.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-07:
+    status: approved
+    name: Home Charging Is Slow but Public Charging Works
+    stage2_choices:
+    - Charging is slow
+    - Home charger or wallbox problem
+    confirmation_test: Electrician checks voltage under load, wire size, terminals and charger setting.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-08:
+    status: approved
+    name: Public Charging Is Slow but Home Charging Works
+    stage2_choices:
+    - Charging is slow
+    - Public charging station problem
+    confirmation_test: Try two different stations; compare kW shown with the car rating.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-09:
+    status: approved
+    name: Vehicle Does Not Accept the Charger's Expected Power
+    stage2_choices:
+    - Charging is slow
+    confirmation_test: Check variant spec, car settings, cable rating and charger current limit.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-10:
+    status: approved
+    name: Charging Stops at a Particular Battery Percentage
+    stage2_choices:
+    - Charging stops at a certain %
+    confirmation_test: Check the charge limit setting and schedule; if not set, scan battery management data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-11:
+    status: approved
+    name: Charging Speed Reduced Due to Battery Temperature
+    stage2_choices:
+    - Charging is slow
+    confirmation_test: Read battery temperatures and cooling data during charging.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-12:
+    status: approved
+    name: Charging Speed Reduced Due to Battery Protection or Control
+    stage2_choices:
+    - Charging is slow
+    - High-voltage or battery warning
+    confirmation_test: Authorised scan of battery management data and cell balance.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-13:
+    status: approved
+    name: Charging Speed Lower Than Expected After Software Update or Service
+    stage2_choices:
+    - Charging is slow
+    - Other
+    confirmation_test: Review job card, check settings, rescan and compare with previous behaviour.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-14:
+    status: approved
+    name: Charging Error After a Long Drive or in Hot Weather
+    stage2_choices:
+    - Charging starts and then stops
+    - Charging does not start
+    confirmation_test: Check temperatures, inlet / plug heat and cooling operation.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: ev_hybrid-q01
+      option: The plug, socket or cable is very hot
+  F06-EV-15:
+    status: approved
+    name: Charging Inlet or Port Not Working
+    stage2_choices:
+    - Charging does not start
+    - Plug does not fit, lock or release
+    confirmation_test: Test with a known-good charger and cable, inspect pins visually, scan for inlet codes.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: ev_hybrid-q19
+      option: Bent pins or burn marks
+  F06-EV-16:
+    status: approved
+    name: Charging Connector Does Not Lock or Release
+    stage2_choices:
+    - Plug does not fit, lock or release
+    confirmation_test: Check the 12V battery first, then lock actuator operation and inlet condition.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-17:
+    status: approved
+    name: Charging Cable or Portable Charger Fault
+    stage2_choices:
+    - Charging does not start
+    - Home charger or wallbox problem
+    confirmation_test: Try another known-good cable and check the socket.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-18:
+    status: approved
+    name: Damaged, Loose or Overheated Charging Connector
+    stage2_choices:
+    - Burning smell, heat or visible damage
+    - Plug does not fit, lock or release
+    confirmation_test: Visual check with power off, contact checks by a trained technician, check supply side.
+    danger_phrases:
+    - melted plastic
+    - burning smell
+    safety_trigger_options:
+    - question: ev_hybrid-q01
+      option: Burning smell or melted plastic
+    - question: ev_hybrid-q01
+      option: Smoke or flame
+    - question: ev_hybrid-q01
+      option: The plug, socket or cable is very hot
+    - question: ev_hybrid-q19
+      option: Bent pins or burn marks
+  F06-EV-19:
+    status: approved
+    name: Charging Port Locking Actuator Fault
+    stage2_choices:
+    - Plug does not fit, lock or release
+    confirmation_test: Test lock actuator operation with a scan tool and inspect.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-20:
+    status: approved
+    name: Charging Port Communication or Pilot-Signal Fault
+    stage2_choices:
+    - Charging does not start
+    confirmation_test: Try a second charger / cable, inspect pins, scan for communication codes.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-21:
+    status: approved
+    name: Moisture, Corrosion or Foreign Material at Charging Inlet
+    stage2_choices:
+    - Charging does not start
+    - Charging starts and then stops
+    confirmation_test: Visual inspection, dry cleaning by a trained person, insulation checks if needed.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-22:
+    status: approved
+    name: Charging Connector Does Not Fit or Is Not Compatible
+    stage2_choices:
+    - Plug does not fit, lock or release
+    confirmation_test: Confirm inlet type from the manual and inspect for objects.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-23:
+    status: approved
+    name: Charging Fails After Rain or Water Exposure
+    stage2_choices:
+    - Charging does not start
+    confirmation_test: Let it dry, inspect, then insulation checks by a trained technician.
+    danger_phrases:
+    - flooded
+    safety_trigger_options:
+    - question: ev_hybrid-q20
+      option: The car was flooded
+  F06-EV-24:
+    status: approved
+    name: Charging Station Cannot Communicate With Vehicle
+    stage2_choices:
+    - Public charging station problem
+    - Charging does not start
+    confirmation_test: Retry, try another station and gun, then scan the car.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-25:
+    status: approved
+    name: Home Charger or Wallbox Not Working
+    stage2_choices:
+    - Home charger or wallbox problem
+    - Charging does not start
+    confirmation_test: Electrician checks supply, protection, wallbox and earthing.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-26:
+    status: approved
+    name: Home Charging Circuit Trips Repeatedly
+    stage2_choices:
+    - Home charger or wallbox problem
+    - Charging starts and then stops
+    confirmation_test: Electrician tests the circuit and wallbox.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-27:
+    status: approved
+    name: Earthing or Electrical Supply Problem
+    stage2_choices:
+    - Home charger or wallbox problem
+    confirmation_test: Electrician checks earth resistance, wiring and voltage.
+    danger_phrases:
+    - tingling or shock
+    safety_trigger_options:
+    - question: ev_hybrid-q24
+      option: 'Yes'
+  F06-EV-28:
+    status: approved
+    name: Home Charger Power Supply or MCB/RCCB Fault
+    stage2_choices:
+    - Home charger or wallbox problem
+    - Charging does not start
+    confirmation_test: Electrician tests the supply and breaker.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-29:
+    status: approved
+    name: Charging Station Is Offline or Out of Service
+    stage2_choices:
+    - Public charging station problem
+    confirmation_test: Check the app or call the operator; try another station.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-30:
+    status: approved
+    name: Charging App, Authentication or Payment Problem
+    stage2_choices:
+    - Public charging station problem
+    - Charging does not start
+    confirmation_test: Retry, check balance, use operator support.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-31:
+    status: approved
+    name: Charging Fails at One Station but Works at Another
+    stage2_choices:
+    - Public charging station problem
+    confirmation_test: Compare stations and note station ID and error.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-32:
+    status: approved
+    name: Charger Output Is Limited by Available Electrical Supply
+    stage2_choices:
+    - Home charger or wallbox problem
+    - Charging is slow
+    confirmation_test: Electrician checks supply capacity and charger setting.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-33:
+    status: approved
+    name: Charging Cable, Socket or Wallbox Overheating
+    stage2_choices:
+    - Burning smell, heat or visible damage
+    - Home charger or wallbox problem
+    confirmation_test: Electrician inspects wiring, socket and charger with power off.
+    danger_phrases:
+    - melted plastic
+    - burning smell
+    safety_trigger_options:
+    - question: ev_hybrid-q01
+      option: Burning smell or melted plastic
+    - question: ev_hybrid-q01
+      option: Smoke or flame
+    - question: ev_hybrid-q01
+      option: The plug, socket or cable is very hot
+  F06-EV-34:
+    status: approved
+    name: Onboard Charger (OBC) Suspected Fault
+    stage2_choices:
+    - Charging does not start
+    confirmation_test: Rule out external causes, read codes, test the AC path.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-35:
+    status: approved
+    name: Onboard Charger Overheating or Thermal Protection
+    stage2_choices:
+    - Charging starts and then stops
+    - Charging is slow
+    confirmation_test: Read onboard charger temperatures and check cooling operation.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: ev_hybrid-q01
+      option: The plug, socket or cable is very hot
+  F06-EV-36:
+    status: approved
+    name: AC Charging Fails but DC Fast Charging Works
+    stage2_choices:
+    - Charging does not start
+    confirmation_test: Test the AC charging path with trained tools.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-37:
+    status: approved
+    name: AC Charging Works but DC Fast Charging Fails
+    stage2_choices:
+    - Charging does not start
+    - Public charging station problem
+    confirmation_test: Try another DC station and scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-38:
+    status: approved
+    name: Charging Contactor, Relay or Control Circuit Fault
+    stage2_choices:
+    - Charging does not start
+    confirmation_test: Scan, check 12V and fuse, test contactor operation.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-39:
+    status: approved
+    name: Charging Communication or Control Module Fault
+    stage2_choices:
+    - Charging does not start
+    - Other
+    confirmation_test: Scan, check wiring and 12V, update software if available.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-40:
+    status: approved
+    name: Charging Software, Calibration or Firmware Fault
+    stage2_choices:
+    - Other
+    confirmation_test: Check software version and campaigns.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-41:
+    status: approved
+    name: Charging Inlet Sensor or Temperature Sensor Fault
+    stage2_choices:
+    - Other
+    - Charging starts and then stops
+    confirmation_test: Compare sensor value with real temperature, scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-42:
+    status: approved
+    name: Charging-Related Fuse or Low-Voltage Supply Fault
+    stage2_choices:
+    - Charging does not start
+    - Other
+    confirmation_test: Test the 12V battery and check fuses.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-43:
+    status: approved
+    name: High-Voltage System Warning
+    stage2_choices:
+    - High-voltage or battery warning
+    - Car will not go into Ready mode
+    confirmation_test: Authorised high-voltage technician scans and tests.
+    danger_phrases:
+    - HV warning
+    safety_trigger_options:
+    - question: ev_hybrid-q02
+      option: HV or isolation warning
+    - question: ev_hybrid-q03
+      option: 'No'
+  F06-EV-44:
+    status: approved
+    name: High-Voltage Interlock or Isolation Fault
+    stage2_choices:
+    - High-voltage or battery warning
+    - Car will not go into Ready mode
+    confirmation_test: Technician checks HV connectors and insulation with approved tools.
+    danger_phrases:
+    - isolation fault
+    safety_trigger_options:
+    - question: ev_hybrid-q02
+      option: HV or isolation warning
+    - question: ev_hybrid-q03
+      option: 'No'
+    - question: ev_hybrid-q20
+      option: The car was flooded
+  F06-EV-45:
+    status: approved
+    name: Battery Management System (BMS) Warning
+    stage2_choices:
+    - High-voltage or battery warning
+    confirmation_test: Read battery management data with an authorised tool.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-46:
+    status: approved
+    name: Traction Battery Temperature Warning
+    stage2_choices:
+    - High-voltage or battery warning
+    confirmation_test: Read battery temperatures and cooling data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-47:
+    status: approved
+    name: High-Voltage Cooling System Fault
+    stage2_choices:
+    - High-voltage or battery warning
+    confirmation_test: Check coolant level and pump operation.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-48:
+    status: approved
+    name: Battery Contactors Do Not Close
+    stage2_choices:
+    - Car will not go into Ready mode
+    confirmation_test: Check 12V, then specialist scan.
+    danger_phrases:
+    - no Ready mode
+    safety_trigger_options:
+    - question: ev_hybrid-q03
+      option: 'No'
+  F06-EV-49:
+    status: approved
+    name: High-Voltage Cable or Connector Fault Suspected
+    stage2_choices:
+    - Burning smell, heat or visible damage
+    - High-voltage or battery warning
+    confirmation_test: Specialist inspects the HV cable with insulated equipment.
+    danger_phrases:
+    - damaged orange cable
+    safety_trigger_options:
+    - question: ev_hybrid-q02
+      option: A damaged or exposed orange cable
+  F06-EV-50:
+    status: approved
+    name: DC-to-DC Converter or 12V Supply Fault Affecting Charging
+    stage2_choices:
+    - Car will not go into Ready mode
+    - Other
+    confirmation_test: Load test the 12V battery and check DC-DC converter output.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: ev_hybrid-q03
+      option: 'No'
+  F06-EV-51:
+    status: approved
+    name: Vehicle Will Not Enter Ready Mode After Charging Error
+    stage2_choices:
+    - Car will not go into Ready mode
+    confirmation_test: Check 12V, then scan.
+    danger_phrases:
+    - no Ready mode
+    safety_trigger_options:
+    - question: ev_hybrid-q03
+      option: 'No'
+  F06-EV-52:
+    status: approved
+    name: Charging Disabled by a Safety Protection System
+    stage2_choices:
+    - Charging does not start
+    - High-voltage or battery warning
+    confirmation_test: Scan and tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-53:
+    status: approved
+    name: Plug-in Hybrid Will Not Charge Externally
+    stage2_choices:
+    - Hybrid car problem
+    - Charging does not start
+    confirmation_test: Try another charger, inspect inlet, scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-54:
+    status: approved
+    name: Plug-in Hybrid Charges Slowly
+    stage2_choices:
+    - Hybrid car problem
+    - Charging is slow
+    confirmation_test: Compare with rated AC kW and the charger.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-55:
+    status: approved
+    name: Hybrid Battery Warning or Reduced Power
+    stage2_choices:
+    - Hybrid car problem
+    - High-voltage or battery warning
+    confirmation_test: Authorised hybrid scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-56:
+    status: approved
+    name: Hybrid System Fault That Is Not an External Charging Fault
+    stage2_choices:
+    - Hybrid car problem
+    confirmation_test: Authorised hybrid diagnosis.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-57:
+    status: approved
+    name: Conventional Hybrid Owner Mistakes Regenerative Charging for Plug-in Charging
+    stage2_choices:
+    - Hybrid car problem
+    confirmation_test: Confirm model and powertrain.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-58:
+    status: approved
+    name: Hybrid 12V Battery Fault Causing Start or System Warnings
+    stage2_choices:
+    - Hybrid car problem
+    - Car will not go into Ready mode
+    confirmation_test: Load test the 12V battery.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: ev_hybrid-q03
+      option: 'No'
+  F06-EV-59:
+    status: approved
+    name: Hybrid Battery Cooling or Temperature Warning
+    stage2_choices:
+    - Hybrid car problem
+    - High-voltage or battery warning
+    confirmation_test: Inspect battery cooling vents and fan, scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-60:
+    status: approved
+    name: Charging Starts Only After Reconnecting the Plug
+    stage2_choices:
+    - Charging does not start
+    - Charging starts and then stops
+    confirmation_test: Inspect plug and inlet, test another charger.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-61:
+    status: approved
+    name: Charging Indicator or Dashboard Shows an Incorrect Status
+    stage2_choices:
+    - Other
+    confirmation_test: Compare charger kW with battery % change.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-62:
+    status: approved
+    name: Charging Failure After Repair, Accident or Component Replacement
+    stage2_choices:
+    - Charging does not start
+    - Other
+    confirmation_test: Check the job card, connectors and coding.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-63:
+    status: approved
+    name: Charging Fault Appears Only in Hot or Wet Conditions
+    stage2_choices:
+    - Other
+    - Charging starts and then stops
+    confirmation_test: Record conditions; inspect inlet and cooling.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-64:
+    status: approved
+    name: Charging Port or Cable Has a Burning Smell or Visible Damage
+    stage2_choices:
+    - Burning smell, heat or visible damage
+    confirmation_test: Visual check (power off) by a trained technician.
+    danger_phrases:
+    - burning smell
+    - smoke
+    - melted plastic
+    safety_trigger_options:
+    - question: ev_hybrid-q01
+      option: Burning smell or melted plastic
+    - question: ev_hybrid-q01
+      option: Smoke or flame
+  F06-EV-65:
+    status: approved
+    name: Vehicle Has Multiple Charging or Electrical Warnings
+    stage2_choices:
+    - Other
+    - High-voltage or battery warning
+    confirmation_test: Test 12V, then scan all modules.
+    danger_phrases: []
+    safety_trigger_options: []
+  F06-EV-66:
+    status: approved
+    name: Charging Fault Cannot Be Identified From Symptoms Alone
+    stage2_choices:
+    - Other
+    confirmation_test: Professional diagnosis.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: ev_hybrid-s-F06-EV-01
+  status: approved
+  fault: F06-EV-01
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-02
+  status: approved
+  fault: F06-EV-02
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not insert tools into connector pins. Do not use water or liquids to clean the connector.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-03
+  status: approved
+  fault: F06-EV-03
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-04
+  status: approved
+  fault: F06-EV-04
+  risk_level: high
+  stop_driving_trigger: 'Do not drive or restart: possible high-voltage, heat or fire risk.'
+  roadside_action: Do not drive and do not restart the car. Park in an open place away from buildings and people.
+    Never touch orange high-voltage cables. If there is smoke or fire, move away and call emergency services (say
+    it is an electric car). Call for a flatbed tow.
+  towing_recommendation: Flatbed. Do not drive or restart (possible high-voltage, heat or fire risk).
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: 'Do not drive and do not restart the car. Park in an open place away from buildings and people.
+      Ask roadside help for a flatbed. Neutral or wheels-on-road towing only if the exact model''s manual allows.
+      Reason: possible high-voltage, heat or fire risk.'
+- id: ev_hybrid-s-F06-EV-05
+  status: approved
+  fault: F06-EV-05
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-06
+  status: approved
+  fault: F06-EV-06
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-07
+  status: approved
+  fault: F06-EV-07
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat. For home wiring, switch off the power
+    and let only a licensed electrician open it.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-08
+  status: approved
+  fault: F06-EV-08
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-09
+  status: approved
+  fault: F06-EV-09
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-10
+  status: approved
+  fault: F06-EV-10
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-11
+  status: approved
+  fault: F06-EV-11
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-12
+  status: approved
+  fault: F06-EV-12
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-13
+  status: approved
+  fault: F06-EV-13
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-14
+  status: approved
+  fault: F06-EV-14
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Do not use damaged cables or adapters to get more speed.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-15
+  status: approved
+  fault: F06-EV-15
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not insert tools into connector pins. Do not use water or liquids to clean the connector.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-16
+  status: approved
+  fault: F06-EV-16
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not insert tools into connector pins. Do not use water or liquids to clean the connector.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-17
+  status: approved
+  fault: F06-EV-17
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not insert tools into connector pins. Do not use water or liquids to clean the connector.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-18
+  status: approved
+  fault: F06-EV-18
+  risk_level: medium
+  stop_driving_trigger: 'Stop charging: the connector is overheating.'
+  roadside_action: Stop charging and, if safe, switch off the charger power. Do not touch melted parts. Do not drive
+    far if a warning or reduced-power message shows. Never touch orange high-voltage cables. If the car cannot move
+    safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-19
+  status: approved
+  fault: F06-EV-19
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not insert tools into connector pins. Do not use water or liquids to clean the connector.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-20
+  status: approved
+  fault: F06-EV-20
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not insert tools into connector pins. Do not use water or liquids to clean the connector.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-21
+  status: approved
+  fault: F06-EV-21
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Do not insert tools into connector pins. Do not use water or liquids to clean the connector.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-22
+  status: approved
+  fault: F06-EV-22
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Do not insert tools into connector pins. Do not use water or liquids to clean the connector.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-23
+  status: approved
+  fault: F06-EV-23
+  risk_level: medium
+  stop_driving_trigger: Do not charge or drive a flooded car.
+  roadside_action: If the car was flooded, do not charge or drive it; call for a flatbed tow. If it only got wet,
+    let it dry before charging.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-24
+  status: approved
+  fault: F06-EV-24
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-25
+  status: approved
+  fault: F06-EV-25
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat. For home wiring, switch off the power
+    and let only a licensed electrician open it.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-26
+  status: approved
+  fault: F06-EV-26
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat. For home wiring, switch off the power
+    and let only a licensed electrician open it.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-27
+  status: approved
+  fault: F06-EV-27
+  risk_level: medium
+  stop_driving_trigger: Stop charging if you feel a tingle or shock.
+  roadside_action: Stop charging. Do not touch the car and the charger at the same time. Switch off the power and
+    get a licensed electrician to check the earthing.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-28
+  status: approved
+  fault: F06-EV-28
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat. For home wiring, switch off the power
+    and let only a licensed electrician open it.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-29
+  status: approved
+  fault: F06-EV-29
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-30
+  status: approved
+  fault: F06-EV-30
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-31
+  status: approved
+  fault: F06-EV-31
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-32
+  status: approved
+  fault: F06-EV-32
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat. For home wiring, switch off the power
+    and let only a licensed electrician open it.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Power off before any inspection of home equipment. Only a licensed electrician opens
+      wiring.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-33
+  status: approved
+  fault: F06-EV-33
+  risk_level: medium
+  stop_driving_trigger: 'Stop charging: the cable, socket or wallbox is overheating.'
+  roadside_action: Stop charging and switch off the power at the supply if it is safe. Do not touch melted parts.
+    Let only a licensed electrician check the wiring.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-34
+  status: approved
+  fault: F06-EV-34
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-35
+  status: approved
+  fault: F06-EV-35
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-36
+  status: approved
+  fault: F06-EV-36
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-37
+  status: approved
+  fault: F06-EV-37
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-38
+  status: approved
+  fault: F06-EV-38
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-39
+  status: approved
+  fault: F06-EV-39
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-40
+  status: approved
+  fault: F06-EV-40
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-41
+  status: approved
+  fault: F06-EV-41
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-42
+  status: approved
+  fault: F06-EV-42
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-43
+  status: approved
+  fault: F06-EV-43
+  risk_level: high
+  stop_driving_trigger: 'Do not drive or restart: possible high-voltage, heat or fire risk.'
+  roadside_action: Do not drive and do not restart the car. Park in an open place away from buildings and people.
+    Never touch orange high-voltage cables. If there is smoke or fire, move away and call emergency services (say
+    it is an electric car). Call for a flatbed tow.
+  towing_recommendation: Flatbed. Do not drive or restart (possible high-voltage, heat or fire risk).
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: 'Do not drive and do not restart the car. Park in an open place away from buildings and people.
+      Ask roadside help for a flatbed. Neutral or wheels-on-road towing only if the exact model''s manual allows.
+      Reason: possible high-voltage, heat or fire risk.'
+- id: ev_hybrid-s-F06-EV-44
+  status: approved
+  fault: F06-EV-44
+  risk_level: high
+  stop_driving_trigger: 'Do not drive or restart: possible high-voltage, heat or fire risk.'
+  roadside_action: Do not drive and do not restart the car. Park in an open place away from buildings and people.
+    Never touch orange high-voltage cables. If there is smoke or fire, move away and call emergency services (say
+    it is an electric car). Call for a flatbed tow.
+  towing_recommendation: Flatbed. Do not drive or restart (possible high-voltage, heat or fire risk).
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: 'Do not drive and do not restart the car. Park in an open place away from buildings and people.
+      Ask roadside help for a flatbed. Neutral or wheels-on-road towing only if the exact model''s manual allows.
+      Reason: possible high-voltage, heat or fire risk.'
+- id: ev_hybrid-s-F06-EV-45
+  status: approved
+  fault: F06-EV-45
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-46
+  status: approved
+  fault: F06-EV-46
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-47
+  status: approved
+  fault: F06-EV-47
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-48
+  status: approved
+  fault: F06-EV-48
+  risk_level: high
+  stop_driving_trigger: 'Do not drive or restart: possible high-voltage, heat or fire risk.'
+  roadside_action: Do not drive and do not restart the car. Park in an open place away from buildings and people.
+    Never touch orange high-voltage cables. If there is smoke or fire, move away and call emergency services (say
+    it is an electric car). Call for a flatbed tow.
+  towing_recommendation: Flatbed. Do not drive or restart (possible high-voltage, heat or fire risk).
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: 'Do not drive and do not restart the car. Park in an open place away from buildings and people.
+      Ask roadside help for a flatbed. Neutral or wheels-on-road towing only if the exact model''s manual allows.
+      Reason: possible high-voltage, heat or fire risk.'
+- id: ev_hybrid-s-F06-EV-49
+  status: approved
+  fault: F06-EV-49
+  risk_level: high
+  stop_driving_trigger: 'Do not drive or restart: possible high-voltage, heat or fire risk.'
+  roadside_action: Do not drive and do not restart the car. Park in an open place away from buildings and people.
+    Never touch orange high-voltage cables. If there is smoke or fire, move away and call emergency services (say
+    it is an electric car). Call for a flatbed tow.
+  towing_recommendation: Flatbed. Do not drive or restart (possible high-voltage, heat or fire risk).
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: 'Do not drive and do not restart the car. Park in an open place away from buildings and people.
+      Ask roadside help for a flatbed. Neutral or wheels-on-road towing only if the exact model''s manual allows.
+      Reason: possible high-voltage, heat or fire risk.'
+- id: ev_hybrid-s-F06-EV-50
+  status: approved
+  fault: F06-EV-50
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-51
+  status: approved
+  fault: F06-EV-51
+  risk_level: high
+  stop_driving_trigger: 'Do not drive or restart: possible high-voltage, heat or fire risk.'
+  roadside_action: Do not drive and do not restart the car. Park in an open place away from buildings and people.
+    Never touch orange high-voltage cables. If there is smoke or fire, move away and call emergency services (say
+    it is an electric car). Call for a flatbed tow.
+  towing_recommendation: Flatbed. Do not drive or restart (possible high-voltage, heat or fire risk).
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: 'Do not drive and do not restart the car. Park in an open place away from buildings and people.
+      Ask roadside help for a flatbed. Neutral or wheels-on-road towing only if the exact model''s manual allows.
+      Reason: possible high-voltage, heat or fire risk.'
+- id: ev_hybrid-s-F06-EV-52
+  status: approved
+  fault: F06-EV-52
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-53
+  status: approved
+  fault: F06-EV-53
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-54
+  status: approved
+  fault: F06-EV-54
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-55
+  status: approved
+  fault: F06-EV-55
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-56
+  status: approved
+  fault: F06-EV-56
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-57
+  status: approved
+  fault: F06-EV-57
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-58
+  status: approved
+  fault: F06-EV-58
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-59
+  status: approved
+  fault: F06-EV-59
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-60
+  status: approved
+  fault: F06-EV-60
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Stop at any smoke, burning smell or heat and follow the emergency steps.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-61
+  status: approved
+  fault: F06-EV-61
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Stop at any smoke, burning smell or heat and follow the emergency steps.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.
+- id: ev_hybrid-s-F06-EV-62
+  status: approved
+  fault: F06-EV-62
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Stop at any smoke, burning smell or heat and follow the emergency steps.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-63
+  status: approved
+  fault: F06-EV-63
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Stop at any smoke, burning smell or heat and follow the emergency steps.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-64
+  status: approved
+  fault: F06-EV-64
+  risk_level: high
+  stop_driving_trigger: 'Do not drive or restart: possible high-voltage, heat or fire risk.'
+  roadside_action: Do not drive and do not restart the car. Park in an open place away from buildings and people.
+    Never touch orange high-voltage cables. If there is smoke or fire, move away and call emergency services (say
+    it is an electric car). Call for a flatbed tow.
+  towing_recommendation: Flatbed. Do not drive or restart (possible high-voltage, heat or fire risk).
+  source_text:
+    safety_precautions: '• Never touch exposed or orange high-voltage wiring.
+
+      • Never open the traction battery, onboard charger or HV junction box (customer or unqualified mechanic).
+
+      • Do not bypass any HV interlock or safety protection.
+
+      • Do not insert tools into charging connector pins.
+
+      • Do not use water or liquids to clean an electrical connector.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • Do not handle a damaged or flooded HV battery.
+
+      • Use trained EV staff, approved insulated tools and the maker''s isolation procedure.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: 'Do not drive and do not restart the car. Park in an open place away from buildings and people.
+      Ask roadside help for a flatbed. Neutral or wheels-on-road towing only if the exact model''s manual allows.
+      Reason: possible high-voltage, heat or fire risk.'
+- id: ev_hybrid-s-F06-EV-65
+  status: approved
+  fault: F06-EV-65
+  risk_level: medium
+  stop_driving_trigger: Do not drive far if a warning or reduced-power message shows.
+  roadside_action: Do not drive far if a warning or reduced-power message shows. Never touch orange high-voltage
+    cables. If the car cannot move safely, call for a flatbed tow.
+  towing_recommendation: Do not drive far with a warning or reduced-power message. Flatbed if the car cannot start
+    or move safely.
+  source_text:
+    safety_precautions: '• Stop at any smoke, burning smell or heat and follow the emergency steps.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Do not drive far if a warning lamp or reduced-power message shows. If the car cannot start
+      or move safely, use a flatbed (platform) truck. Follow this exact model's recovery guide before moving it
+      on its wheels.
+- id: ev_hybrid-s-F06-EV-66
+  status: approved
+  fault: F06-EV-66
+  risk_level: low
+  stop_driving_trigger: Stop charging if there is smoke, a burning smell or heat.
+  roadside_action: Stop charging at once if you notice smoke, a burning smell or heat. Do not use damaged cables
+    or adapters. The car can be driven if there is no warning, smell or heat.
+  towing_recommendation: Not needed if there is no warning, smell or heat. Do not keep charging with faulty equipment.
+  source_text:
+    safety_precautions: '• Stop at any smoke, burning smell or heat and follow the emergency steps.
+
+      • Never touch exposed or orange high-voltage wiring.
+
+      • Do not continue charging with melted plastic, arcing, smoke, unusual heat or a burning smell.
+
+      • If smoke, fire or suspected battery thermal runaway occurs: move away, call emergency services, tell them
+      it is an electric vehicle.'
+    if_towing_needed: Drive normally only if there is no warning, smell or heat. Towing not needed. Do not keep
+      charging with faulty equipment.

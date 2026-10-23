@@ -1,0 +1,1096 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category gearbox
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: gearbox
+category_name: Gearbox / transmission
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:39:44+00:00'
+  run_id: claude-code-gearbox
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: gearbox-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Gear problem
+    effects:
+    - fault: F17-GB-01
+      effect: supports
+      strength: strong
+    - fault: F17-GB-02
+      effect: supports
+      strength: strong
+    - fault: F17-GB-03
+      effect: supports
+      strength: strong
+    - fault: F17-GB-04
+      effect: supports
+      strength: strong
+    - fault: F17-GB-05
+      effect: supports
+      strength: strong
+    - fault: F17-GB-06
+      effect: supports
+      strength: strong
+    - fault: F17-GB-07
+      effect: supports
+      strength: strong
+    - fault: F17-GB-08
+      effect: supports
+      strength: strong
+    - fault: F17-GB-09
+      effect: supports
+      strength: strong
+    - fault: F17-GB-10
+      effect: supports
+      strength: strong
+    - fault: F17-GB-11
+      effect: supports
+      strength: strong
+    - fault: F17-GB-12
+      effect: supports
+      strength: strong
+    - fault: F17-GB-13
+      effect: supports
+      strength: strong
+    - fault: F17-GB-14
+      effect: supports
+      strength: strong
+    - fault: F17-GB-15
+      effect: supports
+      strength: strong
+    - fault: F17-GB-16
+      effect: supports
+      strength: strong
+    - fault: F17-GB-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Remote / key problem
+    effects: []
+    safety_trigger: false
+  - label: Car locked
+    effects: []
+    safety_trigger: false
+  - label: Suspension noise
+    effects: []
+    safety_trigger: false
+  - label: CNG problem
+    effects: []
+    safety_trigger: false
+  - label: Diesel delivery
+    effects: []
+    safety_trigger: false
+  - label: AdBlue warning
+    effects: []
+    safety_trigger: false
+  - label: Other
+    effects:
+    - fault: F17-GB-09
+      effect: supports
+      strength: strong
+    - fault: F17-GB-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q01
+  status: approved
+  stage: 3
+  text: Is there a burning smell, loud grinding, or is the gearbox locked so the car will not move?
+  source_faults:
+  - F17-GB-03
+  - F17-GB-04
+  - F17-GB-15
+  - F17-GB-16
+  merged_from:
+  - 'F17-GB-16 (stages_text): Is the car moving after selecting gear?'
+  - 'F17-GB-16 (symptoms): Burnt smell'
+  - 'F17-GB-16 (symptoms): Bang / grinding'
+  options:
+  - label: The engine revs but the car does not move
+    effects:
+    - fault: F17-GB-16
+      effect: supports
+      strength: strong
+    - fault: F17-GB-04
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: Burning smell or loud grinding
+    effects:
+    - fault: F17-GB-16
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-03
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-15
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F17-GB-16
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q02
+  status: approved
+  stage: 3
+  text: Is your car manual, automatic, AMT, CVT or DCT?
+  source_faults:
+  - F17-GB-01
+  - F17-GB-05
+  - F17-GB-06
+  - F17-GB-07
+  - F17-GB-09
+  - F17-GB-11
+  - F17-GB-12
+  - F17-GB-13
+  - F17-GB-14
+  - F17-GB-15
+  - F17-GB-17
+  merged_from:
+  - 'F17-GB-09 (stages_text): Is it manual or automatic?'
+  - 'F17-GB-13 (stages_text): Is it DCT, CVT or AT?'
+  - 'F17-GB-01 (stages_text): Is your car manual or automatic?'
+  options:
+  - label: Manual
+    effects:
+    - fault: F17-GB-01
+      effect: supports
+      strength: weak
+    - fault: F17-GB-05
+      effect: supports
+      strength: weak
+    - fault: F17-GB-06
+      effect: supports
+      strength: weak
+    - fault: F17-GB-07
+      effect: supports
+      strength: weak
+    - fault: F17-GB-11
+      effect: supports
+      strength: weak
+    - fault: F17-GB-17
+      effect: supports
+      strength: weak
+    - fault: F17-GB-12
+      effect: rules_out
+      strength: strong
+    - fault: F17-GB-13
+      effect: rules_out
+      strength: strong
+    - fault: F17-GB-14
+      effect: rules_out
+      strength: strong
+    - fault: F17-GB-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: AMT (an automatic with an AMT badge on the car)
+    effects:
+    - fault: F17-GB-14
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-13
+      effect: supports
+      strength: weak
+    - fault: F17-GB-05
+      effect: rules_out
+      strength: moderate
+    - fault: F17-GB-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Automatic, CVT or DCT
+    effects:
+    - fault: F17-GB-12
+      effect: supports
+      strength: weak
+    - fault: F17-GB-13
+      effect: supports
+      strength: weak
+    - fault: F17-GB-15
+      effect: supports
+      strength: weak
+    - fault: F17-GB-05
+      effect: rules_out
+      strength: strong
+    - fault: F17-GB-11
+      effect: rules_out
+      strength: strong
+    - fault: F17-GB-17
+      effect: rules_out
+      strength: strong
+    - fault: F17-GB-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q03
+  status: approved
+  stage: 3
+  text: (Manual) Are all gears hard to put in, or only some?
+  source_faults:
+  - F17-GB-01
+  - F17-GB-04
+  - F17-GB-05
+  - F17-GB-07
+  - F17-GB-08
+  - F17-GB-11
+  merged_from:
+  - 'F17-GB-01 (stages_text): Are all gears hard or only some?'
+  - 'F17-GB-07 (stages_text): Do only some gears fail?'
+  options:
+  - label: All gears are hard
+    effects:
+    - fault: F17-GB-01
+      effect: supports
+      strength: strong
+    - fault: F17-GB-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Only one row of gears, or some gears, will not go in
+    effects:
+    - fault: F17-GB-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Only reverse
+    effects:
+    - fault: F17-GB-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No gear goes in at all
+    effects:
+    - fault: F17-GB-04
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-05
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q04
+  status: approved
+  stage: 3
+  text: With the engine switched off, do the gears go in easily?
+  source_faults:
+  - F17-GB-01
+  - F17-GB-03
+  - F17-GB-05
+  - F17-GB-07
+  - F17-GB-11
+  merged_from:
+  - 'F17-GB-05 (stages_text): Does it go in with engine off?'
+  - 'F17-GB-11 (symptoms): Hard 1st/reverse'
+  options:
+  - label: Yes, easily with the engine off
+    effects:
+    - fault: F17-GB-05
+      effect: supports
+      strength: strong
+    - fault: F17-GB-11
+      effect: supports
+      strength: strong
+    - fault: F17-GB-01
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No, hard even with the engine off
+    effects:
+    - fault: F17-GB-07
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-03
+      effect: supports
+      strength: weak
+    - fault: F17-GB-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q05
+  status: approved
+  stage: 3
+  text: With the clutch fully pressed, does the car still creep forward?
+  source_faults:
+  - F17-GB-01
+  - F17-GB-05
+  - F17-GB-11
+  merged_from:
+  - 'F17-GB-11 (stages_text): Does the car creep with clutch fully pressed?'
+  - 'F17-GB-01 (stages_text): Is the clutch pedal normal?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-GB-11
+      effect: supports
+      strength: strong
+    - fault: F17-GB-05
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-GB-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q06
+  status: approved
+  stage: 3
+  text: How does the clutch pedal feel?
+  source_faults:
+  - F17-GB-01
+  - F17-GB-04
+  - F17-GB-05
+  - F17-GB-17
+  merged_from:
+  - 'F17-GB-01 (stages_text): Is the clutch pedal normal?'
+  - 'F17-GB-05 (symptoms): Clutch pedal floor/soft'
+  - 'F17-GB-04 (symptoms): Clutch pedal on floor'
+  options:
+  - label: It stays on the floor or feels soft
+    effects:
+    - fault: F17-GB-05
+      effect: supports
+      strength: strong
+    - fault: F17-GB-04
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It bites very high
+    effects:
+    - fault: F17-GB-17
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Normal
+    effects:
+    - fault: F17-GB-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q07
+  status: approved
+  stage: 3
+  text: Does a gear jump out by itself, or only make a grinding noise?
+  source_faults:
+  - F17-GB-01
+  - F17-GB-02
+  - F17-GB-03
+  - F17-GB-11
+  merged_from:
+  - 'F17-GB-02 (stages_text): Does the gear jump out or only make noise?'
+  options:
+  - label: It jumps out of gear
+    effects:
+    - fault: F17-GB-02
+      effect: supports
+      strength: strong
+    - fault: F17-GB-03
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Grinding when changing gear
+    effects:
+    - fault: F17-GB-02
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-11
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-GB-02
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q08
+  status: approved
+  stage: 3
+  text: Does the gear lever feel loose or wobble a lot?
+  source_faults:
+  - F17-GB-04
+  - F17-GB-06
+  - F17-GB-07
+  merged_from:
+  - 'F17-GB-06 (stages_text): Does the lever wobble a lot?'
+  - 'F17-GB-04 (stages_text): Does the lever move freely?'
+  options:
+  - label: It wobbles, but gears still go in
+    effects:
+    - fault: F17-GB-06
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It moves freely and no gear engages
+    effects:
+    - fault: F17-GB-04
+      effect: supports
+      strength: strong
+    - fault: F17-GB-07
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F17-GB-06
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q09
+  status: approved
+  stage: 3
+  text: Do you hear a whine or hum? Does it stop when you press the clutch?
+  source_faults:
+  - F17-GB-09
+  - F17-GB-10
+  merged_from:
+  - 'F17-GB-10 (stages_text): Does it stop when you press the clutch?'
+  options:
+  - label: Yes, a whine that stops with the clutch pressed
+    effects:
+    - fault: F17-GB-10
+      effect: supports
+      strength: strong
+    - fault: F17-GB-09
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A whine that does not change
+    effects:
+    - fault: F17-GB-10
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No whine
+    effects:
+    - fault: F17-GB-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q10
+  status: approved
+  stage: 3
+  text: Is there oil dripping under the gearbox?
+  source_faults:
+  - F17-GB-01
+  - F17-GB-09
+  - F17-GB-10
+  merged_from:
+  - 'F17-GB-09 (symptoms): Oil drip'
+  - 'F17-GB-01 (stages_text): Is there any fluid leak?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-GB-09
+      effect: supports
+      strength: strong
+    - fault: F17-GB-10
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-GB-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q11
+  status: approved
+  stage: 3
+  text: (Automatic) Is there a delay when you put it in D or R, then a clunk?
+  source_faults:
+  - F17-GB-12
+  merged_from:
+  - 'F17-GB-12 (symptoms): Delay D/R'
+  - 'F17-GB-12 (stages_text): Is it worse when cold?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-GB-12
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-GB-12
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q12
+  status: approved
+  stage: 3
+  text: (Automatic) Does it jerk or change gears harshly?
+  source_faults:
+  - F17-GB-13
+  - F17-GB-14
+  merged_from:
+  - 'F17-GB-13 (stages_text): Is it DCT, CVT or AT?'
+  - 'F17-GB-13 (symptoms): Harsh shift'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-GB-13
+      effect: supports
+      strength: strong
+    - fault: F17-GB-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-GB-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q13
+  status: approved
+  stage: 3
+  text: (AMT) Is the gear indicator or N flashing on the dashboard?
+  source_faults:
+  - F17-GB-14
+  merged_from:
+  - 'F17-GB-14 (stages_text): Is N flashing?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-GB-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-GB-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q14
+  status: approved
+  stage: 3
+  text: Is there a transmission warning or an overheating message?
+  source_faults:
+  - F17-GB-02
+  - F17-GB-12
+  - F17-GB-14
+  - F17-GB-15
+  merged_from:
+  - 'F17-GB-15 (stages_text): Is the warning about overheating?'
+  - 'F17-GB-02 (symptoms): Warning light (AT)'
+  options:
+  - label: Yes, about overheating
+    effects:
+    - fault: F17-GB-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Yes, another gearbox warning
+    effects:
+    - fault: F17-GB-15
+      effect: supports
+      strength: moderate
+    - fault: F17-GB-12
+      effect: supports
+      strength: weak
+    - fault: F17-GB-14
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-GB-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q15
+  status: approved
+  stage: 3
+  text: Do you wait 2-3 seconds with the clutch pressed before putting it into reverse?
+  source_faults:
+  - F17-GB-07
+  - F17-GB-08
+  merged_from:
+  - 'F17-GB-08 (stages_text): Do you wait before selecting reverse?'
+  options:
+  - label: 'No'
+    effects:
+    - fault: F17-GB-08
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Yes, and it still will not go in
+    effects:
+    - fault: F17-GB-08
+      effect: supports
+      strength: weak
+    - fault: F17-GB-07
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q16
+  status: approved
+  stage: 3
+  text: Do you drive mostly in heavy stop-and-go traffic, and does the clutch slip on climbs?
+  source_faults:
+  - F17-GB-17
+  merged_from:
+  - 'F17-GB-17 (stages_text): Do you drive mostly in heavy traffic?'
+  - 'F17-GB-17 (symptoms): Slip on climbs'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-GB-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-GB-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: gearbox-q17
+  status: approved
+  stage: 3
+  text: Did a mechanic already check the clutch and the gear cables, and find them fine?
+  source_faults:
+  - F17-GB-01
+  - F17-GB-03
+  - F17-GB-07
+  merged_from:
+  - 'F17-GB-03 (stages_text): Were clutch and linkage checked?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-GB-03
+      effect: supports
+      strength: strong
+    - fault: F17-GB-01
+      effect: rules_out
+      strength: moderate
+    - fault: F17-GB-07
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F17-GB-01:
+    status: approved
+    name: Gear Shifting Stiff / Hard to Engage
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Engine-off shift test and linkage inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-02:
+    status: approved
+    name: Gear Slipping / Grinding
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Road test and clutch tests.
+    danger_phrases:
+    - gear jumps out
+    safety_trigger_options:
+    - question: gearbox-q07
+      option: It jumps out of gear
+  F17-GB-03:
+    status: approved
+    name: Gearbox Internal Fault
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Gearbox strip inspection.
+    danger_phrases:
+    - no drive
+    safety_trigger_options:
+    - question: gearbox-q01
+      option: Burning smell or loud grinding
+    - question: gearbox-q07
+      option: It jumps out of gear
+  F17-GB-04:
+    status: approved
+    name: Gearbox Failure - Stuck / Will Not Shift
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Linkage check and scan.
+    danger_phrases:
+    - stuck in gear
+    safety_trigger_options:
+    - question: gearbox-q01
+      option: The engine revs but the car does not move
+    - question: gearbox-q03
+      option: No gear goes in at all
+    - question: gearbox-q08
+      option: It moves freely and no gear engages
+  F17-GB-05:
+    status: approved
+    name: Gear Not Engaging in Manual Car
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Engine-off shift test.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: gearbox-q03
+      option: No gear goes in at all
+  F17-GB-06:
+    status: approved
+    name: Gear Lever Loose / Excessive Free Play
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Inspection of the lever bushes.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-07:
+    status: approved
+    name: Gear Selector Cable / Linkage Fault
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Selector cable inspection.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: gearbox-q08
+      option: It moves freely and no gear engages
+  F17-GB-08:
+    status: approved
+    name: Reverse Gear Not Engaging
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Reverse gear tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-09:
+    status: approved
+    name: Gearbox Oil Leak / Low Transmission Fluid
+    stage2_choices:
+    - Gear problem
+    - Other
+    confirmation_test: Clean the gearbox and recheck for the leak.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-10:
+    status: approved
+    name: Gearbox Whining / Humming Noise
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Road test and gearbox oil check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-11:
+    status: approved
+    name: Clutch Drag Affecting Gear Engagement
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Engine-off versus engine-on shift test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-12:
+    status: approved
+    name: Automatic Transmission Delayed Engagement
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Scan and transmission fluid check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-13:
+    status: approved
+    name: Automatic Transmission Jerking / Harsh Shifting
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Scan and road test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-14:
+    status: approved
+    name: AMT Gear Actuator / Calibration Fault
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Scan and AMT actuator test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-GB-15:
+    status: approved
+    name: CVT / DCT / Automatic Transmission Warning
+    stage2_choices:
+    - Gear problem
+    - Other
+    confirmation_test: Transmission scan.
+    danger_phrases:
+    - burnt smell
+    safety_trigger_options:
+    - question: gearbox-q01
+      option: Burning smell or loud grinding
+  F17-GB-16:
+    status: approved
+    name: Severe Transmission Failure / Vehicle Not Moving
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Inspection.
+    danger_phrases:
+    - car not moving
+    - burnt smell
+    safety_trigger_options:
+    - question: gearbox-q01
+      option: Burning smell or loud grinding
+    - question: gearbox-q01
+      option: The engine revs but the car does not move
+  F17-GB-17:
+    status: approved
+    name: Clutch / Gearbox Wear From Stop-Go City Traffic (Riding the Clutch)  [NEW - India]
+    stage2_choices:
+    - Gear problem
+    confirmation_test: Clutch slip test.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: gearbox-s-F17-GB-01
+  status: approved
+  fault: F17-GB-01
+  risk_level: low
+  stop_driving_trigger: Stop if there is a burning smell, loud grinding or the gearbox locks.
+  roadside_action: Do not force the gear lever. Drive gently to a garage.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not force the gear lever.
+    if_towing_needed: NO.
+- id: gearbox-s-F17-GB-02
+  status: approved
+  fault: F17-GB-02
+  risk_level: medium
+  stop_driving_trigger: Stop if the gear keeps jumping out.
+  roadside_action: A gear jumping out is unsafe on slopes and in traffic. Drive gently to a garage, and call for
+    a tow if it keeps happening.
+  towing_recommendation: If the gear jumps out repeatedly.
+  source_text:
+    safety_precautions: • Jumping out of gear is unsafe on slopes/traffic.
+    if_towing_needed: If gear jumps out repeatedly.
+- id: gearbox-s-F17-GB-03
+  status: approved
+  fault: F17-GB-03
+  risk_level: medium
+  stop_driving_trigger: Stop if it is noisy or there is no drive.
+  roadside_action: Do not force the gear lever. If it is very noisy or the car will not drive, call for a tow.
+  towing_recommendation: If noisy or no drive.
+  source_text:
+    safety_precautions: • Gearbox removal needs proper support.
+    if_towing_needed: If noisy / no drive.
+- id: gearbox-s-F17-GB-04
+  status: approved
+  fault: F17-GB-04
+  risk_level: medium
+  stop_driving_trigger: Do not drive if a gear cannot be selected safely.
+  roadside_action: Stop in a safe place, put on the handbrake and hazard lights. Do not force the lever. Call for
+    a tow.
+  towing_recommendation: Yes, if a gear cannot be selected safely.
+  source_text:
+    safety_precautions: • Stop in a safe place.
+    if_towing_needed: YES if gear cannot be selected safely.
+- id: gearbox-s-F17-GB-05
+  status: approved
+  fault: F17-GB-05
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the car cannot move.
+  roadside_action: Stop in a safe place with the handbrake on. Do not force the lever. Call a mechanic.
+  towing_recommendation: If the car cannot move.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: If cannot move.
+- id: gearbox-s-F17-GB-06
+  status: approved
+  fault: F17-GB-06
+  risk_level: low
+  stop_driving_trigger: Stop if there is a burning smell, loud grinding or the gearbox locks.
+  roadside_action: Do not force the gear lever. Drive gently to a garage.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: gearbox-s-F17-GB-07
+  status: approved
+  fault: F17-GB-07
+  risk_level: medium
+  stop_driving_trigger: Do not drive if no gear can be selected.
+  roadside_action: Do not force the lever. A mechanic may be able to re-fit the cable; otherwise call for a tow.
+  towing_recommendation: If no gear can be selected.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: If no gear.
+- id: gearbox-s-F17-GB-08
+  status: approved
+  fault: F17-GB-08
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Wait 2-3 seconds with the clutch fully down before selecting reverse. Do not force it.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: gearbox-s-F17-GB-09
+  status: approved
+  fault: F17-GB-09
+  risk_level: medium
+  stop_driving_trigger: Stop if there is a big leak or an automatic gearbox slips.
+  roadside_action: Do not touch hot oil. If the leak is big or an automatic gearbox slips, call for a tow.
+  towing_recommendation: If there is a big leak or an automatic gearbox slips.
+  source_text:
+    safety_precautions: • Hot oil burns.
+    if_towing_needed: If big leak / AT slipping.
+- id: gearbox-s-F17-GB-10
+  status: approved
+  fault: F17-GB-10
+  risk_level: low
+  stop_driving_trigger: Stop if there is a burning smell, loud grinding or the gearbox locks.
+  roadside_action: Do not force the gear lever. Drive gently to a garage.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: gearbox-s-F17-GB-11
+  status: approved
+  fault: F17-GB-11
+  risk_level: low
+  stop_driving_trigger: Stop if there is a burning smell, loud grinding or the gearbox locks.
+  roadside_action: Do not force the gear lever. Drive gently to a garage.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: gearbox-s-F17-GB-12
+  status: approved
+  fault: F17-GB-12
+  risk_level: low
+  stop_driving_trigger: Stop if there is no drive.
+  roadside_action: Hold the brake while selecting a gear. If the car will not drive, call a mechanic.
+  towing_recommendation: If no drive.
+  source_text:
+    safety_precautions: • Hold brake while selecting gear.
+    if_towing_needed: If no drive.
+- id: gearbox-s-F17-GB-13
+  status: approved
+  fault: F17-GB-13
+  risk_level: low
+  stop_driving_trigger: Stop if there is a burning smell, loud grinding or the gearbox locks.
+  roadside_action: Do not force the gear lever. Drive gently to a garage.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: gearbox-s-F17-GB-14
+  status: approved
+  fault: F17-GB-14
+  risk_level: medium
+  stop_driving_trigger: Stop if no gear can be selected.
+  roadside_action: Stop in a safe place. If no gear can be selected, call for a tow.
+  towing_recommendation: If no gear.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: If no gear.
+- id: gearbox-s-F17-GB-15
+  status: approved
+  fault: F17-GB-15
+  risk_level: medium
+  stop_driving_trigger: Stop if the gearbox overheats or goes into low-power mode.
+  roadside_action: Stop in a safe place and let the gearbox cool as the owner's manual says. If it stays in low-power
+    mode, call for a tow.
+  towing_recommendation: If in low-power mode and unsafe.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: If limp + unsafe.
+- id: gearbox-s-F17-GB-16
+  status: approved
+  fault: F17-GB-16
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: the car is not moving under power.'
+  roadside_action: Stop in a safe place with the hazard lights on. Stand away from traffic. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Stand away from traffic.
+    if_towing_needed: YES.
+- id: gearbox-s-F17-GB-17
+  status: approved
+  fault: F17-GB-17
+  risk_level: low
+  stop_driving_trigger: Stop if there is a burning smell, loud grinding or the gearbox locks.
+  roadside_action: Do not force the gear lever. Drive gently to a garage.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.

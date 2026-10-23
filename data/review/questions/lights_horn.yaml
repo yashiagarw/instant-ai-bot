@@ -1,0 +1,1215 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category lights_horn
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: lights_horn
+category_name: Lights / indicators / horn
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:43:40+00:00'
+  run_id: claude-code-lights_horn
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: lights_horn-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Engine light is on
+    effects: []
+    safety_trigger: false
+  - label: Engine is shaking
+    effects: []
+    safety_trigger: false
+  - label: Engine is making noise
+    effects: []
+    safety_trigger: false
+  - label: Engine stopped
+    effects: []
+    safety_trigger: false
+  - label: Engine is heating
+    effects: []
+    safety_trigger: false
+  - label: Fuse has blown
+    effects:
+    - fault: F12-LT-04
+      effect: supports
+      strength: strong
+    - fault: F12-LT-07
+      effect: supports
+      strength: strong
+    - fault: F12-LT-13
+      effect: supports
+      strength: strong
+    - fault: F12-LT-23
+      effect: supports
+      strength: strong
+    - fault: F12-LT-26
+      effect: supports
+      strength: strong
+    - fault: F12-LT-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Wiring problem
+    effects:
+    - fault: F12-LT-04
+      effect: supports
+      strength: strong
+    - fault: F12-LT-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Electrical burning smell
+    effects:
+    - fault: F12-LT-26
+      effect: supports
+      strength: strong
+    - fault: F12-LT-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Headlight not working
+    effects:
+    - fault: F12-LT-01
+      effect: supports
+      strength: strong
+    - fault: F12-LT-04
+      effect: supports
+      strength: strong
+    - fault: F12-LT-05
+      effect: supports
+      strength: strong
+    - fault: F12-LT-06
+      effect: supports
+      strength: strong
+    - fault: F12-LT-07
+      effect: supports
+      strength: strong
+    - fault: F12-LT-08
+      effect: supports
+      strength: strong
+    - fault: F12-LT-09
+      effect: supports
+      strength: strong
+    - fault: F12-LT-10
+      effect: supports
+      strength: strong
+    - fault: F12-LT-11
+      effect: supports
+      strength: strong
+    - fault: F12-LT-21
+      effect: supports
+      strength: strong
+    - fault: F12-LT-22
+      effect: supports
+      strength: strong
+    - fault: F12-LT-25
+      effect: supports
+      strength: strong
+    - fault: F12-LT-26
+      effect: supports
+      strength: strong
+    - fault: F12-LT-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Indicator not working
+    effects:
+    - fault: F12-LT-01
+      effect: supports
+      strength: strong
+    - fault: F12-LT-12
+      effect: supports
+      strength: strong
+    - fault: F12-LT-13
+      effect: supports
+      strength: strong
+    - fault: F12-LT-14
+      effect: supports
+      strength: strong
+    - fault: F12-LT-15
+      effect: supports
+      strength: strong
+    - fault: F12-LT-25
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Horn not working
+    effects:
+    - fault: F12-LT-02
+      effect: supports
+      strength: strong
+    - fault: F12-LT-23
+      effect: supports
+      strength: strong
+    - fault: F12-LT-24
+      effect: supports
+      strength: strong
+    - fault: F12-LT-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F12-LT-01
+      effect: supports
+      strength: strong
+    - fault: F12-LT-03
+      effect: supports
+      strength: strong
+    - fault: F12-LT-15
+      effect: supports
+      strength: strong
+    - fault: F12-LT-16
+      effect: supports
+      strength: strong
+    - fault: F12-LT-17
+      effect: supports
+      strength: strong
+    - fault: F12-LT-18
+      effect: supports
+      strength: strong
+    - fault: F12-LT-19
+      effect: supports
+      strength: strong
+    - fault: F12-LT-20
+      effect: supports
+      strength: strong
+    - fault: F12-LT-22
+      effect: supports
+      strength: strong
+    - fault: F12-LT-25
+      effect: supports
+      strength: strong
+    - fault: F12-LT-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q01
+  status: approved
+  stage: 3
+  text: Right now, are you driving at night with no headlights or no brake lights?
+  source_faults:
+  - F12-LT-04
+  - F12-LT-05
+  - F12-LT-07
+  - F12-LT-17
+  merged_from:
+  - 'F12-LT-05 (stages_text): Did the problem happen at night?'
+  - 'F12-LT-05 (AI_DIAGNOSIS_RULES): Are both headlights off?'
+  - 'F12-LT-17 (AI_DIAGNOSIS_RULES): Are all brake lights off?'
+  options:
+  - label: No headlights at night
+    effects:
+    - fault: F12-LT-05
+      effect: supports
+      strength: strong
+    - fault: F12-LT-07
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-04
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: No brake lights
+    effects:
+    - fault: F12-LT-17
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q02
+  status: approved
+  stage: 3
+  text: Is there a burning smell, or a melted plug or socket?
+  source_faults:
+  - F12-LT-10
+  - F12-LT-26
+  - F12-LT-27
+  merged_from:
+  - 'F12-LT-26 (symptoms): Melted socket'
+  - 'F12-LT-27 (symptoms): Burnt smell'
+  - 'F12-LT-10 (symptoms): Burnt plug smell'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-26
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-27
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-10
+      effect: supports
+      strength: weak
+    safety_trigger: true
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q03
+  status: approved
+  stage: 3
+  text: Which light is not working?
+  source_faults:
+  - F12-LT-01
+  - F12-LT-04
+  - F12-LT-05
+  - F12-LT-06
+  - F12-LT-07
+  - F12-LT-08
+  - F12-LT-09
+  - F12-LT-12
+  - F12-LT-13
+  - F12-LT-14
+  - F12-LT-15
+  - F12-LT-16
+  - F12-LT-17
+  - F12-LT-18
+  - F12-LT-19
+  - F12-LT-20
+  - F12-LT-21
+  merged_from:
+  - 'F12-LT-01 (AI_DIAGNOSIS_RULES): Which light is not working?'
+  - 'F12-LT-01 (stages_text): Which light is not working?'
+  - 'F12-LT-04 (AI_DIAGNOSIS_RULES): Which lights are out?'
+  options:
+  - label: Headlight
+    effects:
+    - fault: F12-LT-06
+      effect: supports
+      strength: weak
+    - fault: F12-LT-07
+      effect: supports
+      strength: weak
+    - fault: F12-LT-08
+      effect: supports
+      strength: weak
+    - fault: F12-LT-09
+      effect: supports
+      strength: weak
+    - fault: F12-LT-05
+      effect: supports
+      strength: weak
+    - fault: F12-LT-21
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Indicator or hazard lights
+    effects:
+    - fault: F12-LT-12
+      effect: supports
+      strength: weak
+    - fault: F12-LT-13
+      effect: supports
+      strength: weak
+    - fault: F12-LT-14
+      effect: supports
+      strength: weak
+    - fault: F12-LT-15
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Brake light
+    effects:
+    - fault: F12-LT-16
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-17
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Tail or parking light
+    effects:
+    - fault: F12-LT-18
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Reverse light
+    effects:
+    - fault: F12-LT-19
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Fog light
+    effects:
+    - fault: F12-LT-20
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Several lights together
+    effects:
+    - fault: F12-LT-04
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q04
+  status: approved
+  stage: 3
+  text: Is it one side, or both sides?
+  source_faults:
+  - F12-LT-01
+  - F12-LT-04
+  - F12-LT-06
+  - F12-LT-07
+  - F12-LT-08
+  - F12-LT-12
+  - F12-LT-13
+  - F12-LT-16
+  - F12-LT-17
+  - F12-LT-21
+  merged_from:
+  - 'F12-LT-01 (stages_text): Only one side?'
+  - 'F12-LT-08 (AI_DIAGNOSIS_RULES): Both sides or one?'
+  - 'F12-LT-16 (AI_DIAGNOSIS_RULES): One side or all?'
+  - 'F12-LT-06 (AI_DIAGNOSIS_RULES): Which side?'
+  options:
+  - label: One side only
+    effects:
+    - fault: F12-LT-01
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-06
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-12
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-16
+      effect: supports
+      strength: strong
+    - fault: F12-LT-21
+      effect: supports
+      strength: weak
+    - fault: F12-LT-07
+      effect: rules_out
+      strength: moderate
+    - fault: F12-LT-13
+      effect: rules_out
+      strength: moderate
+    - fault: F12-LT-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Both sides
+    effects:
+    - fault: F12-LT-07
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-13
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-17
+      effect: supports
+      strength: strong
+    - fault: F12-LT-04
+      effect: supports
+      strength: weak
+    - fault: F12-LT-06
+      effect: rules_out
+      strength: moderate
+    - fault: F12-LT-12
+      effect: rules_out
+      strength: moderate
+    - fault: F12-LT-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q05
+  status: approved
+  stage: 3
+  text: (Headlights) Which beam works?
+  source_faults:
+  - F12-LT-01
+  - F12-LT-05
+  - F12-LT-07
+  - F12-LT-08
+  - F12-LT-09
+  - F12-LT-25
+  merged_from:
+  - 'F12-LT-01 (stages_text): Does high beam work?'
+  - 'F12-LT-01 (stages_text): Does low beam work?'
+  - 'F12-LT-07 (AI_DIAGNOSIS_RULES): Does the flash work?'
+  - 'F12-LT-09 (AI_DIAGNOSIS_RULES): Does flash work?'
+  options:
+  - label: High beam works, low beam does not
+    effects:
+    - fault: F12-LT-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Low beam works, high beam / flash does not
+    effects:
+    - fault: F12-LT-09
+      effect: supports
+      strength: strong
+    - fault: F12-LT-25
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Only the flash works
+    effects:
+    - fault: F12-LT-07
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-25
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Neither works
+    effects:
+    - fault: F12-LT-05
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Both work
+    effects:
+    - fault: F12-LT-08
+      effect: rules_out
+      strength: moderate
+    - fault: F12-LT-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q06
+  status: approved
+  stage: 3
+  text: Does the light flicker, or go off on bumps or with engine speed?
+  source_faults:
+  - F12-LT-01
+  - F12-LT-10
+  - F12-LT-21
+  - F12-LT-26
+  merged_from:
+  - 'F12-LT-10 (AI_DIAGNOSIS_RULES): Does it flicker on bumps or with engine speed?'
+  - 'F12-LT-01 (stages_text): Does the light flicker?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-10
+      effect: supports
+      strength: strong
+    - fault: F12-LT-21
+      effect: supports
+      strength: weak
+    - fault: F12-LT-26
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q07
+  status: approved
+  stage: 3
+  text: Are the headlights dim, or the lenses yellow and foggy?
+  source_faults:
+  - F12-LT-11
+  merged_from:
+  - 'F12-LT-11 (AI_DIAGNOSIS_RULES): Is the lens yellow?'
+  - 'F12-LT-11 (stages_text): How old are the bulbs?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-11
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q08
+  status: approved
+  stage: 3
+  text: Is there water or fog inside the headlight that does not clear?
+  source_faults:
+  - F12-LT-20
+  - F12-LT-22
+  merged_from:
+  - 'F12-LT-22 (AI_DIAGNOSIS_RULES): Does the fog clear after driving?'
+  - 'F12-LT-20 (symptoms): Water inside lens'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-22
+      effect: supports
+      strength: strong
+    - fault: F12-LT-20
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-22
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q09
+  status: approved
+  stage: 3
+  text: Is it an LED headlight, and is the daytime running light (DRL) or the main beam dark?
+  source_faults:
+  - F12-LT-06
+  - F12-LT-21
+  merged_from:
+  - 'F12-LT-21 (AI_DIAGNOSIS_RULES): Is it LED type?'
+  - 'F12-LT-21 (stages_text): Which part is dark - DRL or main beam?'
+  - 'F12-LT-06 (stages_text): Is it bulb type or LED?'
+  options:
+  - label: Yes, LED, part of it is dark
+    effects:
+    - fault: F12-LT-21
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Normal bulb type
+    effects:
+    - fault: F12-LT-21
+      effect: rules_out
+      strength: moderate
+    - fault: F12-LT-06
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q10
+  status: approved
+  stage: 3
+  text: Do other drivers flash at you, or does your light hit trees and signboards or only near the bumper?
+  source_faults:
+  - F12-LT-26
+  - F12-LT-28
+  merged_from:
+  - 'F12-LT-28 (AI_DIAGNOSIS_RULES): Do other drivers flash at you?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-28
+      effect: supports
+      strength: strong
+    - fault: F12-LT-26
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-28
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q11
+  status: approved
+  stage: 3
+  text: Did you fit brighter bulbs, an LED kit or an extra horn?
+  source_faults:
+  - F12-LT-14
+  - F12-LT-26
+  - F12-LT-27
+  merged_from:
+  - 'F12-LT-26 (AI_DIAGNOSIS_RULES): Did you fit brighter bulbs or an LED kit?'
+  - 'F12-LT-27 (AI_DIAGNOSIS_RULES): Was an extra horn fitted?'
+  - 'F12-LT-14 (AI_DIAGNOSIS_RULES): Did you fit LED bulbs?'
+  options:
+  - label: Brighter bulbs or an LED kit
+    effects:
+    - fault: F12-LT-26
+      effect: supports
+      strength: strong
+    - fault: F12-LT-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: An extra or pressure horn
+    effects:
+    - fault: F12-LT-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-26
+      effect: rules_out
+      strength: moderate
+    - fault: F12-LT-27
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q12
+  status: approved
+  stage: 3
+  text: (Indicators) Does the indicator blink very fast?
+  source_faults:
+  - F12-LT-12
+  - F12-LT-14
+  merged_from:
+  - 'F12-LT-12 (stages_text): Does it blink fast?'
+  - 'F12-LT-14 (symptoms): Fast blink one side'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-14
+      effect: supports
+      strength: strong
+    - fault: F12-LT-12
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q13
+  status: approved
+  stage: 3
+  text: Do the hazard lights work?
+  source_faults:
+  - F12-LT-13
+  - F12-LT-15
+  - F12-LT-25
+  merged_from:
+  - 'F12-LT-13 (AI_DIAGNOSIS_RULES): Do the hazard lights work?'
+  - 'F12-LT-15 (AI_DIAGNOSIS_RULES): Do normal indicators work?'
+  options:
+  - label: Hazards work, indicators do not
+    effects:
+    - fault: F12-LT-13
+      effect: supports
+      strength: strong
+    - fault: F12-LT-25
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Indicators work, hazards do not
+    effects:
+    - fault: F12-LT-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Both work
+    effects:
+    - fault: F12-LT-13
+      effect: rules_out
+      strength: moderate
+    - fault: F12-LT-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q14
+  status: approved
+  stage: 3
+  text: When you press the horn, do you hear a click?
+  source_faults:
+  - F12-LT-02
+  - F12-LT-23
+  - F12-LT-27
+  merged_from:
+  - 'F12-LT-02 (AI_DIAGNOSIS_RULES): Do you hear a click when you press horn?'
+  - 'F12-LT-23 (AI_DIAGNOSIS_RULES): Do you hear a click?'
+  options:
+  - label: Yes, a click but no horn
+    effects:
+    - fault: F12-LT-02
+      effect: supports
+      strength: strong
+    - fault: F12-LT-23
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No click and no sound
+    effects:
+    - fault: F12-LT-23
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-02
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-27
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: The horn works
+    effects:
+    - fault: F12-LT-02
+      effect: rules_out
+      strength: strong
+    - fault: F12-LT-23
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q15
+  status: approved
+  stage: 3
+  text: Does the horn keep sounding by itself, for example when the steering is turned?
+  source_faults:
+  - F12-LT-24
+  merged_from:
+  - 'F12-LT-24 (AI_DIAGNOSIS_RULES): Does it sound when steering turns?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-24
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-24
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q16
+  status: approved
+  stage: 3
+  text: Did the horn stop working after rain or a car wash?
+  source_faults:
+  - F12-LT-02
+  - F12-LT-24
+  merged_from:
+  - 'F12-LT-02 (stages_text): Did it stop after rain?'
+  - 'F12-LT-24 (symptoms): Horn sounds after rain'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-02
+      effect: supports
+      strength: moderate
+    - fault: F12-LT-24
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q17
+  status: approved
+  stage: 3
+  text: Does a light stay on even when the switch is off or the key is out?
+  source_faults:
+  - F12-LT-03
+  merged_from:
+  - 'F12-LT-03 (AI_DIAGNOSIS_RULES): Which light stays on?'
+  - 'F12-LT-03 (stages_text): For how long?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-03
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-03
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q18
+  status: approved
+  stage: 3
+  text: Does the reverse camera switch on when you select reverse?
+  source_faults:
+  - F12-LT-19
+  merged_from:
+  - 'F12-LT-19 (AI_DIAGNOSIS_RULES): Does reverse camera work?'
+  options:
+  - label: 'No'
+    effects:
+    - fault: F12-LT-19
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'Yes'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q19
+  status: approved
+  stage: 3
+  text: (Fog light) Is the low beam switched on when you try the fog light?
+  source_faults:
+  - F12-LT-20
+  merged_from:
+  - 'F12-LT-20 (AI_DIAGNOSIS_RULES): Is low beam ON?'
+  options:
+  - label: 'No'
+    effects:
+    - fault: F12-LT-20
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-20
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: lights_horn-q20
+  status: approved
+  stage: 3
+  text: Do several functions on the light or indicator stalk not work, or does it feel loose?
+  source_faults:
+  - F12-LT-25
+  merged_from:
+  - 'F12-LT-25 (AI_DIAGNOSIS_RULES): Which functions don''t work?'
+  - 'F12-LT-25 (symptoms): Loose stalk'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F12-LT-25
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F12-LT-25
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F12-LT-01:
+    status: approved
+    name: Single Bulb Fused / Not Working
+    stage2_choices:
+    - Other problem
+    - Headlight not working
+    - Indicator not working
+    confirmation_test: Bulb check and power at the plug.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-02:
+    status: approved
+    name: Horn Not Working
+    stage2_choices:
+    - Horn not working
+    confirmation_test: Direct horn test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-03:
+    status: approved
+    name: Light Not Switching Off - Electrical Fault
+    stage2_choices:
+    - Other problem
+    confirmation_test: Relay pull test and switch test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-04:
+    status: approved
+    name: Multiple Lights Out - Wiring / Relay
+    stage2_choices:
+    - Headlight not working
+    - Fuse has blown
+    - Wiring problem
+    confirmation_test: Test the shared fuse, relay and ground.
+    danger_phrases:
+    - no headlights at night
+    safety_trigger_options:
+    - question: lights_horn-q01
+      option: No headlights at night
+  F12-LT-05:
+    status: approved
+    name: Headlight Failure at Night
+    stage2_choices:
+    - Headlight not working
+    confirmation_test: Fuse, relay and switch tests.
+    danger_phrases:
+    - no headlights at night
+    safety_trigger_options:
+    - question: lights_horn-q01
+      option: No headlights at night
+  F12-LT-06:
+    status: approved
+    name: One Headlight Not Working
+    stage2_choices:
+    - Headlight not working
+    confirmation_test: Bulb and plug test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-07:
+    status: approved
+    name: Both Headlights Not Working
+    stage2_choices:
+    - Headlight not working
+    - Fuse has blown
+    confirmation_test: Headlight circuit tests.
+    danger_phrases:
+    - no headlights at night
+    safety_trigger_options:
+    - question: lights_horn-q01
+      option: No headlights at night
+  F12-LT-08:
+    status: approved
+    name: Low Beam Not Working
+    stage2_choices:
+    - Headlight not working
+    confirmation_test: Bulb filament and fuse / relay check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-09:
+    status: approved
+    name: High Beam Not Working
+    stage2_choices:
+    - Headlight not working
+    confirmation_test: High beam circuit test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-10:
+    status: approved
+    name: Headlight Flickering / Intermittent
+    stage2_choices:
+    - Headlight not working
+    - Wiring problem
+    confirmation_test: Wiggle test and voltage check.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: lights_horn-q02
+      option: 'Yes'
+  F12-LT-11:
+    status: approved
+    name: Headlight Dim / Low Brightness
+    stage2_choices:
+    - Headlight not working
+    confirmation_test: Voltage check and lens / bulb inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-12:
+    status: approved
+    name: Indicator Not Working - One Side
+    stage2_choices:
+    - Indicator not working
+    confirmation_test: Visual and bulb check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-13:
+    status: approved
+    name: Both Indicators Not Working
+    stage2_choices:
+    - Indicator not working
+    - Fuse has blown
+    confirmation_test: Hazard light test and flasher check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-14:
+    status: approved
+    name: Indicator Flashing Too Fast
+    stage2_choices:
+    - Indicator not working
+    confirmation_test: Visual check of the indicator bulbs.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-15:
+    status: approved
+    name: Hazard Lights Not Working
+    stage2_choices:
+    - Indicator not working
+    - Other problem
+    confirmation_test: Hazard switch test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-16:
+    status: approved
+    name: Brake Light Not Working
+    stage2_choices:
+    - Other problem
+    confirmation_test: Brake light bulb check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-17:
+    status: approved
+    name: Both Brake Lights Not Working
+    stage2_choices:
+    - Other problem
+    confirmation_test: Brake light switch test.
+    danger_phrases:
+    - no brake lights
+    safety_trigger_options:
+    - question: lights_horn-q01
+      option: No brake lights
+  F12-LT-18:
+    status: approved
+    name: Tail Light / Parking Light Failure
+    stage2_choices:
+    - Other problem
+    confirmation_test: Tail light bulb and fuse checks.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-19:
+    status: approved
+    name: Reverse Light Not Working
+    stage2_choices:
+    - Other problem
+    confirmation_test: Reverse light bulb, switch and fuse checks.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-20:
+    status: approved
+    name: Fog Light Not Working
+    stage2_choices:
+    - Other problem
+    confirmation_test: Fog light bulb and relay checks.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-21:
+    status: approved
+    name: LED Headlight Driver / Module Fault
+    stage2_choices:
+    - Headlight not working
+    confirmation_test: Pin tests and scan of the LED driver.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-22:
+    status: approved
+    name: Headlight Assembly Water Ingress
+    stage2_choices:
+    - Headlight not working
+    - Other problem
+    confirmation_test: Headlight seal inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-23:
+    status: approved
+    name: Horn Relay / Fuse / Wiring Fault
+    stage2_choices:
+    - Horn not working
+    - Fuse has blown
+    confirmation_test: Horn relay swap and tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-24:
+    status: approved
+    name: Horn Sounds Continuously
+    stage2_choices:
+    - Horn not working
+    confirmation_test: Horn relay swap.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-25:
+    status: approved
+    name: Lighting Switch / Combination Stalk Fault
+    stage2_choices:
+    - Indicator not working
+    - Headlight not working
+    - Other problem
+    confirmation_test: Light switch output test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F12-LT-26:
+    status: approved
+    name: Aftermarket High-Watt / LED / HID Bulb Problems  [NEW - India]
+    stage2_choices:
+    - Headlight not working
+    - Fuse has blown
+    - Electrical burning smell
+    confirmation_test: Inspection of the aftermarket bulbs.
+    danger_phrases:
+    - melted socket
+    safety_trigger_options:
+    - question: lights_horn-q02
+      option: 'Yes'
+  F12-LT-27:
+    status: approved
+    name: Loud Aftermarket / Pressure Horn Fitted Without Relay  [NEW - India]
+    stage2_choices:
+    - Horn not working
+    - Fuse has blown
+    - Electrical burning smell
+    confirmation_test: Inspection of the extra horn wiring.
+    danger_phrases:
+    - burnt smell
+    safety_trigger_options:
+    - question: lights_horn-q02
+      option: 'Yes'
+  F12-LT-28:
+    status: approved
+    name: Headlight Beam Pointing Wrong (After Accident / Loaded Car / Bulb Change)  [NEW - India]
+    stage2_choices:
+    - Headlight not working
+    - Other problem
+    confirmation_test: Headlight aim check.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules: []

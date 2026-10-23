@@ -1,0 +1,1030 @@
+category: ignition_key
+loaded_at: '2026-10-23T19:41:19+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question ignition_key-main:
+    id: ignition_key-main
+    status: approved
+    stage: 2
+    text: What problem are you facing?
+    choice_source: file
+    options:
+    - label: Key is hard to turn
+      effects:
+      - fault: F13-IG-01
+        effect: supports
+        strength: strong
+      - fault: F13-IG-05
+        effect: supports
+        strength: strong
+      - fault: F13-IG-07
+        effect: supports
+        strength: strong
+      - fault: F13-IG-09
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Key is stuck
+      effects:
+      - fault: F13-IG-05
+        effect: supports
+        strength: strong
+      - fault: F13-IG-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Key not detected
+      effects:
+      - fault: F13-IG-03
+        effect: supports
+        strength: strong
+      - fault: F13-IG-11
+        effect: supports
+        strength: strong
+      - fault: F13-IG-12
+        effect: supports
+        strength: strong
+      - fault: F13-IG-13
+        effect: supports
+        strength: strong
+      - fault: F13-IG-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Ignition not working
+      effects:
+      - fault: F13-IG-02
+        effect: supports
+        strength: strong
+      - fault: F13-IG-04
+        effect: supports
+        strength: strong
+      - fault: F13-IG-08
+        effect: supports
+        strength: strong
+      - fault: F13-IG-10
+        effect: supports
+        strength: strong
+      - fault: F13-IG-12
+        effect: supports
+        strength: strong
+      - fault: F13-IG-14
+        effect: supports
+        strength: strong
+      - fault: F13-IG-15
+        effect: supports
+        strength: strong
+      - fault: F13-IG-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Something is loose under the car
+      effects: []
+      safety_trigger: false
+    - label: Bottom cover is hanging
+      effects: []
+      safety_trigger: false
+    - label: Something is touching the road
+      effects: []
+      safety_trigger: false
+    - label: Push-start button not working
+      effects:
+      - fault: F13-IG-03
+        effect: supports
+        strength: strong
+      - fault: F13-IG-09
+        effect: supports
+        strength: strong
+      - fault: F13-IG-11
+        effect: supports
+        strength: strong
+      - fault: F13-IG-13
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Car makes a clicking sound
+      effects: []
+      safety_trigger: false
+    - label: Starter motor not working
+      effects: []
+      safety_trigger: false
+    - label: Other problem
+      effects:
+      - fault: F13-IG-10
+        effect: supports
+        strength: strong
+      - fault: F13-IG-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q01:
+    id: ignition_key-q01
+    status: approved
+    stage: 3
+    text: Did the engine cut out while you were driving?
+    source_faults:
+    - F13-IG-02
+    - F13-IG-08
+    merged_from:
+    - 'F13-IG-08 (symptoms): Engine cuts out'
+    - 'F13-IG-02 (symptoms): Cuts out when key moved'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-08
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-02
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q02:
+    id: ignition_key-q02
+    status: approved
+    stage: 3
+    text: Did the car stand in deep water, or have rats damaged the wiring?
+    source_faults:
+    - F13-IG-15
+    merged_from:
+    - 'F13-IG-15 (stages_text): Did the car stand in water?'
+    - 'F13-IG-15 (stages_text): Any rat damage?'
+    options:
+    - label: Deep water
+      effects:
+      - fault: F13-IG-15
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Rat damage
+      effects:
+      - fault: F13-IG-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-IG-15
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q03:
+    id: ignition_key-q03
+    status: approved
+    stage: 3
+    text: Is the steering locked? Does the key turn if you move the steering wheel a little left and right?
+    source_faults:
+    - F13-IG-01
+    - F13-IG-05
+    - F13-IG-07
+    - F13-IG-09
+    merged_from:
+    - 'F13-IG-01 (stages_text): Does the key turn if you move the steering a little?'
+    - 'F13-IG-05 (stages_text): Is the steering locked?'
+    - 'F13-IG-09 (stages_text): Is the steering locked?'
+    options:
+    - label: Yes, it turns when I move the steering
+      effects:
+      - fault: F13-IG-09
+        effect: supports
+        strength: strong
+      - fault: F13-IG-01
+        effect: supports
+        strength: strong
+      - fault: F13-IG-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The steering is locked and the key still will not turn
+      effects:
+      - fault: F13-IG-05
+        effect: supports
+        strength: strong
+      - fault: F13-IG-07
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: The steering is not locked
+      effects:
+      - fault: F13-IG-09
+        effect: rules_out
+        strength: moderate
+      - fault: F13-IG-05
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q04:
+    id: ignition_key-q04
+    status: approved
+    stage: 3
+    text: Does the spare key work better?
+    source_faults:
+    - F13-IG-01
+    - F13-IG-02
+    - F13-IG-03
+    - F13-IG-05
+    - F13-IG-07
+    - F13-IG-10
+    - F13-IG-11
+    - F13-IG-12
+    - F13-IG-13
+    merged_from:
+    - 'F13-IG-02 (stages_text): Have you tried the spare key?'
+    - 'F13-IG-07 (stages_text): Does the spare key also need wiggling?'
+    - 'F13-IG-10 (stages_text): Does the spare key work?'
+    - 'F13-IG-12 (stages_text): Does the spare key work?'
+    - 'F13-IG-13 (stages_text): Do both keys fail?'
+    options:
+    - label: Yes, the spare key works
+      effects:
+      - fault: F13-IG-12
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-10
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-03
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-11
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-01
+        effect: supports
+        strength: weak
+      - fault: F13-IG-13
+        effect: rules_out
+        strength: moderate
+      - fault: F13-IG-07
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: No, both keys have the same problem
+      effects:
+      - fault: F13-IG-07
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-13
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-05
+        effect: supports
+        strength: weak
+      - fault: F13-IG-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: I have no spare key
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q05:
+    id: ignition_key-q05
+    status: approved
+    stage: 3
+    text: Is it the original key, or a copy made by a local key maker?
+    source_faults:
+    - F13-IG-01
+    - F13-IG-10
+    - F13-IG-16
+    merged_from:
+    - 'F13-IG-01 (stages_text): Is it the original key?'
+    - 'F13-IG-16 (stages_text): Does the original key start the car?'
+    options:
+    - label: A copy, and the original key starts the car
+      effects:
+      - fault: F13-IG-16
+        effect: supports
+        strength: strong
+      - fault: F13-IG-10
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: A copy, and it is worse than the original
+      effects:
+      - fault: F13-IG-01
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The original key
+      effects:
+      - fault: F13-IG-16
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q06:
+    id: ignition_key-q06
+    status: approved
+    stage: 3
+    text: (Automatic car) Is the gear lever fully in P?
+    source_faults:
+    - F13-IG-05
+    - F13-IG-06
+    merged_from:
+    - 'F13-IG-06 (stages_text): Is it automatic? Is lever fully in P?'
+    - 'F13-IG-05 (stages_text): Is it an automatic in P?'
+    options:
+    - label: No, or not sure it is fully in P
+      effects:
+      - fault: F13-IG-06
+        effect: supports
+        strength: strong
+      - fault: F13-IG-05
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Yes, fully in P
+      effects:
+      - fault: F13-IG-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Manual car
+      effects:
+      - fault: F13-IG-06
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q07:
+    id: ignition_key-q07
+    status: approved
+    stage: 3
+    text: When you turn the key to ON, do the dashboard lights come on?
+    source_faults:
+    - F13-IG-02
+    - F13-IG-04
+    - F13-IG-08
+    - F13-IG-14
+    merged_from:
+    - 'F13-IG-08 (stages_text): Does the dashboard light up at ON?'
+    - 'F13-IG-04 (stages_text): Does the dashboard light up at all?'
+    - 'F13-IG-14 (stages_text): Is part of the dashboard working?'
+    - 'F13-IG-02 (stages_text): Does the dashboard light up when it fails?'
+    options:
+    - label: Nothing lights up
+      effects:
+      - fault: F13-IG-04
+        effect: supports
+        strength: strong
+      - fault: F13-IG-08
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Only part of the dashboard works
+      effects:
+      - fault: F13-IG-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: They flicker, or go off when the key is moved
+      effects:
+      - fault: F13-IG-02
+        effect: supports
+        strength: strong
+      - fault: F13-IG-08
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Yes, normally
+      effects:
+      - fault: F13-IG-04
+        effect: rules_out
+        strength: moderate
+      - fault: F13-IG-08
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q08:
+    id: ignition_key-q08
+    status: approved
+    stage: 3
+    text: Do the headlights and horn work?
+    source_faults:
+    - F13-IG-04
+    merged_from:
+    - 'F13-IG-04 (stages_text): Do headlights or horn work?'
+    options:
+    - label: No, or very weak
+      effects:
+      - fault: F13-IG-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-04
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q09:
+    id: ignition_key-q09
+    status: approved
+    stage: 3
+    text: Is a key or security light blinking on the dashboard? Does the engine crank but not start, or start and
+      die after 2 seconds?
+    source_faults:
+    - F13-IG-01
+    - F13-IG-10
+    - F13-IG-12
+    - F13-IG-16
+    merged_from:
+    - 'F13-IG-10 (stages_text): Is a key light blinking?'
+    - 'F13-IG-10 (symptoms): Starts then dies in 2 s'
+    - 'F13-IG-01 (stages_text): Is there an immobilizer warning?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-10
+        effect: supports
+        strength: strong
+      - fault: F13-IG-16
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-12
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-IG-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q10:
+    id: ignition_key-q10
+    status: approved
+    stage: 3
+    text: Does your car have a push-start button? Does it show "Key not detected"?
+    source_faults:
+    - F13-IG-01
+    - F13-IG-03
+    - F13-IG-11
+    - F13-IG-13
+    merged_from:
+    - 'F13-IG-03 (stages_text): Does your car have a push-start button?'
+    - 'F13-IG-01 (stages_text): Does the car show ''Key Not Detected''?'
+    options:
+    - label: Yes, and it shows Key not detected
+      effects:
+      - fault: F13-IG-03
+        effect: supports
+        strength: strong
+      - fault: F13-IG-11
+        effect: supports
+        strength: moderate
+      - fault: F13-IG-13
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Yes, but no such message
+      effects:
+      - fault: F13-IG-03
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: No push-start button
+      effects:
+      - fault: F13-IG-03
+        effect: rules_out
+        strength: strong
+      - fault: F13-IG-11
+        effect: rules_out
+        strength: moderate
+      - fault: F13-IG-13
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q11:
+    id: ignition_key-q11
+    status: approved
+    stage: 3
+    text: Does the remote work only when you are close to the car?
+    source_faults:
+    - F13-IG-03
+    - F13-IG-11
+    merged_from:
+    - 'F13-IG-11 (stages_text): Does the remote work only near the car?'
+    - 'F13-IG-03 (symptoms): Lock/unlock range short'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-11
+        effect: supports
+        strength: strong
+      - fault: F13-IG-03
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-IG-11
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q12:
+    id: ignition_key-q12
+    status: approved
+    stage: 3
+    text: Was the key dropped or did it get wet? Is the key shell cracked?
+    source_faults:
+    - F13-IG-12
+    merged_from:
+    - 'F13-IG-12 (stages_text): Was the key dropped or wet?'
+    - 'F13-IG-12 (symptoms): Cracked shell'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-12
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-IG-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q13:
+    id: ignition_key-q13
+    status: approved
+    stage: 3
+    text: Is the key stuck in the ignition and will not come out?
+    source_faults:
+    - F13-IG-01
+    - F13-IG-06
+    merged_from:
+    - 'F13-IG-06 (symptoms): Key won''t come out'
+    - 'F13-IG-01 (stages_text): Does your key turn?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-06
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-IG-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q14:
+    id: ignition_key-q14
+    status: approved
+    stage: 3
+    text: Does the key feel loose, need wiggling, or turn only one way?
+    source_faults:
+    - F13-IG-01
+    - F13-IG-07
+    merged_from:
+    - 'F13-IG-07 (symptoms): Needs wiggling'
+    - 'F13-IG-07 (symptoms): Loose key feel'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-07
+        effect: supports
+        strength: strong
+      - fault: F13-IG-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-IG-07
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q15:
+    id: ignition_key-q15
+    status: approved
+    stage: 3
+    text: Has a fuse blown, or is there a burnt smell near the fuse box?
+    source_faults:
+    - F13-IG-08
+    - F13-IG-14
+    merged_from:
+    - 'F13-IG-14 (symptoms): Blown fuse'
+    - 'F13-IG-08 (symptoms): Burnt smell'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-14
+        effect: supports
+        strength: strong
+      - fault: F13-IG-08
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question ignition_key-q16:
+    id: ignition_key-q16
+    status: approved
+    stage: 3
+    text: Does the problem come and go, sometimes starting after a few tries?
+    source_faults:
+    - F13-IG-02
+    - F13-IG-15
+    merged_from:
+    - 'F13-IG-02 (symptoms): Works after retries'
+    - 'F13-IG-02 (symptoms): Random no start'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F13-IG-02
+        effect: supports
+        strength: strong
+      - fault: F13-IG-15
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F13-IG-02
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F13-IG-01:
+    status: approved
+    name: Ignition Key Slightly Stiff
+    stage2_choices:
+    - Key is hard to turn
+    confirmation_test: Spare key and steering wiggle test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-02:
+    status: approved
+    name: Intermittent Ignition Problem
+    stage2_choices:
+    - Ignition not working
+    confirmation_test: Wiggle test and voltage test.
+    danger_phrases:
+    - engine cut out while driving
+    safety_trigger_options:
+    - question: ignition_key-q01
+      option: 'Yes'
+  fault F13-IG-03:
+    status: approved
+    name: Key Not Detected
+    stage2_choices:
+    - Key not detected
+    - Push-start button not working
+    confirmation_test: Change the key battery and try the spare key.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-04:
+    status: approved
+    name: Complete Ignition System Failure
+    stage2_choices:
+    - Ignition not working
+    confirmation_test: Battery voltage and terminal check.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-05:
+    status: approved
+    name: Key Not Turning in Ignition
+    stage2_choices:
+    - Key is hard to turn
+    - Key is stuck
+    confirmation_test: Steering wiggle test and spare key.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-06:
+    status: approved
+    name: Key Stuck in Ignition
+    stage2_choices:
+    - Key is stuck
+    confirmation_test: Check the gear lever is in P and the key is at LOCK.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-07:
+    status: approved
+    name: Ignition Lock Cylinder Worn / Damaged
+    stage2_choices:
+    - Key is hard to turn
+    confirmation_test: Inspect the lock cylinder.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-08:
+    status: approved
+    name: Ignition Switch Electrical Fault
+    stage2_choices:
+    - Ignition not working
+    confirmation_test: Voltage test at the ignition switch.
+    danger_phrases:
+    - burnt smell
+    - engine cuts out
+    safety_trigger_options:
+    - question: ignition_key-q01
+      option: 'Yes'
+  fault F13-IG-09:
+    status: approved
+    name: Steering Lock Preventing Key Turning
+    stage2_choices:
+    - Key is hard to turn
+    - Push-start button not working
+    confirmation_test: Steering lock release procedure.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-10:
+    status: approved
+    name: Immobilizer Warning / Key Recognition Failure
+    stage2_choices:
+    - Ignition not working
+    - Other problem
+    confirmation_test: Spare key test and scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-11:
+    status: approved
+    name: Weak / Dead Smart-Key Battery
+    stage2_choices:
+    - Key not detected
+    - Push-start button not working
+    confirmation_test: Key battery test or replacement.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-12:
+    status: approved
+    name: Key Fob / Transponder Damage
+    stage2_choices:
+    - Key not detected
+    - Ignition not working
+    confirmation_test: Spare key test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-13:
+    status: approved
+    name: Smart-Key Antenna / Receiver Fault
+    stage2_choices:
+    - Key not detected
+    - Push-start button not working
+    confirmation_test: Scan and smart-key antenna test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F13-IG-14:
+    status: approved
+    name: Ignition Power Supply / Relay / Fuse Fault
+    stage2_choices:
+    - Ignition not working
+    confirmation_test: Fuse and relay test.
+    danger_phrases:
+    - burnt smell
+    safety_trigger_options: []
+  fault F13-IG-15:
+    status: approved
+    name: Ignition Problem After Water Damage or Wiring Fault
+    stage2_choices:
+    - Ignition not working
+    - Key not detected
+    confirmation_test: Inspection for water or wiring damage.
+    danger_phrases:
+    - stood in deep water
+    safety_trigger_options:
+    - question: ignition_key-q02
+      option: Deep water
+  fault F13-IG-16:
+    status: approved
+    name: Duplicate Key from Local Key Maker - Cranks but No Start  [NEW - India]
+    stage2_choices:
+    - Ignition not working
+    - Other problem
+    confirmation_test: Try the original key.
+    danger_phrases: []
+    safety_trigger_options: []
+  safety_rule ignition_key-s-F13-IG-01:
+    id: ignition_key-s-F13-IG-01
+    status: approved
+    fault: F13-IG-01
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Gently move the steering left and right while turning the key. Do not force it, the key may
+      break.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Do not force - key may break.
+      if_towing_needed: NO.
+  safety_rule ignition_key-s-F13-IG-02:
+    id: ignition_key-s-F13-IG-02
+    status: approved
+    fault: F13-IG-02
+    risk_level: medium
+    stop_driving_trigger: Stop safely if the engine cuts out while driving.
+    roadside_action: If the engine cuts out, steer to a safe place and switch on the hazard lights. Try the spare
+      key. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Airbag nearby - follow wait time after battery OFF.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-03:
+    id: ignition_key-s-F13-IG-03
+    status: approved
+    fault: F13-IG-03
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Change the key's coin battery, or use the emergency start method in the owner's manual. Do
+      not force the key. Never let anyone bypass the car's security or hot-wire it.
+    towing_recommendation: No, unless no key works.
+    source_text:
+      safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+      if_towing_needed: NO - unless no key works.
+  safety_rule ignition_key-s-F13-IG-04:
+    id: ignition_key-s-F13-IG-04
+    status: approved
+    fault: F13-IG-04
+    risk_level: low
+    stop_driving_trigger: Stop safely if the engine cuts out while driving.
+    roadside_action: Do not force the key. Never let anyone bypass the car's security or hot-wire it. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Correct jump-start order.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-05:
+    id: ignition_key-s-F13-IG-05
+    status: approved
+    fault: F13-IG-05
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Gently move the steering, check the gear is in P, and try the spare key. Do not force the key.
+    towing_recommendation: Depends (yes if the key will not turn at all).
+    source_text:
+      safety_precautions: • No force.
+      if_towing_needed: Depends - YES if key will not turn at all.
+  safety_rule ignition_key-s-F13-IG-06:
+    id: ignition_key-s-F13-IG-06
+    status: approved
+    fault: F13-IG-06
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Move the gear lever fully into P, turn the key to LOCK and press the key release button if
+      there is one. Do not force it.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • No force.
+      if_towing_needed: NO.
+  safety_rule ignition_key-s-F13-IG-07:
+    id: ignition_key-s-F13-IG-07
+    status: approved
+    fault: F13-IG-07
+    risk_level: low
+    stop_driving_trigger: Stop safely if the engine cuts out while driving.
+    roadside_action: Do not force the key. Never let anyone bypass the car's security or hot-wire it. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Airbag precautions.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-08:
+    id: ignition_key-s-F13-IG-08
+    status: approved
+    fault: F13-IG-08
+    risk_level: medium
+    stop_driving_trigger: Stop safely if the engine cuts out while driving.
+    roadside_action: If the engine cuts out, steer to a safe place and switch on the hazard lights. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Airbag.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-09:
+    id: ignition_key-s-F13-IG-09
+    status: approved
+    fault: F13-IG-09
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Turn the steering gently left and right while turning the key or pressing start. Do not force
+      it.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • No force.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-10:
+    id: ignition_key-s-F13-IG-10
+    status: approved
+    fault: F13-IG-10
+    risk_level: low
+    stop_driving_trigger: Stop safely if the engine cuts out while driving.
+    roadside_action: Do not force the key. Never let anyone bypass the car's security or hot-wire it. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-11:
+    id: ignition_key-s-F13-IG-11
+    status: approved
+    fault: F13-IG-11
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Replace the key's coin battery. Keep coin batteries away from children.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Keep coin cells away from children.
+      if_towing_needed: NO.
+  safety_rule ignition_key-s-F13-IG-12:
+    id: ignition_key-s-F13-IG-12
+    status: approved
+    fault: F13-IG-12
+    risk_level: low
+    stop_driving_trigger: Stop safely if the engine cuts out while driving.
+    roadside_action: Do not force the key. Never let anyone bypass the car's security or hot-wire it. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-13:
+    id: ignition_key-s-F13-IG-13
+    status: approved
+    fault: F13-IG-13
+    risk_level: low
+    stop_driving_trigger: Stop safely if the engine cuts out while driving.
+    roadside_action: Do not force the key. Never let anyone bypass the car's security or hot-wire it. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-14:
+    id: ignition_key-s-F13-IG-14
+    status: approved
+    fault: F13-IG-14
+    risk_level: low
+    stop_driving_trigger: Stop safely if the engine cuts out while driving.
+    roadside_action: Do not force the key. Never let anyone bypass the car's security or hot-wire it. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Never bigger fuse.
+      if_towing_needed: Depends.
+  safety_rule ignition_key-s-F13-IG-15:
+    id: ignition_key-s-F13-IG-15
+    status: approved
+    fault: F13-IG-15
+    risk_level: medium
+    stop_driving_trigger: Do not crank after the car stood in deep water.
+    roadside_action: If the car stood in deep water, do not try to start it. Call for a tow.
+    towing_recommendation: Yes, if it stood in deep water.
+    source_text:
+      safety_precautions: • No cranking after deep water.
+      if_towing_needed: YES if stood in deep water.
+  safety_rule ignition_key-s-F13-IG-16:
+    id: ignition_key-s-F13-IG-16
+    status: approved
+    fault: F13-IG-16
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Use the original key. Do not force the key. Never let anyone bypass the car's security or hot-wire
+      it.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Never bypass the immobiliser, hot-wire or defeat the security system.
+      if_towing_needed: NO.

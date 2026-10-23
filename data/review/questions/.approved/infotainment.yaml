@@ -1,0 +1,1034 @@
+category: infotainment
+loaded_at: '2026-10-23T19:42:01+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question infotainment-main:
+    id: infotainment-main
+    status: approved
+    stage: 2
+    text: What problem are you facing?
+    choice_source: file
+    options:
+    - label: Screen not working
+      effects:
+      - fault: F16-IF-01
+        effect: supports
+        strength: strong
+      - fault: F16-IF-03
+        effect: supports
+        strength: strong
+      - fault: F16-IF-04
+        effect: supports
+        strength: strong
+      - fault: F16-IF-05
+        effect: supports
+        strength: strong
+      - fault: F16-IF-06
+        effect: supports
+        strength: strong
+      - fault: F16-IF-08
+        effect: supports
+        strength: strong
+      - fault: F16-IF-13
+        effect: supports
+        strength: strong
+      - fault: F16-IF-14
+        effect: supports
+        strength: strong
+      - fault: F16-IF-15
+        effect: supports
+        strength: strong
+      - fault: F16-IF-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Music not working
+      effects:
+      - fault: F16-IF-02
+        effect: supports
+        strength: strong
+      - fault: F16-IF-04
+        effect: supports
+        strength: strong
+      - fault: F16-IF-07
+        effect: supports
+        strength: strong
+      - fault: F16-IF-09
+        effect: supports
+        strength: strong
+      - fault: F16-IF-10
+        effect: supports
+        strength: strong
+      - fault: F16-IF-13
+        effect: supports
+        strength: strong
+      - fault: F16-IF-14
+        effect: supports
+        strength: strong
+      - fault: F16-IF-16
+        effect: supports
+        strength: strong
+      - fault: F16-IF-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Camera not working
+      effects:
+      - fault: F16-IF-04
+        effect: supports
+        strength: strong
+      - fault: F16-IF-11
+        effect: supports
+        strength: strong
+      - fault: F16-IF-12
+        effect: supports
+        strength: strong
+      - fault: F16-IF-17
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Airbag warning
+      effects: []
+      safety_trigger: false
+    - label: Pipe leaking
+      effects: []
+      safety_trigger: false
+    - label: Water or coolant leaking
+      effects: []
+      safety_trigger: false
+    - label: Silencer noise
+      effects: []
+      safety_trigger: false
+    - label: Smoke coming
+      effects: []
+      safety_trigger: false
+    - label: Burning smell
+      effects: []
+      safety_trigger: false
+    - label: Other problem
+      effects:
+      - fault: F16-IF-07
+        effect: supports
+        strength: strong
+      - fault: F16-IF-08
+        effect: supports
+        strength: strong
+      - fault: F16-IF-14
+        effect: supports
+        strength: strong
+      - fault: F16-IF-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q01:
+    id: infotainment-q01
+    status: approved
+    stage: 3
+    text: Is there a burning smell or smoke from the dashboard?
+    source_faults:
+    - F16-IF-13
+    - F16-IF-15
+    - F16-IF-16
+    merged_from:
+    - 'F16-IF-15 (symptoms): Unit warm / burnt smell (rare)'
+    - 'F16-IF-16 (symptoms): Warm wiring'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-16
+        effect: supports
+        strength: moderate
+      - fault: F16-IF-15
+        effect: supports
+        strength: weak
+      - fault: F16-IF-13
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q02:
+    id: infotainment-q02
+    status: approved
+    stage: 3
+    text: What does the screen do?
+    source_faults:
+    - F16-IF-01
+    - F16-IF-03
+    - F16-IF-05
+    - F16-IF-06
+    - F16-IF-13
+    - F16-IF-15
+    merged_from:
+    - 'F16-IF-01 (stages_text): Is the screen frozen or completely black?'
+    - 'F16-IF-06 (stages_text): Does it restart without phone connected?'
+    - 'F16-IF-05 (stages_text): Is the picture normal?'
+    - 'F16-IF-01 (stages_text): Does the screen restart by itself?'
+    options:
+    - label: It freezes for a while, then works after restarting the car
+      effects:
+      - fault: F16-IF-01
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It keeps restarting by itself (logo again and again)
+      effects:
+      - fault: F16-IF-06
+        effect: supports
+        strength: strong
+      - fault: F16-IF-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: The picture is fine but touch does not work
+      effects:
+      - fault: F16-IF-05
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It is completely black
+      effects:
+      - fault: F16-IF-03
+        effect: supports
+        strength: strong
+      - fault: F16-IF-13
+        effect: supports
+        strength: moderate
+      - fault: F16-IF-15
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: The screen works normally
+      effects:
+      - fault: F16-IF-01
+        effect: rules_out
+        strength: moderate
+      - fault: F16-IF-03
+        effect: rules_out
+        strength: moderate
+      - fault: F16-IF-05
+        effect: rules_out
+        strength: moderate
+      - fault: F16-IF-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q03:
+    id: infotainment-q03
+    status: approved
+    stage: 3
+    text: Is the music still playing while the screen is black?
+    source_faults:
+    - F16-IF-01
+    - F16-IF-03
+    - F16-IF-13
+    - F16-IF-15
+    merged_from:
+    - 'F16-IF-03 (stages_text): Is the music still playing?'
+    - 'F16-IF-01 (stages_text): Is the music still playing?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-03
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: No, the whole unit is dead
+      effects:
+      - fault: F16-IF-13
+        effect: supports
+        strength: moderate
+      - fault: F16-IF-15
+        effect: supports
+        strength: moderate
+      - fault: F16-IF-03
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q04:
+    id: infotainment-q04
+    status: approved
+    stage: 3
+    text: Did the problem start after a battery change?
+    source_faults:
+    - F16-IF-03
+    - F16-IF-13
+    merged_from:
+    - 'F16-IF-03 (stages_text): Did it start after battery change?'
+    - 'F16-IF-13 (symptoms): After battery change'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-03
+        effect: supports
+        strength: moderate
+      - fault: F16-IF-13
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q05:
+    id: infotainment-q05
+    status: approved
+    stage: 3
+    text: Has a fuse blown for the music system?
+    source_faults:
+    - F16-IF-13
+    - F16-IF-16
+    merged_from:
+    - 'F16-IF-13 (stages_text): Did a fuse blow?'
+    - 'F16-IF-16 (symptoms): Fuse blows'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-13
+        effect: supports
+        strength: strong
+      - fault: F16-IF-16
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F16-IF-13
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q06:
+    id: infotainment-q06
+    status: approved
+    stage: 3
+    text: Did the AC controls, camera and music all stop at the same time?
+    source_faults:
+    - F16-IF-04
+    merged_from:
+    - 'F16-IF-04 (stages_text): Did all stop at the same time?'
+    - 'F16-IF-04 (stages_text): Is the AC itself cooling?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F16-IF-04
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q07:
+    id: infotainment-q07
+    status: approved
+    stage: 3
+    text: If the screen works, is any sound source working (FM, USB or Bluetooth)?
+    source_faults:
+    - F16-IF-02
+    - F16-IF-07
+    - F16-IF-09
+    merged_from:
+    - 'F16-IF-02 (stages_text): Is any source (FM / USB / Bluetooth) working?'
+    - 'F16-IF-02 (stages_text): Is the screen working?'
+    options:
+    - label: No source gives any sound
+      effects:
+      - fault: F16-IF-09
+        effect: supports
+        strength: strong
+      - fault: F16-IF-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Only one source does not work
+      effects:
+      - fault: F16-IF-02
+        effect: supports
+        strength: strong
+      - fault: F16-IF-07
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: All sources work
+      effects:
+      - fault: F16-IF-02
+        effect: rules_out
+        strength: moderate
+      - fault: F16-IF-09
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q08:
+    id: infotainment-q08
+    status: approved
+    stage: 3
+    text: Is mute switched on, or is the balance / fader set to one side?
+    source_faults:
+    - F16-IF-02
+    - F16-IF-09
+    merged_from:
+    - 'F16-IF-09 (stages_text): Is mute or fader set wrong?'
+    - 'F16-IF-02 (symptoms): Mute icon on screen'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-09
+        effect: supports
+        strength: moderate
+      - fault: F16-IF-02
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q09:
+    id: infotainment-q09
+    status: approved
+    stage: 3
+    text: Is only one speaker silent or crackling?
+    source_faults:
+    - F16-IF-10
+    merged_from:
+    - 'F16-IF-10 (stages_text): Which speaker?'
+    - 'F16-IF-10 (symptoms): Crackling'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-10
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F16-IF-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q10:
+    id: infotainment-q10
+    status: approved
+    stage: 3
+    text: Does Bluetooth or Android Auto / Apple CarPlay work with another phone or cable?
+    source_faults:
+    - F16-IF-07
+    - F16-IF-08
+    - F16-IF-14
+    merged_from:
+    - 'F16-IF-07 (stages_text): Does another phone connect?'
+    - 'F16-IF-08 (stages_text): Does it work with another cable or phone?'
+    options:
+    - label: Bluetooth works with another phone
+      effects:
+      - fault: F16-IF-07
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Android Auto / CarPlay works with another cable or phone
+      effects:
+      - fault: F16-IF-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: No, nothing connects
+      effects:
+      - fault: F16-IF-07
+        effect: supports
+        strength: weak
+      - fault: F16-IF-08
+        effect: supports
+        strength: weak
+      - fault: F16-IF-14
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: I do not use these
+      effects:
+      - fault: F16-IF-07
+        effect: rules_out
+        strength: moderate
+      - fault: F16-IF-08
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q11:
+    id: infotainment-q11
+    status: approved
+    stage: 3
+    text: What does the reverse camera show?
+    source_faults:
+    - F16-IF-11
+    - F16-IF-12
+    - F16-IF-17
+    merged_from:
+    - 'F16-IF-11 (stages_text): Is the screen working normally?'
+    - 'F16-IF-12 (stages_text): Did you clean the lens?'
+    options:
+    - label: No picture, or a "No signal" message
+      effects:
+      - fault: F16-IF-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: A blurry, foggy or dark picture
+      effects:
+      - fault: F16-IF-12
+        effect: supports
+        strength: strong
+      - fault: F16-IF-17
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: It works
+      effects:
+      - fault: F16-IF-11
+        effect: rules_out
+        strength: moderate
+      - fault: F16-IF-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q12:
+    id: infotainment-q12
+    status: approved
+    stage: 3
+    text: Is it still blurry after cleaning the camera lens with a soft cloth?
+    source_faults:
+    - F16-IF-12
+    - F16-IF-17
+    merged_from:
+    - 'F16-IF-12 (stages_text): Did you clean the lens?'
+    options:
+    - label: Yes, still blurry
+      effects:
+      - fault: F16-IF-12
+        effect: supports
+        strength: moderate
+      - fault: F16-IF-17
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No, it is clear now
+      effects:
+      - fault: F16-IF-12
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q13:
+    id: infotainment-q13
+    status: approved
+    stage: 3
+    text: Does the problem come and go, for example on bumps? Are the steering-wheel buttons dead?
+    source_faults:
+    - F16-IF-10
+    - F16-IF-14
+    merged_from:
+    - 'F16-IF-14 (stages_text): Does it fail on bumps?'
+    - 'F16-IF-14 (symptoms): Steering controls dead'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-14
+        effect: supports
+        strength: strong
+      - fault: F16-IF-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F16-IF-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q14:
+    id: infotainment-q14
+    status: approved
+    stage: 3
+    text: Was an aftermarket stereo, amplifier or other accessory fitted?
+    source_faults:
+    - F16-IF-01
+    - F16-IF-09
+    - F16-IF-13
+    - F16-IF-16
+    merged_from:
+    - 'F16-IF-16 (stages_text): Was any stereo/amp fitted outside?'
+    - 'F16-IF-01 (stages_text): Did any repair or accessory installation happen recently?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-16
+        effect: supports
+        strength: strong
+      - fault: F16-IF-09
+        effect: supports
+        strength: weak
+      - fault: F16-IF-13
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F16-IF-16
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q15:
+    id: infotainment-q15
+    status: approved
+    stage: 3
+    text: Did water get into the car or the dashboard (rain or flooding)?
+    source_faults:
+    - F16-IF-01
+    - F16-IF-14
+    - F16-IF-17
+    merged_from:
+    - 'F16-IF-17 (stages_text): Did water enter the car?'
+    - 'F16-IF-01 (stages_text): Did water enter the dashboard?'
+    options:
+    - label: Yes, the car was flooded
+      effects:
+      - fault: F16-IF-17
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: Yes, some rain water
+      effects:
+      - fault: F16-IF-17
+        effect: supports
+        strength: moderate
+      - fault: F16-IF-14
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F16-IF-17
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question infotainment-q16:
+    id: infotainment-q16
+    status: approved
+    stage: 3
+    text: Did a workshop already test the power and wiring, and find them fine?
+    source_faults:
+    - F16-IF-13
+    - F16-IF-14
+    - F16-IF-15
+    merged_from:
+    - 'F16-IF-15 (stages_text): Were power and wiring tested?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F16-IF-15
+        effect: supports
+        strength: strong
+      - fault: F16-IF-13
+        effect: rules_out
+        strength: moderate
+      - fault: F16-IF-14
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F16-IF-01:
+    status: approved
+    name: Screen Glitch / Temporary Freezing
+    stage2_choices:
+    - Screen not working
+    confirmation_test: Repeat without the phone connected, voltage check and software version.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-02:
+    status: approved
+    name: Music System Not Working
+    stage2_choices:
+    - Music not working
+    confirmation_test: Try all sources, fuse check and output test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-03:
+    status: approved
+    name: Entertainment Screen Completely Black
+    stage2_choices:
+    - Screen not working
+    confirmation_test: Fuse, power and connector test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-04:
+    status: approved
+    name: Combined AC + Camera + Music Failure
+    stage2_choices:
+    - Screen not working
+    - Music not working
+    - Camera not working
+    confirmation_test: Scan of all modules and power / ground test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-05:
+    status: approved
+    name: Touchscreen Not Responding
+    stage2_choices:
+    - Screen not working
+    confirmation_test: Restart, software check and touch panel test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-06:
+    status: approved
+    name: Infotainment System Repeatedly Restarting
+    stage2_choices:
+    - Screen not working
+    confirmation_test: Voltage test, test without USB, software check.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-07:
+    status: approved
+    name: Bluetooth Not Connecting
+    stage2_choices:
+    - Music not working
+    - Other problem
+    confirmation_test: Try a second phone.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-08:
+    status: approved
+    name: Android Auto / Apple CarPlay Not Working
+    stage2_choices:
+    - Screen not working
+    - Other problem
+    confirmation_test: Try another cable and phone.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-09:
+    status: approved
+    name: No Sound from Speakers
+    stage2_choices:
+    - Music not working
+    confirmation_test: Speaker output test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-10:
+    status: approved
+    name: One Speaker Not Working / Distorted Sound
+    stage2_choices:
+    - Music not working
+    confirmation_test: Speaker resistance and wiggle test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-11:
+    status: approved
+    name: Reverse Camera Not Showing
+    stage2_choices:
+    - Camera not working
+    confirmation_test: Camera power and video signal test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-12:
+    status: approved
+    name: Reverse Camera Showing Black / Blurry Image
+    stage2_choices:
+    - Camera not working
+    confirmation_test: Clean and inspect the camera.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-13:
+    status: approved
+    name: Infotainment Fuse / Power Supply Fault
+    stage2_choices:
+    - Screen not working
+    - Music not working
+    confirmation_test: Fuse and voltage test.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: infotainment-q01
+      option: 'Yes'
+  fault F16-IF-14:
+    status: approved
+    name: Infotainment Wiring / Connector / CAN Communication Fault
+    stage2_choices:
+    - Screen not working
+    - Music not working
+    - Other problem
+    confirmation_test: Wiggle test and scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F16-IF-15:
+    status: approved
+    name: Infotainment Head Unit / Display / Software Failure
+    stage2_choices:
+    - Screen not working
+    confirmation_test: Full tests of the head unit.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: infotainment-q01
+      option: 'Yes'
+  fault F16-IF-16:
+    status: approved
+    name: Aftermarket Stereo / Accessory Wiring Problems  [NEW - India]
+    stage2_choices:
+    - Music not working
+    - Other problem
+    confirmation_test: Current draw test and removal test of the accessory.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: infotainment-q01
+      option: 'Yes'
+  fault F16-IF-17:
+    status: approved
+    name: Screen / Camera / Speaker Fault After Water Entry (Monsoon)  [NEW - India]
+    stage2_choices:
+    - Screen not working
+    - Camera not working
+    - Music not working
+    confirmation_test: Inspection for water damage.
+    danger_phrases:
+    - flooded
+    safety_trigger_options:
+    - question: infotainment-q15
+      option: Yes, the car was flooded
+  safety_rule infotainment-s-F16-IF-01:
+    id: infotainment-s-F16-IF-01
+    status: approved
+    fault: F16-IF-01
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything. Switch the car off,
+      wait, and switch it on again.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Do not operate the screen while driving.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-02:
+    id: infotainment-s-F16-IF-02
+    status: approved
+    fault: F16-IF-02
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Ignition OFF before removing panels.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-03:
+    id: infotainment-s-F16-IF-03
+    status: approved
+    fault: F16-IF-03
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Same-rating fuse only.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-04:
+    id: infotainment-s-F16-IF-04
+    status: approved
+    fault: F16-IF-04
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Battery OFF for wiring work.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-05:
+    id: infotainment-s-F16-IF-05
+    status: approved
+    fault: F16-IF-05
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • No sharp tools on screen.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-06:
+    id: infotainment-s-F16-IF-06
+    status: approved
+    fault: F16-IF-06
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • -
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-07:
+    id: infotainment-s-F16-IF-07
+    status: approved
+    fault: F16-IF-07
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Do not use phone while driving.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-08:
+    id: infotainment-s-F16-IF-08
+    status: approved
+    fault: F16-IF-08
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Set up only when parked.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-09:
+    id: infotainment-s-F16-IF-09
+    status: approved
+    fault: F16-IF-09
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Battery OFF for wiring.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-10:
+    id: infotainment-s-F16-IF-10
+    status: approved
+    fault: F16-IF-10
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Use trim tools.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-11:
+    id: infotainment-s-F16-IF-11
+    status: approved
+    fault: F16-IF-11
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Reverse slowly using the mirrors, with a helper if possible.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • -
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-12:
+    id: infotainment-s-F16-IF-12
+    status: approved
+    fault: F16-IF-12
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Clean the camera lens with a soft cloth. Reverse slowly using the mirrors.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • -
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-13:
+    id: infotainment-s-F16-IF-13
+    status: approved
+    fault: F16-IF-13
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell.
+    roadside_action: Use only a fuse of the same rating. Never fit a bigger fuse.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: '• Same-rating fuse only.
+
+        • Never a bigger fuse or wire.'
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-14:
+    id: infotainment-s-F16-IF-14
+    status: approved
+    fault: F16-IF-14
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Battery OFF.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-15:
+    id: infotainment-s-F16-IF-15
+    status: approved
+    fault: F16-IF-15
+    risk_level: low
+    stop_driving_trigger: Stop if there is a burning smell or smoke from the dashboard.
+    roadside_action: Do not use the screen while driving. Park safely before trying anything.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Battery OFF.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-16:
+    id: infotainment-s-F16-IF-16
+    status: approved
+    fault: F16-IF-16
+    risk_level: medium
+    stop_driving_trigger: Stop if wiring feels warm or smells of burning.
+    roadside_action: If wiring is warm or smells, switch off the car. Get the accessory wiring checked.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Battery OFF.
+      if_towing_needed: NO.
+  safety_rule infotainment-s-F16-IF-17:
+    id: infotainment-s-F16-IF-17
+    status: approved
+    fault: F16-IF-17
+    risk_level: medium
+    stop_driving_trigger: Do not start the car if it was flooded.
+    roadside_action: If the car was flooded, do not start it. Call for a tow.
+    towing_recommendation: If flooded.
+    source_text:
+      safety_precautions: • Battery OFF.
+      if_towing_needed: If flooded.

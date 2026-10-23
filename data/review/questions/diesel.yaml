@@ -1,0 +1,965 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category diesel
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: diesel
+category_name: Diesel delivery / AdBlue
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:32:49+00:00'
+  run_id: claude-code-diesel
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: diesel-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Gear problem
+    effects: []
+    safety_trigger: false
+  - label: Remote / key problem
+    effects: []
+    safety_trigger: false
+  - label: Car locked
+    effects: []
+    safety_trigger: false
+  - label: Suspension noise
+    effects: []
+    safety_trigger: false
+  - label: CNG problem
+    effects: []
+    safety_trigger: false
+  - label: Diesel delivery
+    effects:
+    - fault: F17-DS-01
+      effect: supports
+      strength: strong
+    - fault: F17-DS-05
+      effect: supports
+      strength: strong
+    - fault: F17-DS-06
+      effect: supports
+      strength: strong
+    - fault: F17-DS-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: AdBlue warning
+    effects:
+    - fault: F17-DS-02
+      effect: supports
+      strength: strong
+    - fault: F17-DS-03
+      effect: supports
+      strength: strong
+    - fault: F17-DS-13
+      effect: supports
+      strength: strong
+    - fault: F17-DS-14
+      effect: supports
+      strength: strong
+    - fault: F17-DS-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other
+    effects:
+    - fault: F17-DS-04
+      effect: supports
+      strength: strong
+    - fault: F17-DS-05
+      effect: supports
+      strength: strong
+    - fault: F17-DS-06
+      effect: supports
+      strength: strong
+    - fault: F17-DS-07
+      effect: supports
+      strength: strong
+    - fault: F17-DS-08
+      effect: supports
+      strength: strong
+    - fault: F17-DS-09
+      effect: supports
+      strength: strong
+    - fault: F17-DS-10
+      effect: supports
+      strength: strong
+    - fault: F17-DS-11
+      effect: supports
+      strength: strong
+    - fault: F17-DS-12
+      effect: supports
+      strength: strong
+    - fault: F17-DS-15
+      effect: supports
+      strength: strong
+    - fault: F17-DS-16
+      effect: supports
+      strength: strong
+    - fault: F17-DS-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q01
+  status: approved
+  stage: 3
+  text: Was the wrong fuel or fluid put in? (petrol in the diesel tank, AdBlue in the diesel tank, or diesel in
+    the AdBlue tank)
+  source_faults:
+  - F17-DS-06
+  - F17-DS-13
+  merged_from:
+  - 'F17-DS-06 (stages_text): Was the wrong fuel added?'
+  - 'F17-DS-13 (stages_text): What was filled in the AdBlue tank?'
+  - 'F17-DS-06 (stages_text): Did you start the engine after filling?'
+  options:
+  - label: Wrong fuel in the diesel tank
+    effects:
+    - fault: F17-DS-06
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: Diesel or something else in the AdBlue tank
+    effects:
+    - fault: F17-DS-13
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F17-DS-06
+      effect: rules_out
+      strength: strong
+    - fault: F17-DS-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q02
+  status: approved
+  stage: 3
+  text: Can you see or smell diesel leaking?
+  source_faults:
+  - F17-DS-01
+  - F17-DS-11
+  - F17-DS-17
+  merged_from:
+  - 'F17-DS-11 (stages_text): Is it dripping now?'
+  - 'F17-DS-01 (stages_text): Is any fuel leaking?'
+  - 'F17-DS-17 (stages_text): Any puddle or smell?'
+  options:
+  - label: Yes, it is dripping or there is a puddle
+    effects:
+    - fault: F17-DS-11
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: No leak, but the fuel level dropped overnight
+    effects:
+    - fault: F17-DS-17
+      effect: supports
+      strength: strong
+    - fault: F17-DS-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-DS-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q03
+  status: approved
+  stage: 3
+  text: Is the car out of diesel, or is the fuel light on?
+  source_faults:
+  - F17-DS-01
+  - F17-DS-05
+  merged_from:
+  - 'F17-DS-01 (stages_text): Is your car out of diesel?'
+  - 'F17-DS-01 (symptoms): Fuel light on'
+  options:
+  - label: Yes, and the engine has stopped
+    effects:
+    - fault: F17-DS-05
+      effect: supports
+      strength: strong
+    - fault: F17-DS-01
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Yes, the fuel light is on but it still runs
+    effects:
+    - fault: F17-DS-01
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No, there is diesel
+    effects:
+    - fault: F17-DS-01
+      effect: rules_out
+      strength: strong
+    - fault: F17-DS-05
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q04
+  status: approved
+  stage: 3
+  text: After refuelling, does the engine start?
+  source_faults:
+  - F17-DS-05
+  - F17-DS-09
+  merged_from:
+  - 'F17-DS-05 (stages_text): Did it start after refuelling?'
+  options:
+  - label: No, it cranks but does not start
+    effects:
+    - fault: F17-DS-05
+      effect: supports
+      strength: strong
+    - fault: F17-DS-09
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q05
+  status: approved
+  stage: 3
+  text: Is there an AdBlue message or a km countdown ("no restart in … km") on the dashboard?
+  source_faults:
+  - F17-DS-01
+  - F17-DS-02
+  - F17-DS-03
+  - F17-DS-13
+  - F17-DS-14
+  - F17-DS-15
+  merged_from:
+  - 'F17-DS-02 (stages_text): Is there a km countdown?'
+  - 'F17-DS-15 (stages_text): Any countdown shown?'
+  - 'F17-DS-01 (stages_text): Is the car showing a no-restart countdown?'
+  options:
+  - label: AdBlue low message
+    effects:
+    - fault: F17-DS-02
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Countdown or SCR warning even though the AdBlue tank is full
+    effects:
+    - fault: F17-DS-03
+      effect: supports
+      strength: strong
+    - fault: F17-DS-14
+      effect: supports
+      strength: moderate
+    - fault: F17-DS-15
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: AdBlue quality warning after a refill
+    effects:
+    - fault: F17-DS-13
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-DS-02
+      effect: rules_out
+      strength: strong
+    - fault: F17-DS-03
+      effect: rules_out
+      strength: moderate
+    - fault: F17-DS-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q06
+  status: approved
+  stage: 3
+  text: Has the countdown reached zero?
+  source_faults:
+  - F17-DS-03
+  - F17-DS-14
+  merged_from:
+  - 'F17-DS-03 (symptoms): Countdown'
+  - 'F17-DS-14 (symptoms): Countdown'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-03
+      effect: supports
+      strength: moderate
+    - fault: F17-DS-14
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: No, there are still km left
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q07
+  status: approved
+  stage: 3
+  text: Are there white crystals near the AdBlue tank or the exhaust?
+  source_faults:
+  - F17-DS-13
+  - F17-DS-14
+  merged_from:
+  - 'F17-DS-14 (stages_text): Any crystals near the exhaust?'
+  - 'F17-DS-13 (symptoms): Crystals'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-14
+      effect: supports
+      strength: strong
+    - fault: F17-DS-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q08
+  status: approved
+  stage: 3
+  text: Did the problem start right after filling diesel?
+  source_faults:
+  - F17-DS-04
+  - F17-DS-07
+  merged_from:
+  - 'F17-DS-04 (stages_text): Did problem start after a refuel?'
+  - 'F17-DS-07 (stages_text): Did it start after rain / new pump?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-04
+      effect: supports
+      strength: strong
+    - fault: F17-DS-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-DS-04
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q09
+  status: approved
+  stage: 3
+  text: Is the water-in-fuel light (a fuel pump symbol with water drops) on?
+  source_faults:
+  - F17-DS-07
+  merged_from:
+  - 'F17-DS-07 (symptoms): WIF light'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-DS-07
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q10
+  status: approved
+  stage: 3
+  text: Is there smoke from the exhaust, or a knocking sound from the engine?
+  source_faults:
+  - F17-DS-04
+  - F17-DS-06
+  - F17-DS-10
+  merged_from:
+  - 'F17-DS-10 (stages_text): Is there black smoke?'
+  - 'F17-DS-04 (symptoms): Knocking'
+  - 'F17-DS-06 (symptoms): Knocking'
+  options:
+  - label: Black smoke
+    effects:
+    - fault: F17-DS-10
+      effect: supports
+      strength: strong
+    - fault: F17-DS-04
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Knocking sound
+    effects:
+    - fault: F17-DS-10
+      effect: supports
+      strength: moderate
+    - fault: F17-DS-04
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-DS-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q11
+  status: approved
+  stage: 3
+  text: Has the car lost power (for example on hills), or gone into a low-power mode?
+  source_faults:
+  - F17-DS-04
+  - F17-DS-07
+  - F17-DS-08
+  - F17-DS-09
+  - F17-DS-16
+  merged_from:
+  - 'F17-DS-08 (symptoms): Uphill weakness'
+  - 'F17-DS-16 (symptoms): Limp mode'
+  - 'F17-DS-09 (symptoms): Power loss'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-08
+      effect: supports
+      strength: moderate
+    - fault: F17-DS-09
+      effect: supports
+      strength: moderate
+    - fault: F17-DS-16
+      effect: supports
+      strength: moderate
+    - fault: F17-DS-04
+      effect: supports
+      strength: weak
+    - fault: F17-DS-07
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q12
+  status: approved
+  stage: 3
+  text: When was the diesel filter last changed?
+  source_faults:
+  - F17-DS-08
+  merged_from:
+  - 'F17-DS-08 (stages_text): When was filter changed?'
+  options:
+  - label: It is overdue
+    effects:
+    - fault: F17-DS-08
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Recently
+    effects:
+    - fault: F17-DS-08
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q13
+  status: approved
+  stage: 3
+  text: Does a mechanic's scan show a fuel pressure code?
+  source_faults:
+  - F17-DS-08
+  - F17-DS-09
+  merged_from:
+  - 'F17-DS-09 (stages_text): Any pressure code?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-09
+      effect: supports
+      strength: strong
+    - fault: F17-DS-08
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No scan yet
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q14
+  status: approved
+  stage: 3
+  text: Is starting difficult, especially in the morning when cold?
+  source_faults:
+  - F17-DS-08
+  - F17-DS-12
+  merged_from:
+  - 'F17-DS-12 (stages_text): Is it worse in the morning?'
+  - 'F17-DS-12 (symptoms): Glow light'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-12
+      effect: supports
+      strength: strong
+    - fault: F17-DS-08
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-DS-12
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q15
+  status: approved
+  stage: 3
+  text: Is the DPF (exhaust filter) light on, and is the car used mostly for short trips?
+  source_faults:
+  - F17-DS-16
+  merged_from:
+  - 'F17-DS-16 (stages_text): Mostly short trips?'
+  - 'F17-DS-16 (symptoms): DPF light'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F17-DS-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: diesel-q16
+  status: approved
+  stage: 3
+  text: Is the fuel cap open, or are there scratch marks near the tank?
+  source_faults:
+  - F17-DS-17
+  merged_from:
+  - 'F17-DS-17 (symptoms): Cap open'
+  - 'F17-DS-17 (symptoms): Scratch marks'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F17-DS-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F17-DS-01:
+    status: approved
+    name: Diesel Low - Delivery / Refuelling Needed
+    stage2_choices:
+    - Diesel delivery
+    confirmation_test: Refuel.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-02:
+    status: approved
+    name: AdBlue / DEF Fluid Low
+    stage2_choices:
+    - AdBlue warning
+    confirmation_test: Refill AdBlue.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-03:
+    status: approved
+    name: AdBlue / DEF System Fault
+    stage2_choices:
+    - AdBlue warning
+    confirmation_test: Scan.
+    danger_phrases:
+    - countdown ended
+    safety_trigger_options:
+    - question: diesel-q06
+      option: 'Yes'
+  F17-DS-04:
+    status: approved
+    name: Diesel Contamination / Additive Issue
+    stage2_choices:
+    - Other
+    confirmation_test: Fuel sample and filter check.
+    danger_phrases:
+    - running badly
+    safety_trigger_options: []
+  F17-DS-05:
+    status: approved
+    name: Diesel Tank Empty / Engine Stopped
+    stage2_choices:
+    - Diesel delivery
+    - Other
+    confirmation_test: Refuel, prime the fuel system and start.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-06:
+    status: approved
+    name: Wrong Fuel Added to Diesel Tank
+    stage2_choices:
+    - Other
+    - Diesel delivery
+    confirmation_test: Fuel sample.
+    danger_phrases:
+    - wrong fuel
+    safety_trigger_options:
+    - question: diesel-q01
+      option: Wrong fuel in the diesel tank
+  F17-DS-07:
+    status: approved
+    name: Water in Diesel / Water-in-Fuel Warning
+    stage2_choices:
+    - Other
+    confirmation_test: Drain the water separator.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-08:
+    status: approved
+    name: Diesel Fuel Filter Blocked
+    stage2_choices:
+    - Other
+    confirmation_test: Fuel pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-09:
+    status: approved
+    name: Diesel Fuel Pump / Supply Pressure Fault
+    stage2_choices:
+    - Other
+    confirmation_test: Fuel pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-10:
+    status: approved
+    name: Diesel Injector Fault
+    stage2_choices:
+    - Other
+    confirmation_test: Specialist injector tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-11:
+    status: approved
+    name: Diesel Fuel Line Leak
+    stage2_choices:
+    - Other
+    confirmation_test: Visual check of the fuel lines.
+    danger_phrases:
+    - heavy leak
+    - fuel smell
+    safety_trigger_options:
+    - question: diesel-q02
+      option: Yes, it is dripping or there is a puddle
+  F17-DS-12:
+    status: approved
+    name: Diesel Starting Difficulty / Air in Fuel System
+    stage2_choices:
+    - Other
+    confirmation_test: Air leak and glow plug tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-13:
+    status: approved
+    name: AdBlue Quality / Contamination Warning
+    stage2_choices:
+    - AdBlue warning
+    confirmation_test: AdBlue sample.
+    danger_phrases:
+    - diesel in AdBlue tank
+    safety_trigger_options:
+    - question: diesel-q01
+      option: Diesel or something else in the AdBlue tank
+  F17-DS-14:
+    status: approved
+    name: AdBlue Pump / Injector / Heater Fault
+    stage2_choices:
+    - AdBlue warning
+    confirmation_test: AdBlue pump, injector and heater tests.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: diesel-q06
+      option: 'Yes'
+  F17-DS-15:
+    status: approved
+    name: SCR / NOx Sensor / Emissions Warning
+    stage2_choices:
+    - AdBlue warning
+    - Other
+    confirmation_test: NOx sensor and wiring tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-16:
+    status: approved
+    name: Diesel DPF Regeneration / Exhaust Restriction Warning
+    stage2_choices:
+    - Other
+    confirmation_test: Scan (DPF soot load).
+    danger_phrases: []
+    safety_trigger_options: []
+  F17-DS-17:
+    status: approved
+    name: Diesel Theft / Tank Siphoning Suspected  [NEW - India]
+    stage2_choices:
+    - Diesel delivery
+    - Other
+    confirmation_test: Leak check.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: diesel-s-F17-DS-01
+  status: approved
+  fault: F17-DS-01
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Park in a safe place with hazard lights on. Ask for diesel delivery or go to the nearest pump.
+    Never put AdBlue in the diesel tank.
+  towing_recommendation: Only if fuel delivery is not available.
+  source_text:
+    safety_precautions: • Never put AdBlue in the diesel tank, or diesel in the AdBlue tank.
+    if_towing_needed: Only if delivery not available.
+- id: diesel-s-F17-DS-02
+  status: approved
+  fault: F17-DS-02
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Refill with the correct AdBlue (blue cap tank). Never put AdBlue in the diesel tank.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Never put AdBlue in the diesel tank, or diesel in the AdBlue tank.
+
+      • Do not use unapproved fuel or DEF additives.'
+    if_towing_needed: NO.
+- id: diesel-s-F17-DS-03
+  status: approved
+  fault: F17-DS-03
+  risk_level: medium
+  stop_driving_trigger: The car may not restart once the countdown ends.
+  roadside_action: Drive to the dealer before the countdown ends. Do not disable any emission parts.
+  towing_recommendation: If the countdown has ended.
+  source_text:
+    safety_precautions: • Do not remove or disable DPF, SCR, EGR or other emission systems.
+    if_towing_needed: If countdown ended.
+- id: diesel-s-F17-DS-04
+  status: approved
+  fault: F17-DS-04
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine runs badly.
+  roadside_action: If the engine runs roughly or knocks, stop in a safe place. Do not add any fuel additives. Call
+    a mechanic.
+  towing_recommendation: If running badly.
+  source_text:
+    safety_precautions: '• Do not use unapproved fuel or DEF additives.
+
+      • Never loosen common-rail injector pipes - extremely high pressure.'
+    if_towing_needed: If running badly.
+- id: diesel-s-F17-DS-05
+  status: approved
+  fault: F17-DS-05
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Refuel. Do not keep cranking for long. If it does not start after refuelling, call a mechanic.
+  towing_recommendation: If it does not start after refuelling.
+  source_text:
+    safety_precautions: • Never loosen common-rail injector pipes - extremely high pressure.
+    if_towing_needed: If no start after refuel.
+- id: diesel-s-F17-DS-06
+  status: approved
+  fault: F17-DS-06
+  risk_level: high
+  stop_driving_trigger: Do not start or restart the engine.
+  roadside_action: Do not start or restart the engine. Push the car to a safe place if needed, and call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• If wrong fuel or wrong fluid was added, do NOT start or restart the engine.
+
+      • Never put AdBlue in the diesel tank, or diesel in the AdBlue tank.'
+    if_towing_needed: YES.
+- id: diesel-s-F17-DS-07
+  status: approved
+  fault: F17-DS-07
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Drive gently to a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never loosen common-rail injector pipes - extremely high pressure.
+    if_towing_needed: NO.
+- id: diesel-s-F17-DS-08
+  status: approved
+  fault: F17-DS-08
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Drive gently to a workshop.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never loosen common-rail injector pipes - extremely high pressure.
+    if_towing_needed: NO.
+- id: diesel-s-F17-DS-09
+  status: approved
+  fault: F17-DS-09
+  risk_level: medium
+  stop_driving_trigger: Stop safely if the engine stalls or loses power.
+  roadside_action: Stop in a safe place. Do not touch the fuel pipes. Call a mechanic.
+  towing_recommendation: If it does not start.
+  source_text:
+    safety_precautions: • Never loosen common-rail injector pipes - extremely high pressure.
+    if_towing_needed: If no start.
+- id: diesel-s-F17-DS-10
+  status: approved
+  fault: F17-DS-10
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Drive gently to a workshop. Do not touch the injector pipes.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Never loosen common-rail injector pipes - extremely high pressure.
+    if_towing_needed: NO.
+- id: diesel-s-F17-DS-11
+  status: approved
+  fault: F17-DS-11
+  risk_level: high
+  stop_driving_trigger: Stop if diesel is leaking heavily.
+  roadside_action: Stop and switch off the engine. No smoking or flames near the car. Keep away from the hot exhaust.
+    Call a mechanic.
+  towing_recommendation: Yes, if the leak is heavy.
+  source_text:
+    safety_precautions: '• Never loosen common-rail injector pipes - extremely high pressure.
+
+      • No smoking near leak.'
+    if_towing_needed: YES if heavy.
+- id: diesel-s-F17-DS-12
+  status: approved
+  fault: F17-DS-12
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Use short cranks only. If it will not start, call a mechanic.
+  towing_recommendation: If it does not start.
+  source_text:
+    safety_precautions: • Never loosen common-rail injector pipes - extremely high pressure.
+    if_towing_needed: If no start.
+- id: diesel-s-F17-DS-13
+  status: approved
+  fault: F17-DS-13
+  risk_level: high
+  stop_driving_trigger: Do not start the engine if diesel went into the AdBlue tank.
+  roadside_action: Do not start or restart the engine. Push the car to a safe place if needed, and call for a tow.
+  towing_recommendation: Yes, if diesel was added to the AdBlue tank.
+  source_text:
+    safety_precautions: '• If wrong fuel or wrong fluid was added, do NOT start or restart the engine.
+
+      • Never put AdBlue in the diesel tank, or diesel in the AdBlue tank.'
+    if_towing_needed: YES if diesel added.
+- id: diesel-s-F17-DS-14
+  status: approved
+  fault: F17-DS-14
+  risk_level: medium
+  stop_driving_trigger: The car may not restart once the countdown ends.
+  roadside_action: Go to the dealer soon, before the countdown ends.
+  towing_recommendation: If the countdown has ended.
+  source_text:
+    safety_precautions: • Do not remove or disable DPF, SCR, EGR or other emission systems.
+    if_towing_needed: If countdown ended.
+- id: diesel-s-F17-DS-15
+  status: approved
+  fault: F17-DS-15
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Go to the dealer. Do not disable any emission parts.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not remove or disable DPF, SCR, EGR or other emission systems.
+    if_towing_needed: NO.
+- id: diesel-s-F17-DS-16
+  status: approved
+  fault: F17-DS-16
+  risk_level: medium
+  stop_driving_trigger: Stop if the low-power mode makes driving unsafe.
+  roadside_action: Follow the owner's manual advice for the DPF light. If power is very low, stop safely and call
+    a mechanic.
+  towing_recommendation: If low-power mode is severe.
+  source_text:
+    safety_precautions: • Do not remove or disable DPF, SCR, EGR or other emission systems.
+    if_towing_needed: If limp mode severe.
+- id: diesel-s-F17-DS-17
+  status: approved
+  fault: F17-DS-17
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Refuel. No smoking near any fuel smell. Get a leak check if the level keeps dropping.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • No smoking near any fuel smell.
+    if_towing_needed: NO.

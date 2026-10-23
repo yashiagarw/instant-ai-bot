@@ -1,0 +1,680 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category mirror
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: mirror
+category_name: Mirrors (ORVM / IRVM)
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:44:14+00:00'
+  run_id: claude-code-mirror
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: mirror-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Side mirror problem
+    effects:
+    - fault: F14-MR-01
+      effect: supports
+      strength: strong
+    - fault: F14-MR-02
+      effect: supports
+      strength: strong
+    - fault: F14-MR-03
+      effect: supports
+      strength: strong
+    - fault: F14-MR-04
+      effect: supports
+      strength: strong
+    - fault: F14-MR-05
+      effect: supports
+      strength: strong
+    - fault: F14-MR-06
+      effect: supports
+      strength: strong
+    - fault: F14-MR-07
+      effect: supports
+      strength: strong
+    - fault: F14-MR-08
+      effect: supports
+      strength: strong
+    - fault: F14-MR-09
+      effect: supports
+      strength: strong
+    - fault: F14-MR-10
+      effect: supports
+      strength: strong
+    - fault: F14-MR-11
+      effect: supports
+      strength: strong
+    - fault: F14-MR-12
+      effect: supports
+      strength: strong
+    - fault: F14-MR-13
+      effect: supports
+      strength: strong
+    - fault: F14-MR-14
+      effect: supports
+      strength: strong
+    - fault: F14-MR-15
+      effect: supports
+      strength: strong
+    - fault: F14-MR-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Car inspection
+    effects: []
+    safety_trigger: false
+  - label: Suspension noise
+    effects: []
+    safety_trigger: false
+  - label: Door problem
+    effects: []
+    safety_trigger: false
+  - label: Bonnet / boot problem
+    effects: []
+    safety_trigger: false
+  - label: Window problem
+    effects: []
+    safety_trigger: false
+  - label: Wiper problem
+    effects: []
+    safety_trigger: false
+  - label: Sunroof problem
+    effects: []
+    safety_trigger: false
+  - label: Other
+    effects:
+    - fault: F14-MR-13
+      effect: supports
+      strength: strong
+    - fault: F14-MR-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q01
+  status: approved
+  stage: 3
+  text: Can you see traffic behind you clearly?
+  source_faults:
+  - F14-MR-03
+  - F14-MR-04
+  - F14-MR-06
+  merged_from:
+  - 'F14-MR-04 (AI_DIAGNOSIS_RULES): Can you see traffic behind you clearly?'
+  - 'F14-MR-06 (AI_DIAGNOSIS_RULES): Can you see traffic behind?'
+  - 'F14-MR-03 (stages_text): Can you see traffic behind?'
+  options:
+  - label: 'No'
+    effects:
+    - fault: F14-MR-04
+      effect: supports
+      strength: moderate
+    - fault: F14-MR-03
+      effect: supports
+      strength: moderate
+    - fault: F14-MR-06
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'Yes'
+    effects:
+    - fault: F14-MR-04
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q02
+  status: approved
+  stage: 3
+  text: Which mirror has the problem?
+  source_faults:
+  - F14-MR-01
+  - F14-MR-03
+  - F14-MR-05
+  - F14-MR-06
+  - F14-MR-13
+  - F14-MR-14
+  merged_from:
+  - 'F14-MR-01 (stages_text): Which mirror has a problem?'
+  - 'F14-MR-13 (AI_DIAGNOSIS_RULES): Did it fall off the windshield?'
+  options:
+  - label: A side mirror outside the car
+    effects:
+    - fault: F14-MR-13
+      effect: rules_out
+      strength: strong
+    - fault: F14-MR-14
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: The inside rear-view mirror
+    effects:
+    - fault: F14-MR-13
+      effect: supports
+      strength: moderate
+    - fault: F14-MR-14
+      effect: supports
+      strength: moderate
+    - fault: F14-MR-01
+      effect: rules_out
+      strength: moderate
+    - fault: F14-MR-03
+      effect: rules_out
+      strength: moderate
+    - fault: F14-MR-05
+      effect: rules_out
+      strength: moderate
+    - fault: F14-MR-06
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q03
+  status: approved
+  stage: 3
+  text: What is wrong with the mirror?
+  source_faults:
+  - F14-MR-01
+  - F14-MR-02
+  - F14-MR-03
+  - F14-MR-04
+  - F14-MR-11
+  - F14-MR-12
+  - F14-MR-16
+  merged_from:
+  - 'F14-MR-03 (AI_DIAGNOSIS_RULES): Is the mirror missing or hanging?'
+  - 'F14-MR-02 (AI_DIAGNOSIS_RULES): Is only the glass broken?'
+  - 'F14-MR-01 (AI_DIAGNOSIS_RULES): Is the glass loose or the complete mirror shaking?'
+  - 'F14-MR-16 (AI_DIAGNOSIS_RULES): What broke - glass, cover or whole mirror?'
+  options:
+  - label: The whole mirror is missing
+    effects:
+    - fault: F14-MR-04
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It is broken off and hanging
+    effects:
+    - fault: F14-MR-03
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: Only the glass is cracked
+    effects:
+    - fault: F14-MR-02
+      effect: supports
+      strength: strong
+    - fault: F14-MR-16
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: The glass is loose or fell out
+    effects:
+    - fault: F14-MR-12
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The whole mirror shakes
+    effects:
+    - fault: F14-MR-01
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Only the outer cover is broken
+    effects:
+    - fault: F14-MR-11
+      effect: supports
+      strength: strong
+    - fault: F14-MR-16
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q04
+  status: approved
+  stage: 3
+  text: Did the mirror hit something, for example a bike or auto in traffic?
+  source_faults:
+  - F14-MR-01
+  - F14-MR-03
+  - F14-MR-11
+  - F14-MR-16
+  merged_from:
+  - 'F14-MR-01 (stages_text): Did the mirror hit anything?'
+  - 'F14-MR-16 (symptoms): Bent mirror'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-MR-16
+      effect: supports
+      strength: strong
+    - fault: F14-MR-01
+      effect: supports
+      strength: moderate
+    - fault: F14-MR-03
+      effect: supports
+      strength: weak
+    - fault: F14-MR-11
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-MR-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q05
+  status: approved
+  stage: 3
+  text: Does the mirror fold and unfold electrically?
+  source_faults:
+  - F14-MR-01
+  - F14-MR-05
+  - F14-MR-06
+  merged_from:
+  - 'F14-MR-05 (AI_DIAGNOSIS_RULES): Does it make a sound?'
+  - 'F14-MR-06 (symptoms): Stuck folded'
+  - 'F14-MR-01 (stages_text): Is it folding normally?'
+  options:
+  - label: It will not fold
+    effects:
+    - fault: F14-MR-05
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It is stuck folded, or only half open
+    effects:
+    - fault: F14-MR-06
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It folds normally
+    effects:
+    - fault: F14-MR-05
+      effect: rules_out
+      strength: moderate
+    - fault: F14-MR-06
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: It is not a folding mirror
+    effects:
+    - fault: F14-MR-05
+      effect: rules_out
+      strength: strong
+    - fault: F14-MR-06
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q06
+  status: approved
+  stage: 3
+  text: When you press the mirror adjust switch, do both mirrors fail to move, or only one?
+  source_faults:
+  - F14-MR-07
+  - F14-MR-08
+  merged_from:
+  - 'F14-MR-07 (AI_DIAGNOSIS_RULES): Are both mirrors not moving?'
+  - 'F14-MR-08 (AI_DIAGNOSIS_RULES): Do both mirrors fail?'
+  options:
+  - label: Both mirrors do not move
+    effects:
+    - fault: F14-MR-08
+      effect: supports
+      strength: strong
+    - fault: F14-MR-07
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Only one mirror does not move
+    effects:
+    - fault: F14-MR-07
+      effect: supports
+      strength: strong
+    - fault: F14-MR-08
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Both move normally
+    effects:
+    - fault: F14-MR-07
+      effect: rules_out
+      strength: moderate
+    - fault: F14-MR-08
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q07
+  status: approved
+  stage: 3
+  text: Is the indicator light on the mirror not blinking, while the other indicators work?
+  source_faults:
+  - F14-MR-09
+  merged_from:
+  - 'F14-MR-09 (AI_DIAGNOSIS_RULES): Do other indicators work?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-MR-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-MR-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q08
+  status: approved
+  stage: 3
+  text: Does the mirror stay foggy when the heater is on? Does the rear window defogger work?
+  source_faults:
+  - F14-MR-10
+  merged_from:
+  - 'F14-MR-10 (AI_DIAGNOSIS_RULES): Does the rear defogger work?'
+  options:
+  - label: The mirror stays foggy but the rear defogger works
+    effects:
+    - fault: F14-MR-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Both stay foggy
+    effects:
+    - fault: F14-MR-10
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: No problem
+    effects:
+    - fault: F14-MR-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q09
+  status: approved
+  stage: 3
+  text: Does the mirror still work (move, fold, light up) apart from the damage?
+  source_faults:
+  - F14-MR-02
+  - F14-MR-11
+  merged_from:
+  - 'F14-MR-11 (AI_DIAGNOSIS_RULES): Does the mirror still work?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-MR-11
+      effect: supports
+      strength: moderate
+    - fault: F14-MR-02
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-MR-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q10
+  status: approved
+  stage: 3
+  text: Does it stop working when the door is opened or closed? Has a rat damaged the wiring?
+  source_faults:
+  - F14-MR-15
+  merged_from:
+  - 'F14-MR-15 (AI_DIAGNOSIS_RULES): Does it fail when door moves?'
+  - 'F14-MR-15 (symptoms): Rat damage'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-MR-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-MR-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q11
+  status: approved
+  stage: 3
+  text: (Inside mirror) Did it fall off the windscreen?
+  source_faults:
+  - F14-MR-13
+  merged_from:
+  - 'F14-MR-13 (AI_DIAGNOSIS_RULES): Did it fall off the windshield?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-MR-13
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-MR-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: mirror-q12
+  status: approved
+  stage: 3
+  text: (Auto-dimming inside mirror) Is liquid leaking, or does it stay dark or never dim?
+  source_faults:
+  - F14-MR-14
+  merged_from:
+  - 'F14-MR-14 (AI_DIAGNOSIS_RULES): Is liquid leaking?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F14-MR-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F14-MR-14
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F14-MR-01:
+    status: approved
+    name: Side Mirror Loose / Shaking
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Shake test and mounting inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-02:
+    status: approved
+    name: Side Mirror Glass Cracked
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Visual check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-03:
+    status: approved
+    name: Side Mirror Broken Off
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Visual check.
+    danger_phrases:
+    - no rear view
+    safety_trigger_options:
+    - question: mirror-q01
+      option: 'No'
+    - question: mirror-q03
+      option: It is broken off and hanging
+  F14-MR-04:
+    status: approved
+    name: Missing Mirror Affecting Visibility
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Visual check.
+    danger_phrases:
+    - no rear view
+    safety_trigger_options:
+    - question: mirror-q01
+      option: 'No'
+  F14-MR-05:
+    status: approved
+    name: ORVM Not Folding Electrically
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Voltage and fold motor test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-06:
+    status: approved
+    name: ORVM Not Opening / Unfolding
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Voltage and fold motor test.
+    danger_phrases:
+    - no rear view
+    safety_trigger_options:
+    - question: mirror-q01
+      option: 'No'
+  F14-MR-07:
+    status: approved
+    name: Mirror Adjustment Motor Not Working
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Voltage test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-08:
+    status: approved
+    name: Mirror Adjustment Switch Fault
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Mirror switch test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-09:
+    status: approved
+    name: Mirror Indicator / Turn Signal Not Working
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Voltage test at the mirror indicator.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-10:
+    status: approved
+    name: Mirror Heating / Defogging Not Working
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Voltage and resistance test of the heater.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-11:
+    status: approved
+    name: Mirror Housing / Cover Broken
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Visual and function check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-12:
+    status: approved
+    name: Mirror Glass Loose / Falling Out
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Visual check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-13:
+    status: approved
+    name: Interior Rear-View Mirror Loose / Detached
+    stage2_choices:
+    - Other
+    - Side mirror problem
+    confirmation_test: Visual check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-14:
+    status: approved
+    name: Auto-Dimming Mirror Fault
+    stage2_choices:
+    - Other
+    - Side mirror problem
+    confirmation_test: Power and function check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-15:
+    status: approved
+    name: ORVM Wiring / Connector / Camera Fault
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Wiggle and continuity test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F14-MR-16:
+    status: approved
+    name: Mirror Damaged in Tight Lane / Traffic (Bike / Auto Hit)  [NEW - India]
+    stage2_choices:
+    - Side mirror problem
+    confirmation_test: Inspection of the damage.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules: []

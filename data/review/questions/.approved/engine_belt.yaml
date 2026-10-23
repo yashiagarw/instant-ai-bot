@@ -1,0 +1,1585 @@
+category: engine_belt
+loaded_at: '2026-10-23T19:36:50+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question engine_belt-main:
+    id: engine_belt-main
+    status: approved
+    stage: 2
+    text: What problem are you facing? (Gaadi mein kya dikkat aa rahi hai?)
+    choice_source: file
+    options:
+    - label: Belt is making noise (belt se awaaz)
+      effects:
+      - fault: F11-EB-01
+        effect: supports
+        strength: strong
+      - fault: F11-EB-02
+        effect: supports
+        strength: strong
+      - fault: F11-EB-05
+        effect: supports
+        strength: strong
+      - fault: F11-EB-06
+        effect: supports
+        strength: strong
+      - fault: F11-EB-07
+        effect: supports
+        strength: strong
+      - fault: F11-EB-08
+        effect: supports
+        strength: strong
+      - fault: F11-EB-09
+        effect: supports
+        strength: strong
+      - fault: F11-EB-10
+        effect: supports
+        strength: strong
+      - fault: F11-EB-11
+        effect: supports
+        strength: strong
+      - fault: F11-EB-12
+        effect: supports
+        strength: strong
+      - fault: F11-EB-13
+        effect: supports
+        strength: strong
+      - fault: F11-EB-14
+        effect: supports
+        strength: strong
+      - fault: F11-EB-15
+        effect: supports
+        strength: strong
+      - fault: F11-EB-16
+        effect: supports
+        strength: strong
+      - fault: F11-EB-18
+        effect: supports
+        strength: strong
+      - fault: F11-EB-23
+        effect: supports
+        strength: strong
+      - fault: F11-EB-25
+        effect: supports
+        strength: strong
+      - fault: F11-EB-26
+        effect: supports
+        strength: strong
+      - fault: F11-EB-27
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Belt is broken (belt toot gayi)
+      effects:
+      - fault: F11-EB-03
+        effect: supports
+        strength: strong
+      - fault: F11-EB-04
+        effect: supports
+        strength: strong
+      - fault: F11-EB-12
+        effect: supports
+        strength: strong
+      - fault: F11-EB-16
+        effect: supports
+        strength: strong
+      - fault: F11-EB-19
+        effect: supports
+        strength: strong
+      - fault: F11-EB-20
+        effect: supports
+        strength: strong
+      - fault: F11-EB-21
+        effect: supports
+        strength: strong
+      - fault: F11-EB-24
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Battery warning light is on
+      effects:
+      - fault: F11-EB-01
+        effect: supports
+        strength: strong
+      - fault: F11-EB-03
+        effect: supports
+        strength: strong
+      - fault: F11-EB-08
+        effect: supports
+        strength: strong
+      - fault: F11-EB-11
+        effect: supports
+        strength: strong
+      - fault: F11-EB-14
+        effect: supports
+        strength: strong
+      - fault: F11-EB-15
+        effect: supports
+        strength: strong
+      - fault: F11-EB-18
+        effect: supports
+        strength: strong
+      - fault: F11-EB-20
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Engine is heating (gaadi garam)
+      effects:
+      - fault: F11-EB-03
+        effect: supports
+        strength: strong
+      - fault: F11-EB-04
+        effect: supports
+        strength: strong
+      - fault: F11-EB-17
+        effect: supports
+        strength: strong
+      - fault: F11-EB-20
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Brake is making noise
+      effects: []
+      safety_trigger: false
+    - label: Brake pedal feels soft
+      effects: []
+      safety_trigger: false
+    - label: Brake is not working properly (brake kam)
+      effects: []
+      safety_trigger: false
+    - label: Brake fluid is leaking (brake oil leak)
+      effects: []
+      safety_trigger: false
+    - label: Brake is not working at all (brake fail)
+      effects: []
+      safety_trigger: false
+    - label: Other problem
+      effects:
+      - fault: F11-EB-02
+        effect: supports
+        strength: strong
+      - fault: F11-EB-13
+        effect: supports
+        strength: strong
+      - fault: F11-EB-17
+        effect: supports
+        strength: strong
+      - fault: F11-EB-21
+        effect: supports
+        strength: strong
+      - fault: F11-EB-22
+        effect: supports
+        strength: strong
+      - fault: F11-EB-23
+        effect: supports
+        strength: strong
+      - fault: F11-EB-24
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q01:
+    id: engine_belt-q01
+    status: approved
+    stage: 3
+    text: Is the temperature needle rising, or do you see steam?
+    source_faults:
+    - F11-EB-01
+    - F11-EB-03
+    - F11-EB-04
+    - F11-EB-12
+    - F11-EB-17
+    - F11-EB-20
+    merged_from:
+    - 'F11-EB-20 (stages_text): Is the temperature gauge high? Is there steam?'
+    - 'F11-EB-03 (stages_text): Is the temperature gauge going up?'
+    - 'F11-EB-17 (stages_text): Is the temperature rising?'
+    - 'F11-EB-01 (stages_text): Is the engine temperature rising?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-20
+        effect: supports
+        strength: strong
+      - fault: F11-EB-03
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-17
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-04
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-12
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F11-EB-20
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q02:
+    id: engine_belt-q02
+    status: approved
+    stage: 3
+    text: Is there a burning rubber smell or smoke from the front of the engine?
+    source_faults:
+    - F11-EB-01
+    - F11-EB-04
+    - F11-EB-07
+    - F11-EB-10
+    - F11-EB-15
+    - F11-EB-16
+    merged_from:
+    - 'F11-EB-04 (stages_text): Is there a burning smell or smoke?'
+    - 'F11-EB-15 (stages_text): Is there a burning smell?'
+    - 'F11-EB-10 (stages_text): Any burning smell?'
+    - 'F11-EB-01 (stages_text): Is there a burning rubber smell?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-04
+        effect: supports
+        strength: strong
+      - fault: F11-EB-15
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-10
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-16
+        effect: supports
+        strength: weak
+      - fault: F11-EB-07
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F11-EB-04
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q03:
+    id: engine_belt-q03
+    status: approved
+    stage: 3
+    text: With the engine switched off, can you see that the belt is broken or missing?
+    source_faults:
+    - F11-EB-01
+    - F11-EB-03
+    - F11-EB-04
+    - F11-EB-12
+    - F11-EB-19
+    - F11-EB-20
+    - F11-EB-21
+    merged_from:
+    - 'F11-EB-03 (stages_text): Can you see the belt is missing (engine OFF)?'
+    - 'F11-EB-01 (stages_text): Can you see a broken belt with the engine switched off?'
+    options:
+    - label: Yes, the belt is missing or broken
+      effects:
+      - fault: F11-EB-03
+        effect: supports
+        strength: strong
+      - fault: F11-EB-20
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-21
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-19
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Belt pieces are wrapped around the pulleys
+      effects:
+      - fault: F11-EB-04
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: The belt has come off the pulley
+      effects:
+      - fault: F11-EB-12
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: No, the belt is there
+      effects:
+      - fault: F11-EB-03
+        effect: rules_out
+        strength: strong
+      - fault: F11-EB-04
+        effect: rules_out
+        strength: moderate
+      - fault: F11-EB-20
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q04:
+    id: engine_belt-q04
+    status: approved
+    stage: 3
+    text: Is the red battery light on or flickering?
+    source_faults:
+    - F11-EB-01
+    - F11-EB-03
+    - F11-EB-08
+    - F11-EB-11
+    - F11-EB-15
+    - F11-EB-18
+    - F11-EB-20
+    merged_from:
+    - 'F11-EB-03 (stages_text): Is the red battery light ON?'
+    - 'F11-EB-18 (stages_text): Is the battery light ON or flickering?'
+    - 'F11-EB-11 (stages_text): Is the battery light flickering?'
+    - 'F11-EB-15 (stages_text): Is battery light ON?'
+    options:
+    - label: On all the time
+      effects:
+      - fault: F11-EB-03
+        effect: supports
+        strength: strong
+      - fault: F11-EB-15
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-20
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-18
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Flickering
+      effects:
+      - fault: F11-EB-18
+        effect: supports
+        strength: strong
+      - fault: F11-EB-11
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-01
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-08
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-18
+        effect: rules_out
+        strength: moderate
+      - fault: F11-EB-03
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q05:
+    id: engine_belt-q05
+    status: approved
+    stage: 3
+    text: Did the steering become very heavy suddenly?
+    source_faults:
+    - F11-EB-03
+    - F11-EB-21
+    merged_from:
+    - 'F11-EB-21 (stages_text): Did the steering become heavy suddenly?'
+    - 'F11-EB-03 (symptoms): Heavy steering (hydraulic cars)'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-21
+        effect: supports
+        strength: strong
+      - fault: F11-EB-03
+        effect: supports
+        strength: weak
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F11-EB-21
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q06:
+    id: engine_belt-q06
+    status: approved
+    stage: 3
+    text: When do you hear the noise?
+    source_faults:
+    - F11-EB-01
+    - F11-EB-02
+    - F11-EB-05
+    - F11-EB-06
+    - F11-EB-07
+    - F11-EB-09
+    - F11-EB-10
+    - F11-EB-15
+    - F11-EB-16
+    - F11-EB-26
+    merged_from:
+    - 'F11-EB-01 (stages_text): Does the sound come at start, with AC, or when accelerating?'
+    - 'F11-EB-05 (stages_text): Does it squeal at idle or only when accelerating?'
+    - 'F11-EB-06 (stages_text): How long does the noise last after start?'
+    - 'F11-EB-10 (stages_text): Is the noise all the time?'
+    options:
+    - label: For a few seconds after a cold start
+      effects:
+      - fault: F11-EB-06
+        effect: supports
+        strength: strong
+      - fault: F11-EB-26
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Only when accelerating hard
+      effects:
+      - fault: F11-EB-05
+        effect: supports
+        strength: strong
+      - fault: F11-EB-01
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Only with the AC on
+      effects:
+      - fault: F11-EB-07
+        effect: supports
+        strength: strong
+      - fault: F11-EB-16
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: All the time
+      effects:
+      - fault: F11-EB-10
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-09
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-15
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No noise
+      effects:
+      - fault: F11-EB-01
+        effect: rules_out
+        strength: moderate
+      - fault: F11-EB-05
+        effect: rules_out
+        strength: moderate
+      - fault: F11-EB-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q07:
+    id: engine_belt-q07
+    status: approved
+    stage: 3
+    text: Does the noise stop when you switch the AC off?
+    source_faults:
+    - F11-EB-07
+    - F11-EB-16
+    merged_from:
+    - 'F11-EB-07 (stages_text): Does the noise stop when AC is OFF?'
+    - 'F11-EB-16 (stages_text): Does the noise stop when AC is OFF?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-07
+        effect: supports
+        strength: strong
+      - fault: F11-EB-16
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-16
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-07
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q08:
+    id: engine_belt-q08
+    status: approved
+    stage: 3
+    text: What kind of noise is it?
+    source_faults:
+    - F11-EB-01
+    - F11-EB-05
+    - F11-EB-06
+    - F11-EB-08
+    - F11-EB-09
+    - F11-EB-10
+    - F11-EB-11
+    - F11-EB-15
+    - F11-EB-16
+    - F11-EB-18
+    - F11-EB-23
+    merged_from:
+    - 'F11-EB-08 (stages_text): Is it a squeal or a hum?'
+    - 'F11-EB-09 (stages_text): Is there rattling?'
+    - 'F11-EB-10 (symptoms): Whine or rumble constant'
+    - 'F11-EB-15 (symptoms): Growl from alternator'
+    - 'F11-EB-16 (symptoms): Grinding from AC compressor'
+    options:
+    - label: A sharp squeal
+      effects:
+      - fault: F11-EB-01
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-05
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-06
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-18
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: A whine, hum or rumble
+      effects:
+      - fault: F11-EB-10
+        effect: supports
+        strength: strong
+      - fault: F11-EB-08
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-23
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: A rattle or ticking
+      effects:
+      - fault: F11-EB-09
+        effect: supports
+        strength: strong
+      - fault: F11-EB-11
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: A growl or grinding
+      effects:
+      - fault: F11-EB-15
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-16
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q09:
+    id: engine_belt-q09
+    status: approved
+    stage: 3
+    text: With the engine idling, does the belt or the tensioner arm shake or jump?
+    source_faults:
+    - F11-EB-09
+    - F11-EB-11
+    merged_from:
+    - 'F11-EB-09 (stages_text): Does the belt or tensioner shake at idle?'
+    - 'F11-EB-11 (stages_text): Does the belt shake at idle?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-09
+        effect: supports
+        strength: strong
+      - fault: F11-EB-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-09
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q10:
+    id: engine_belt-q10
+    status: approved
+    stage: 3
+    text: With the engine off, can you see cracks, loose threads, or a shiny hard surface on the belt?
+    source_faults:
+    - F11-EB-01
+    - F11-EB-02
+    - F11-EB-05
+    - F11-EB-06
+    - F11-EB-13
+    - F11-EB-26
+    merged_from:
+    - 'F11-EB-02 (stages_text): Can you see cracks or loose threads on the belt (engine OFF)?'
+    - 'F11-EB-26 (stages_text): Any cracks on the belt?'
+    - 'F11-EB-01 (symptoms): Shiny / glazed belt surface'
+    options:
+    - label: Cracks or loose threads
+      effects:
+      - fault: F11-EB-02
+        effect: supports
+        strength: strong
+      - fault: F11-EB-26
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Shiny and hard
+      effects:
+      - fault: F11-EB-01
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-05
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-06
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Wet with oil or coolant
+      effects:
+      - fault: F11-EB-13
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It looks fine
+      effects:
+      - fault: F11-EB-02
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q11:
+    id: engine_belt-q11
+    status: approved
+    stage: 3
+    text: Was the belt changed recently? Where?
+    source_faults:
+    - F11-EB-01
+    - F11-EB-08
+    - F11-EB-14
+    - F11-EB-27
+    merged_from:
+    - 'F11-EB-08 (stages_text): Was the belt changed recently?'
+    - 'F11-EB-14 (stages_text): Was the belt changed recently? Where was it fitted?'
+    - 'F11-EB-27 (stages_text): Where and when was the belt changed?'
+    - 'F11-EB-01 (stages_text): Was the belt recently changed?'
+    options:
+    - label: Yes, at a roadside or local shop, and the noise started soon after
+      effects:
+      - fault: F11-EB-27
+        effect: supports
+        strength: strong
+      - fault: F11-EB-14
+        effect: supports
+        strength: moderate
+      - fault: F11-EB-08
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Yes, at a workshop, and the noise started soon after
+      effects:
+      - fault: F11-EB-08
+        effect: supports
+        strength: strong
+      - fault: F11-EB-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-08
+        effect: rules_out
+        strength: moderate
+      - fault: F11-EB-14
+        effect: rules_out
+        strength: moderate
+      - fault: F11-EB-27
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q12:
+    id: engine_belt-q12
+    status: approved
+    stage: 3
+    text: Has the belt broken or come off more than once?
+    source_faults:
+    - F11-EB-12
+    - F11-EB-19
+    merged_from:
+    - 'F11-EB-19 (stages_text): How many times has it broken?'
+    - 'F11-EB-12 (stages_text): Does the belt come off again and again?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-19
+        effect: supports
+        strength: strong
+      - fault: F11-EB-12
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-19
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q13:
+    id: engine_belt-q13
+    status: approved
+    stage: 3
+    text: Are the engine oil or coolant levels dropping?
+    source_faults:
+    - F11-EB-13
+    - F11-EB-17
+    merged_from:
+    - 'F11-EB-13 (stages_text): Are levels dropping?'
+    - 'F11-EB-17 (stages_text): Is coolant level dropping?'
+    options:
+    - label: Coolant is dropping, with a leak at the front of the engine
+      effects:
+      - fault: F11-EB-17
+        effect: supports
+        strength: strong
+      - fault: F11-EB-13
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: Oil is dropping
+      effects:
+      - fault: F11-EB-13
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-17
+        effect: rules_out
+        strength: moderate
+      - fault: F11-EB-13
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q14:
+    id: engine_belt-q14
+    status: approved
+    stage: 3
+    text: Did the noise start after driving through water or heavy rain?
+    source_faults:
+    - F11-EB-02
+    - F11-EB-25
+    merged_from:
+    - 'F11-EB-25 (stages_text): Did you drive through water?'
+    - 'F11-EB-25 (stages_text): Does the noise stop after drying?'
+    options:
+    - label: Yes, and it stops when things dry
+      effects:
+      - fault: F11-EB-25
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Yes, and it continues
+      effects:
+      - fault: F11-EB-25
+        effect: supports
+        strength: weak
+      - fault: F11-EB-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-25
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q15:
+    id: engine_belt-q15
+    status: approved
+    stage: 3
+    text: Was the car parked unused for months before this started?
+    source_faults:
+    - F11-EB-26
+    merged_from:
+    - 'F11-EB-26 (stages_text): How long was the car parked?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-26
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-26
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q16:
+    id: engine_belt-q16
+    status: approved
+    stage: 3
+    text: Did the engine stop suddenly while driving, and now the starter sounds faster than normal?
+    source_faults:
+    - F11-EB-24
+    merged_from:
+    - 'F11-EB-24 (stages_text): Did the engine stop suddenly while driving?'
+    - 'F11-EB-24 (stages_text): Does the starter sound faster than normal?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-24
+        effect: supports
+        strength: strong
+      safety_trigger: true
+    - label: 'No'
+      effects:
+      - fault: F11-EB-24
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q17:
+    id: engine_belt-q17
+    status: approved
+    stage: 3
+    text: Is there a whine from the side of the engine (timing cover), or is the engine running rough?
+    source_faults:
+    - F11-EB-23
+    merged_from:
+    - 'F11-EB-23 (stages_text): Is the noise from the side of the engine (timing cover)?'
+    - 'F11-EB-23 (stages_text): Engine running rough?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-23
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F11-EB-23
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q18:
+    id: engine_belt-q18
+    status: approved
+    stage: 3
+    text: Do you know when the timing belt was last changed?
+    source_faults:
+    - F11-EB-22
+    merged_from:
+    - 'F11-EB-22 (stages_text): Do you know when the timing belt was last changed?'
+    - 'F11-EB-22 (stages_text): How many km has the car done?'
+    options:
+    - label: Not known, or it is overdue
+      effects:
+      - fault: F11-EB-22
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Changed on schedule
+      effects:
+      - fault: F11-EB-22
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question engine_belt-q19:
+    id: engine_belt-q19
+    status: approved
+    stage: 3
+    text: Did the problem start after an accident?
+    source_faults:
+    - F11-EB-12
+    merged_from:
+    - 'F11-EB-12 (stages_text): Any accident recently?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F11-EB-12
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F11-EB-01:
+    status: approved
+    name: Belt Squeal / Looseness
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Battery warning light is on
+    confirmation_test: Visual check, tension check and pulley spin test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-02:
+    status: approved
+    name: Belt Worn / Fraying / Cracking
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Other problem
+    confirmation_test: Visual inspection of belt and pulleys.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-03:
+    status: approved
+    name: Belt Broken - Alternator Not Charging
+    stage2_choices:
+    - Belt is broken (belt toot gayi)
+    - Battery warning light is on
+    - Engine is heating (gaadi garam)
+    confirmation_test: Engine-off look and spin each pulley.
+    danger_phrases:
+    - temperature rising
+    safety_trigger_options:
+    - question: engine_belt-q01
+      option: 'Yes'
+    - question: engine_belt-q05
+      option: 'Yes'
+  fault F11-EB-04:
+    status: approved
+    name: Belt Failure with Secondary Damage Risk
+    stage2_choices:
+    - Belt is broken (belt toot gayi)
+    - Engine is heating (gaadi garam)
+    confirmation_test: Full pulley spin test and timing cover check.
+    danger_phrases:
+    - burning smell
+    - smoke
+    safety_trigger_options:
+    - question: engine_belt-q01
+      option: 'Yes'
+    - question: engine_belt-q02
+      option: 'Yes'
+    - question: engine_belt-q03
+      option: Belt pieces are wrapped around the pulleys
+  fault F11-EB-05:
+    status: approved
+    name: Belt Slipping During Acceleration
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Tension check and belt condition.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-06:
+    status: approved
+    name: Belt Noise During Cold Start
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Belt and tension check.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-07:
+    status: approved
+    name: Belt Noise When AC Is Switched On
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Belt check, AC pulley spin and AC clutch check.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: engine_belt-q02
+      option: 'Yes'
+  fault F11-EB-08:
+    status: approved
+    name: Incorrect Belt Tension
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Battery warning light is on
+    confirmation_test: Belt tension measurement.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-09:
+    status: approved
+    name: Automatic Belt Tensioner Failure
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Tensioner arm and bearing test with the belt off.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-10:
+    status: approved
+    name: Idler Pulley Bearing Noise / Failure
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Belt-off spin test of the idler pulley.
+    danger_phrases:
+    - burning smell
+    safety_trigger_options:
+    - question: engine_belt-q02
+      option: 'Yes'
+  fault F11-EB-11:
+    status: approved
+    name: Alternator Pulley / Overrunning Pulley Fault
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Battery warning light is on
+    confirmation_test: Alternator pulley freewheel test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-12:
+    status: approved
+    name: Belt Misalignment / Running Off Pulley
+    stage2_choices:
+    - Belt is broken (belt toot gayi)
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Pulley alignment check.
+    danger_phrases:
+    - engine overheats
+    safety_trigger_options:
+    - question: engine_belt-q01
+      option: 'Yes'
+  fault F11-EB-13:
+    status: approved
+    name: Belt Contaminated by Engine Oil / Coolant
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Other problem
+    confirmation_test: Clean the belt and watch for the leak.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-14:
+    status: approved
+    name: Wrong Belt Size / Incorrect Belt Installation
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Battery warning light is on
+    confirmation_test: Belt part number and routing check.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-15:
+    status: approved
+    name: Alternator Bearing Seized / Belt Damage
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Battery warning light is on
+    confirmation_test: Belt-off spin and alternator bench test.
+    danger_phrases:
+    - burning smell
+    - smoke
+    safety_trigger_options:
+    - question: engine_belt-q02
+      option: 'Yes'
+  fault F11-EB-16:
+    status: approved
+    name: AC Compressor Pulley / Bearing Seizure
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Belt is broken (belt toot gayi)
+    confirmation_test: AC pulley spin and compressor turn test.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: engine_belt-q02
+      option: 'Yes'
+  fault F11-EB-17:
+    status: approved
+    name: Belt-Driven Water Pump Fault
+    stage2_choices:
+    - Engine is heating (gaadi garam)
+    - Other problem
+    confirmation_test: Cooling pressure test and water pump play check.
+    danger_phrases:
+    - overheating
+    safety_trigger_options:
+    - question: engine_belt-q01
+      option: 'Yes'
+  fault F11-EB-18:
+    status: approved
+    name: Battery Warning Light Due to Belt Slip
+    stage2_choices:
+    - Battery warning light is on
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Charging test before and after fixing the belt tension.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-19:
+    status: approved
+    name: Repeated Belt Breakage
+    stage2_choices:
+    - Belt is broken (belt toot gayi)
+    confirmation_test: Full belt system inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-20:
+    status: approved
+    name: Belt Failure with Overheating
+    stage2_choices:
+    - Belt is broken (belt toot gayi)
+    - Engine is heating (gaadi garam)
+    - Battery warning light is on
+    confirmation_test: Inspection and cooling pressure test.
+    danger_phrases:
+    - temperature high
+    - steam
+    safety_trigger_options:
+    - question: engine_belt-q01
+      option: 'Yes'
+  fault F11-EB-21:
+    status: approved
+    name: Belt Failure with Loss of Hydraulic Power Steering
+    stage2_choices:
+    - Belt is broken (belt toot gayi)
+    - Other problem
+    confirmation_test: Belt, steering pump and fluid check.
+    danger_phrases:
+    - very heavy steering
+    safety_trigger_options:
+    - question: engine_belt-q05
+      option: 'Yes'
+  fault F11-EB-22:
+    status: approved
+    name: Timing Belt Wear / Replacement Due
+    stage2_choices:
+    - Other problem
+    confirmation_test: Service record and timing belt inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-23:
+    status: approved
+    name: Timing Belt Tensioner / Idler Failure
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    - Other problem
+    confirmation_test: Timing cover-off inspection.
+    danger_phrases:
+    - engine runs rough
+    safety_trigger_options: []
+  fault F11-EB-24:
+    status: approved
+    name: Timing Belt Jumped / Broken - Engine Damage Risk
+    stage2_choices:
+    - Belt is broken (belt toot gayi)
+    - Other problem
+    confirmation_test: Timing cover-off check and compression test.
+    danger_phrases:
+    - engine stopped suddenly
+    safety_trigger_options:
+    - question: engine_belt-q16
+      option: 'Yes'
+  fault F11-EB-25:
+    status: approved
+    name: Belt Squeal After Driving Through Water / Monsoon  [NEW - India]
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Inspect and recheck after drying.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-26:
+    status: approved
+    name: Belt Cracked After Long Parking (Car Not Used for Months)  [NEW - India]
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Visual check and pulley spin test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F11-EB-27:
+    status: approved
+    name: Belt Noise After Local / Roadside Belt Change (Cheap or Over-Tight Belt)  [NEW - India]
+    stage2_choices:
+    - Belt is making noise (belt se awaaz)
+    confirmation_test: Belt part number and tension check.
+    danger_phrases: []
+    safety_trigger_options: []
+  safety_rule engine_belt-s-F11-EB-01:
+    id: engine_belt-s-F11-EB-01
+    status: approved
+    fault: F11-EB-01
+    risk_level: low
+    stop_driving_trigger: Stop if the belt breaks or the battery / temperature light comes on.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. The car can usually
+      be driven to a garage. Stop if the battery or temperature light comes on.
+    towing_recommendation: No, unless the belt breaks or the battery / temperature light comes on.
+    source_text:
+      safety_precautions: '• Engine OFF and key removed before touching belt.
+
+        • Keep hands, hair, clothes away from a running belt.
+
+        • Hot engine - let it cool.'
+      if_towing_needed: NO - unless the belt breaks or battery / temperature light comes ON.
+  safety_rule engine_belt-s-F11-EB-02:
+    id: engine_belt-s-F11-EB-02
+    status: approved
+    fault: F11-EB-02
+    risk_level: low
+    stop_driving_trigger: Stop if the belt breaks.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. Avoid long trips until
+      the belt is changed.
+    towing_recommendation: No, unless broken.
+    source_text:
+      safety_precautions: '• Engine OFF before inspection.
+
+        • Use proper tensioner tool - spring can snap back.'
+      if_towing_needed: NO - unless broken.
+  safety_rule engine_belt-s-F11-EB-03:
+    id: engine_belt-s-F11-EB-03
+    status: approved
+    fault: F11-EB-03
+    risk_level: medium
+    stop_driving_trigger: Stop if the temperature rises or the battery light is on.
+    roadside_action: Stop in a safe place and switch off the engine. Do not open the radiator cap while hot. Call
+      a mechanic; tow if the engine overheated.
+    towing_recommendation: Yes, if the engine overheated, a pulley is seized, or no belt is available.
+    source_text:
+      safety_precautions: '• Engine OFF before touching.
+
+        • Never open hot radiator cap.
+
+        • Battery may be weak - jump only by trained mechanic.'
+      if_towing_needed: YES if engine overheated, a pulley is seized, or no belt is available.
+  safety_rule engine_belt-s-F11-EB-04:
+    id: engine_belt-s-F11-EB-04
+    status: approved
+    fault: F11-EB-04
+    risk_level: high
+    stop_driving_trigger: 'Do not restart: broken belt with damage risk.'
+    roadside_action: Switch off the engine and do not restart it. Call for a tow.
+    towing_recommendation: Yes.
+    source_text:
+      safety_precautions: '• Never restart with belt pieces inside.
+
+        • Hot parts - wait to cool.'
+      if_towing_needed: YES.
+  safety_rule engine_belt-s-F11-EB-05:
+    id: engine_belt-s-F11-EB-05
+    status: approved
+    fault: F11-EB-05
+    risk_level: low
+    stop_driving_trigger: Stop if the battery or temperature light comes on.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. The car can usually
+      be driven to a garage. Stop if the battery or temperature light comes on.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Engine OFF during checks.
+      if_towing_needed: NO.
+  safety_rule engine_belt-s-F11-EB-06:
+    id: engine_belt-s-F11-EB-06
+    status: approved
+    fault: F11-EB-06
+    risk_level: low
+    stop_driving_trigger: Stop if the battery or temperature light comes on.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. The car can usually
+      be driven to a garage. Stop if the battery or temperature light comes on.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Engine OFF.
+      if_towing_needed: NO.
+  safety_rule engine_belt-s-F11-EB-07:
+    id: engine_belt-s-F11-EB-07
+    status: approved
+    fault: F11-EB-07
+    risk_level: low
+    stop_driving_trigger: Stop if the battery or temperature light comes on.
+    roadside_action: Keep the AC off until it is checked. Switch off the engine and never touch the belt or pulleys
+      while it runs.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Do not open AC gas pipes - high pressure gas.
+      if_towing_needed: NO.
+  safety_rule engine_belt-s-F11-EB-08:
+    id: engine_belt-s-F11-EB-08
+    status: approved
+    fault: F11-EB-08
+    risk_level: low
+    stop_driving_trigger: Stop if the battery or temperature light comes on.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. The car can usually
+      be driven to a garage. Stop if the battery or temperature light comes on.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Engine OFF while adjusting.
+      if_towing_needed: NO.
+  safety_rule engine_belt-s-F11-EB-09:
+    id: engine_belt-s-F11-EB-09
+    status: approved
+    fault: F11-EB-09
+    risk_level: low
+    stop_driving_trigger: Stop if the belt comes off.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. The car can usually
+      be driven to a garage. Stop if the battery or temperature light comes on.
+    towing_recommendation: No, unless the belt came off.
+    source_text:
+      safety_precautions: • Tensioner spring is strong - use correct tool.
+      if_towing_needed: NO - unless belt came off.
+  safety_rule engine_belt-s-F11-EB-10:
+    id: engine_belt-s-F11-EB-10
+    status: approved
+    fault: F11-EB-10
+    risk_level: medium
+    stop_driving_trigger: Stop if there is a burning smell (pulley seized).
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. If there is a burning
+      smell, stop and call a mechanic.
+    towing_recommendation: No, unless seized.
+    source_text:
+      safety_precautions: • Engine OFF.
+      if_towing_needed: NO - unless seized.
+  safety_rule engine_belt-s-F11-EB-11:
+    id: engine_belt-s-F11-EB-11
+    status: approved
+    fault: F11-EB-11
+    risk_level: low
+    stop_driving_trigger: Stop if the battery light stays on.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. The car can usually
+      be driven to a garage. Stop if the battery or temperature light comes on.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Disconnect battery before alternator work.
+      if_towing_needed: NO.
+  safety_rule engine_belt-s-F11-EB-12:
+    id: engine_belt-s-F11-EB-12
+    status: approved
+    fault: F11-EB-12
+    risk_level: medium
+    stop_driving_trigger: Stop if the belt came off and the engine overheats.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. Do not just put the
+      belt back on. If the temperature rises, call for a tow.
+    towing_recommendation: Yes, if the belt came off and the engine overheats.
+    source_text:
+      safety_precautions: • Engine OFF.
+      if_towing_needed: YES if belt came off and engine overheats.
+  safety_rule engine_belt-s-F11-EB-13:
+    id: engine_belt-s-F11-EB-13
+    status: approved
+    fault: F11-EB-13
+    risk_level: low
+    stop_driving_trigger: Stop if the oil or coolant level is very low.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. Check the oil and
+      coolant levels when the engine is cool. Get the leak checked.
+    towing_recommendation: No, unless oil or coolant is very low.
+    source_text:
+      safety_precautions: '• Hot coolant - let cool.
+
+        • Clean spills (fire risk on hot parts).'
+      if_towing_needed: NO - unless oil or coolant is very low.
+  safety_rule engine_belt-s-F11-EB-14:
+    id: engine_belt-s-F11-EB-14
+    status: approved
+    fault: F11-EB-14
+    risk_level: low
+    stop_driving_trigger: Stop if the battery or temperature light comes on.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. The car can usually
+      be driven to a garage. Stop if the battery or temperature light comes on.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Engine OFF.
+      if_towing_needed: NO.
+  safety_rule engine_belt-s-F11-EB-15:
+    id: engine_belt-s-F11-EB-15
+    status: approved
+    fault: F11-EB-15
+    risk_level: medium
+    stop_driving_trigger: Stop if the belt is burning or the battery is very low.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. Do not touch the hot
+      alternator. If the belt is burnt, call for a tow.
+    towing_recommendation: Yes, if the belt is burnt or the battery is very low.
+    source_text:
+      safety_precautions: '• Disconnect battery first.
+
+        • Hot alternator - let cool.'
+      if_towing_needed: YES if belt burnt / battery very low.
+  safety_rule engine_belt-s-F11-EB-16:
+    id: engine_belt-s-F11-EB-16
+    status: approved
+    fault: F11-EB-16
+    risk_level: low
+    stop_driving_trigger: Stop if the main belt broke and the engine overheats.
+    roadside_action: Keep the AC off. If the main belt is damaged, call a mechanic or a tow.
+    towing_recommendation: No, unless the main belt broke and the engine overheats.
+    source_text:
+      safety_precautions: • AC gas only with recovery machine.
+      if_towing_needed: NO - unless main belt broke and engine overheats.
+  safety_rule engine_belt-s-F11-EB-17:
+    id: engine_belt-s-F11-EB-17
+    status: approved
+    fault: F11-EB-17
+    risk_level: medium
+    stop_driving_trigger: Do not drive if the engine is overheating.
+    roadside_action: Do not drive if the engine is overheating. Do not open the radiator cap while hot. Call a mechanic.
+    towing_recommendation: Yes, if overheating.
+    source_text:
+      safety_precautions: • Hot coolant burns.
+      if_towing_needed: YES if overheating.
+  safety_rule engine_belt-s-F11-EB-18:
+    id: engine_belt-s-F11-EB-18
+    status: approved
+    fault: F11-EB-18
+    risk_level: low
+    stop_driving_trigger: Stop if the battery goes flat.
+    roadside_action: Switch off the AC and extra lights, and drive to a garage. Do not touch the belt.
+    towing_recommendation: Depends (if the battery is flat).
+    source_text:
+      safety_precautions: • Engine OFF while working on belt.
+      if_towing_needed: Depends - if battery is flat.
+  safety_rule engine_belt-s-F11-EB-19:
+    id: engine_belt-s-F11-EB-19
+    status: approved
+    fault: F11-EB-19
+    risk_level: medium
+    stop_driving_trigger: Stop if the belt breaks again.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. Fit a new belt only
+      to reach a garage, if it is safe.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Engine OFF.
+      if_towing_needed: Depends.
+  safety_rule engine_belt-s-F11-EB-20:
+    id: engine_belt-s-F11-EB-20
+    status: approved
+    fault: F11-EB-20
+    risk_level: high
+    stop_driving_trigger: 'Do not drive: belt failure with overheating.'
+    roadside_action: Switch off the engine. Keep away from steam and do not open the radiator cap. Call for a tow.
+    towing_recommendation: Yes.
+    source_text:
+      safety_precautions: • Hot coolant can burn badly.
+      if_towing_needed: YES.
+  safety_rule engine_belt-s-F11-EB-21:
+    id: engine_belt-s-F11-EB-21
+    status: approved
+    fault: F11-EB-21
+    risk_level: medium
+    stop_driving_trigger: Do not drive with very heavy steering.
+    roadside_action: Stop in a safe place. Do not drive with very heavy steering. Call a mechanic.
+    towing_recommendation: Depends.
+    source_text:
+      safety_precautions: • Engine OFF while fitting belt.
+      if_towing_needed: Depends.
+  safety_rule engine_belt-s-F11-EB-22:
+    id: engine_belt-s-F11-EB-22
+    status: approved
+    fault: F11-EB-22
+    risk_level: low
+    stop_driving_trigger: Not stated
+    roadside_action: Book a timing belt change as a planned job.
+    towing_recommendation: No (planned job).
+    source_text:
+      safety_precautions: '• Wrong timing = engine damage.
+
+        • Never crank engine with timing marks unchecked.'
+      if_towing_needed: NO (planned job).
+  safety_rule engine_belt-s-F11-EB-23:
+    id: engine_belt-s-F11-EB-23
+    status: approved
+    fault: F11-EB-23
+    risk_level: medium
+    stop_driving_trigger: Stop if the engine runs rough.
+    roadside_action: If the engine runs rough, stop and call for a tow. Otherwise go to a garage soon.
+    towing_recommendation: Depends (tow if the engine runs rough).
+    source_text:
+      safety_precautions: • Correct timing marks essential.
+      if_towing_needed: Depends - tow if engine runs rough.
+  safety_rule engine_belt-s-F11-EB-24:
+    id: engine_belt-s-F11-EB-24
+    status: approved
+    fault: F11-EB-24
+    risk_level: high
+    stop_driving_trigger: 'Do not crank: timing belt failure.'
+    roadside_action: Do not try to start the engine again. Call for a tow.
+    towing_recommendation: Yes.
+    source_text:
+      safety_precautions: • Never crank with suspected timing failure.
+      if_towing_needed: YES.
+  safety_rule engine_belt-s-F11-EB-25:
+    id: engine_belt-s-F11-EB-25
+    status: approved
+    fault: F11-EB-25
+    risk_level: low
+    stop_driving_trigger: Stop if the engine took in water.
+    roadside_action: Let the belt dry. Do not spray anything on it.
+    towing_recommendation: No, unless the engine took in water.
+    source_text:
+      safety_precautions: • Engine OFF.
+      if_towing_needed: NO - unless engine took in water.
+  safety_rule engine_belt-s-F11-EB-26:
+    id: engine_belt-s-F11-EB-26
+    status: approved
+    fault: F11-EB-26
+    risk_level: low
+    stop_driving_trigger: Stop if the belt breaks.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. Get the belt checked
+      before long trips.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Engine OFF.
+      if_towing_needed: NO.
+  safety_rule engine_belt-s-F11-EB-27:
+    id: engine_belt-s-F11-EB-27
+    status: approved
+    fault: F11-EB-27
+    risk_level: low
+    stop_driving_trigger: Stop if the battery or temperature light comes on.
+    roadside_action: Switch off the engine and never touch the belt or pulleys while it runs. The car can usually
+      be driven to a garage. Stop if the battery or temperature light comes on.
+    towing_recommendation: No.
+    source_text:
+      safety_precautions: • Engine OFF.
+      if_towing_needed: NO.

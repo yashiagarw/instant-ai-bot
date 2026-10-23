@@ -1,0 +1,1695 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category sensor_ecu
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: sensor_ecu
+category_name: Sensor / ECU / reset
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:45:13+00:00'
+  run_id: claude-code-sensor_ecu
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: sensor_ecu-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Car giving jerks
+    effects:
+    - fault: F15-SE-07
+      effect: supports
+      strength: strong
+    - fault: F15-SE-09
+      effect: supports
+      strength: strong
+    - fault: F15-SE-10
+      effect: supports
+      strength: strong
+    - fault: F15-SE-24
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine shaking
+    effects: []
+    safety_trigger: false
+  - label: Car stopping again and again
+    effects:
+    - fault: F15-SE-06
+      effect: supports
+      strength: strong
+    - fault: F15-SE-10
+      effect: supports
+      strength: strong
+    - fault: F15-SE-17
+      effect: supports
+      strength: strong
+    - fault: F15-SE-22
+      effect: supports
+      strength: strong
+    - fault: F15-SE-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Engine light on
+    effects:
+    - fault: F15-SE-01
+      effect: supports
+      strength: strong
+    - fault: F15-SE-02
+      effect: supports
+      strength: strong
+    - fault: F15-SE-03
+      effect: supports
+      strength: strong
+    - fault: F15-SE-05
+      effect: supports
+      strength: strong
+    - fault: F15-SE-12
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Sensor warning
+    effects:
+    - fault: F15-SE-01
+      effect: supports
+      strength: strong
+    - fault: F15-SE-02
+      effect: supports
+      strength: strong
+    - fault: F15-SE-05
+      effect: supports
+      strength: strong
+    - fault: F15-SE-08
+      effect: supports
+      strength: strong
+    - fault: F15-SE-09
+      effect: supports
+      strength: strong
+    - fault: F15-SE-12
+      effect: supports
+      strength: strong
+    - fault: F15-SE-13
+      effect: supports
+      strength: strong
+    - fault: F15-SE-14
+      effect: supports
+      strength: strong
+    - fault: F15-SE-16
+      effect: supports
+      strength: strong
+    - fault: F15-SE-18
+      effect: supports
+      strength: strong
+    - fault: F15-SE-19
+      effect: supports
+      strength: strong
+    - fault: F15-SE-20
+      effect: supports
+      strength: strong
+    - fault: F15-SE-24
+      effect: supports
+      strength: strong
+    - fault: F15-SE-26
+      effect: supports
+      strength: strong
+    - fault: F15-SE-27
+      effect: supports
+      strength: strong
+    - fault: F15-SE-28
+      effect: supports
+      strength: strong
+    - fault: F15-SE-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Car not starting
+    effects:
+    - fault: F15-SE-04
+      effect: supports
+      strength: strong
+    - fault: F15-SE-06
+      effect: supports
+      strength: strong
+    - fault: F15-SE-07
+      effect: supports
+      strength: strong
+    - fault: F15-SE-15
+      effect: supports
+      strength: strong
+    - fault: F15-SE-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Car needs computer scan
+    effects:
+    - fault: F15-SE-03
+      effect: supports
+      strength: strong
+    - fault: F15-SE-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Mechanic said ECU problem
+    effects:
+    - fault: F15-SE-17
+      effect: supports
+      strength: strong
+    - fault: F15-SE-18
+      effect: supports
+      strength: strong
+    - fault: F15-SE-19
+      effect: supports
+      strength: strong
+    - fault: F15-SE-20
+      effect: supports
+      strength: strong
+    - fault: F15-SE-23
+      effect: supports
+      strength: strong
+    - fault: F15-SE-25
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Car has low power
+    effects:
+    - fault: F15-SE-08
+      effect: supports
+      strength: strong
+    - fault: F15-SE-11
+      effect: supports
+      strength: strong
+    - fault: F15-SE-15
+      effect: supports
+      strength: strong
+    - fault: F15-SE-16
+      effect: supports
+      strength: strong
+    - fault: F15-SE-21
+      effect: supports
+      strength: strong
+    - fault: F15-SE-30
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F15-SE-11
+      effect: supports
+      strength: strong
+    - fault: F15-SE-13
+      effect: supports
+      strength: strong
+    - fault: F15-SE-22
+      effect: supports
+      strength: strong
+    - fault: F15-SE-23
+      effect: supports
+      strength: strong
+    - fault: F15-SE-26
+      effect: supports
+      strength: strong
+    - fault: F15-SE-27
+      effect: supports
+      strength: strong
+    - fault: F15-SE-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q01
+  status: approved
+  stage: 3
+  text: Is there a red warning light, is the engine overheating, or is the accelerator pedal not responding?
+  source_faults:
+  - F15-SE-02
+  - F15-SE-10
+  - F15-SE-11
+  - F15-SE-13
+  - F15-SE-21
+  merged_from:
+  - 'F15-SE-02 (stages_text): Is the car running normally?'
+  - 'F15-SE-21 (stages_text): Is temperature normal?'
+  - 'F15-SE-11 (symptoms): No response'
+  options:
+  - label: A red warning or overheating
+    effects:
+    - fault: F15-SE-02
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-21
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-13
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: The accelerator pedal does not respond
+    effects:
+    - fault: F15-SE-11
+      effect: supports
+      strength: strong
+    - fault: F15-SE-10
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F15-SE-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q02
+  status: approved
+  stage: 3
+  text: Is the engine light on now? Is it steady or blinking?
+  source_faults:
+  - F15-SE-01
+  - F15-SE-02
+  - F15-SE-05
+  - F15-SE-12
+  merged_from:
+  - 'F15-SE-01 (stages_text): Is the light still on?'
+  - 'F15-SE-05 (stages_text): Is the light steady or blinking?'
+  options:
+  - label: Blinking
+    effects:
+    - fault: F15-SE-05
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Steady
+    effects:
+    - fault: F15-SE-05
+      effect: supports
+      strength: strong
+    - fault: F15-SE-02
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It came on and went off
+    effects:
+    - fault: F15-SE-01
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not on
+    effects:
+    - fault: F15-SE-01
+      effect: supports
+      strength: weak
+    - fault: F15-SE-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q03
+  status: approved
+  stage: 3
+  text: Apart from the warning, does the car drive normally?
+  source_faults:
+  - F15-SE-01
+  - F15-SE-02
+  - F15-SE-03
+  - F15-SE-05
+  - F15-SE-12
+  - F15-SE-14
+  merged_from:
+  - 'F15-SE-01 (stages_text): Did the car drive normally?'
+  - 'F15-SE-02 (stages_text): Is the car running normally?'
+  - 'F15-SE-03 (stages_text): Is it running normally?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-01
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-03
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-05
+      effect: supports
+      strength: weak
+    - fault: F15-SE-14
+      effect: supports
+      strength: weak
+    - fault: F15-SE-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-01
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q04
+  status: approved
+  stage: 3
+  text: Does the engine turn over (crank) normally but not start?
+  source_faults:
+  - F15-SE-01
+  - F15-SE-04
+  - F15-SE-06
+  - F15-SE-07
+  - F15-SE-15
+  - F15-SE-17
+  merged_from:
+  - 'F15-SE-04 (stages_text): Does the engine turn when you start?'
+  - 'F15-SE-01 (stages_text): Does the engine crank but not start?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-04
+      effect: supports
+      strength: strong
+    - fault: F15-SE-06
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-15
+      effect: supports
+      strength: weak
+    - fault: F15-SE-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It takes long, but starts
+    effects:
+    - fault: F15-SE-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No, it starts normally
+    effects:
+    - fault: F15-SE-04
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q05
+  status: approved
+  stage: 3
+  text: Does the engine stop by itself while driving, and restart after cooling?
+  source_faults:
+  - F15-SE-06
+  merged_from:
+  - 'F15-SE-06 (stages_text): Does it stop while driving?'
+  - 'F15-SE-06 (symptoms): Stalls and restarts after cooling'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-06
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F15-SE-06
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q06
+  status: approved
+  stage: 3
+  text: Has the car gone into low-power mode (speed or rpm limited, AC switches off)?
+  source_faults:
+  - F15-SE-08
+  - F15-SE-11
+  - F15-SE-15
+  - F15-SE-21
+  - F15-SE-30
+  merged_from:
+  - 'F15-SE-21 (stages_text): Is temperature normal?'
+  - 'F15-SE-21 (symptoms): Speed/rpm limit'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-21
+      effect: supports
+      strength: strong
+    - fault: F15-SE-08
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-11
+      effect: supports
+      strength: weak
+    - fault: F15-SE-30
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-15
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-21
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q07
+  status: approved
+  stage: 3
+  text: Has a garage scanned the car? Which part did the scan name?
+  source_faults:
+  - F15-SE-01
+  - F15-SE-06
+  - F15-SE-07
+  - F15-SE-08
+  - F15-SE-09
+  - F15-SE-10
+  - F15-SE-11
+  - F15-SE-12
+  - F15-SE-13
+  - F15-SE-14
+  - F15-SE-15
+  - F15-SE-16
+  - F15-SE-17
+  - F15-SE-18
+  - F15-SE-20
+  - F15-SE-25
+  - F15-SE-26
+  merged_from:
+  - 'F15-SE-01 (stages_text): Has the car been scanned?'
+  - 'F15-SE-01 (stages_text): Do you have the fault code?'
+  options:
+  - label: Crankshaft or camshaft sensor
+    effects:
+    - fault: F15-SE-06
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Air flow (MAF / MAP) or intake temperature sensor
+    effects:
+    - fault: F15-SE-08
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-09
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-14
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Throttle or accelerator pedal sensor
+    effects:
+    - fault: F15-SE-10
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Oxygen, knock or coolant temperature sensor
+    effects:
+    - fault: F15-SE-12
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-16
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Fuel pressure sensor
+    effects:
+    - fault: F15-SE-15
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Speed or ABS sensor
+    effects:
+    - fault: F15-SE-26
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Many codes, or no communication with the ECU
+    effects:
+    - fault: F15-SE-17
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-18
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-20
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-25
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No scan yet
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q08
+  status: approved
+  stage: 3
+  text: Are many warning lights on at once, or do the gauges drop to zero?
+  source_faults:
+  - F15-SE-01
+  - F15-SE-17
+  - F15-SE-18
+  - F15-SE-19
+  - F15-SE-20
+  merged_from:
+  - 'F15-SE-17 (stages_text): Many lights at once?'
+  - 'F15-SE-01 (stages_text): Are multiple warning lights showing?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-17
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-18
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-20
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-19
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-17
+      effect: rules_out
+      strength: weak
+    - fault: F15-SE-20
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q09
+  status: approved
+  stage: 3
+  text: Did the warning come back after an earlier reset? Do you want the light reset?
+  source_faults:
+  - F15-SE-01
+  - F15-SE-03
+  merged_from:
+  - 'F15-SE-03 (stages_text): What problem is your car showing?'
+  - 'F15-SE-01 (stages_text): Did the warning return after a reset?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-03
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q10
+  status: approved
+  stage: 3
+  text: Does the warning come mainly in rain, after a car wash or after water-logging?
+  source_faults:
+  - F15-SE-01
+  - F15-SE-19
+  - F15-SE-24
+  merged_from:
+  - 'F15-SE-24 (stages_text): Only in rain?'
+  - 'F15-SE-19 (stages_text): Water-logging recently?'
+  - 'F15-SE-01 (stages_text): Did the problem start after rain or washing?'
+  options:
+  - label: Only in rain or after a wash, and it goes when dry
+    effects:
+    - fault: F15-SE-24
+      effect: supports
+      strength: strong
+    - fault: F15-SE-19
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: The car went into deep water
+    effects:
+    - fault: F15-SE-24
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-19
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F15-SE-24
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q11
+  status: approved
+  stage: 3
+  text: Was the battery changed or disconnected recently, or the throttle cleaned?
+  source_faults:
+  - F15-SE-20
+  - F15-SE-22
+  - F15-SE-28
+  merged_from:
+  - 'F15-SE-28 (stages_text): Was the battery changed recently?'
+  - 'F15-SE-22 (stages_text): Was the throttle cleaned or battery changed?'
+  - 'F15-SE-20 (stages_text): Battery or rat issue recently?'
+  options:
+  - label: Battery changed or disconnected
+    effects:
+    - fault: F15-SE-28
+      effect: supports
+      strength: strong
+    - fault: F15-SE-22
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-20
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Throttle cleaned
+    effects:
+    - fault: F15-SE-22
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-28
+      effect: rules_out
+      strength: moderate
+    - fault: F15-SE-22
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q12
+  status: approved
+  stage: 3
+  text: Was a CNG kit or an accessory fitted recently?
+  source_faults:
+  - F15-SE-18
+  - F15-SE-27
+  merged_from:
+  - 'F15-SE-27 (stages_text): Anything fitted recently?'
+  - 'F15-SE-18 (stages_text): Any accessory fitted recently?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-27
+      effect: supports
+      strength: strong
+    - fault: F15-SE-18
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-27
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q13
+  status: approved
+  stage: 3
+  text: Have rats damaged any wiring?
+  source_faults:
+  - F15-SE-19
+  - F15-SE-20
+  merged_from:
+  - 'F15-SE-20 (stages_text): Battery or rat issue recently?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-20
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-19
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q14
+  status: approved
+  stage: 3
+  text: Was the car remapped (tuned), or is there a service centre notice for your model?
+  source_faults:
+  - F15-SE-23
+  merged_from:
+  - 'F15-SE-23 (stages_text): Was the car remapped?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-23
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-23
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q15
+  status: approved
+  stage: 3
+  text: Is the idle speed too high or too low, or does it stall at traffic signals?
+  source_faults:
+  - F15-SE-10
+  - F15-SE-22
+  - F15-SE-28
+  merged_from:
+  - 'F15-SE-10 (stages_text): Idle high or low?'
+  - 'F15-SE-22 (symptoms): Stalls at signals'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-10
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-22
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-28
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q16
+  status: approved
+  stage: 3
+  text: Is there a floor mat under the accelerator pedal?
+  source_faults:
+  - F15-SE-11
+  merged_from:
+  - 'F15-SE-11 (stages_text): Is a floor mat under the pedal?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-11
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-11
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q17
+  status: approved
+  stage: 3
+  text: Is there black smoke, or has the mileage dropped?
+  source_faults:
+  - F15-SE-08
+  - F15-SE-09
+  - F15-SE-12
+  merged_from:
+  - 'F15-SE-08 (stages_text): Black smoke?'
+  - 'F15-SE-09 (stages_text): Mileage dropped?'
+  options:
+  - label: Black smoke
+    effects:
+    - fault: F15-SE-08
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-09
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Mileage dropped
+    effects:
+    - fault: F15-SE-09
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-12
+      effect: supports
+      strength: moderate
+    - fault: F15-SE-08
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q18
+  status: approved
+  stage: 3
+  text: Do you hear a pinging sound when climbing or with a full car?
+  source_faults:
+  - F15-SE-16
+  merged_from:
+  - 'F15-SE-16 (stages_text): Pinging sound on climbs?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-16
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q19
+  status: approved
+  stage: 3
+  text: Is the coolant level OK, and does the temperature gauge show odd readings or the fan run all the time?
+  source_faults:
+  - F15-SE-13
+  merged_from:
+  - 'F15-SE-13 (stages_text): Is coolant level OK?'
+  - 'F15-SE-13 (symptoms): Fan always on'
+  options:
+  - label: The gauge is odd or the fan always runs
+    effects:
+    - fault: F15-SE-13
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Coolant is low
+    effects:
+    - fault: F15-SE-13
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: All normal
+    effects:
+    - fault: F15-SE-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q20
+  status: approved
+  stage: 3
+  text: Did the car fail its PUC (pollution) test, or were codes cleared recently?
+  source_faults:
+  - F15-SE-12
+  - F15-SE-29
+  merged_from:
+  - 'F15-SE-29 (stages_text): Were codes cleared recently?'
+  - 'F15-SE-12 (stages_text): PUC failed?'
+  options:
+  - label: PUC failed
+    effects:
+    - fault: F15-SE-29
+      effect: supports
+      strength: strong
+    - fault: F15-SE-12
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: Codes were cleared just before the test
+    effects:
+    - fault: F15-SE-29
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-29
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q21
+  status: approved
+  stage: 3
+  text: Is the speedometer not working, or is the ABS / traction light on?
+  source_faults:
+  - F15-SE-26
+  merged_from:
+  - 'F15-SE-26 (stages_text): Speedometer working?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-26
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-26
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q22
+  status: approved
+  stage: 3
+  text: (Diesel) Is the DPF light on, and is the car used mostly for short city trips?
+  source_faults:
+  - F15-SE-15
+  - F15-SE-30
+  merged_from:
+  - 'F15-SE-30 (stages_text): Mostly short city trips?'
+  - 'F15-SE-15 (stages_text): Diesel?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-30
+      effect: supports
+      strength: strong
+    - fault: F15-SE-15
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-30
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: sensor_ecu-q23
+  status: approved
+  stage: 3
+  text: Did a workshop test the ECU power, ground and wiring and find them fine?
+  source_faults:
+  - F15-SE-17
+  - F15-SE-19
+  - F15-SE-25
+  merged_from:
+  - 'F15-SE-25 (stages_text): Were power and ground tested?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F15-SE-25
+      effect: supports
+      strength: strong
+    - fault: F15-SE-17
+      effect: rules_out
+      strength: moderate
+    - fault: F15-SE-19
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F15-SE-25
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F15-SE-01:
+    status: approved
+    name: Minor Sensor Glitch (Light Came and Went)
+    stage2_choices:
+    - Sensor warning
+    - Engine light on
+    confirmation_test: Scan the stored code and freeze-frame data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-02:
+    status: approved
+    name: Sensor Check Warning Shown on Dashboard
+    stage2_choices:
+    - Sensor warning
+    - Engine light on
+    confirmation_test: Scan and tests.
+    danger_phrases:
+    - red warning
+    - overheating
+    safety_trigger_options:
+    - question: sensor_ecu-q01
+      option: A red warning or overheating
+  F15-SE-03:
+    status: approved
+    name: Customer Requests ECU Reset
+    stage2_choices:
+    - Car needs computer scan
+    - Engine light on
+    confirmation_test: Scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-04:
+    status: approved
+    name: Sensor / ECU Fault With No Start (Engine Cranks)
+    stage2_choices:
+    - Car not starting
+    confirmation_test: Crank signal and fuel tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-05:
+    status: approved
+    name: Check Engine Light - Sensor Fault Suspected
+    stage2_choices:
+    - Engine light on
+    - Sensor warning
+    confirmation_test: Scan and test.
+    danger_phrases:
+    - blinking light
+    - shaking
+    safety_trigger_options:
+    - question: sensor_ecu-q02
+      option: Blinking
+  F15-SE-06:
+    status: approved
+    name: Crankshaft Position Sensor Fault
+    stage2_choices:
+    - Car stopping again and again
+    - Car not starting
+    confirmation_test: Crankshaft sensor signal test.
+    danger_phrases:
+    - engine cut out
+    safety_trigger_options:
+    - question: sensor_ecu-q05
+      option: 'Yes'
+  F15-SE-07:
+    status: approved
+    name: Camshaft Position Sensor Fault
+    stage2_choices:
+    - Car not starting
+    - Car giving jerks
+    confirmation_test: Camshaft sensor signal and timing check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-08:
+    status: approved
+    name: MAF (Mass Air Flow) Sensor Fault
+    stage2_choices:
+    - Car has low power
+    - Sensor warning
+    confirmation_test: Live data of the MAF sensor.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-09:
+    status: approved
+    name: MAP Sensor Fault
+    stage2_choices:
+    - Car giving jerks
+    - Sensor warning
+    confirmation_test: Live data of the MAP sensor.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-10:
+    status: approved
+    name: Throttle Position Sensor (TPS) Fault
+    stage2_choices:
+    - Car giving jerks
+    - Car stopping again and again
+    confirmation_test: Throttle sensor sweep test.
+    danger_phrases:
+    - no throttle
+    safety_trigger_options:
+    - question: sensor_ecu-q01
+      option: The accelerator pedal does not respond
+  F15-SE-11:
+    status: approved
+    name: Accelerator Pedal Position Sensor Fault
+    stage2_choices:
+    - Car has low power
+    - Other problem
+    confirmation_test: Accelerator pedal dual signal test.
+    danger_phrases:
+    - pedal not responding
+    safety_trigger_options:
+    - question: sensor_ecu-q01
+      option: The accelerator pedal does not respond
+  F15-SE-12:
+    status: approved
+    name: Oxygen (O2 / Lambda) Sensor Fault
+    stage2_choices:
+    - Engine light on
+    - Sensor warning
+    confirmation_test: Oxygen sensor signal test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-13:
+    status: approved
+    name: Engine Coolant Temperature (ECT) Sensor Fault
+    stage2_choices:
+    - Sensor warning
+    - Other problem
+    confirmation_test: Compare the temperature reading.
+    danger_phrases:
+    - overheating
+    safety_trigger_options:
+    - question: sensor_ecu-q01
+      option: A red warning or overheating
+  F15-SE-14:
+    status: approved
+    name: Intake Air Temperature (IAT) Sensor Fault
+    stage2_choices:
+    - Sensor warning
+    confirmation_test: Compare the intake air temperature reading.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-15:
+    status: approved
+    name: Fuel Rail Pressure Sensor Fault
+    stage2_choices:
+    - Car has low power
+    - Car not starting
+    confirmation_test: Fuel pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-16:
+    status: approved
+    name: Knock Sensor Fault
+    stage2_choices:
+    - Car has low power
+    - Sensor warning
+    confirmation_test: Knock sensor tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-17:
+    status: approved
+    name: ECU Power Supply / Ground Fault
+    stage2_choices:
+    - Mechanic said ECU problem
+    - Car not starting
+    - Car stopping again and again
+    confirmation_test: Voltage drop test of ECU power and ground.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-18:
+    status: approved
+    name: ECU Communication / CAN Bus Fault
+    stage2_choices:
+    - Mechanic said ECU problem
+    - Sensor warning
+    confirmation_test: Network (CAN) test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-19:
+    status: approved
+    name: ECU Wiring / Connector Corrosion
+    stage2_choices:
+    - Mechanic said ECU problem
+    - Sensor warning
+    confirmation_test: Inspection of the ECU connectors.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: sensor_ecu-q10
+      option: The car went into deep water
+  F15-SE-20:
+    status: approved
+    name: Multiple Sensor Warnings Together
+    stage2_choices:
+    - Sensor warning
+    - Mechanic said ECU problem
+    confirmation_test: Sensor reference voltage and ground tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-21:
+    status: approved
+    name: ECU Limp Mode / Reduced Engine Power
+    stage2_choices:
+    - Car has low power
+    confirmation_test: Scan.
+    danger_phrases:
+    - overheating
+    safety_trigger_options:
+    - question: sensor_ecu-q01
+      option: A red warning or overheating
+  F15-SE-22:
+    status: approved
+    name: Throttle Relearn / Adaptation Required
+    stage2_choices:
+    - Car stopping again and again
+    - Other problem
+    confirmation_test: Throttle relearn and live data.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-23:
+    status: approved
+    name: ECU Software Update / Calibration Issue
+    stage2_choices:
+    - Mechanic said ECU problem
+    - Other problem
+    confirmation_test: ECU software version check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-24:
+    status: approved
+    name: Intermittent Sensor Fault After Rain / Water Exposure
+    stage2_choices:
+    - Sensor warning
+    - Car giving jerks
+    confirmation_test: Water test of the connectors.
+    danger_phrases:
+    - flooded
+    safety_trigger_options:
+    - question: sensor_ecu-q10
+      option: The car went into deep water
+  F15-SE-25:
+    status: approved
+    name: Confirmed ECU Internal Failure - Repair or Replacement
+    stage2_choices:
+    - Mechanic said ECU problem
+    confirmation_test: Full circuit tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-26:
+    status: approved
+    name: Vehicle / Wheel Speed Sensor Fault  [NEW - India]
+    stage2_choices:
+    - Sensor warning
+    - Other problem
+    confirmation_test: Live data of the speed sensors.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-27:
+    status: approved
+    name: Sensor Errors After Aftermarket CNG Kit / Accessory Fitting  [NEW - India]
+    stage2_choices:
+    - Sensor warning
+    - Other problem
+    confirmation_test: Disconnect test of the accessory or kit.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-28:
+    status: approved
+    name: Warnings / Rough Idle After Battery Change or Disconnection  [NEW - India]
+    stage2_choices:
+    - Sensor warning
+    - Car stopping again and again
+    confirmation_test: Scan and relearn.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-29:
+    status: approved
+    name: PUC Fail / Pending Codes / Not-Ready Monitors  [NEW - India]
+    stage2_choices:
+    - Car needs computer scan
+    - Other problem
+    confirmation_test: Scan data and readiness monitors.
+    danger_phrases: []
+    safety_trigger_options: []
+  F15-SE-30:
+    status: approved
+    name: BS6 Diesel DPF / EGR Warning and Limp Mode  [NEW - India]
+    stage2_choices:
+    - Car has low power
+    - Sensor warning
+    confirmation_test: Scan data (DPF / EGR).
+    danger_phrases:
+    - red warning
+    safety_trigger_options: []
+safety_rules:
+- id: sensor_ecu-s-F15-SE-01
+  status: approved
+  fault: F15-SE-01
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-02
+  status: approved
+  fault: F15-SE-02
+  risk_level: medium
+  stop_driving_trigger: Stop if there is a red warning or overheating.
+  roadside_action: If there is a red warning or overheating, stop and do not drive. Otherwise book a scan.
+  towing_recommendation: Only if there is a red warning.
+  source_text:
+    safety_precautions: • Stop if red warning or overheating.
+    if_towing_needed: Only if red warning.
+- id: sensor_ecu-s-F15-SE-03
+  status: approved
+  fault: F15-SE-03
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not clear codes before diagnosis.
+    if_towing_needed: NO unless fault needs it.
+- id: sensor_ecu-s-F15-SE-04
+  status: approved
+  fault: F15-SE-04
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not keep cranking. Call a mechanic with a scanner.
+  towing_recommendation: Yes, if it cannot be fixed on the spot.
+  source_text:
+    safety_precautions: • Ignition OFF before unplugging.
+    if_towing_needed: YES if not fixed on spot.
+- id: sensor_ecu-s-F15-SE-05
+  status: approved
+  fault: F15-SE-05
+  risk_level: medium
+  stop_driving_trigger: Stop if the light blinks with shaking.
+  roadside_action: If the engine light blinks, slow down and stop safely. Otherwise book a scan.
+  towing_recommendation: If blinking with shaking.
+  source_text:
+    safety_precautions: • Blinking = stop.
+    if_towing_needed: If blinking + shaking.
+- id: sensor_ecu-s-F15-SE-06
+  status: approved
+  fault: F15-SE-06
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine cuts out while driving.
+  roadside_action: If the engine cuts out, switch on the hazard lights and steer to a safe place. Call a mechanic.
+  towing_recommendation: If it does not start.
+  source_text:
+    safety_precautions: • Ignition OFF.
+    if_towing_needed: If no start.
+- id: sensor_ecu-s-F15-SE-07
+  status: approved
+  fault: F15-SE-07
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Ignition OFF.
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-08
+  status: approved
+  fault: F15-SE-08
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not touch sensing wire.
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-09
+  status: approved
+  fault: F15-SE-09
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-10
+  status: approved
+  fault: F15-SE-10
+  risk_level: medium
+  stop_driving_trigger: Stop if the throttle does not respond.
+  roadside_action: If the car does not respond to the accelerator, stop safely and call a mechanic.
+  towing_recommendation: If there is no throttle response.
+  source_text:
+    safety_precautions: • Fingers away from throttle with key ON.
+    if_towing_needed: If no throttle.
+- id: sensor_ecu-s-F15-SE-11
+  status: approved
+  fault: F15-SE-11
+  risk_level: high
+  stop_driving_trigger: Do not drive in traffic if the pedal does not respond.
+  roadside_action: Check that the floor mat is not under the pedal. If the pedal still does not respond, do not
+    drive in traffic. Call for a tow.
+  towing_recommendation: If there is no response.
+  source_text:
+    safety_precautions: • Pedal problem = do not drive in traffic.
+    if_towing_needed: If no response.
+- id: sensor_ecu-s-F15-SE-12
+  status: approved
+  fault: F15-SE-12
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Hot exhaust.
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-13
+  status: approved
+  fault: F15-SE-13
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine is overheating.
+  roadside_action: Top up coolant only when the engine is cold. Never open a hot radiator cap. Stop if the engine
+    overheats.
+  towing_recommendation: If overheating.
+  source_text:
+    safety_precautions: • Never open hot radiator cap.
+    if_towing_needed: If overheating.
+- id: sensor_ecu-s-F15-SE-14
+  status: approved
+  fault: F15-SE-14
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-15
+  status: approved
+  fault: F15-SE-15
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: If it does not start.
+  source_text:
+    safety_precautions: • Very high fuel pressure - specialist only.
+    if_towing_needed: If no start.
+- id: sensor_ecu-s-F15-SE-16
+  status: approved
+  fault: F15-SE-16
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-17
+  status: approved
+  fault: F15-SE-17
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Check the battery terminals are tight. Book a scan. Do not ask for a reset before the fault is
+    found. Stop if a red warning or overheating appears.
+  towing_recommendation: If it does not start.
+  source_text:
+    safety_precautions: • Same-rating fuse only.
+    if_towing_needed: If no start.
+- id: sensor_ecu-s-F15-SE-18
+  status: approved
+  fault: F15-SE-18
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery OFF for wiring work.
+    if_towing_needed: Depends.
+- id: sensor_ecu-s-F15-SE-19
+  status: approved
+  fault: F15-SE-19
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery OFF.
+    if_towing_needed: Depends.
+- id: sensor_ecu-s-F15-SE-20
+  status: approved
+  fault: F15-SE-20
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: Depends.
+- id: sensor_ecu-s-F15-SE-21
+  status: approved
+  fault: F15-SE-21
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine is overheating or driving is unsafe.
+  roadside_action: If the temperature is high, stop safely. Otherwise drive gently to a garage for a scan.
+  towing_recommendation: If overheating or unsafe.
+  source_text:
+    safety_precautions: • Stop if overheating.
+    if_towing_needed: If overheating / unsafe.
+- id: sensor_ecu-s-F15-SE-22
+  status: approved
+  fault: F15-SE-22
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-23
+  status: approved
+  fault: F15-SE-23
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Stable battery support during update.
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-24
+  status: approved
+  fault: F15-SE-24
+  risk_level: medium
+  stop_driving_trigger: Never start a car that went into deep water.
+  roadside_action: If the car went into deep water, do not start it; call for a tow. Otherwise let it dry.
+  towing_recommendation: Yes, if flooded.
+  source_text:
+    safety_precautions: • Never start a car that went into deep water - tow it.
+    if_towing_needed: YES if flooded.
+- id: sensor_ecu-s-F15-SE-25
+  status: approved
+  fault: F15-SE-25
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: If it does not start.
+  source_text:
+    safety_precautions: • Battery OFF for ECU removal.
+    if_towing_needed: If no start.
+- id: sensor_ecu-s-F15-SE-26
+  status: approved
+  fault: F15-SE-26
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Support car properly.
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-27
+  status: approved
+  fault: F15-SE-27
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery OFF.
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-28
+  status: approved
+  fault: F15-SE-28
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • -
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-29
+  status: approved
+  fault: F15-SE-29
+  risk_level: low
+  stop_driving_trigger: Stop if there is a red warning, overheating, or the pedal does not respond.
+  roadside_action: Book a scan. Do not ask for a reset before the fault is found. Stop if a red warning or overheating
+    appears.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Hot exhaust.
+    if_towing_needed: NO.
+- id: sensor_ecu-s-F15-SE-30
+  status: approved
+  fault: F15-SE-30
+  risk_level: low
+  stop_driving_trigger: Stop if there is low-power mode with a red warning.
+  roadside_action: Follow the owner's manual advice for the DPF light. Do not touch the hot exhaust.
+  towing_recommendation: If low-power mode with a red warning.
+  source_text:
+    safety_precautions: • DPF very hot during regen.
+    if_towing_needed: If limp + red warning.

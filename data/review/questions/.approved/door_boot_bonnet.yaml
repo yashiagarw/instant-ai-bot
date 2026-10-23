@@ -1,0 +1,718 @@
+category: door_boot_bonnet
+loaded_at: '2026-10-23T19:33:32+00:00'
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+approved:
+  question door_boot_bonnet-main:
+    id: door_boot_bonnet-main
+    status: approved
+    stage: 2
+    text: What problem are you facing?
+    choice_source: file
+    options:
+    - label: Side mirror problem
+      effects: []
+      safety_trigger: false
+    - label: Car inspection
+      effects: []
+      safety_trigger: false
+    - label: Suspension noise
+      effects: []
+      safety_trigger: false
+    - label: Door problem
+      effects:
+      - fault: F14-DB-01
+        effect: supports
+        strength: strong
+      - fault: F14-DB-02
+        effect: supports
+        strength: strong
+      - fault: F14-DB-03
+        effect: supports
+        strength: strong
+      - fault: F14-DB-05
+        effect: supports
+        strength: strong
+      - fault: F14-DB-06
+        effect: supports
+        strength: strong
+      - fault: F14-DB-07
+        effect: supports
+        strength: strong
+      - fault: F14-DB-08
+        effect: supports
+        strength: strong
+      - fault: F14-DB-09
+        effect: supports
+        strength: strong
+      - fault: F14-DB-10
+        effect: supports
+        strength: strong
+      - fault: F14-DB-11
+        effect: supports
+        strength: strong
+      - fault: F14-DB-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Bonnet / boot problem
+      effects:
+      - fault: F14-DB-04
+        effect: supports
+        strength: strong
+      - fault: F14-DB-12
+        effect: supports
+        strength: strong
+      - fault: F14-DB-13
+        effect: supports
+        strength: strong
+      - fault: F14-DB-14
+        effect: supports
+        strength: strong
+      - fault: F14-DB-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Window problem
+      effects: []
+      safety_trigger: false
+    - label: Wiper problem
+      effects: []
+      safety_trigger: false
+    - label: Sunroof problem
+      effects: []
+      safety_trigger: false
+    - label: Other
+      effects:
+      - fault: F14-DB-10
+        effect: supports
+        strength: strong
+      - fault: F14-DB-11
+        effect: supports
+        strength: strong
+      - fault: F14-DB-16
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q01:
+    id: door_boot_bonnet-q01
+    status: approved
+    stage: 3
+    text: Can the bonnet close and lock properly?
+    source_faults:
+    - F14-DB-04
+    - F14-DB-12
+    merged_from:
+    - 'F14-DB-12 (AI_DIAGNOSIS_RULES): Can the bonnet latch securely?'
+    - 'F14-DB-04 (AI_DIAGNOSIS_RULES): Can the bonnet latch securely?'
+    - 'F14-DB-12 (symptoms): Bonnet lifts'
+    options:
+    - label: No, it does not lock, or it lifts while driving
+      effects:
+      - fault: F14-DB-12
+        effect: supports
+        strength: strong
+      - fault: F14-DB-04
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-12
+        effect: rules_out
+        strength: strong
+      safety_trigger: false
+    - label: My problem is not with the bonnet
+      effects:
+      - fault: F14-DB-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q02:
+    id: door_boot_bonnet-q02
+    status: approved
+    stage: 3
+    text: Can the door close and stay securely shut?
+    source_faults:
+    - F14-DB-02
+    - F14-DB-03
+    - F14-DB-09
+    merged_from:
+    - 'F14-DB-02 (AI_DIAGNOSIS_RULES): Can the door close securely?'
+    - 'F14-DB-02 (stages_text): Can the door close securely?'
+    - 'F14-DB-03 (symptoms): Won''t latch'
+    options:
+    - label: No, it will not stay shut
+      effects:
+      - fault: F14-DB-02
+        effect: supports
+        strength: strong
+      - fault: F14-DB-03
+        effect: supports
+        strength: moderate
+      safety_trigger: true
+    - label: It closes, but only with force, or the door-open warning stays on
+      effects:
+      - fault: F14-DB-02
+        effect: supports
+        strength: moderate
+      - fault: F14-DB-09
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-02
+        effect: rules_out
+        strength: moderate
+      - fault: F14-DB-03
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q03:
+    id: door_boot_bonnet-q03
+    status: approved
+    stage: 3
+    text: Is the problem with the bonnet or the boot?
+    source_faults:
+    - F14-DB-04
+    - F14-DB-13
+    - F14-DB-14
+    - F14-DB-15
+    merged_from:
+    - 'F14-DB-04 (AI_DIAGNOSIS_RULES): Is it the bonnet or boot?'
+    options:
+    - label: 'Bonnet: it will not open'
+      effects:
+      - fault: F14-DB-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'Boot: it will not open, close or lock'
+      effects:
+      - fault: F14-DB-13
+        effect: supports
+        strength: strong
+      - fault: F14-DB-04
+        effect: supports
+        strength: moderate
+      - fault: F14-DB-15
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Boot or bonnet falls down when opened
+      effects:
+      - fault: F14-DB-14
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: A power boot stops halfway or re-opens
+      effects:
+      - fault: F14-DB-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q04:
+    id: door_boot_bonnet-q04
+    status: approved
+    stage: 3
+    text: Does the boot close and lock securely?
+    source_faults:
+    - F14-DB-13
+    merged_from:
+    - 'F14-DB-13 (AI_DIAGNOSIS_RULES): Does the boot close securely?'
+    - 'F14-DB-13 (symptoms): Opens itself'
+    options:
+    - label: 'No'
+      effects:
+      - fault: F14-DB-13
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-13
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q05:
+    id: door_boot_bonnet-q05
+    status: approved
+    stage: 3
+    text: Do all the doors fail to lock with the remote, or only one door?
+    source_faults:
+    - F14-DB-01
+    - F14-DB-05
+    - F14-DB-06
+    merged_from:
+    - 'F14-DB-06 (AI_DIAGNOSIS_RULES): Is it only one door?'
+    - 'F14-DB-05 (AI_DIAGNOSIS_RULES): Does the inside lock button work?'
+    - 'F14-DB-01 (stages_text): Is central locking working?'
+    options:
+    - label: All the doors
+      effects:
+      - fault: F14-DB-05
+        effect: supports
+        strength: strong
+      - fault: F14-DB-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Only one door
+      effects:
+      - fault: F14-DB-06
+        effect: supports
+        strength: strong
+      - fault: F14-DB-05
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Central locking works fine
+      effects:
+      - fault: F14-DB-05
+        effect: rules_out
+        strength: moderate
+      - fault: F14-DB-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q06:
+    id: door_boot_bonnet-q06
+    status: approved
+    stage: 3
+    text: Do the lock buttons inside the car work?
+    source_faults:
+    - F14-DB-05
+    - F14-DB-16
+    merged_from:
+    - 'F14-DB-05 (AI_DIAGNOSIS_RULES): Does the inside lock button work?'
+    options:
+    - label: Yes, only the remote does not work
+      effects:
+      - fault: F14-DB-05
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-DB-05
+        effect: supports
+        strength: moderate
+      - fault: F14-DB-16
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q07:
+    id: door_boot_bonnet-q07
+    status: approved
+    stage: 3
+    text: Will the key not turn in the door lock? Does the spare key work?
+    source_faults:
+    - F14-DB-01
+    - F14-DB-16
+    merged_from:
+    - 'F14-DB-01 (AI_DIAGNOSIS_RULES): Does the spare key work?'
+    - 'F14-DB-01 (symptoms): Key won''t turn'
+    options:
+    - label: The key will not turn, even the spare key
+      effects:
+      - fault: F14-DB-01
+        effect: supports
+        strength: strong
+      - fault: F14-DB-16
+        effect: supports
+        strength: moderate
+      safety_trigger: false
+    - label: The spare key works
+      effects:
+      - fault: F14-DB-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: No problem with the key
+      effects:
+      - fault: F14-DB-01
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q08:
+    id: door_boot_bonnet-q08
+    status: approved
+    stage: 3
+    text: Which door handle does not work?
+    source_faults:
+    - F14-DB-03
+    - F14-DB-07
+    - F14-DB-08
+    merged_from:
+    - 'F14-DB-07 (AI_DIAGNOSIS_RULES): Does the door open from inside?'
+    - 'F14-DB-08 (AI_DIAGNOSIS_RULES): Is it a rear door with child lock?'
+    - 'F14-DB-03 (AI_DIAGNOSIS_RULES): Does it open from inside?'
+    options:
+    - label: The outside handle (the door opens from inside)
+      effects:
+      - fault: F14-DB-07
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The inside handle (the door opens from outside)
+      effects:
+      - fault: F14-DB-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The door does not open from inside or outside
+      effects:
+      - fault: F14-DB-03
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The handles work
+      effects:
+      - fault: F14-DB-07
+        effect: rules_out
+        strength: moderate
+      - fault: F14-DB-08
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q09:
+    id: door_boot_bonnet-q09
+    status: approved
+    stage: 3
+    text: Is it a rear door with the child lock switched on?
+    source_faults:
+    - F14-DB-08
+    merged_from:
+    - 'F14-DB-08 (AI_DIAGNOSIS_RULES): Is it a rear door with child lock?'
+    - 'F14-DB-08 (symptoms): Child lock on'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-DB-08
+        effect: rules_out
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q10:
+    id: door_boot_bonnet-q10
+    status: approved
+    stage: 3
+    text: Does the door drop down when you open it, or is the gap around it uneven?
+    source_faults:
+    - F14-DB-02
+    - F14-DB-09
+    merged_from:
+    - 'F14-DB-09 (AI_DIAGNOSIS_RULES): Does the door drop when opened?'
+    - 'F14-DB-09 (symptoms): Uneven gap'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-09
+        effect: supports
+        strength: strong
+      - fault: F14-DB-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-DB-09
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q11:
+    id: door_boot_bonnet-q11
+    status: approved
+    stage: 3
+    text: Does the door rattle or squeak on rough roads? Is it worse with the window down?
+    source_faults:
+    - F14-DB-01
+    - F14-DB-10
+    merged_from:
+    - 'F14-DB-10 (AI_DIAGNOSIS_RULES): Does it rattle with window down?'
+    - 'F14-DB-01 (stages_text): Is there any unusual noise?'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-10
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-DB-10
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q12:
+    id: door_boot_bonnet-q12
+    status: approved
+    stage: 3
+    text: Does water come into the car near a door when it rains?
+    source_faults:
+    - F14-DB-11
+    merged_from:
+    - 'F14-DB-11 (AI_DIAGNOSIS_RULES): Does water enter only in rain?'
+    - 'F14-DB-11 (symptoms): Wet carpet'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-DB-11
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q13:
+    id: door_boot_bonnet-q13
+    status: approved
+    stage: 3
+    text: Have you seen rat damage or rust, or did the problems start after the monsoon?
+    source_faults:
+    - F14-DB-01
+    - F14-DB-16
+    merged_from:
+    - 'F14-DB-16 (AI_DIAGNOSIS_RULES): Seen rat damage or rust?'
+    - 'F14-DB-01 (symptoms): After rain'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-16
+        effect: supports
+        strength: strong
+      - fault: F14-DB-01
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects:
+      - fault: F14-DB-16
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question door_boot_bonnet-q14:
+    id: door_boot_bonnet-q14
+    status: approved
+    stage: 3
+    text: Did the problem start after an accident?
+    source_faults:
+    - F14-DB-01
+    - F14-DB-02
+    - F14-DB-03
+    - F14-DB-12
+    merged_from:
+    - 'F14-DB-01 (stages_text): Did the problem start after an accident?'
+    - 'F14-DB-12 (symptoms): After accident'
+    options:
+    - label: 'Yes'
+      effects:
+      - fault: F14-DB-12
+        effect: supports
+        strength: moderate
+      - fault: F14-DB-02
+        effect: supports
+        strength: weak
+      - fault: F14-DB-03
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: 'No'
+      effects: []
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  fault F14-DB-01:
+    status: approved
+    name: Door Lock Stuck
+    stage2_choices:
+    - Door problem
+    confirmation_test: Try the spare key, then inspect under the door trim.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-02:
+    status: approved
+    name: Door Not Closing Properly
+    stage2_choices:
+    - Door problem
+    confirmation_test: Latch and striker check.
+    danger_phrases:
+    - door cannot be secured
+    safety_trigger_options:
+    - question: door_boot_bonnet-q02
+      option: No, it will not stay shut
+  fault F14-DB-03:
+    status: approved
+    name: Door Latch / Mechanism Broken
+    stage2_choices:
+    - Door problem
+    confirmation_test: Trim-off test of the latch.
+    danger_phrases:
+    - door cannot be secured
+    safety_trigger_options:
+    - question: door_boot_bonnet-q02
+      option: No, it will not stay shut
+  fault F14-DB-04:
+    status: approved
+    name: Boot / Bonnet Will Not Open or Close
+    stage2_choices:
+    - Bonnet / boot problem
+    confirmation_test: Release lever and latch check.
+    danger_phrases:
+    - bonnet cannot latch
+    safety_trigger_options:
+    - question: door_boot_bonnet-q01
+      option: No, it does not lock, or it lifts while driving
+  fault F14-DB-05:
+    status: approved
+    name: Central Locking Not Working
+    stage2_choices:
+    - Door problem
+    confirmation_test: Remote battery and fuse test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-06:
+    status: approved
+    name: One Door Not Locking / Unlocking
+    stage2_choices:
+    - Door problem
+    confirmation_test: Voltage test at the door lock actuator.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-07:
+    status: approved
+    name: Door Handle Broken - Exterior
+    stage2_choices:
+    - Door problem
+    confirmation_test: Inspect the outside handle and rod.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-08:
+    status: approved
+    name: Door Handle Broken - Interior
+    stage2_choices:
+    - Door problem
+    confirmation_test: Check the child lock and the inside handle cable.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-09:
+    status: approved
+    name: Door Hinge Loose / Sagging
+    stage2_choices:
+    - Door problem
+    confirmation_test: Door lift test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-10:
+    status: approved
+    name: Door Making Noise / Rattling
+    stage2_choices:
+    - Door problem
+    - Other
+    confirmation_test: Road test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-11:
+    status: approved
+    name: Door Weather Seal Damaged / Water Entry
+    stage2_choices:
+    - Door problem
+    - Other
+    confirmation_test: Water test.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-12:
+    status: approved
+    name: Bonnet Latch / Safety Catch Fault
+    stage2_choices:
+    - Bonnet / boot problem
+    confirmation_test: Bonnet latch test.
+    danger_phrases:
+    - bonnet cannot latch
+    safety_trigger_options:
+    - question: door_boot_bonnet-q01
+      option: No, it does not lock, or it lifts while driving
+  fault F14-DB-13:
+    status: approved
+    name: Boot Latch / Tailgate Lock Fault
+    stage2_choices:
+    - Bonnet / boot problem
+    confirmation_test: Boot latch and actuator tests.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-14:
+    status: approved
+    name: Bonnet / Boot Gas Strut Weak or Failed
+    stage2_choices:
+    - Bonnet / boot problem
+    confirmation_test: Hold test of the gas strut.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-15:
+    status: approved
+    name: Power Tailgate / Boot Release Motor Fault
+    stage2_choices:
+    - Bonnet / boot problem
+    confirmation_test: Scan and test of the power tailgate.
+    danger_phrases: []
+    safety_trigger_options: []
+  fault F14-DB-16:
+    status: approved
+    name: Door / Lock Problems After Rat Damage or Monsoon Rust  [NEW - India]
+    stage2_choices:
+    - Door problem
+    - Other
+    confirmation_test: Inspect for rat damage and rust.
+    danger_phrases: []
+    safety_trigger_options: []

@@ -1,0 +1,1514 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category fuel_delivery
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: fuel_delivery
+category_name: Fuel empty / petrol delivery
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:38:32+00:00'
+  run_id: claude-code-fuel_delivery
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: fuel_delivery-main
+  status: approved
+  stage: 2
+  text: Gaadi mein kya dikkat aa rahi hai?
+  choice_source: file
+  options:
+  - label: Petrol khatam ho gaya
+    effects:
+    - fault: F10-FD-01
+      effect: supports
+      strength: strong
+    - fault: F10-FD-02
+      effect: supports
+      strength: strong
+    - fault: F10-FD-03
+      effect: supports
+      strength: strong
+    - fault: F10-FD-04
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Petrol hai, par gaadi start nahi ho rahi
+    effects:
+    - fault: F10-FD-05
+      effect: supports
+      strength: strong
+    - fault: F10-FD-06
+      effect: supports
+      strength: strong
+    - fault: F10-FD-07
+      effect: supports
+      strength: strong
+    - fault: F10-FD-09
+      effect: supports
+      strength: strong
+    - fault: F10-FD-15
+      effect: supports
+      strength: strong
+    - fault: F10-FD-16
+      effect: supports
+      strength: strong
+    - fault: F10-FD-17
+      effect: supports
+      strength: strong
+    - fault: F10-FD-20
+      effect: supports
+      strength: strong
+    - fault: F10-FD-21
+      effect: supports
+      strength: strong
+    - fault: F10-FD-23
+      effect: supports
+      strength: strong
+    - fault: F10-FD-26
+      effect: supports
+      strength: strong
+    - fault: F10-FD-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Gaadi chalti chalti band ho gayi
+    effects:
+    - fault: F10-FD-01
+      effect: supports
+      strength: strong
+    - fault: F10-FD-02
+      effect: supports
+      strength: strong
+    - fault: F10-FD-06
+      effect: supports
+      strength: strong
+    - fault: F10-FD-09
+      effect: supports
+      strength: strong
+    - fault: F10-FD-11
+      effect: supports
+      strength: strong
+    - fault: F10-FD-16
+      effect: supports
+      strength: strong
+    - fault: F10-FD-19
+      effect: supports
+      strength: strong
+    - fault: F10-FD-24
+      effect: supports
+      strength: strong
+    - fault: F10-FD-27
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: ABS light aa rahi hai
+    effects: []
+    safety_trigger: false
+  - label: EPS light aa rahi hai
+    effects: []
+    safety_trigger: false
+  - label: EPC light aa rahi hai
+    effects: []
+    safety_trigger: false
+  - label: ESP / ESC light aa rahi hai
+    effects: []
+    safety_trigger: false
+  - label: Bahut saari warning lights aa rahi hain
+    effects: []
+    safety_trigger: false
+  - label: Brake warning light aa rahi hai
+    effects: []
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F10-FD-03
+      effect: supports
+      strength: strong
+    - fault: F10-FD-04
+      effect: supports
+      strength: strong
+    - fault: F10-FD-08
+      effect: supports
+      strength: strong
+    - fault: F10-FD-10
+      effect: supports
+      strength: strong
+    - fault: F10-FD-11
+      effect: supports
+      strength: strong
+    - fault: F10-FD-12
+      effect: supports
+      strength: strong
+    - fault: F10-FD-13
+      effect: supports
+      strength: strong
+    - fault: F10-FD-14
+      effect: supports
+      strength: strong
+    - fault: F10-FD-15
+      effect: supports
+      strength: strong
+    - fault: F10-FD-17
+      effect: supports
+      strength: strong
+    - fault: F10-FD-18
+      effect: supports
+      strength: strong
+    - fault: F10-FD-19
+      effect: supports
+      strength: strong
+    - fault: F10-FD-20
+      effect: supports
+      strength: strong
+    - fault: F10-FD-22
+      effect: supports
+      strength: strong
+    - fault: F10-FD-25
+      effect: supports
+      strength: strong
+    - fault: F10-FD-26
+      effect: supports
+      strength: strong
+    - fault: F10-FD-27
+      effect: supports
+      strength: strong
+    - fault: F10-FD-28
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q01
+  status: approved
+  stage: 3
+  text: Can you smell petrol, or see petrol dripping?
+  source_faults:
+  - F10-FD-01
+  - F10-FD-12
+  - F10-FD-14
+  - F10-FD-18
+  - F10-FD-21
+  - F10-FD-28
+  merged_from:
+  - 'F10-FD-18 (stages_text): Do you see petrol dripping?'
+  - 'F10-FD-18 (stages_text): Strong smell?'
+  - 'F10-FD-28 (stages_text): Petrol smell?'
+  - 'F10-FD-01 (stages_text): Kya petrol ki smell aa rahi hai?'
+  options:
+  - label: Petrol is dripping, or there is a strong smell
+    effects:
+    - fault: F10-FD-18
+      effect: supports
+      strength: strong
+    - fault: F10-FD-28
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: A slight smell only
+    effects:
+    - fault: F10-FD-14
+      effect: supports
+      strength: weak
+    - fault: F10-FD-21
+      effect: supports
+      strength: weak
+    - fault: F10-FD-12
+      effect: supports
+      strength: weak
+    - fault: F10-FD-18
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-18
+      effect: rules_out
+      strength: strong
+    - fault: F10-FD-28
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q02
+  status: approved
+  stage: 3
+  text: Was the wrong fuel filled (for example diesel in a petrol car)?
+  source_faults:
+  - F10-FD-01
+  - F10-FD-20
+  merged_from:
+  - 'F10-FD-20 (stages_text): Did you start after filling?'
+  - 'F10-FD-01 (stages_text): Kya recently fuel bharwaya tha?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-20
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: 'No'
+    effects:
+    - fault: F10-FD-20
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q03
+  status: approved
+  stage: 3
+  text: What does the fuel meter show?
+  source_faults:
+  - F10-FD-01
+  - F10-FD-02
+  - F10-FD-03
+  - F10-FD-04
+  - F10-FD-11
+  - F10-FD-23
+  merged_from:
+  - 'F10-FD-01 (stages_text): What does the fuel meter show?'
+  - 'F10-FD-02 (stages_text): How much fuel is left?'
+  - 'F10-FD-23 (stages_text): Petrol level?'
+  - 'F10-FD-01 (stages_text): Tank mein petrol kitna hai?'
+  options:
+  - label: Empty, or the low fuel light is on
+    effects:
+    - fault: F10-FD-01
+      effect: supports
+      strength: strong
+    - fault: F10-FD-02
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-11
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It shows fuel, but the car ran out
+    effects:
+    - fault: F10-FD-03
+      effect: supports
+      strength: strong
+    - fault: F10-FD-04
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The needle is stuck or jumps around
+    effects:
+    - fault: F10-FD-03
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-04
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It shows enough fuel
+    effects:
+    - fault: F10-FD-01
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q04
+  status: approved
+  stage: 3
+  text: Did the car stop on a slope or a turn, and restart on flat ground?
+  source_faults:
+  - F10-FD-02
+  - F10-FD-11
+  merged_from:
+  - 'F10-FD-02 (stages_text): Did it stop on a slope or turn?'
+  - 'F10-FD-02 (stages_text): Does it restart on flat ground?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-02
+      effect: supports
+      strength: strong
+    - fault: F10-FD-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-02
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q05
+  status: approved
+  stage: 3
+  text: When you turn the key to ON (without starting), do you hear a short hum from the fuel tank?
+  source_faults:
+  - F10-FD-05
+  - F10-FD-06
+  - F10-FD-07
+  - F10-FD-09
+  - F10-FD-23
+  - F10-FD-26
+  merged_from:
+  - 'F10-FD-05 (stages_text): Do you hear a hum at key ON?'
+  - 'F10-FD-09 (stages_text): Hum at key ON?'
+  - 'F10-FD-23 (stages_text): Pump hum?'
+  options:
+  - label: No hum
+    effects:
+    - fault: F10-FD-05
+      effect: supports
+      strength: strong
+    - fault: F10-FD-09
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-06
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-07
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-26
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Yes, a hum
+    effects:
+    - fault: F10-FD-05
+      effect: rules_out
+      strength: moderate
+    - fault: F10-FD-09
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q06
+  status: approved
+  stage: 3
+  text: Does the engine turn over (crank) when you try to start, but not start?
+  source_faults:
+  - F10-FD-01
+  - F10-FD-05
+  - F10-FD-09
+  - F10-FD-23
+  merged_from:
+  - 'F10-FD-23 (stages_text): Self maarne par engine ghoom raha hai?'
+  - 'F10-FD-01 (stages_text): Engine start hone ki koshish karta hai?'
+  options:
+  - label: Yes, it cranks but does not start
+    effects:
+    - fault: F10-FD-23
+      effect: supports
+      strength: strong
+    - fault: F10-FD-05
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-09
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It starts
+    effects:
+    - fault: F10-FD-23
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q07
+  status: approved
+  stage: 3
+  text: Is the security (car with key) light blinking on the dashboard?
+  source_faults:
+  - F10-FD-05
+  - F10-FD-23
+  merged_from:
+  - 'F10-FD-05 (stages_text): Security light?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-05
+      effect: rules_out
+      strength: weak
+    - fault: F10-FD-23
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q08
+  status: approved
+  stage: 3
+  text: Has the fuel pump fuse blown, maybe more than once? Any hot wire or burnt smell?
+  source_faults:
+  - F10-FD-06
+  - F10-FD-07
+  merged_from:
+  - 'F10-FD-07 (stages_text): Fuse blew again?'
+  - 'F10-FD-07 (stages_text): Hot wire or smell?'
+  - 'F10-FD-06 (stages_text): Does tapping the relay help?'
+  options:
+  - label: The fuse blew, or blows again
+    effects:
+    - fault: F10-FD-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A mechanic tapped or swapped the relay and it worked
+    effects:
+    - fault: F10-FD-06
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-07
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q09
+  status: approved
+  stage: 3
+  text: Did the engine stop while driving? Did it restart after cooling down?
+  source_faults:
+  - F10-FD-01
+  - F10-FD-06
+  - F10-FD-09
+  - F10-FD-16
+  - F10-FD-24
+  - F10-FD-27
+  merged_from:
+  - 'F10-FD-24 (stages_text): Restarted after cooling?'
+  - 'F10-FD-09 (stages_text): Did it stop while driving?'
+  - 'F10-FD-01 (stages_text): Gaadi chalti chalti band hui thi?'
+  options:
+  - label: It stopped and restarted after cooling
+    effects:
+    - fault: F10-FD-24
+      effect: supports
+      strength: strong
+    - fault: F10-FD-27
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-06
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It stopped and will not restart
+    effects:
+    - fault: F10-FD-09
+      effect: supports
+      strength: strong
+    - fault: F10-FD-24
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: It stops on bumps
+    effects:
+    - fault: F10-FD-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It has not stopped while driving
+    effects:
+    - fault: F10-FD-24
+      effect: rules_out
+      strength: moderate
+    - fault: F10-FD-09
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q10
+  status: approved
+  stage: 3
+  text: Is the car weak when going uphill, overtaking or at high speed?
+  source_faults:
+  - F10-FD-01
+  - F10-FD-08
+  - F10-FD-10
+  - F10-FD-11
+  - F10-FD-25
+  - F10-FD-27
+  merged_from:
+  - 'F10-FD-08 (stages_text): Weak at high speed or uphill?'
+  - 'F10-FD-25 (stages_text): Weak uphill/overtaking?'
+  - 'F10-FD-01 (stages_text): Pickup pehle se kam tha?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-25
+      effect: supports
+      strength: strong
+    - fault: F10-FD-08
+      effect: supports
+      strength: strong
+    - fault: F10-FD-10
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-11
+      effect: supports
+      strength: weak
+    - fault: F10-FD-27
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-08
+      effect: rules_out
+      strength: moderate
+    - fault: F10-FD-25
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q11
+  status: approved
+  stage: 3
+  text: Does the engine take a long time to start (long cranking)?
+  source_faults:
+  - F10-FD-08
+  - F10-FD-10
+  - F10-FD-14
+  merged_from:
+  - 'F10-FD-08 (stages_text): Long cranking?'
+  - 'F10-FD-10 (symptoms): Hard start'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-08
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-10
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-14
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q12
+  status: approved
+  stage: 3
+  text: When was the fuel filter last changed?
+  source_faults:
+  - F10-FD-10
+  merged_from:
+  - 'F10-FD-10 (stages_text): When was fuel filter changed?'
+  options:
+  - label: A long time ago, it is overdue
+    effects:
+    - fault: F10-FD-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Recently
+    effects:
+    - fault: F10-FD-10
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q13
+  status: approved
+  stage: 3
+  text: Is the fuel pump loud (a whine from the back seat area)?
+  source_faults:
+  - F10-FD-08
+  - F10-FD-11
+  - F10-FD-27
+  merged_from:
+  - 'F10-FD-11 (stages_text): Loud pump?'
+  - 'F10-FD-27 (symptoms): Loud pump'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-11
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-27
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-08
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q14
+  status: approved
+  stage: 3
+  text: Do you usually drive with the fuel on reserve?
+  source_faults:
+  - F10-FD-11
+  - F10-FD-27
+  merged_from:
+  - 'F10-FD-27 (stages_text): Do you usually drive on reserve?'
+  - 'F10-FD-11 (stages_text): Stops when fuel is low?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-27
+      effect: supports
+      strength: strong
+    - fault: F10-FD-11
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-27
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q15
+  status: approved
+  stage: 3
+  text: Is the idle rough, or has the mileage dropped?
+  source_faults:
+  - F10-FD-12
+  - F10-FD-13
+  - F10-FD-14
+  merged_from:
+  - 'F10-FD-12 (stages_text): Rough idle?'
+  - 'F10-FD-12 (stages_text): Mileage dropped?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-12
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-14
+      effect: supports
+      strength: weak
+    - fault: F10-FD-13
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-12
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q16
+  status: approved
+  stage: 3
+  text: Is there black smoke from the exhaust?
+  source_faults:
+  - F10-FD-14
+  merged_from:
+  - 'F10-FD-14 (stages_text): Black smoke?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-14
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q17
+  status: approved
+  stage: 3
+  text: Is the engine warning light on?
+  source_faults:
+  - F10-FD-01
+  - F10-FD-12
+  - F10-FD-13
+  - F10-FD-15
+  - F10-FD-17
+  - F10-FD-21
+  merged_from:
+  - 'F10-FD-13 (stages_text): Engine light?'
+  - 'F10-FD-15 (stages_text): Engine light?'
+  - 'F10-FD-01 (stages_text): Koi check-engine light jal rahi hai?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-13
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-15
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-12
+      effect: supports
+      strength: weak
+    - fault: F10-FD-21
+      effect: supports
+      strength: weak
+    - fault: F10-FD-17
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-15
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q18
+  status: approved
+  stage: 3
+  text: Is it a turbo or direct-injection petrol engine?
+  source_faults:
+  - F10-FD-15
+  merged_from:
+  - 'F10-FD-15 (stages_text): Turbo or direct injection petrol?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-15
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q19
+  status: approved
+  stage: 3
+  text: Have you seen rats, or bitten wires or hoses?
+  source_faults:
+  - F10-FD-13
+  - F10-FD-16
+  - F10-FD-28
+  merged_from:
+  - 'F10-FD-28 (stages_text): Rats seen?'
+  - 'F10-FD-13 (stages_text): Rats seen?'
+  - 'F10-FD-16 (stages_text): Rats seen?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-28
+      effect: supports
+      strength: strong
+    - fault: F10-FD-13
+      effect: supports
+      strength: moderate
+    - fault: F10-FD-16
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-28
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q20
+  status: approved
+  stage: 3
+  text: Did the problem start right after filling fuel?
+  source_faults:
+  - F10-FD-19
+  - F10-FD-21
+  merged_from:
+  - 'F10-FD-19 (stages_text): Started right after filling?'
+  - 'F10-FD-21 (stages_text): Hard start only after filling?'
+  options:
+  - label: Yes, it jerks, misfires or stalls since filling
+    effects:
+    - fault: F10-FD-19
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Yes, it is hard to start just after filling, then fine
+    effects:
+    - fault: F10-FD-21
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-19
+      effect: rules_out
+      strength: moderate
+    - fault: F10-FD-21
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q21
+  status: approved
+  stage: 3
+  text: When you open the fuel cap, is there a loud whoosh? Does the car run better with the cap loose?
+  source_faults:
+  - F10-FD-22
+  merged_from:
+  - 'F10-FD-22 (stages_text): Whoosh when opening cap?'
+  - 'F10-FD-22 (stages_text): Better with cap loose?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F10-FD-22
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F10-FD-22
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: fuel_delivery-q22
+  status: approved
+  stage: 3
+  text: (CNG car) When did you last run on petrol?
+  source_faults:
+  - F10-FD-01
+  - F10-FD-26
+  merged_from:
+  - 'F10-FD-26 (stages_text): When did you last use petrol?'
+  - 'F10-FD-26 (stages_text): How much petrol in tank?'
+  - 'F10-FD-01 (stages_text): Kya gaadi petrol aur CNG dono par chalti hai?'
+  options:
+  - label: Not for a long time
+    effects:
+    - fault: F10-FD-26
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Recently
+    effects:
+    - fault: F10-FD-26
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not a CNG car
+    effects:
+    - fault: F10-FD-26
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F10-FD-01:
+    status: approved
+    name: Petrol Finished (Fuel Tank Empty)
+    stage2_choices:
+    - Petrol khatam ho gaya
+    - Gaadi chalti chalti band ho gayi
+    confirmation_test: Add 5 litres of petrol and start.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-02:
+    status: approved
+    name: Very Low Fuel - Car Stops on Slopes or Turns
+    stage2_choices:
+    - Gaadi chalti chalti band ho gayi
+    - Petrol khatam ho gaya
+    confirmation_test: Fill fuel and test drive.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-03:
+    status: approved
+    name: Fuel Meter Shows Wrong Reading
+    stage2_choices:
+    - Other problem
+    - Petrol khatam ho gaya
+    confirmation_test: Fuel level sender resistance test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-04:
+    status: approved
+    name: Fuel Level Sender / Float Fault
+    stage2_choices:
+    - Other problem
+    - Petrol khatam ho gaya
+    confirmation_test: Fuel level sender resistance sweep.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-05:
+    status: approved
+    name: Fuel Pump Not Priming (No Hum at Key ON)
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    confirmation_test: Voltage at the pump and fuel pressure.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-06:
+    status: approved
+    name: Fuel Pump Relay Failed
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    - Gaadi chalti chalti band ho gayi
+    confirmation_test: Relay swap test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-07:
+    status: approved
+    name: Fuel Pump Fuse Blown / Power Problem
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    confirmation_test: Current draw and short test.
+    danger_phrases:
+    - burnt smell
+    safety_trigger_options: []
+  F10-FD-08:
+    status: approved
+    name: Weak Fuel Pump / Low Fuel Pressure
+    stage2_choices:
+    - Other problem
+    confirmation_test: Fuel pressure under load.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-09:
+    status: approved
+    name: Electric Fuel Pump Completely Failed
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    - Gaadi chalti chalti band ho gayi
+    confirmation_test: Voltage at the pump and fuel pressure.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-10:
+    status: approved
+    name: Fuel Filter Blocked
+    stage2_choices:
+    - Other problem
+    confirmation_test: Fuel pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-11:
+    status: approved
+    name: Fuel Pump Strainer (Inlet Filter) Blocked
+    stage2_choices:
+    - Other problem
+    - Gaadi chalti chalti band ho gayi
+    confirmation_test: Inspect the pump strainer.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-12:
+    status: approved
+    name: Fuel Injector Blocked / Poor Spray
+    stage2_choices:
+    - Other problem
+    confirmation_test: Injector bench test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-13:
+    status: approved
+    name: Fuel Injector Electrical Fault
+    stage2_choices:
+    - Other problem
+    confirmation_test: Injector resistance and signal test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-14:
+    status: approved
+    name: Fuel Pressure Regulator Fault
+    stage2_choices:
+    - Other problem
+    confirmation_test: Fuel pressure and pressure hold test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-15:
+    status: approved
+    name: Fuel Rail Pressure Sensor Fault (Direct Injection Petrol)
+    stage2_choices:
+    - Other problem
+    - Petrol hai, par gaadi start nahi ho rahi
+    confirmation_test: Live data and wiring check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-16:
+    status: approved
+    name: Fuel Pump Wiring / Earth (Ground) Fault
+    stage2_choices:
+    - Gaadi chalti chalti band ho gayi
+    - Petrol hai, par gaadi start nahi ho rahi
+    confirmation_test: Voltage drop test at the pump.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-17:
+    status: approved
+    name: Fuel Pump Control Module Fault
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    - Other problem
+    confirmation_test: Power and output test of the pump control module.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-18:
+    status: approved
+    name: Petrol Leak / Damaged Fuel Line (DANGER)
+    stage2_choices:
+    - Other problem
+    confirmation_test: Visual check and pressure test.
+    danger_phrases:
+    - petrol smell
+    - petrol dripping
+    safety_trigger_options:
+    - question: fuel_delivery-q01
+      option: Petrol is dripping, or there is a strong smell
+  F10-FD-19:
+    status: approved
+    name: Water or Dirt in Petrol (Contaminated Fuel)
+    stage2_choices:
+    - Other problem
+    - Gaadi chalti chalti band ho gayi
+    confirmation_test: Fuel sample.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-20:
+    status: approved
+    name: Wrong Fuel Filled (Diesel in Petrol Car)
+    stage2_choices:
+    - Other problem
+    - Petrol hai, par gaadi start nahi ho rahi
+    confirmation_test: Fuel sample.
+    danger_phrases:
+    - wrong fuel
+    safety_trigger_options:
+    - question: fuel_delivery-q02
+      option: 'Yes'
+  F10-FD-21:
+    status: approved
+    name: EVAP Purge Valve Stuck Open - Hard Start After Refuel
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    confirmation_test: Purge valve hold test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-22:
+    status: approved
+    name: Fuel Tank Vent Blocked (Whoosh Sound When Opening Cap)
+    stage2_choices:
+    - Other problem
+    confirmation_test: Cap-loose test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-23:
+    status: approved
+    name: Engine Cranks But Won't Start - Fuel Suspected
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    confirmation_test: Fuel pressure, injector pulse and spark test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-24:
+    status: approved
+    name: Engine Stops While Driving - Fuel Supply Lost
+    stage2_choices:
+    - Gaadi chalti chalti band ho gayi
+    confirmation_test: Hot fuel pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-25:
+    status: approved
+    name: Poor Pickup / Hesitation Because of Low Fuel Pressure
+    stage2_choices:
+    - Other problem
+    confirmation_test: Fuel pressure under load.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-26:
+    status: approved
+    name: 'CNG Car: Petrol Side Not Used for Long - Pump Stuck / Stale Petrol  [NEW - India]'
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    - Other problem
+    confirmation_test: Fuel pressure and fuel check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-27:
+    status: approved
+    name: Fuel Pump Worn Early From Driving on Reserve  [NEW - India]
+    stage2_choices:
+    - Other problem
+    - Gaadi chalti chalti band ho gayi
+    confirmation_test: Fuel pressure test.
+    danger_phrases: []
+    safety_trigger_options: []
+  F10-FD-28:
+    status: approved
+    name: Rat-Bitten Fuel Hose or Pump Wire  [NEW - India]
+    stage2_choices:
+    - Petrol hai, par gaadi start nahi ho rahi
+    - Other problem
+    confirmation_test: Inspection for rat damage.
+    danger_phrases:
+    - petrol smell
+    - leak
+    safety_trigger_options:
+    - question: fuel_delivery-q01
+      option: Petrol is dripping, or there is a strong smell
+safety_rules:
+- id: fuel_delivery-s-F10-FD-01
+  status: approved
+  fault: F10-FD-01
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Park safely with hazard lights on. Ask for fuel delivery in an approved can. No smoking or flames;
+    wipe any spilled petrol.
+  towing_recommendation: No. Only if it still does not start.
+  source_text:
+    safety_precautions: '• No smoking or flames.
+
+      • Approved metal/HDPE fuel can only.
+
+      • Wipe spilled petrol.'
+    if_towing_needed: NO. Only if it still does not start.
+- id: fuel_delivery-s-F10-FD-02
+  status: approved
+  fault: F10-FD-02
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Steer to a safe place (steering gets heavy when the engine stops) and add fuel.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Stop safely - steering heavy when engine stops.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-03
+  status: approved
+  fault: F10-FD-03
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Note the km after a full tank and refill by km until it is fixed.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Fuel vapour - no sparks, ventilate.
+
+      • Release fuel pressure before opening.'
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-04
+  status: approved
+  fault: F10-FD-04
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Note the km after a full tank and refill by km until it is fixed.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Fuel vapour.
+
+      • New seal to avoid leaks.'
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-05
+  status: approved
+  fault: F10-FD-05
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not crank the engine again and again. Call a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: '• Fuel vapour.
+
+      • No shorting relays.'
+    if_towing_needed: DEPENDS.
+- id: fuel_delivery-s-F10-FD-06
+  status: approved
+  fault: F10-FD-06
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Call a mechanic; a trained person can swap the relay with the same type.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Same-type relay only.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-07
+  status: approved
+  fault: F10-FD-07
+  risk_level: medium
+  stop_driving_trigger: Stop if there is a burnt smell or hot wire.
+  roadside_action: Do not fit a bigger fuse. If there is a burnt smell, switch off and call a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Fire risk with wrong fuse.
+    if_towing_needed: DEPENDS.
+- id: fuel_delivery-s-F10-FD-08
+  status: approved
+  fault: F10-FD-08
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel under pressure.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-09
+  status: approved
+  fault: F10-FD-09
+  risk_level: medium
+  stop_driving_trigger: The car cannot be driven if the pump has failed.
+  roadside_action: Move to a safe place and call for a tow.
+  towing_recommendation: Yes, usually.
+  source_text:
+    safety_precautions: '• Fuel vapour - ventilate.
+
+      • Release pressure first.'
+    if_towing_needed: YES usually.
+- id: fuel_delivery-s-F10-FD-10
+  status: approved
+  fault: F10-FD-10
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Catch spilled fuel.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-11
+  status: approved
+  fault: F10-FD-11
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel vapour.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-12
+  status: approved
+  fault: F10-FD-12
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel pressure.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-13
+  status: approved
+  fault: F10-FD-13
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Battery off for wiring.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-14
+  status: approved
+  fault: F10-FD-14
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel pressure.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-15
+  status: approved
+  fault: F10-FD-15
+  risk_level: low
+  stop_driving_trigger: Stop if the car loses power in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Very high fuel pressure.
+    if_towing_needed: DEPENDS.
+- id: fuel_delivery-s-F10-FD-16
+  status: approved
+  fault: F10-FD-16
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine cuts out while driving.
+  roadside_action: If the engine cuts out, steer to a safe place and switch on the hazard lights. Call a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Fuel vapour near pump.
+    if_towing_needed: DEPENDS.
+- id: fuel_delivery-s-F10-FD-17
+  status: approved
+  fault: F10-FD-17
+  risk_level: low
+  stop_driving_trigger: Stop if the engine cuts out.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Fuel area.
+    if_towing_needed: DEPENDS.
+- id: fuel_delivery-s-F10-FD-18
+  status: approved
+  fault: F10-FD-18
+  risk_level: high
+  stop_driving_trigger: 'Do not drive: petrol leak.'
+  roadside_action: Switch off the engine. No smoking, flames or sparks. Keep people away from the car and call for
+    help. Do not drive. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Fire risk.
+
+      • Ventilate.
+
+      • Fire extinguisher nearby.'
+    if_towing_needed: YES.
+- id: fuel_delivery-s-F10-FD-19
+  status: approved
+  fault: F10-FD-19
+  risk_level: medium
+  stop_driving_trigger: Stop driving with contaminated fuel.
+  roadside_action: Stop driving and park in a safe place. Call a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Large petrol quantity - fire risk.
+    if_towing_needed: DEPENDS.
+- id: fuel_delivery-s-F10-FD-20
+  status: approved
+  fault: F10-FD-20
+  risk_level: high
+  stop_driving_trigger: Do not start the engine.
+  roadside_action: Do not start the engine. Push the car to a safe place and call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: • Fire risk.
+    if_towing_needed: YES.
+- id: fuel_delivery-s-F10-FD-21
+  status: approved
+  fault: F10-FD-21
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel vapour.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-22
+  status: approved
+  fault: F10-FD-22
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Loosen the fuel cap briefly to release the vacuum, then close it. Get the vent checked.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel vapour.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-23
+  status: approved
+  fault: F10-FD-23
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not keep cranking. Call a mechanic.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • No over-cranking.
+    if_towing_needed: DEPENDS.
+- id: fuel_delivery-s-F10-FD-24
+  status: approved
+  fault: F10-FD-24
+  risk_level: medium
+  stop_driving_trigger: Stop if the engine cuts out while driving.
+  roadside_action: Steer to a safe place and switch on the hazard lights. Try to restart once. If it keeps stopping,
+    call for a tow.
+  towing_recommendation: Depends.
+  source_text:
+    safety_precautions: • Traffic.
+    if_towing_needed: DEPENDS.
+- id: fuel_delivery-s-F10-FD-25
+  status: approved
+  fault: F10-FD-25
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel pressure.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-26
+  status: approved
+  fault: F10-FD-26
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Run on CNG and get the petrol side checked.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel + gas safety.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-27
+  status: approved
+  fault: F10-FD-27
+  risk_level: low
+  stop_driving_trigger: Stop if you smell petrol or the car stops in traffic.
+  roadside_action: The car can be driven gently to a garage. Stop if you smell petrol.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Fuel vapour.
+    if_towing_needed: NO.
+- id: fuel_delivery-s-F10-FD-28
+  status: approved
+  fault: F10-FD-28
+  risk_level: high
+  stop_driving_trigger: Do not drive if petrol is leaking.
+  roadside_action: 'If petrol is leaking: Switch off the engine. No smoking, flames or sparks. Keep people away
+    from the car and call for help. Call for a tow.'
+  towing_recommendation: Yes, if leaking.
+  source_text:
+    safety_precautions: • Fire risk.
+    if_towing_needed: YES if leaking.

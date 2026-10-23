@@ -1,0 +1,997 @@
+# Draft questions for one category, generated offline by an LLM. Nothing here is live.
+#
+# How to review:
+#   1. Read each entry under questions, faults and safety_rules. Edit wording, options or effects freely.
+#      effects: which faults an option supports or rules out (strength strong / moderate / weak).
+#      safety_trigger: true shows an immediate stop-driving warning when that option is chosen.
+#   2. Set status: approved (or rejected) on each entry you have checked. Leave the rest as draft.
+#   3. Put your name in reviewed_by at the top.
+#   4. Load:  cd backend && uv run python -m app.knowledge.questions load --category airbag_srs
+#      Only approved entries are loaded. `diff` shows what changed since the last load.
+# Every question keeps exactly one "Not sure" option (not_sure: true) with no effects.
+category: airbag_srs
+category_name: Airbag / SRS
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+generated:
+  at: '2026-10-23T19:29:45+00:00'
+  run_id: claude-code-airbag_srs
+  provider: claude_code
+  model: claude-code
+  prompt_version: 1
+  dataset_version: 36
+  dataset_checksum: e1ddb2628673c994
+questions:
+- id: airbag_srs-main
+  status: approved
+  stage: 2
+  text: What problem are you facing?
+  choice_source: file
+  options:
+  - label: Screen not working
+    effects: []
+    safety_trigger: false
+  - label: Music not working
+    effects: []
+    safety_trigger: false
+  - label: Camera not working
+    effects: []
+    safety_trigger: false
+  - label: Airbag warning
+    effects:
+    - fault: F16-AB-01
+      effect: supports
+      strength: strong
+    - fault: F16-AB-02
+      effect: supports
+      strength: strong
+    - fault: F16-AB-03
+      effect: supports
+      strength: strong
+    - fault: F16-AB-04
+      effect: supports
+      strength: strong
+    - fault: F16-AB-05
+      effect: supports
+      strength: strong
+    - fault: F16-AB-06
+      effect: supports
+      strength: strong
+    - fault: F16-AB-07
+      effect: supports
+      strength: strong
+    - fault: F16-AB-08
+      effect: supports
+      strength: strong
+    - fault: F16-AB-09
+      effect: supports
+      strength: strong
+    - fault: F16-AB-10
+      effect: supports
+      strength: strong
+    - fault: F16-AB-11
+      effect: supports
+      strength: strong
+    - fault: F16-AB-12
+      effect: supports
+      strength: strong
+    - fault: F16-AB-13
+      effect: supports
+      strength: strong
+    - fault: F16-AB-14
+      effect: supports
+      strength: strong
+    - fault: F16-AB-15
+      effect: supports
+      strength: strong
+    - fault: F16-AB-16
+      effect: supports
+      strength: strong
+    - fault: F16-AB-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Pipe leaking
+    effects: []
+    safety_trigger: false
+  - label: Water or coolant leaking
+    effects: []
+    safety_trigger: false
+  - label: Silencer noise
+    effects: []
+    safety_trigger: false
+  - label: Smoke coming
+    effects: []
+    safety_trigger: false
+  - label: Burning smell
+    effects: []
+    safety_trigger: false
+  - label: Other problem
+    effects:
+    - fault: F16-AB-13
+      effect: supports
+      strength: strong
+    - fault: F16-AB-15
+      effect: supports
+      strength: strong
+    - fault: F16-AB-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q01
+  status: approved
+  stage: 3
+  text: Was the car in an accident? Did any airbag open?
+  source_faults:
+  - F16-AB-01
+  - F16-AB-03
+  - F16-AB-05
+  - F16-AB-10
+  - F16-AB-15
+  merged_from:
+  - 'F16-AB-01 (stages_text): Was the car in an accident?'
+  - 'F16-AB-03 (stages_text): Did any airbag open?'
+  - 'F16-AB-15 (stages_text): Did any airbag open?'
+  - 'F16-AB-03 (stages_text): Is anyone hurt?'
+  options:
+  - label: Yes, and an airbag opened
+    effects:
+    - fault: F16-AB-03
+      effect: supports
+      strength: strong
+    - fault: F16-AB-15
+      effect: supports
+      strength: moderate
+    safety_trigger: true
+  - label: Yes, but no airbag opened
+    effects:
+    - fault: F16-AB-15
+      effect: supports
+      strength: strong
+    - fault: F16-AB-10
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-05
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No accident
+    effects:
+    - fault: F16-AB-03
+      effect: rules_out
+      strength: strong
+    - fault: F16-AB-15
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q02
+  status: approved
+  stage: 3
+  text: Did the warning start after a seat was moved, removed or repaired?
+  source_faults:
+  - F16-AB-01
+  - F16-AB-04
+  - F16-AB-08
+  merged_from:
+  - 'F16-AB-04 (stages_text): Was a seat moved or removed?'
+  - 'F16-AB-01 (stages_text): Did it start after seat movement or battery change?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-04
+      effect: supports
+      strength: strong
+    - fault: F16-AB-08
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-AB-04
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q03
+  status: approved
+  stage: 3
+  text: Were seat covers fitted recently?
+  source_faults:
+  - F16-AB-06
+  - F16-AB-16
+  merged_from:
+  - 'F16-AB-16 (stages_text): Were covers fitted recently?'
+  - 'F16-AB-06 (stages_text): Is there a seat cover?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-16
+      effect: supports
+      strength: strong
+    - fault: F16-AB-06
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-AB-16
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q04
+  status: approved
+  stage: 3
+  text: Was the battery changed, jump-started or very weak recently?
+  source_faults:
+  - F16-AB-01
+  - F16-AB-09
+  - F16-AB-11
+  merged_from:
+  - 'F16-AB-11 (stages_text): Was the battery changed?'
+  - 'F16-AB-09 (stages_text): Was the battery weak recently?'
+  - 'F16-AB-01 (stages_text): Did it start after seat movement or battery change?'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-11
+      effect: supports
+      strength: strong
+    - fault: F16-AB-09
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-AB-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q05
+  status: approved
+  stage: 3
+  text: Did water get inside the car?
+  source_faults:
+  - F16-AB-01
+  - F16-AB-12
+  merged_from:
+  - 'F16-AB-12 (stages_text): How high did the water come?'
+  - 'F16-AB-01 (stages_text): Was there water inside the car?'
+  options:
+  - label: Yes, the car was flooded (water above the floor)
+    effects:
+    - fault: F16-AB-12
+      effect: supports
+      strength: strong
+    safety_trigger: true
+  - label: The carpet is wet, or it smells musty under the seats
+    effects:
+    - fault: F16-AB-12
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-AB-12
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q06
+  status: approved
+  stage: 3
+  text: Is a seat belt locked, or slow to go back in?
+  source_faults:
+  - F16-AB-03
+  - F16-AB-05
+  merged_from:
+  - 'F16-AB-05 (stages_text): Is the belt locked?'
+  - 'F16-AB-05 (symptoms): Belt slow to retract'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-05
+      effect: supports
+      strength: strong
+    - fault: F16-AB-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-AB-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q07
+  status: approved
+  stage: 3
+  text: Does the seat belt buckle click in properly?
+  source_faults:
+  - F16-AB-13
+  merged_from:
+  - 'F16-AB-13 (stages_text): Does the buckle latch?'
+  - 'F16-AB-13 (symptoms): Coin / dirt inside buckle'
+  options:
+  - label: No, it does not latch
+    effects:
+    - fault: F16-AB-13
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-13
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q08
+  status: approved
+  stage: 3
+  text: Is the seat-belt warning wrong, for example it beeps for an empty seat or when the belt is on?
+  source_faults:
+  - F16-AB-01
+  - F16-AB-06
+  - F16-AB-13
+  merged_from:
+  - 'F16-AB-01 (stages_text): Is the seat-belt warning also showing?'
+  - 'F16-AB-13 (symptoms): Belt warning even when buckled'
+  - 'F16-AB-06 (symptoms): Seat-belt reminder beeps for empty seat'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-13
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-06
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q09
+  status: approved
+  stage: 3
+  text: Does the passenger airbag status light look wrong, or change when you put a bag on the seat?
+  source_faults:
+  - F16-AB-06
+  - F16-AB-16
+  merged_from:
+  - 'F16-AB-06 (symptoms): Light changes with bag on seat'
+  - 'F16-AB-16 (symptoms): Wrong passenger status'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-06
+      effect: supports
+      strength: strong
+    - fault: F16-AB-16
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: 'No'
+    effects:
+    - fault: F16-AB-06
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q10
+  status: approved
+  stage: 3
+  text: Are the horn or the steering-wheel buttons not working (sometimes only when the wheel is turned)?
+  source_faults:
+  - F16-AB-07
+  merged_from:
+  - 'F16-AB-07 (stages_text): Is the horn working?'
+  - 'F16-AB-07 (symptoms): Steering cruise / audio buttons fail at some angles'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-07
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No, they work
+    effects:
+    - fault: F16-AB-07
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q11
+  status: approved
+  stage: 3
+  text: Does the airbag light come and go, for example over bumps or potholes?
+  source_faults:
+  - F16-AB-01
+  - F16-AB-02
+  - F16-AB-07
+  - F16-AB-08
+  - F16-AB-14
+  merged_from:
+  - 'F16-AB-08 (symptoms): Light after bumps / potholes'
+  - 'F16-AB-01 (symptoms): Light comes and goes'
+  options:
+  - label: It comes and goes
+    effects:
+    - fault: F16-AB-08
+      effect: supports
+      strength: strong
+    - fault: F16-AB-07
+      effect: supports
+      strength: weak
+    - fault: F16-AB-01
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It stays on all the time
+    effects:
+    - fault: F16-AB-14
+      effect: supports
+      strength: weak
+    - fault: F16-AB-02
+      effect: supports
+      strength: weak
+    - fault: F16-AB-08
+      effect: rules_out
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q12
+  status: approved
+  stage: 3
+  text: Was any repair done recently on the dashboard, seats, steering or body?
+  source_faults:
+  - F16-AB-01
+  - F16-AB-02
+  - F16-AB-04
+  - F16-AB-07
+  - F16-AB-08
+  - F16-AB-10
+  merged_from:
+  - 'F16-AB-08 (stages_text): Any recent dashboard / seat work?'
+  - 'F16-AB-10 (stages_text): Any bump or body repair?'
+  - 'F16-AB-07 (symptoms): After steering work'
+  - 'F16-AB-01 (stages_text): Has any SRS part been repaired recently?'
+  options:
+  - label: Dashboard or seat work
+    effects:
+    - fault: F16-AB-08
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-04
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-02
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Steering work
+    effects:
+    - fault: F16-AB-07
+      effect: supports
+      strength: moderate
+    safety_trigger: false
+  - label: A bump, or bumper / door / body repair
+    effects:
+    - fault: F16-AB-10
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q13
+  status: approved
+  stage: 3
+  text: Has a workshop done an SRS (airbag) scan? What did it show?
+  source_faults:
+  - F16-AB-02
+  - F16-AB-08
+  - F16-AB-09
+  - F16-AB-14
+  merged_from:
+  - 'F16-AB-02 (stages_text): Do you have the fault code?'
+  - 'F16-AB-14 (stages_text): Were power and wiring tested?'
+  - 'F16-AB-09 (symptoms): Scanner shows ''no response'' from SRS'
+  options:
+  - label: An internal module fault, even after power and wiring were checked
+    effects:
+    - fault: F16-AB-14
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: The scanner got no response from the airbag system
+    effects:
+    - fault: F16-AB-09
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: A fault code for one circuit
+    effects:
+    - fault: F16-AB-02
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-08
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: No scan done yet
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q14
+  status: approved
+  stage: 3
+  text: Are other warning lights (for example ABS) on at the same time?
+  source_faults:
+  - F16-AB-09
+  - F16-AB-12
+  merged_from:
+  - 'F16-AB-09 (symptoms): ABS / other module warnings together'
+  - 'F16-AB-12 (symptoms): Many warnings'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-09
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-12
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q15
+  status: approved
+  stage: 3
+  text: When you switch on the ignition, does the airbag light come on for a few seconds and then go off?
+  source_faults:
+  - F16-AB-01
+  - F16-AB-14
+  - F16-AB-17
+  merged_from:
+  - 'F16-AB-17 (stages_text): Does the airbag light come on for a few seconds at start?'
+  - 'F16-AB-17 (symptoms): Light never shows at start'
+  options:
+  - label: It never comes on at all
+    effects:
+    - fault: F16-AB-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: It comes on and stays on
+    effects:
+    - fault: F16-AB-01
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-14
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: It comes on and goes off normally
+    effects:
+    - fault: F16-AB-17
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: airbag_srs-q16
+  status: approved
+  stage: 3
+  text: Did you buy this car used, or has it been repaired after an accident?
+  source_faults:
+  - F16-AB-15
+  - F16-AB-17
+  merged_from:
+  - 'F16-AB-17 (symptoms): Accident history'
+  - 'F16-AB-17 (symptoms): Insurance claim history'
+  options:
+  - label: 'Yes'
+    effects:
+    - fault: F16-AB-17
+      effect: supports
+      strength: moderate
+    - fault: F16-AB-15
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: 'No'
+    effects: []
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+faults:
+  F16-AB-01:
+    status: approved
+    name: Airbag Warning Light
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: SRS scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-02:
+    status: approved
+    name: Airbag System Fault (Message / Code Stored)
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: SRS scan and the maker's test procedure for the circuit named by the code.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-03:
+    status: approved
+    name: Airbags Deployed After Accident
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Authorised SRS inspection.
+    danger_phrases:
+    - airbags deployed
+    - anyone hurt
+    safety_trigger_options:
+    - question: airbag_srs-q01
+      option: Yes, and an airbag opened
+  F16-AB-04:
+    status: approved
+    name: Airbag Warning After Seat Movement
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: SRS scan and inspection of the under-seat connector.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-05:
+    status: approved
+    name: Seat Belt Pretensioner Fault
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: SRS scan.
+    danger_phrases:
+    - belt unusable
+    safety_trigger_options: []
+  F16-AB-06:
+    status: approved
+    name: Passenger Occupancy Sensor Fault
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Scan and occupancy sensor calibration.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-07:
+    status: approved
+    name: Steering Wheel Clock Spring Fault
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Scan and clock spring inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-08:
+    status: approved
+    name: Airbag Connector / Wiring Fault
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Scan and wiring inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-09:
+    status: approved
+    name: Airbag Control Module Communication Fault
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Power and network test of the airbag module.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-10:
+    status: approved
+    name: Crash Sensor Fault
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Scan and crash sensor inspection.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-11:
+    status: approved
+    name: Airbag Warning After Battery Replacement
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: SRS scan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-12:
+    status: approved
+    name: Airbag Warning After Water Damage
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Inspection and scan.
+    danger_phrases:
+    - flooded
+    safety_trigger_options:
+    - question: airbag_srs-q05
+      option: Yes, the car was flooded (water above the floor)
+  F16-AB-13:
+    status: approved
+    name: Seat Belt Buckle / SRS Signal Fault
+    stage2_choices:
+    - Airbag warning
+    - Other problem
+    confirmation_test: Buckle switch data check.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-14:
+    status: approved
+    name: Airbag Module Fault / Internal Diagnostic Error
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Full tests (power and wiring good, internal code stays).
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-15:
+    status: approved
+    name: Post-Accident SRS Inspection / System Restoration
+    stage2_choices:
+    - Airbag warning
+    - Other problem
+    confirmation_test: Maker's post-accident SRS inspection.
+    danger_phrases: []
+    safety_trigger_options:
+    - question: airbag_srs-q01
+      option: Yes, and an airbag opened
+  F16-AB-16:
+    status: approved
+    name: Airbag Light / Side Airbag Blocked by Aftermarket Seat Covers  [NEW - India]
+    stage2_choices:
+    - Airbag warning
+    confirmation_test: Remove the seat covers and rescan.
+    danger_phrases: []
+    safety_trigger_options: []
+  F16-AB-17:
+    status: approved
+    name: Used / Accident-Repaired Car With SRS Doubt  [NEW - India]
+    stage2_choices:
+    - Other problem
+    - Airbag warning
+    confirmation_test: SRS scan.
+    danger_phrases: []
+    safety_trigger_options: []
+safety_rules:
+- id: airbag_srs-s-F16-AB-01
+  status: approved
+  fault: F16-AB-01
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+
+      • Only trained technicians work on SRS.'
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-02
+  status: approved
+  fault: F16-AB-02
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-03
+  status: approved
+  fault: F16-AB-03
+  risk_level: high
+  stop_driving_trigger: Do not drive if the airbags opened.
+  roadside_action: Check if anyone is hurt and call 108 / 112 if needed. Do not drive the car. Do not touch the
+    airbag parts, they can be hot. Call for a tow.
+  towing_recommendation: Yes.
+  source_text:
+    safety_precautions: '• Deployed modules get hot; powder may irritate skin/eyes.
+
+      • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.'
+    if_towing_needed: YES.
+- id: airbag_srs-s-F16-AB-04
+  status: approved
+  fault: F16-AB-04
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan. Do not touch any loose wire under the seat.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-05
+  status: approved
+  fault: F16-AB-05
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the seat belt cannot be used.
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. If the seat belt cannot be used,
+    do not drive. Call a mechanic.
+  towing_recommendation: No, unless the belt cannot be used.
+  source_text:
+    safety_precautions: '• Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+
+      • Pyrotechnic part - trained only.'
+    if_towing_needed: NO unless belt unusable.
+- id: airbag_srs-s-F16-AB-06
+  status: approved
+  fault: F16-AB-06
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Remove seat covers and any objects from the seat. Do not unplug or touch any airbag parts or
+    yellow connectors. The car can be driven, but the airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-07
+  status: approved
+  fault: F16-AB-07
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: '• Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+
+      • Airbag module stored face up, away from heat.'
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-08
+  status: approved
+  fault: F16-AB-08
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-09
+  status: approved
+  fault: F16-AB-09
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-10
+  status: approved
+  fault: F16-AB-10
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-11
+  status: approved
+  fault: F16-AB-11
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Check that the battery terminals are tight. Do not unplug or touch any airbag parts or yellow
+    connectors. The car can be driven, but the airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-12
+  status: approved
+  fault: F16-AB-12
+  risk_level: medium
+  stop_driving_trigger: Do not start the car if it was flooded.
+  roadside_action: If water came inside the car, do not start it. Call for a tow. Do not unplug or touch any airbag
+    parts or yellow connectors.
+  towing_recommendation: Yes, if the car was flooded.
+  source_text:
+    safety_precautions: '• Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+
+      • Battery OFF before drying.'
+    if_towing_needed: YES if flooded.
+- id: airbag_srs-s-F16-AB-13
+  status: approved
+  fault: F16-AB-13
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-14
+  status: approved
+  fault: F16-AB-14
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-15
+  status: approved
+  fault: F16-AB-15
+  risk_level: medium
+  stop_driving_trigger: Do not drive if the accident damage makes the car unsafe.
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. Get a full SRS inspection after
+    the accident. If the damage makes the car unsafe, call for a tow.
+  towing_recommendation: Depends on the damage.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: Depends on damage.
+- id: airbag_srs-s-F16-AB-16
+  status: approved
+  fault: F16-AB-16
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Remove the aftermarket seat covers. Do not unplug or touch any airbag parts or yellow connectors.
+    The car can be driven, but the airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
+- id: airbag_srs-s-F16-AB-17
+  status: approved
+  fault: F16-AB-17
+  risk_level: low
+  stop_driving_trigger: Not stated
+  roadside_action: Do not unplug or touch any airbag parts or yellow connectors. The car can be driven, but the
+    airbags may not work in a crash. Book an SRS scan.
+  towing_recommendation: No.
+  source_text:
+    safety_precautions: • Do not unplug, test or touch airbag parts or yellow SRS connectors yourself.
+    if_towing_needed: NO.
