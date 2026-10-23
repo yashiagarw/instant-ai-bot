@@ -8,9 +8,10 @@ from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
 from sqlalchemy.engine import make_url
+from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
-from app.db import database_is_up, make_engine
+from app.db import database_is_up, get_session, make_engine
 from app.main import create_app
 
 BACKEND = Path(__file__).resolve().parent.parent
@@ -56,8 +57,28 @@ def migrated_db(test_engine, alembic_config):
 
 
 @pytest.fixture
-def client(test_settings, migrated_db):
+def db_connection(migrated_db):
+    """A connection inside a transaction that is rolled back after the test.
+    Test modules can override this fixture (e.g. to start from seeded data)."""
+    with migrated_db.connect() as conn:
+        trans = conn.begin()
+        yield conn
+        trans.rollback()
+
+
+@pytest.fixture
+def db_session(db_connection):
+    """ORM session on the test connection. commit() only releases a savepoint, so nothing
+    a test writes survives the test."""
+    with Session(bind=db_connection, join_transaction_mode="create_savepoint") as session:
+        yield session
+
+
+@pytest.fixture
+def client(test_settings, db_session):
+    """API client whose requests use the test's db_session."""
     app = create_app(test_settings)
+    app.dependency_overrides[get_session] = lambda: db_session
     with TestClient(app) as c:
         yield c
     app.state.engine.dispose()

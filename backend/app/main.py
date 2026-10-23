@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import health
 from app.config import Settings, get_settings
 from app.db import make_engine, make_session_factory
+from app.vehicles import api as vehicles_api
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -25,6 +26,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     app.include_router(health.router, prefix="/api")
+    app.include_router(vehicles_api.router, prefix="/api")
     return app
 
 

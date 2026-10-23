@@ -306,6 +306,24 @@ Every question has exactly one `is_not_sure` option, which has no effects. Stage
 
 QUALITY_AUDIT rows are not imported as data. The importer copies their result into the import report, and their key lists (APPROX keys, fit-to-confirm keys) become a fallback fault link for file 9's part sources.
 
+## Catalogue, sessions and requests
+
+Implemented with the knowledge tables in migration `0002` (task 1.3). Code: `backend/app/vehicles`, `backend/app/diagnosis`, `backend/app/requests`.
+
+| Table | Main columns | Notes |
+|---|---|---|
+| makes | name, aliases | |
+| models | make_id, name, body_type, aliases, search_text | `search_text` (make + model + aliases, lower case) has a pg_trgm GIN index for fuzzy search |
+| variants | model_id, name, fuel, transmission, engine, year_from, year_to, price_segment | one row per fuel + gearbox + generation; unique on (model, fuel, transmission, year_from, engine). EVs and hybrids are variants of the parent model |
+| unlisted_vehicles | raw_text, typed make / model / year, fuel, transmission, price_segment, reviewed | null fuel / gearbox / segment = "Not sure" |
+| diagnosis_sessions | id (random UUID), variant_id or unlisted_vehicle_id (not both), vehicle_snapshot, price_segment, coverage_level, problem_group_code, entry_text, status, engine_version, dataset_version_id, completed_at | the snapshot keeps history stable when the catalogue changes |
+| session_events | session_id, event_type, question_id, option_id, payload, created_at | `created_at` is when the question was asked / answered |
+| session_results | session_id, rank, fault_id, fault_key, score, confidence, evidence, cost_snapshot | |
+| feedback | session_id, source (customer / support / mechanic), helpful, comment, confirmed_fault_id | confirmed fault = future training label |
+| service_requests | id (UUID), session_id, name, phone, area_text, vehicle_snapshot, problem_summary, status, consent_given, consent_text_version, consent_at | a CHECK refuses any row without a full consent record |
+
+Value sets (fuel, transmission, segment, statuses) are text columns with CHECK constraints rather than native Postgres enums, so adding a value is a one-line migration. Seed data: `data/catalogue/vehicles.yaml` (`uv run python -m app.vehicles.seed`).
+
 ## Coverage level (computed, not stored per fault)
 
 | Level | When |

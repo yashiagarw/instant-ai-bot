@@ -1,0 +1,464 @@
+# Vehicle catalogue seed: popular cars in Delhi NCR (India).
+# Load or update with:  cd backend && uv run python -m app.vehicles.seed
+#
+# Structure: make -> model -> variants. Each variant line expands to one row per
+# transmission in `transmissions`.
+#   years:     [from, to]  (to = null means still on sale)
+#   fuel:      petrol | diesel | cng | hybrid | ev     (ev = pure battery EV; hybrid = strong hybrid)
+#   transmissions: mt | amt | cvt | dct | at          (cvt includes hybrid e-CVT; at = torque converter / EV single speed)
+#   segment:   budget (below Rs 10 lakh ex-showroom) | mid (10-25 lakh) | premium (above 25 lakh)
+#   engine:    optional; needed when two variants share fuel + transmission + years (e.g. "1.0 Turbo")
+#
+# REVIEW BEFORE LAUNCH. Years and segments were compiled from public launch dates and
+# ex-showroom price ranges (Oct 2026) and have not been checked by the team. Models whose
+# price range crosses a boundary are split by the typical price of that fuel / gearbox,
+# so a top trim may sit one segment higher. Older generations are not listed: users with
+# those cars use "My car isn't listed" and pick fuel, gearbox and price band.
+# EVs and hybrids are variants of their parent model (Nexon EV = Nexon, fuel ev).
+
+version: 1
+reviewed: false
+
+makes:
+  - name: Maruti Suzuki
+    aliases: [maruti, suzuki, msil]
+    models:
+      - name: Alto K10
+        body: hatchback
+        aliases: [alto]
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2022, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: S-Presso
+        body: hatchback
+        aliases: [spresso, s presso]
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2019, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Celerio
+        body: hatchback
+        variants:
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2021, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Wagon R
+        body: hatchback
+        aliases: [wagonr, wagon-r]
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2019, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Swift
+        body: hatchback
+        variants:
+          - {years: [2018, 2024], fuel: petrol, transmissions: [mt, amt], segment: budget, engine: "1.2 K-series"}
+          - {years: [2024, null], fuel: petrol, transmissions: [mt, amt], segment: budget, engine: "1.2 Z-series"}
+          - {years: [2024, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Dzire
+        body: sedan
+        aliases: [swift dzire, desire]
+        variants:
+          - {years: [2017, 2024], fuel: petrol, transmissions: [mt, amt], segment: budget, engine: "1.2 K-series"}
+          - {years: [2017, 2024], fuel: cng, transmissions: [mt], segment: budget, engine: "1.2 K-series"}
+          - {years: [2024, null], fuel: petrol, transmissions: [mt, amt], segment: budget, engine: "1.2 Z-series"}
+          - {years: [2024, null], fuel: cng, transmissions: [mt], segment: budget, engine: "1.2 Z-series"}
+      - name: Baleno
+        body: hatchback
+        variants:
+          - {years: [2015, 2022], fuel: petrol, transmissions: [mt, cvt], segment: budget}
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2022, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Fronx
+        body: crossover
+        variants:
+          - {years: [2023, null], fuel: petrol, transmissions: [mt, amt], segment: budget, engine: "1.2"}
+          - {years: [2023, null], fuel: petrol, transmissions: [mt], segment: mid, engine: "1.0 Turbo"}
+          - {years: [2023, null], fuel: petrol, transmissions: [at], segment: mid, engine: "1.0 Turbo"}
+          - {years: [2023, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Brezza
+        body: suv
+        aliases: [vitara brezza]
+        variants:
+          - {years: [2016, 2020], fuel: diesel, transmissions: [mt, amt], segment: budget}
+          - {years: [2020, 2022], fuel: petrol, transmissions: [mt], segment: budget}
+          - {years: [2020, 2022], fuel: petrol, transmissions: [at], segment: mid}
+          - {years: [2022, null], fuel: petrol, transmissions: [mt], segment: budget}
+          - {years: [2022, null], fuel: petrol, transmissions: [at], segment: mid}
+          - {years: [2022, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Ertiga
+        body: mpv
+        variants:
+          - {years: [2018, null], fuel: petrol, transmissions: [mt], segment: budget}
+          - {years: [2018, null], fuel: petrol, transmissions: [at], segment: mid}
+          - {years: [2018, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Grand Vitara
+        body: suv
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, at], segment: mid}
+          - {years: [2022, null], fuel: hybrid, transmissions: [cvt], segment: mid}
+          - {years: [2022, null], fuel: cng, transmissions: [mt], segment: mid}
+      - name: Eeco
+        body: van
+        variants:
+          - {years: [2010, null], fuel: petrol, transmissions: [mt], segment: budget}
+          - {years: [2010, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Jimny
+        body: suv
+        variants:
+          - {years: [2023, null], fuel: petrol, transmissions: [mt, at], segment: mid}
+      - name: Invicto
+        body: mpv
+        variants:
+          - {years: [2023, null], fuel: hybrid, transmissions: [cvt], segment: premium}
+
+  - name: Hyundai
+    aliases: [hundai, hyndai]
+    models:
+      - name: Grand i10 Nios
+        body: hatchback
+        aliases: [i10, grand i10, nios]
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2019, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: i20
+        body: hatchback
+        aliases: [elite i20]
+        variants:
+          - {years: [2020, null], fuel: petrol, transmissions: [mt], segment: budget, engine: "1.2"}
+          - {years: [2020, null], fuel: petrol, transmissions: [cvt], segment: mid, engine: "1.2"}
+          - {years: [2020, null], fuel: petrol, transmissions: [dct], segment: mid, engine: "1.0 Turbo"}
+      - name: Aura
+        body: sedan
+        variants:
+          - {years: [2020, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2020, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Exter
+        body: suv
+        variants:
+          - {years: [2023, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2023, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Venue
+        body: suv
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [mt], segment: budget, engine: "1.2"}
+          - {years: [2019, null], fuel: petrol, transmissions: [dct], segment: mid, engine: "1.0 Turbo"}
+          - {years: [2019, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: Verna
+        body: sedan
+        variants:
+          - {years: [2023, null], fuel: petrol, transmissions: [mt, cvt], segment: mid, engine: "1.5"}
+          - {years: [2023, null], fuel: petrol, transmissions: [dct], segment: mid, engine: "1.5 Turbo"}
+      - name: Creta
+        body: suv
+        aliases: [creta electric]
+        variants:
+          - {years: [2015, 2020], fuel: petrol, transmissions: [mt, at], segment: mid}
+          - {years: [2015, 2020], fuel: diesel, transmissions: [mt, at], segment: mid}
+          - {years: [2020, null], fuel: petrol, transmissions: [mt, cvt], segment: mid, engine: "1.5"}
+          - {years: [2020, null], fuel: petrol, transmissions: [dct], segment: mid, engine: "1.5 Turbo"}
+          - {years: [2020, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+          - {years: [2025, null], fuel: ev, transmissions: [at], segment: mid}
+      - name: Alcazar
+        body: suv
+        variants:
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, dct], segment: mid}
+          - {years: [2021, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: Ioniq 5
+        body: suv
+        aliases: [ioniq]
+        variants:
+          - {years: [2023, null], fuel: ev, transmissions: [at], segment: premium}
+
+  - name: Tata
+    aliases: [tata motors]
+    models:
+      - name: Tiago
+        body: hatchback
+        aliases: [tiago ev]
+        variants:
+          - {years: [2016, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2022, null], fuel: cng, transmissions: [mt, amt], segment: budget}
+          - {years: [2022, null], fuel: ev, transmissions: [at], segment: budget}
+      - name: Tigor
+        body: sedan
+        aliases: [tigor ev]
+        variants:
+          - {years: [2017, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2022, null], fuel: cng, transmissions: [mt, amt], segment: budget}
+          - {years: [2021, null], fuel: ev, transmissions: [at], segment: mid}
+      - name: Altroz
+        body: hatchback
+        variants:
+          - {years: [2020, null], fuel: petrol, transmissions: [mt, dct], segment: budget}
+          - {years: [2020, null], fuel: diesel, transmissions: [mt], segment: budget}
+          - {years: [2023, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Punch
+        body: suv
+        aliases: [punch ev]
+        variants:
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2023, null], fuel: cng, transmissions: [mt], segment: budget}
+          - {years: [2024, null], fuel: ev, transmissions: [at], segment: mid}
+      - name: Nexon
+        body: suv
+        aliases: [nexon ev]
+        variants:
+          - {years: [2017, 2023], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2017, 2023], fuel: diesel, transmissions: [mt, amt], segment: mid}
+          - {years: [2023, null], fuel: petrol, transmissions: [mt], segment: budget}
+          - {years: [2023, null], fuel: petrol, transmissions: [amt, dct], segment: mid}
+          - {years: [2023, null], fuel: diesel, transmissions: [mt, amt], segment: mid}
+          - {years: [2024, null], fuel: cng, transmissions: [mt], segment: budget}
+          - {years: [2020, null], fuel: ev, transmissions: [at], segment: mid}
+      - name: Curvv
+        body: suv
+        aliases: [curv, curvv ev]
+        variants:
+          - {years: [2024, null], fuel: petrol, transmissions: [mt, dct], segment: mid}
+          - {years: [2024, null], fuel: diesel, transmissions: [mt, dct], segment: mid}
+          - {years: [2024, null], fuel: ev, transmissions: [at], segment: mid}
+      - name: Harrier
+        body: suv
+        variants:
+          - {years: [2019, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: Safari
+        body: suv
+        variants:
+          - {years: [2021, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+
+  - name: Mahindra
+    aliases: [mahindra and mahindra, m&m]
+    models:
+      - name: Bolero
+        body: suv
+        variants:
+          - {years: [2011, null], fuel: diesel, transmissions: [mt], segment: budget}
+      - name: Bolero Neo
+        body: suv
+        aliases: [neo, tuv300]
+        variants:
+          - {years: [2021, null], fuel: diesel, transmissions: [mt], segment: mid}
+      - name: Thar
+        body: suv
+        variants:
+          - {years: [2020, null], fuel: petrol, transmissions: [mt, at], segment: mid}
+          - {years: [2020, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: Thar Roxx
+        body: suv
+        aliases: [roxx, thar 5 door]
+        variants:
+          - {years: [2024, null], fuel: petrol, transmissions: [mt, at], segment: mid}
+          - {years: [2024, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: XUV 3XO
+        body: suv
+        aliases: [xuv3xo, 3xo, xuv300, xuv 300]
+        variants:
+          - {years: [2019, 2024], fuel: petrol, transmissions: [mt, amt], segment: budget, engine: "1.2 Turbo (XUV300)"}
+          - {years: [2019, 2024], fuel: diesel, transmissions: [mt, amt], segment: mid, engine: "1.5 (XUV300)"}
+          - {years: [2024, null], fuel: petrol, transmissions: [mt], segment: budget}
+          - {years: [2024, null], fuel: petrol, transmissions: [at], segment: mid}
+          - {years: [2024, null], fuel: diesel, transmissions: [mt, amt], segment: mid}
+      - name: Scorpio-N
+        body: suv
+        aliases: [scorpio n, scorpion]
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, at], segment: mid}
+          - {years: [2022, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: Scorpio Classic
+        body: suv
+        aliases: [scorpio]
+        variants:
+          - {years: [2022, null], fuel: diesel, transmissions: [mt], segment: mid}
+      - name: XUV700
+        body: suv
+        aliases: [xuv 700, xuv7oo]
+        variants:
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, at], segment: mid}
+          - {years: [2021, null], fuel: diesel, transmissions: [mt], segment: mid}
+          - {years: [2021, null], fuel: diesel, transmissions: [at], segment: premium}
+      - name: BE 6
+        body: suv
+        aliases: [be6]
+        variants:
+          - {years: [2025, null], fuel: ev, transmissions: [at], segment: mid}
+
+  - name: Kia
+    models:
+      - name: Sonet
+        body: suv
+        variants:
+          - {years: [2020, null], fuel: petrol, transmissions: [mt], segment: budget, engine: "1.2"}
+          - {years: [2020, null], fuel: petrol, transmissions: [dct], segment: mid, engine: "1.0 Turbo"}
+          - {years: [2020, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: Seltos
+        body: suv
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [mt, cvt], segment: mid, engine: "1.5"}
+          - {years: [2019, null], fuel: petrol, transmissions: [dct], segment: mid, engine: "Turbo"}
+          - {years: [2019, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: Carens
+        body: mpv
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [mt], segment: mid, engine: "1.5"}
+          - {years: [2022, null], fuel: petrol, transmissions: [dct], segment: mid, engine: "1.5 Turbo"}
+          - {years: [2022, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: Syros
+        body: suv
+        variants:
+          - {years: [2025, null], fuel: petrol, transmissions: [mt, dct], segment: mid}
+          - {years: [2025, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+      - name: EV6
+        body: crossover
+        variants:
+          - {years: [2022, null], fuel: ev, transmissions: [at], segment: premium}
+
+  - name: Honda
+    models:
+      - name: Amaze
+        body: sedan
+        variants:
+          - {years: [2018, 2024], fuel: petrol, transmissions: [mt, cvt], segment: budget}
+          - {years: [2018, 2023], fuel: diesel, transmissions: [mt, cvt], segment: budget}
+          - {years: [2024, null], fuel: petrol, transmissions: [mt, cvt], segment: budget}
+      - name: City
+        body: sedan
+        aliases: [city hybrid, city ehev, e:hev]
+        variants:
+          - {years: [2020, null], fuel: petrol, transmissions: [mt, cvt], segment: mid}
+          - {years: [2020, 2023], fuel: diesel, transmissions: [mt], segment: mid}
+          - {years: [2022, null], fuel: hybrid, transmissions: [cvt], segment: mid}
+      - name: Elevate
+        body: suv
+        variants:
+          - {years: [2023, null], fuel: petrol, transmissions: [mt, cvt], segment: mid}
+
+  - name: Toyota
+    models:
+      - name: Glanza
+        body: hatchback
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+          - {years: [2022, null], fuel: cng, transmissions: [mt], segment: budget}
+      - name: Urban Cruiser Hyryder
+        body: suv
+        aliases: [hyryder, hyrider]
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, at], segment: mid}
+          - {years: [2022, null], fuel: hybrid, transmissions: [cvt], segment: mid}
+          - {years: [2023, null], fuel: cng, transmissions: [mt], segment: mid}
+      - name: Innova Crysta
+        body: mpv
+        aliases: [innova, crysta]
+        variants:
+          - {years: [2016, null], fuel: diesel, transmissions: [mt, at], segment: mid}
+          - {years: [2016, 2022], fuel: petrol, transmissions: [mt, at], segment: mid}
+      - name: Innova Hycross
+        body: mpv
+        aliases: [hycross]
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [cvt], segment: mid}
+          - {years: [2022, null], fuel: hybrid, transmissions: [cvt], segment: premium}
+      - name: Fortuner
+        body: suv
+        variants:
+          - {years: [2016, null], fuel: petrol, transmissions: [mt, at], segment: premium}
+          - {years: [2016, null], fuel: diesel, transmissions: [mt, at], segment: premium}
+
+  - name: MG
+    aliases: [morris garages, mg motor]
+    models:
+      - name: Comet EV
+        body: hatchback
+        aliases: [comet]
+        variants:
+          - {years: [2023, null], fuel: ev, transmissions: [at], segment: budget}
+      - name: Windsor EV
+        body: crossover
+        aliases: [windsor]
+        variants:
+          - {years: [2024, null], fuel: ev, transmissions: [at], segment: mid}
+      - name: Hector
+        body: suv
+        aliases: [hector plus]
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [mt, cvt], segment: mid}
+          - {years: [2019, null], fuel: diesel, transmissions: [mt], segment: mid}
+      - name: ZS EV
+        body: suv
+        aliases: [zs]
+        variants:
+          - {years: [2020, null], fuel: ev, transmissions: [at], segment: mid}
+
+  - name: Renault
+    models:
+      - name: Kwid
+        body: hatchback
+        aliases: [kwid]
+        variants:
+          - {years: [2015, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+      - name: Triber
+        body: mpv
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
+      - name: Kiger
+        body: suv
+        variants:
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, amt], segment: budget, engine: "1.0"}
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, cvt], segment: budget, engine: "1.0 Turbo"}
+
+  - name: Nissan
+    models:
+      - name: Magnite
+        body: suv
+        variants:
+          - {years: [2020, null], fuel: petrol, transmissions: [mt, amt], segment: budget, engine: "1.0"}
+          - {years: [2020, null], fuel: petrol, transmissions: [mt, cvt], segment: budget, engine: "1.0 Turbo"}
+
+  - name: Skoda
+    models:
+      - name: Kushaq
+        body: suv
+        variants:
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, at], segment: mid, engine: "1.0 TSI"}
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, dct], segment: mid, engine: "1.5 TSI"}
+      - name: Slavia
+        body: sedan
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, at], segment: mid, engine: "1.0 TSI"}
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, dct], segment: mid, engine: "1.5 TSI"}
+      - name: Kylaq
+        body: suv
+        variants:
+          - {years: [2025, null], fuel: petrol, transmissions: [mt], segment: budget}
+          - {years: [2025, null], fuel: petrol, transmissions: [at], segment: mid}
+
+  - name: Volkswagen
+    aliases: [vw]
+    models:
+      - name: Taigun
+        body: suv
+        variants:
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, at], segment: mid, engine: "1.0 TSI"}
+          - {years: [2021, null], fuel: petrol, transmissions: [mt, dct], segment: mid, engine: "1.5 TSI"}
+      - name: Virtus
+        body: sedan
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, at], segment: mid, engine: "1.0 TSI"}
+          - {years: [2022, null], fuel: petrol, transmissions: [mt, dct], segment: mid, engine: "1.5 TSI"}
+
+  - name: BMW
+    models:
+      - name: 3 Series
+        body: sedan
+        aliases: [3 series gran limousine, 330li, 320d]
+        variants:
+          - {years: [2019, null], fuel: petrol, transmissions: [at], segment: premium}
+          - {years: [2019, null], fuel: diesel, transmissions: [at], segment: premium}
+
+  - name: Mercedes-Benz
+    aliases: [mercedes, benz, merc]
+    models:
+      - name: C-Class
+        body: sedan
+        aliases: [c class, c200, c220d]
+        variants:
+          - {years: [2022, null], fuel: petrol, transmissions: [at], segment: premium}
+          - {years: [2022, null], fuel: diesel, transmissions: [at], segment: premium}

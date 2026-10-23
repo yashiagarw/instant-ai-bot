@@ -12,6 +12,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `backend/alembic` | Database migrations |
 | `data/raw` | The 18 original Excel datasets. Never edit |
 | `data/schema` | Manifest, column aliases, taxonomy, import rules |
+| `data/catalogue` | Vehicle catalogue seed (editable YAML) |
 | `docs` | Dataset profile, findings, data model |
 | `scripts` | Offline data scripts (dataset profiler) |
 | `docker-compose.yml` | PostgreSQL 16 + pgvector |
@@ -37,6 +38,7 @@ docker compose up -d db
 cd backend
 uv sync
 uv run alembic upgrade head
+uv run python -m app.vehicles.seed      # vehicle catalogue from data/catalogue/vehicles.yaml
 cd ..
 
 # 4. Web
@@ -53,6 +55,7 @@ Two terminals:
 cd backend && uv run uvicorn app.main:app --reload --port 8000
 # http://localhost:8000/api/health  ->  {"status":"ok","database":"ok"}
 # http://localhost:8000/docs        ->  API docs
+# http://localhost:8000/api/vehicles/search?q=swift%202019%20petrol
 ```
 
 ```bash
@@ -83,6 +86,7 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 - Connection settings: root `.env` (container) and `backend/.env` (`DATABASE_URL`, `TEST_DATABASE_URL`). Keep them in sync.
 - The test database is created by `docker/postgres/init/` the first time the volume is created. If you created the volume before that script existed, run `docker compose down -v && docker compose up -d db` (this deletes local data).
 - pytest refuses to run against a database whose name does not end in `_test`.
+- Vehicle catalogue: edit `data/catalogue/vehicles.yaml`, then `cd backend && uv run python -m app.vehicles.seed` (safe to re-run; add `--prune` to delete entries removed from the file).
 - New migration: `cd backend && uv run alembic revision -m "describe change"` (autogenerate works once models exist: add `--autogenerate`). Never edit an applied migration.
 
 ## Environment variables
