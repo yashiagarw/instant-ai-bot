@@ -2,3 +2,15 @@
 __pycache__/
 .venv/
 .pytest_cache/
+.ruff_cache/
+
+# Secrets: real env files stay local. The *.example files are committed.
+.env
+.env.*
+!.env.example
+
+# Node / Next.js (apps/web has its own .gitignore too)
+node_modules/
+.next/
+coverage/
+*.tsbuildinfo
