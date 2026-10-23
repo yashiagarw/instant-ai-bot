@@ -2,6 +2,8 @@
 
 Checked on 23 Oct 2026 against the 18 files in `data/raw/` with `scripts/profile_datasets.py`. Full generated numbers: `docs/dataset-check.md`. Target schema: `docs/data-model.md`. Nothing in `data/raw/` was changed (SHA-1 of every file compared before and after).
 
+This file is the change log for the dataset profile: section 1 lists the corrections now applied to `docs/dataset-profile.md`, and section 6 records the decisions on the open questions.
+
 Re-run:
 
 ```bash
@@ -113,23 +115,32 @@ Row counts are data rows after the header; "notes" are trailing rows without a f
 | 17 | Gearbox, key lockout, suspension, CNG, diesel | 85 (GB 17, KL 17, SU 17, CG 17, DS 17) | 4 | numeric | 1,105 | 148 / 60 | none | SU clashes with 14 |
 | 18 | Body, waterlogging, number plate, towing | 64 (BD 16, WL 16, NF 16, TW 16) | 4 | numeric | 832 | 101 / 48 | 11 sheets | water / accident rules, towing calculator |
 
-## 6. Open questions
+## 6. Decisions (change log)
 
-1. **File 2 costs.** Do you have an older copy of the Overheating file with its price sheet (the one the `#REF!` formulas pointed to)? If not, should the costs be re-entered from the part-price text plus labour estimates, or should Overheating launch with "price on inspection"? It is a Phase 1 category.
-2. **Text costs in files 6 and 7.** Show file 7's ranges as ranges (₹2,150–₹2,795), and file 6's "₹800–₹3,000 + additional quotation required" as text? Or do you want numbers entered for these 139 rows?
-3. **Phrases for files 1-6.** These have one example phrase per row. Can your team write 5-10 real-sounding Hinglish phrases per fault for Clutch, Overheating, Steering, Tyre, AC and EV (about 160 rows)? Without them, matching and testing for these categories is weak, and 4 of them are Phase 1.
-4. **Synthetic phrases.** Most phrase cells say "example" or "synthetic, not real complaints". OK to use them for matching and as test cases, provided we label the accuracy as "on synthetic phrases" until real cases come in?
-5. **Suspension (files 14 and 17).** Merge into one category now and dedupe in review, or keep two categories until the review?
-6. **CL-02 "MAYBE"**: is it Limited?
-7. **Safety sheet rows.** Treat SAFETY_AND_TOWING_RULES, WATERLOGGING and ACCIDENT rows as approved on import, or should a mechanic sign them off first? Same for the global "EMERGENCY - ..." lines.
-8. **File 9 part sources.** No fault column. Should we link them via QUALITY_AUDIT key lists and part numbers (reviewed), or can your team add a "Fault IDs using it" column like files 12, 14 and 18?
-9. **Vehicle filters beyond the brief.** (a) Fuel delivery (FD) is about petrol: show only for petrol, CNG and hybrid cars (proposed `petrol_engine` filter)? (b) Should EVs also hide engine-only categories (clutch, exhaust, fuel delivery, CNG, diesel, engine belt, jerking / misfire)? (c) DCT gearboxes have clutches; should they see Clutch?
-10. **Emergency row.** The roadmap's tile table has 8 topics including "Smoke or burning smell"; prompt 1.8 lists 7 without smoke and adds "Need a tow". I kept the 8 from the tile table. On an EV, should "Petrol finished" become "Battery ran out"?
-11. **Category kinds.** I set fast_track for stuck, key lockout, waterlogging, towing / accident and smoke (they appear only in the emergency row), and inspect for inspection and body. Is number plate / fittings a diagnose category or a service booking?
-12. **Hindi labels.** Only 4 tile labels come from the roadmap. Who will check the other drafts (`hi_review: true` in taxonomy.yaml)? Do categories also need Hindi names?
-13. **EV columns.** Is STEP-BY-STEP REPAIR PLAN customer-facing or mechanic-only? Same for REPAIR RESULT CHECK. I marked both internal for now.
-14. **Pictures.** All pictures are AI-generated illustrations, and the sheets say "not an OEM drawing". OK to show them to customers with a "drawn guide picture" caption? File 4 links to Google image searches. Drop those?
-15. **Profile doc.** Should I update `docs/dataset-profile.md` with the corrections in section 1, or keep it as the original profile and treat this file as the correction?
+The 15 open questions from the first version of this file, answered on 23 Oct 2026. Where each decision lives:
+
+| # | Question | Decision | Recorded in |
+|---|---|---|---|
+| 1 | File 2 costs (`#REF!`, no older file) | Recalculate from the "Parts total" line in the part-price text plus a reviewed labour table, marked "approx". Show "Price on inspection" where that is not possible. Overheating stays in Phase 1 | import_rules.yaml `costs.2`; data-model.md fault_costs |
+| 2 | Text costs in files 6 and 7 | File 7: parse ranges into min / max and show as ranges. File 6: keep text, flag "quotation required". No manual entry | import_rules.yaml `costs.6`, `costs.7` |
+| 3 | Phrases for files 1-6 | Team writes real phrases later. Task 1.4b gets an extra step: draft 5-10 Hinglish phrases per fault for files 1-6, synthetic and `draft`, approved by a person | import_rules.yaml `phrases`; data-model.md customer_phrases |
+| 4 | Synthetic phrases | Use them; label accuracy "on synthetic phrases" until real cases exist | import_rules.yaml `phrases` |
+| 5 | Suspension (files 14, 17) | One category now; both original IDs kept (F14-SU-xx, F17-SU-xx); dedupe in review | taxonomy.yaml `suspension`; data-model.md category_sources |
+| 6 | CL-02 "MAYBE" | Limited | import_rules.yaml `value_overrides` |
+| 7 | Safety rows sign-off | Imported active as `active_pending_signoff` (warnings work before review). A mechanic signs off all before launch. Same for the EMERGENCY lines | import_rules.yaml `safety`; data-model.md safety_rules |
+| 8 | File 9 part sources | Draft links from QUALITY_AUDIT keys and part numbers, for review. Team may add a "Fault IDs using it" column later | import_rules.yaml `part_links`; data-model.md reference tables |
+| 9 | Extra vehicle filters | (a) Fuel delivery only for petrol, CNG, hybrid. (b) Pure EVs hide engine-only categories (clutch, engine belt, jerking / misfire, exhaust; fuel, CNG and diesel already hidden by their fuel filters); hybrids keep them. (c) Clutch for MT, AMT and DCT; not for torque-converter AT or CVT | taxonomy.yaml `vehicle_filters` |
+| 10 | Emergency row | Keep 8 topics. On EVs, "Petrol finished" becomes "Battery ran out" and routes to EV charging rows | taxonomy.yaml `emergency.out_of_fuel.variants` |
+| 11 | Number plate / fittings | `inspect` (service booking) | taxonomy.yaml |
+| 12 | Hindi labels | The team's Hindi speaker checks every `hi_review` label. Only tiles and emergency topics need Hindi; categories do not | taxonomy.yaml; data-model.md categories |
+| 13 | EV repair plan / result check | Mechanic-only | column_aliases.yaml |
+| 14 | Pictures | Show with the caption "Illustration, not an exact part drawing". Google search links (file 4) are internal only | import_rules.yaml `images`, `internal_sheets` |
+| 15 | Profile doc | `docs/dataset-profile.md` updated with the corrections; this file is the change log | dataset-profile.md |
+
+Still open:
+
+- The file 2 labour table (`data/review/costs/F02-labour.yaml`) needs a person to approve it in task 1.4; until then Overheating costs show "Price on inspection".
+- Exactly which EV rows "Battery ran out" routes to is set in the reviewed structuring step (`fault_hint: charging`).
 
 ## 7. Follow-ups noticed (not done)
 

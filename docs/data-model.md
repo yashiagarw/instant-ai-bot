@@ -1,12 +1,13 @@
 # Canonical data model
 
-Status: draft for review (23 Oct 2026). This is the target schema the importer (task 1.4) maps the 18 Excel files into, and the shape the SQLAlchemy models (task 1.3) implement. It is written from the real files: see `docs/dataset-check.md` (generated) and `docs/dataset-findings.md`.
+Status: draft, updated with the answers to the dataset open questions (23 Oct 2026; see "Decisions" in `docs/dataset-findings.md`). This is the target schema the importer (task 1.4) maps the 18 Excel files into, and the shape the SQLAlchemy models (task 1.3) implement. It is written from the real files: see `docs/dataset-check.md` (generated) and `docs/dataset-findings.md`.
 
 Supporting files:
 
 - `data/schema/manifest.yaml`: one entry per raw file (file number, main sheet, header row, ID prefix to category code).
 - `data/schema/column_aliases.yaml`: header aliases to canonical field names, with visibility (customer / internal / source).
 - `data/schema/taxonomy.yaml`: categories, kinds, tiles, emergency row, inspection, vehicle filters.
+- `data/schema/import_rules.yaml`: row corrections (CL-02), per-file cost rules (files 2, 6, 7), phrase drafting, safety status on import, file 9 part links, picture caption, internal-only sheets.
 
 ## Principles
 
@@ -14,7 +15,8 @@ Supporting files:
 2. **Keep the source.** Every imported row keeps its file, sheet, row number and raw cell text, so any value on screen can be traced back to a cell.
 3. **Nothing is guessed.** A cell that cannot be parsed (text in a number column, `#REF!`, unknown road-repairable value) is stored as text, flagged `needs_review` and listed in the import report.
 4. **Internal stays internal.** MECHANIC TASK, HOW TO REPAIR BY MECHANIC and SUGGESTIONS-AARAV are stored with `internal = true` or in `internal_notes`. Customer API serializers must exclude them by type, not by remembering to filter.
-5. **Reviewed structure.** Questions, options, option effects and drafted safety rules have a `status` (`draft` / `approved` / `rejected`). The live engine reads only `approved`.
+5. **Reviewed structure.** Questions, options, option effects, drafted phrases and drafted part links have a `status` (`draft` / `approved` / `rejected`). The live engine reads only `approved`.
+6. **Safety over-warns.** Safety rules are the one exception to 5: imported rules are live from day one with status `active_pending_signoff`, and a mechanic must move every rule to `approved` before launch.
 
 ## Keys
 
@@ -77,9 +79,10 @@ Types are PostgreSQL. Every table also has `id` (bigint identity) unless a natur
 |---|---|---|
 | code | text PK | `wont_start`, `battery_dead`, `book_inspection` |
 | group_type | enum `tile`, `emergency`, `inspection` | |
-| label_en, label_hi | text | `label_hi_reviewed` boolean |
+| label_en, label_hi | text | `label_hi_reviewed` boolean (checked by the team's Hindi speaker) |
 | position | smallint | display order |
 | mode | enum `diagnose`, `fast_track`, `inspect`, null | emergency topics force `fast_track` |
+| variants | jsonb | vehicle-specific label and categories, first match wins. "Petrol finished" becomes "Battery ran out" for pure EVs and routes to the EV charging rows |
 
 `problem_group_categories (group_code, category_code, position)`: many-to-many. A category can be in several groups (battery is in a tile and in the emergency row).
 
@@ -88,15 +91,23 @@ Types are PostgreSQL. Every table also has `id` (bigint identity) unless a natur
 | Column | Type | Notes |
 |---|---|---|
 | code | text PK | |
-| name | text | English display name |
-| name_hi | text null | to be added (not in the files) |
-| kind | enum `diagnose`, `fast_track`, `inspect` | |
-| vehicle_filter | jsonb null | e.g. `{"fuel": ["cng"]}`, `{"transmission": ["mt","amt"]}`; null = all cars |
+| name | text | English display name (categories have no Hindi name; only tiles and emergency topics do) |
+| kind | enum `diagnose`, `fast_track`, `inspect` | number plate / fittings is `inspect` (service booking) |
+| vehicle_filters | jsonb | list of filter definitions from taxonomy.yaml, all must match; empty = all cars. An unknown car attribute passes the filter |
 | beta | boolean | |
 | wave | numeric(2,1) | rollout wave |
 | config | jsonb | Phase 2: question budget, thresholds |
 
-`category_sources (category_code, file_no, id_prefix, category_value)`: which file + prefix feeds the category, and the raw CATEGORY text. Suspension has two rows (files 14 and 17); file 9 has two categories with the same `category_value`, split by prefix.
+`category_sources (category_code, file_no, id_prefix, category_value)`: which file + prefix feeds the category, and the raw CATEGORY text. Suspension is one category with two rows here (files 14 and 17); its faults keep their own keys (`F14-SU-03`, `F17-SU-03`) and duplicates are resolved in review as `fault_links` with relation `duplicate_candidate` → `merged_into`. File 9 has two categories with the same `category_value`, split by prefix.
+
+Vehicle filters (taxonomy.yaml):
+
+| Filter | Passes when | Used by |
+|---|---|---|
+| clutch | transmission in MT, AMT, DCT (not torque-converter AT, not CVT) | clutch |
+| combustion_engine | fuel is not pure EV (hybrids pass) | clutch, engine_belt, jerking_misfire, exhaust |
+| petrol_engine | fuel in petrol, CNG, hybrid | fuel_delivery |
+| cng / diesel / ev_hybrid | fuel matches | cng / diesel / ev_hybrid |
 
 ### faults (dv)
 
@@ -112,7 +123,7 @@ One row per row of a main sheet (972).
 | name | text | SUB-CATEGORY | |
 | description | text | DESCRIPTION | |
 | likely_fault | text | LIKELY FAULT | shown as text; also a structuring input |
-| road_repairable | enum `yes`, `limited`, `no`, `unknown` | Can It Be Repaired on the Road? | first word; anything else is `unknown` + review (1 row: F01 CL-02 "MAYBE") |
+| road_repairable | enum `yes`, `limited`, `no`, `unknown` | Can It Be Repaired on the Road? | first word, then `value_overrides` in import_rules.yaml (F01-CL-02 "MAYBE" → `limited`); anything else is `unknown` + review |
 | road_repairable_text | text | same | full cell, e.g. "Yes - Jump-start and charging check on the road." |
 | repair_location | text | Recommended Repair Location | free text; normalised to a `repair_location_type` enum later |
 | towing_conditions_text | text | IF TOWING NEEDED | also split into fault_items (`towing_condition`) |
@@ -166,9 +177,13 @@ Splitting rules (in order): numbered lines (`1.`, `1)`), bullet lines (`•`, `-
 | text | text | the phrase as written ("Gaadi pickup thoda kam le rahi hai") |
 | english_gloss | text null | the "= My car is picking up speed a little slowly" line under a Hinglish phrase |
 | language | enum `en`, `hinglish`, `hi`, `unknown` | heuristic guess |
-| is_synthetic | boolean | true when the cell says "example", "illustrative" or "synthetic" (most files do) |
+| is_synthetic | boolean | true when the cell says "example", "illustrative" or "synthetic" (most files do), and for every drafted phrase |
+| source | enum `dataset`, `drafted`, `real` | `drafted` = written by the structuring step for files 1-6; `real` = written by the team or from confirmed cases |
+| status | enum `draft`, `approved`, `rejected` | dataset phrases import as `approved`; drafted phrases start as `draft` and are not matched or evaluated until approved |
 | held_out | boolean | reproducible 20% for evaluation |
 | embedding | vector(384) null | null for held-out phrases |
+
+Files 1-6 have one phrase per fault. The reviewed structuring step (1.4b) drafts 5-10 Hinglish phrases per fault for them (`source = drafted`, `is_synthetic = true`, `status = draft`). The team will add real phrases later. Until real confirmed cases exist, every accuracy figure is labelled "on synthetic phrases".
 
 Splitting: numbered items (files 9-18), ` | ` (file 7), bullet lines (files 1, 8), else the whole cell is one phrase (files 2-6). Header lines like "(Example messages ...)" and "SIMPLE ENGLISH:" are dropped.
 
@@ -192,10 +207,24 @@ One row per fault and segment (`budget` below ₹10 lakh, `mid` ₹10-25 lakh, `
 | approx_label | text null | | the label shown to the user, e.g. "approx - ask shop" |
 | checked_on | date null | | latest date found in the price cells ("price checked online 22-Oct-2026"); model-year text like "Dec 2018+" is ignored |
 | price_basis | text null | | e.g. file 3 `[VERIFIED]` = MRP checked; EV column 42 |
-| needs_review | boolean | | text total, `#REF!`, formula without cached value, unparseable |
+| cost_source | enum `sheet`, `recalculated`, `none` | | `recalculated` for file 2 |
+| display_mode | enum `amount`, `range`, `text`, `on_inspection` | | how the UI shows the total |
+| quotation_required | boolean | | file 6 ("+ additional quotation required") |
+| needs_review | boolean | | unparseable cell, `#REF!` without a recalculation, formula without cached value |
 | review_reason | text null | | |
 
-The result screen shows `total_inr` (or the min-max range) with `approx_label` and `checked_on`. A cost with `needs_review = true` is not shown as a number; the UI shows the text and "price on inspection".
+The result screen shows `total_inr` (`amount`) or `total_min_inr`–`total_max_inr` (`range`) with `approx_label` and `checked_on`; `text` shows `total_text` with the "quotation required" label; `on_inspection` shows "Price on inspection". A cost with `needs_review = true` is never shown as a number.
+
+Per-file cost rules (import_rules.yaml):
+
+| File | Raw cells | Stored as |
+|---|---|---|
+| 2 Overheating | labour, total, minimum all `#REF!` | `recalculated`: parts total per segment from the "Parts total: Rs …" line in the part-price text (present in 19 of 20 rows) + labour from the reviewed table `data/review/costs/F02-labour.yaml`; `is_approx`, label "approx". A row missing either input → `on_inspection` |
+| 6 EV | text, e.g. "₹800–₹3,000 + additional quotation required" | `text`, `quotation_required = true`, no manual numbers |
+| 7 Self start & stuck | ranges, e.g. "₹2,150–₹2,795 (parts + labour)" | `range` with min / max parsed; anything that is not a range → review and `on_inspection` |
+| others | numbers or formula results | `amount` |
+
+File 2 labour table. The files hold no labour figures for file 2, and labour is a fact, so it is not generated. The 1.4 importer drafts `data/review/costs/F02-labour.yaml` (one row per OH fault and segment) from data already in the files: labour for matching cooling repairs in other files (file 12 engine-heating rows, LABOUR_PRICE_RESEARCH rows), and the hands-on time in file 2's Estimated Repair Time column. Each row records its basis. A person approves the table; unapproved rows mean `on_inspection`.
 
 ### images and fault_images (dv)
 
@@ -208,7 +237,7 @@ The result screen shows `total_inr` (or the min-max range) with `approx_label` a
 | width, height | int | |
 | image_code | text null | `H01`, `IMG-13`, `PT05` when an index or caption names it |
 | caption | text null | "Halogen Headlight Bulb (H4 type shown)" |
-| image_type | text | "drawn guide picture" (the files say AI-generated technical illustration, not an OEM drawing) |
+| image_type | text | "drawn guide picture" (the files say AI-generated technical illustration, not an OEM drawing). Customers always see the caption "Illustration, not an exact part drawing" |
 | verification_note | text null | from PARTS_IMAGE_INDEX / IMAGE_LIBRARY |
 
 `fault_images (fault_id, image_id, role, source)`: `role` = `main` / `also`; `source` = `anchor` (picture anchored on the fault's row, column 33), `index` (PARTS_IMAGE_INDEX "Fault IDs"), `text_ref` (an `IMG-xx` code in PARTS IMAGES text). Unique on (fault_id, image_id).
@@ -241,11 +270,12 @@ A link target in another file (file 18 links to `GB-16`, `SU-16`; file 9 links t
 | towing_recommendation | text | |
 | details | jsonb | waterlogging: water exposure, engine status, occupant risk, restart restriction, recovery method, required inspection. accident: severity, injury question, vehicle condition, drivetrain rule, recovery type, equipment, destination |
 | triggers | jsonb | answer options / keywords that fire the rule (filled in the reviewed structuring step) |
-| status | enum `draft`, `approved`, `rejected` | imported sheet rows start `approved` only after a person confirms (open question) |
+| status | enum `draft`, `active_pending_signoff`, `approved`, `rejected` | imported sheet rows and EMERGENCY lines start `active_pending_signoff`: live immediately (over-warning is acceptable), signed off by a mechanic before launch. Drafted rules start `draft` |
+| signed_off_by, signed_off_at | text, timestamptz null | mechanic sign-off |
 | source | enum `sheet`, `drafted_from_columns` | drafted = from Safety Precautions and IF TOWING NEEDED for files without the sheet |
 | source_ref | text | file / sheet / row |
 
-The engine must evaluate every approved rule on every answer and on free text, before scoring, with no fallback that skips it.
+The engine must evaluate every `active_pending_signoff` and `approved` rule on every answer and on free text, before scoring, with no fallback that skips it. Launch check: no rule may still be `active_pending_signoff`.
 
 ### diagnosis_rules_raw (dv)
 
@@ -267,11 +297,12 @@ Every question has exactly one `is_not_sure` option, which has no effects. Stage
 
 | Table | Source | Columns (main) | Fault link |
 |---|---|---|---|
-| part_price_sources | PARTS_PRICE_SOURCES (9, 12, 14, 18) | key, segment, vehicle_fit_text, vehicle_fit (structured, reviewed later), part, brand, oem_or_aftermarket, part_number, price_inr, price_basis, supplier, source_url, checked_on, gst_text, fitting_included_text, verification_status (`checked`, `listed_recheck`, `approx`), picture_code, note | `part_price_source_faults` from "Fault IDs using it" (12, 14, 18). File 9 has no such column (open question) |
+| part_price_sources | PARTS_PRICE_SOURCES (9, 12, 14, 18) | key, segment, vehicle_fit_text, vehicle_fit (structured, reviewed later), part, brand, oem_or_aftermarket, part_number, price_inr, price_basis, supplier, source_url, checked_on, gst_text, fitting_included_text, verification_status (`checked`, `listed_recheck`, `approx`), picture_code, note | `part_price_source_faults (source_id, fault_id, link_source, status)`. From "Fault IDs using it" (12, 14, 18): `link_source = column`, `approved`. File 9 has no such column: drafted from QUALITY_AUDIT key lists (`quality_audit_key`) and part numbers quoted in main-sheet price text (`part_number`), `status = draft` until reviewed. The team may add the column to file 9 later |
 | labour_rates_research | LABOUR_PRICE_RESEARCH, LABOUR_AND_RECOVERY_RESEARCH | repair, budget_inr, mid_inr, premium_inr, workshop_type, location, basis, status (`approx` / `listed`), checked_on, extra jsonb | none (by repair name) |
 | price_breakdown_lines | PRICE BREAKDOWN (5) | fault source_id, tier (Budget / Mid-range / Premium / Minimum), type (Parts / Labour), item, amount_inr, note | by ID |
 | towing_charge_examples | TOWING_CHARGE_CALCULATOR (18) | case, call_out, included_km, extra_km, per_km, loading, winching, special_equipment, waiting, toll_parking, gst_pct, total | none; the formula row 1 is documented |
 | inspection_checklist_items | USED_CAR_INSPECTION_CHECKLIST (14) | no, system, method | none (template; result columns are blank) |
+| internal_links | REAL IMAGE LINKS (4) | fault source_id, part name, url, label | by ID. Staff only: Google image-search links are never shown to customers |
 
 QUALITY_AUDIT rows are not imported as data. The importer copies their result into the import report, and their key lists (APPROX keys, fit-to-confirm keys) become a fallback fault link for file 9's part sources.
 
@@ -314,7 +345,7 @@ QUALITY_AUDIT rows are not imported as data. The importer copies their result in
 | 32 | SUGGESTIONS-AARAV | internal_notes |
 | 33 | PARTS IMAGES | fault_images (anchored pictures + `IMG-xx` text refs); text in source_cells |
 | 34 | CUSTOMER PROBLEM IN STAGES | faults.question_stages_raw, stage2_choices |
-| 35-42 | EV extra columns | faults.extra.ev.* (see column_aliases.yaml) |
+| 35-42 | EV extra columns | faults.extra.ev.* (see column_aliases.yaml). STEP-BY-STEP REPAIR PLAN and REPAIR RESULT CHECK are mechanic-only: stored as fault_items `mechanic_step` / `mechanic_task` (internal) |
 
 ## Import order
 

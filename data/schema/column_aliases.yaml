@@ -198,7 +198,7 @@ ev_extra_columns:
     aliases: ["FOLLOW-UP QUESTIONS FOR CUSTOMER"]
   - field: ev_repair_plan
     position: 37
-    visibility: internal   # open question: customer-facing or mechanic-only?
+    visibility: internal   # mechanic-only (decided 23 Oct 2026)
     aliases: ["STEP-BY-STEP REPAIR PLAN"]
   - field: ev_part_price_guide
     position: 38
@@ -214,7 +214,7 @@ ev_extra_columns:
     aliases: ["ESTIMATED TIME"]
   - field: ev_repair_result_check
     position: 41
-    visibility: internal   # open question
+    visibility: internal   # mechanic-only (decided 23 Oct 2026)
     aliases: ["REPAIR RESULT CHECK"]
   - field: ev_price_basis
     position: 42

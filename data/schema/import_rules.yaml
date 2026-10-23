@@ -1,0 +1,66 @@
+# Import decisions that are not column mappings. Answers to the dataset open
+# questions (23 Oct 2026); see docs/dataset-findings.md, "Decisions".
+# The importer (task 1.4) reads this file; data/raw/ is never edited.
+
+# Per-row value corrections, keyed by fault_key. The raw cell is kept in
+# faults.source_cells; the corrected value is what the app uses.
+value_overrides:
+  F01-CL-02:
+    road_repairable: limited   # raw cell says "MAYBE"
+
+# How segment costs are read, per file. Default: numeric cells (or formula
+# results) for labour, total and minimum.
+costs:
+  # File 2: every labour / total / minimum cell is #REF!. Recalculate.
+  2:
+    mode: recalculate
+    parts_total_from: part_prices_text     # "Parts total: Rs 350" line, per segment
+    labour_from: data/review/costs/F02-labour.yaml   # reviewed table, see docs/data-model.md
+    is_approx: true
+    approx_label: "approx"
+    # Rows where parts total or approved labour is missing show this instead of a number.
+    fallback_display: price_on_inspection
+  # File 6: text totals like "₹800–₹3,000 + additional quotation required". Keep as text.
+  6:
+    mode: text
+    quotation_required: true
+    is_approx: true
+    approx_label: "quotation required"
+  # File 7: ranges like "₹2,150–₹2,795\n(parts + labour)". Parse min / max.
+  7:
+    mode: range
+    is_approx: true
+    approx_label: "approx"
+    fallback_display: price_on_inspection   # a cell that is not a range goes to review
+
+# Customer phrases.
+phrases:
+  # Files 1-6 have one example phrase per fault. The reviewed structuring step
+  # (1.4b) drafts 5-10 Hinglish phrases per fault for these files.
+  draft_for_files: [1, 2, 3, 4, 5, 6]
+  draft_per_fault: {min: 5, max: 10}
+  draft_status: draft          # usable only after a person approves them
+  draft_is_synthetic: true
+  # Phrases in the files are mostly labelled synthetic. Use them, and label
+  # evaluation results "on synthetic phrases" until real confirmed cases exist.
+  accuracy_label_until_real_cases: "on synthetic phrases"
+
+# Safety rules from SAFETY_AND_TOWING_RULES, WATERLOGGING_SAFETY_RULES,
+# ACCIDENT_RECOVERY_RULES and the "EMERGENCY - ..." lines. Active immediately
+# (better to over-warn); every rule needs mechanic sign-off before launch.
+safety:
+  import_status: active_pending_signoff
+  launch_requires_status: approved
+
+# Part price sources in file 9 have no fault column. Draft links for review.
+part_links:
+  9:
+    link_from: [quality_audit_keys, part_numbers_in_price_text]
+    status: draft
+
+# Pictures.
+images:
+  customer_caption: "Illustration, not an exact part drawing"
+# Sheets whose links are kept for staff only, never shown to customers.
+internal_sheets:
+  - {file: 4, sheet: REAL IMAGE LINKS}   # Google image-search links

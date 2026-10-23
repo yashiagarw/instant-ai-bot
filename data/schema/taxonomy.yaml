@@ -1,7 +1,10 @@
 # Problem taxonomy: categories, the tiles users tap, the emergency row and
 # inspection booking. DRAFT built from the "What the user taps" table in the
-# roadmap (23 Oct 2026). Hindi labels marked `hi_review: true` are drafts that
-# need a native-speaker check; the first four come from the roadmap.
+# roadmap (23 Oct 2026), updated with the answers to the dataset open questions
+# (see docs/dataset-findings.md, "Decisions"). Hindi labels marked
+# `hi_review: true` are drafts for the team's Hindi speaker to check; the first
+# four come from the roadmap. Only tiles, emergency topics and inspection need
+# Hindi; categories do not.
 #
 # Becomes an admin screen in Phase 4. Until then, edit this file and re-run
 # the tests in scripts/tests/.
@@ -10,13 +13,13 @@ version: 1
 status: draft
 
 # ---------------------------------------------------------------------------
-# Vehicle filters. A category with a filter is shown only when the selected car
-# matches. If the field is unknown (unlisted car, user answered "Not sure"),
-# the category is shown: a filter hides things only when we know they do not
-# apply.
+# Vehicle filters. A category lists zero or more filters in `filters`; it is
+# shown only when the selected car matches all of them. If a field is unknown
+# (unlisted car, user answered "Not sure"), that filter passes: a filter hides
+# things only when we know they do not apply.
 #
-# Fuel values: petrol, diesel, cng, hybrid, ev
-# Transmission values: mt, amt, cvt, dct, at
+# Fuel values: petrol, diesel, cng, hybrid, ev   (ev = pure battery EV)
+# Transmission values: mt, amt, cvt, dct, at     (at = torque-converter automatic)
 vehicle_filters:
   cng:
     fuel: [cng]
@@ -24,12 +27,16 @@ vehicle_filters:
     fuel: [ev, hybrid]
   diesel:
     fuel: [diesel]
+  # Cars with a clutch: manual, AMT and DCT. Torque-converter AT and CVT do not.
   clutch:
-    transmission: [mt, amt]
-  # Proposed, not in the brief: file 10's fuel rows are about petrol delivery.
-  # CNG cars start on petrol and hybrids have a petrol engine. See open questions.
+    transmission: [mt, amt, dct]
+  # File 10's fuel rows are about petrol delivery. CNG cars start on petrol and
+  # hybrids have a petrol engine.
   petrol_engine:
     fuel: [petrol, cng, hybrid]
+  # Engine-only categories: hidden for pure EVs, kept for hybrids.
+  combustion_engine:
+    fuel: [petrol, diesel, cng, hybrid]
 
 # ---------------------------------------------------------------------------
 # Categories. code is the stable key used by faults and questions.
@@ -37,7 +44,8 @@ vehicle_filters:
 # kind:
 #   diagnose   - one-at-a-time questions, ranked causes, segment costs
 #   fast_track - few questions (max 3), safety tips, then Request a Mechanic
-#   inspect    - checklist and booking, photo-led
+#   inspect    - checklist / service booking, photo-led
+# filters: names from vehicle_filters; all must match (empty = every car)
 # wave: rollout wave from the roadmap (1 = Phase 1, 2 = Phase 2, 2.5 = Phase 2-3, 3 = Phase 3)
 # beta: shown with a "Beta" label until its questions are reviewed and tuned
 categories:
@@ -45,7 +53,7 @@ categories:
     name: Clutch system
     sources: [{file: 1, prefix: CL}]
     kind: diagnose
-    filter: clutch
+    filters: [clutch, combustion_engine]
     wave: 1
     beta: false
   - code: cooling
@@ -76,7 +84,7 @@ categories:
     name: EV / hybrid / charging
     sources: [{file: 6, prefix: EV}]
     kind: diagnose
-    filter: ev_hybrid
+    filters: [ev_hybrid]
     wave: 2.5
     beta: true
   - code: self_start
@@ -113,7 +121,7 @@ categories:
     name: Fuel empty / petrol delivery
     sources: [{file: 10, prefix: FD}]
     kind: diagnose
-    filter: petrol_engine
+    filters: [petrol_engine]
     wave: 2
     beta: true
   - code: dashboard_warning
@@ -126,6 +134,7 @@ categories:
     name: Engine / alternator belt
     sources: [{file: 11, prefix: EB}]
     kind: diagnose
+    filters: [combustion_engine]
     wave: 2
     beta: true
   - code: brakes
@@ -184,7 +193,8 @@ categories:
     beta: true
   - code: suspension
     name: Suspension / shock absorber / noise
-    # Two source groups, merged after the duplicate review (open question).
+    # One category from two source groups. Both keep their original IDs
+    # (F14-SU-xx, F17-SU-xx); duplicates are resolved in review via fault_links.
     sources: [{file: 14, prefix: SU}, {file: 17, prefix: SU}]
     kind: diagnose
     wave: 2
@@ -205,6 +215,7 @@ categories:
     name: Jerking / misfiring / stalling
     sources: [{file: 15, prefix: JM}]
     kind: diagnose
+    filters: [combustion_engine]
     wave: 2
     beta: true
   - code: sensor_ecu
@@ -235,6 +246,7 @@ categories:
     name: Exhaust / silencer
     sources: [{file: 16, prefix: EX}]
     kind: diagnose
+    filters: [combustion_engine]
     wave: 3
     beta: true
   - code: smoke_fire
@@ -259,14 +271,14 @@ categories:
     name: CNG system
     sources: [{file: 17, prefix: CG}]
     kind: diagnose
-    filter: cng
+    filters: [cng]
     wave: 2.5
     beta: true
   - code: diesel
     name: Diesel delivery / AdBlue
     sources: [{file: 17, prefix: DS}]
     kind: diagnose
-    filter: diesel
+    filters: [diesel]
     wave: 2.5
     beta: true
   - code: body
@@ -284,7 +296,7 @@ categories:
   - code: number_plate
     name: Number plate / fittings
     sources: [{file: 18, prefix: NF}]
-    kind: diagnose
+    kind: inspect   # service booking
     wave: 3
     beta: true
   - code: towing_accident
@@ -365,7 +377,8 @@ tiles:
 # Emergency row: roadside help. Always runs in fast_track mode (max 3
 # questions, safety tips, Request a Mechanic), whatever the category's own kind.
 # Categories are still filtered by vehicle: "Petrol finished" on a diesel car
-# uses the diesel rows, and on an EV it is hidden (see open questions).
+# uses the diesel rows. A topic can have vehicle `variants`; the first variant
+# whose `when` matches the car replaces the topic's label and categories.
 emergency:
   mode: fast_track
   wave: 1   # fast-track for the whole row ships in Phase 1 (roadmap)
@@ -385,6 +398,15 @@ emergency:
       label_hi: "पेट्रोल खत्म"
       hi_review: true
       categories: [fuel_delivery, diesel]
+      variants:
+        - when: {fuel: [ev]}   # pure EVs only; hybrids keep "Petrol finished"
+          label_en: "Battery ran out"
+          label_hi: "बैटरी चार्ज खत्म"
+          hi_review: true
+          categories: [ev_hybrid]
+          # Route to the charging / low-charge rows of the EV file. The exact
+          # fault list is set in the reviewed structuring step (1.4b).
+          fault_hint: charging
     - code: locked_out
       label_en: "Locked out"
       label_hi: "चाबी अंदर, गाड़ी लॉक"
