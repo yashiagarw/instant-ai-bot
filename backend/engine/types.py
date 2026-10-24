@@ -160,6 +160,7 @@ class Request:
     vehicle: Vehicle | None = None
     group: str | None = None  # tile, emergency topic or inspection code
     category: str | None = None  # a category already chosen inside the tile
+    categories: list[str] = field(default_factory=list)  # several categories picked directly (no tile)
     text: str = ""
     answers: list[Answer] = field(default_factory=list)
 
@@ -252,3 +253,4 @@ class Result:
     questions_asked: int
     active_categories: list[str]
     disclaimer: str
+    stop_reason: str | None = None  # why the flow ended: leader_clear, single_candidate, question_limit, ...

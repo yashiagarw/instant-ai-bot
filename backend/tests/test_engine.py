@@ -216,7 +216,7 @@ def test_coverage_levels(knowledge):
     assert coverage_level(Vehicle(model="Swift", segment="budget"), pads) == "segment_estimate"  # unlisted car
     assert coverage_level(Vehicle(model="Swift Dzire Tour", segment="budget", listed=True), pads) == "segment_estimate"
     assert coverage_level(Vehicle(model="Baleno", segment="budget", listed=True), pads) == "segment_estimate"
-    assert coverage_level(Vehicle(model="Swift", segment="budget", listed=True), None) == "general_guidance"
+    assert coverage_level(Vehicle(model="Swift", segment="budget", listed=True), None) == "segment_estimate"
 
 
 def test_costs_come_from_the_segment_with_label_and_date(knowledge):
@@ -264,7 +264,8 @@ def test_option_effects_add_and_subtract_and_not_sure_changes_nothing(engine):
 
 def test_main_complaint_narrows_the_candidates(engine):
     r = engine.diagnose(Request(category="brakes", text="brake oil leak", answers=[Answer(100, 101)]))
-    assert "F11-BR-02" not in keys(r)  # "Noise" keeps pads and disc only, even though the text says leak
+    # "Noise" keeps pads and disc ahead even though the text says leak; the leak only fills the last slot.
+    assert keys(r)[-1] == "F11-BR-02" and r.ranked[-1].confidence == "low" and keys(r)[0] != "F11-BR-02"
     other = engine.diagnose(Request(category="brakes", answers=[Answer(100, 103)]))  # choice with no effects
     assert len(other.ranked) == 0 and other.next_question is not None  # nothing narrowed, keep asking
 
@@ -531,3 +532,75 @@ def test_a_likely_fault_rule_is_not_cut_by_the_phrase_alert_cap(knowledge):
     assert len(capped) == 3 and 30 not in [a.rule_id for a in capped]
     kept = evaluate(rules, "steam", set(), ids, {}, knowledge.faults, {}, likely_any={5: "Likely cause"})
     assert 30 in [a.rule_id for a in kept]
+
+
+def test_several_categories_picked_directly_are_routed_like_a_tile(engine):
+    r = engine.diagnose(Request(categories=["brakes", "tyre"]))
+    assert r.mode == "diagnose" and r.next_question.id == ROUTE_QUESTION
+    assert [o.id for o in r.next_question.options] == ["brakes", "tyre", ""]
+    one = engine.diagnose(Request(categories=["tyre"]))
+    assert one.active_categories == ["tyre"] and one.next_question.id == 200
+
+
+# ---------------------------------------------------------------- result clean-up
+
+
+def test_up_to_three_faults_are_shown_when_available(engine):
+    r = engine.diagnose(Request(category="brakes", text="brake se squeal awaaz"))
+    assert [x.fault_key for x in r.ranked][:1] == ["F11-BR-01"] and len(r.ranked) == 3
+    ruled = engine.diagnose(Request(category="brakes", answers=[Answer(100, 101), Answer(120, 122)]))
+    assert "F11-BR-03" not in [x.fault_key for x in ruled.ranked]  # a ruled-out fault never fills a slot
+
+
+def test_confidence_follows_the_stop_rule(engine):
+    alone = engine.diagnose(Request(category="tyre", answers=[Answer(200, 203)]))  # one candidate left
+    assert alone.done and alone.stop_reason == "single_candidate" and alone.ranked[0].confidence == "high"
+    clear = engine.diagnose(Request(category="tyre", answers=[Answer(200, 204), Answer(220, 221)]))
+    assert clear.stop_reason == "leader_clear" and clear.ranked[0].confidence == "high"
+    open_ = engine.diagnose(Request(category="brakes", answers=[Answer(100, 101)]))
+    assert open_.stop_reason is None and not open_.done
+
+
+def test_faults_set_aside_by_the_main_complaint_fill_the_list_last_with_low_confidence(engine):
+    r = engine.diagnose(Request(category="tyre", answers=[Answer(200, 202)]))  # "Soft again": one candidate
+    keys = [x.fault_key for x in r.ranked]
+    assert keys[0] == "F04-TY-02" and len(keys) == 3 and set(keys[1:]) == {"F04-TY-01", "F04-TY-03"}
+    assert r.ranked[0].confidence == "high" and all(x.confidence == "low" for x in r.ranked[1:])
+
+
+def test_a_tip_that_repeats_shorter_tips_is_replaced_by_them_in_place():
+    from engine.text import pick_lines
+
+    combined = "Park on flat ground away from traffic with hazard lights on. Use only the maker's jacking points."
+    short = ["Park on flat ground away from traffic. Hazard lights on.", "Use only the maker's jacking points."]
+    extra = ["Keep children inside the car.", "Carry a reflective triangle.", "Call for help if unsure."]
+    assert pick_lines([combined, *extra, *short, short[0]], 4) == [*short, *extra[:2]]
+    nested = "Stop far from traffic. " + combined + " Carry a reflective triangle."  # its piece is `combined`
+    assert pick_lines([nested, combined, *short, extra[1]], 3) == [*short, extra[1]]
+    assert pick_lines([*short, "Use the maker's jacking points. Park away from traffic."], 5) == short  # shown
+    own = combined + " Do not touch a hot rim; chock the wheels."  # has its own advice: kept
+    assert pick_lines([own, *short], 3) == [own]  # and the short tips only repeat it once it is shown
+
+
+def test_top_fault_keeps_its_own_safety_tips_within_the_cap(knowledge):
+    actions = [
+        "Call a tow truck now.",
+        "Keep the bonnet closed.",
+        "Switch off the ignition.",
+        "Wait behind the barrier.",
+        "Warn other drivers early.",
+        "Keep pets inside.",
+        "Note the odometer reading.",
+        "Photograph the dashboard.",
+    ]
+    knowledge.rules += [
+        et.SafetyRule(100 + i, "fault", "high", roadside_action=a, fault_id=2) for i, a in enumerate(actions)
+    ]
+    knowledge.faults[1].safety_tips = ["Pump the pedal before driving.", "Pump the pedal before driving!"]
+    eng = Engine(knowledge)
+    r = eng.diagnose(Request(category="brakes", text="brake se squeal awaaz"))  # not done yet: tips built below
+    assert r.ranked[0].fault_key == "F11-BR-01"
+    tips = eng._tips(r.ranked, set(), ["brakes"], False)
+    assert len(tips) == 8 and tips.count("Pump the pedal before driving.") == 1
+    assert "Pump the pedal before driving!" not in tips  # near-duplicate of the reserved tip
+    assert tips[:5] == eng._tips(r.ranked[1:], set(), ["brakes"], False)[:5]  # higher-risk tips keep their order

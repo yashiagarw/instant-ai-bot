@@ -102,3 +102,57 @@ def phrase_in(phrase: str, text_tokens: set[str]) -> bool:
 
 
 Embed = Callable[[str], list[float]]
+
+
+NEAR_DUPLICATE = 0.6  # word overlap (Jaccard) at which two lines say the same thing
+COVERED = 0.85  # share of a line's words already said by shorter lines -> the line only repeats them
+PIECE = 0.6  # share of a short line's words found in a long line -> the short line is a piece of it
+
+
+def _words(text: str) -> set[str]:
+    return {t for t in tokens(text) if len(t) > 2}
+
+
+def drop_repeats(lines: list[str]) -> list[str]:
+    """Remove exact and near-duplicate lines (the first one is kept)."""
+    kept: list[str] = []
+    for line in lines:
+        w = _words(line)
+        if not line.strip() or any(
+            line.strip().lower() == k.strip().lower() or _jaccard(w, _words(k)) >= NEAR_DUPLICATE for k in kept
+        ):
+            continue
+        kept.append(line)
+    return kept
+
+
+def pick_lines(lines: list[str], limit: int) -> list[str]:
+    """Up to `limit` lines without duplicates. A line that just repeats shorter lines combined (its words are
+    almost all in them) is replaced, at its place, by those shorter pieces, so nothing it says is lost."""
+    pool = drop_repeats(lines)
+    out: list[str] = []
+
+    def add(line: str) -> None:
+        if line in out:
+            return
+        w = _words(line)
+        shorter = [k for k in pool if len(_words(k)) < len(w)]
+        said = set().union(*(_words(k) for k in [*out, *shorter]))  # lines already shown count as said
+        if len(w) >= 4 and len(w & said) / len(w) >= COVERED:
+            for k in shorter:
+                if _part_of(_words(k), w):
+                    add(k)  # a piece may itself only repeat shorter lines (strictly shorter: this ends)
+        else:
+            out.append(line)
+
+    for line in pool:
+        add(line)
+    return out[:limit]
+
+
+def _part_of(piece: set[str], whole: set[str]) -> bool:
+    return bool(piece) and len(piece & whole) / len(piece) >= PIECE
+
+
+def _jaccard(a: set[str], b: set[str]) -> float:
+    return len(a & b) / len(a | b) if a and b else 0.0

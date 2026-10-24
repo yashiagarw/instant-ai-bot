@@ -12,7 +12,7 @@ import re
 from itertools import combinations
 
 from engine.safety import danger_vocabulary, evaluate, global_rule_phrases
-from engine.text import Embed, Match, TextIndex
+from engine.text import Embed, Match, TextIndex, drop_repeats, pick_lines
 from engine.types import (
     ROUTE_QUESTION,
     Category,
@@ -46,6 +46,8 @@ MAX_QUESTIONS = 8  # diagnose: main complaint + follow-ups
 FAST_TRACK_MAX = 3
 SPLIT_TOP = 5  # the next question is the one that best separates the current top 5
 MAX_RANKED = 5
+MIN_RANKED = 3  # show at least this many faults when the candidates allow
+CLEAR_STOPS = ("leader_clear", "single_candidate")  # stop reasons that mean the leader is clearly ahead
 MAX_SUGGESTIONS = 3
 ROUTE_MIN = 0.25  # free text picks a category by itself only above this similarity ...
 ROUTE_RATIO = 1.5  # ... and this far ahead of the next category
@@ -54,6 +56,7 @@ LIKELY_TOP = 3  # when the flow ends, every rule of the top 3 faults fires
 MAX_TIPS = 8
 RULE_TIPS = 4  # fast_track: likely faults' rule actions shown before the topic's own lines
 TOPIC_TIPS = 3  # fast_track: the topic's most shared safety lines, always shown
+TOP_FAULT_TIPS = 3  # slots within MAX_TIPS reserved for the top fault's own safety lines
 
 ROADSIDE_VERDICT = {"yes": "roadside_fix_possible", "limited": "roadside_limited", "no": "workshop"}
 
@@ -82,9 +85,14 @@ def model_listed(model: str, fit_text: str) -> bool:
 
 
 def coverage_level(vehicle: Vehicle | None, top: Fault | None) -> str:
-    if vehicle is None or vehicle.segment is None or top is None:
+    if vehicle is None or vehicle.segment is None:
         return "general_guidance"
-    if vehicle.listed and vehicle.model and any(model_listed(vehicle.model, t) for t in top.part_fit_texts):
+    if (
+        top is not None
+        and vehicle.listed
+        and vehicle.model
+        and any(model_listed(vehicle.model, t) for t in top.part_fit_texts)
+    ):
         return "part_fit_verified"
     return "segment_estimate"
 
@@ -155,6 +163,10 @@ class Engine:
         else:
             mode = "suggest"  # free text only: every category may be suggested (fast_track / inspect too)
             cats = list(k.categories)
+        if req.categories:  # categories picked directly: route among them like a tile
+            picked = [c for c in req.categories if c in k.categories]
+            cats = [c for c in cats if c in picked] if group else picked
+            mode = "diagnose" if mode == "suggest" else mode
         cats = [c for c in cats if c in k.categories and vehicle_allows(k.categories[c], vehicle)]
         if req.category and req.category in k.categories and (group is None or req.category in cats):
             cats = [req.category] if vehicle_allows(k.categories[req.category], vehicle) else []
@@ -196,6 +208,7 @@ class Engine:
         answered_opts: set[int] = set()
         asked = 0
         narrowed = False
+        set_aside: set[int] = set()  # faults the main complaint narrowed out (not ruled out)
         for a in req.answers:
             if a.question_id == ROUTE_QUESTION or a.option_id not in self.options:
                 continue
@@ -211,6 +224,7 @@ class Engine:
                 supported = {fid for fid, w in o.effects.items() if w > 0}
                 in_cat = {fid for fid in candidates if k.faults[fid].category == q.category}
                 if supported & in_cat:
+                    set_aside |= in_cat - supported
                     candidates -= in_cat - supported
                     narrowed = True
                     for fid in supported & candidates:
@@ -247,31 +261,37 @@ class Engine:
         # Next question and stopping.
         limit = FAST_TRACK_MAX if mode == "fast_track" else MAX_QUESTIONS
         next_q: QuestionOut | None = None
-        done = False
+        stop_reason: str | None = None
         if mode == "inspect":
-            done = True
+            stop_reason = "inspect"
         elif stop_now:
-            done = True
+            stop_reason = "safety"
         elif route_q is not None:
             next_q = route_q
         elif not cats:
-            done = mode != "suggest"
+            stop_reason = None if mode == "suggest" else "no_category"
         elif len(cats) > 1 and route_answer is None:
             pass  # several categories, nothing to route on yet (no free text): wait for a tile or text
         else:
             main = self.main_q.get(cats[0]) if len(cats) == 1 else None
             if main and main.id not in answered_q and asked < limit:
                 next_q = self._out(main)
-            elif asked >= limit or self._leader_clear(order, scores) or len(order) <= 1:
-                done = True
+            elif len(order) <= 1:
+                stop_reason = "single_candidate"
+            elif self._leader_clear(order, scores):
+                stop_reason = "leader_clear"
+            elif asked >= limit:
+                stop_reason = "question_limit"
             else:
                 q = self._best_split(cats, answered_q, order, scores)
                 if q is None:
-                    done = True
+                    stop_reason = "no_question"
                 else:
                     next_q = self._out(q)
+        done = stop_reason is not None
 
-        ranked = self._ranked(order, scores, evidence, vehicle, narrowed)
+        backup = sorted((f for f in set_aside if k.canonical(f) not in seen_groups), key=lambda f: (-scores[f], f))
+        ranked = self._ranked(order, scores, evidence, vehicle, narrowed, stop_reason, backup)
         if done and ranked:  # the flow ended: the likely faults' safety rules always run
             groups = {k.canonical(r.fault_id): r.name for r in ranked[:LIKELY_TOP]}
             alerts = safety(
@@ -303,6 +323,7 @@ class Engine:
             safety_tips=tips,
             checklist=self._checklist(cats) if mode == "inspect" else [],
             questions_asked=asked,
+            stop_reason=stop_reason,
             active_categories=cats,
             disclaimer=DISCLAIMER,
         )
@@ -358,11 +379,18 @@ class Engine:
                     best, best_value = q, value
         return best
 
-    def _ranked(self, order, scores, evidence, vehicle, narrowed: bool) -> list[RankedFault]:
+    def _ranked(
+        self, order, scores, evidence, vehicle, narrowed: bool, stop_reason=None, backup=()
+    ) -> list[RankedFault]:
         shown = [fid for fid in order if scores[fid] > 0][:MAX_RANKED]
-        if not shown and narrowed:
-            # Narrowed by the main complaint but no other evidence yet: show what is not ruled out.
-            shown = [fid for fid in order if scores[fid] >= 0][:MAX_RANKED]
+        if shown or narrowed:
+            # Up to MIN_RANKED faults when available: fill with candidates that are not ruled out, then with
+            # faults the main complaint set aside (shown last, low confidence).
+            for fid in [*order, *backup]:
+                if len(shown) >= MIN_RANKED:
+                    break
+                if fid not in shown and scores[fid] >= 0:
+                    shown.append(fid)
         if not shown:
             return []
         lead = scores[shown[0]]
@@ -372,11 +400,13 @@ class Engine:
             f = self.k.faults[fid]
             if i == 0:
                 margin = lead - second
-                conf = (
-                    "high" if lead > 0 and margin >= STOP_MARGIN else "medium" if margin >= STOP_MARGIN / 2 else "low"
-                )
+                if stop_reason in CLEAR_STOPS or (lead > 0 and margin >= STOP_MARGIN):
+                    conf = "high"  # same rule the engine stops on: the leader is clearly ahead (or alone)
+                else:
+                    conf = "medium" if margin >= STOP_MARGIN / 2 else "low"
             else:
-                conf = "medium" if scores[fid] > 0 and lead - scores[fid] < STOP_MARGIN / 2 else "low"
+                close = scores[fid] > 0 and lead - scores[fid] < STOP_MARGIN / 2
+                conf = "medium" if close and fid not in backup else "low"
             out.append(
                 RankedFault(
                     fault_id=fid,
@@ -420,11 +450,15 @@ class Engine:
             if fast_track
             else actions + globals_ + own
         )
-        out = []
-        for t in tips:
-            if t and t not in out:
-                out.append(t)
-        return out[:MAX_TIPS]
+        shown = pick_lines([t for t in tips if t], MAX_TIPS)
+        if not ranked:
+            return shown
+        # Reserve slots for the top fault's own lines, so higher-risk tips of other faults never crowd them out.
+        head = shown[: MAX_TIPS - TOP_FAULT_TIPS]
+        top = pick_lines(self.k.faults[ranked[0].fault_id].safety_tips, TOP_FAULT_TIPS)
+        missing = [t for t in top if len(drop_repeats([*head, t])) > len(head)]  # not already said above
+        rest = [t for t in shown[len(head) :] if t not in missing]
+        return pick_lines([*head, *missing, *rest], MAX_TIPS)
 
     def _topic_tips(self, candidates: set[int]) -> list[str]:
         counts: dict[str, int] = {}

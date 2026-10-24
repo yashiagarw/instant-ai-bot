@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     web_origin: str = "http://localhost:3000"
     # Seconds to wait for Postgres before the health check reports it unavailable.
     db_connect_timeout: int = 3
+    # Diagnosis API. Embeddings load the sentence-transformers model (about 470 MB) at first use;
+    # off by default because keyword matching scored as well on the dev split.
+    diagnosis_embeddings: bool = False
+    # Per-IP limit on new diagnosis sessions: at most N per window.
+    session_rate_limit: int = 10
+    session_rate_window_seconds: int = 60
+    # Use the first X-Forwarded-For address as the client IP. Only enable behind a proxy you control.
+    trust_forwarded_for: bool = False
     # Offline question structuring (app.knowledge.questions). Never used by the live app.
     # Empty key = the SDK's own credential lookup (ANTHROPIC_API_KEY env, `ant auth login` profile).
     llm_provider: Literal["anthropic", "openai"] = "anthropic"
