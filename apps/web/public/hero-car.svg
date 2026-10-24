@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="t">
+  <title id="t">A car being checked by Instant Mechanic</title>
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F07A2A"/>
+      <stop offset="1" stop-color="#D9620F"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE3CC"/>
+      <stop offset="1" stop-color="#FFF6EE"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="320" cy="338" rx="250" ry="22" fill="#15120F" opacity=".12"/>
+  <path d="M92 300c-14 0-22-10-20-24l8-46c3-17 15-30 32-34l78-18 62-62c14-14 32-22 52-22h112c22 0 42 10 56 27l50 60 54 12c22 5 38 24 40 47l3 34c1 14-9 26-23 26z" fill="url(#body)"/>
+  <path d="M232 176l46-46c9-9 21-14 34-14h52v60zM384 116h40c14 0 27 6 36 17l36 43H384z" fill="url(#glass)"/>
+  <rect x="368" y="116" width="12" height="60" fill="#D9620F"/>
+  <path d="M96 246h40M500 222h48" stroke="#FFF6EE" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="190" cy="300" r="50" fill="#15120F"/><circle cx="190" cy="300" r="22" fill="#FFF6EE"/>
+  <circle cx="470" cy="300" r="50" fill="#15120F"/><circle cx="470" cy="300" r="22" fill="#FFF6EE"/>
+  <g transform="translate(446 22)">
+    <rect width="176" height="92" rx="20" fill="#fff" stroke="#15120F" stroke-opacity=".12" stroke-width="2"/>
+    <circle cx="36" cy="46" r="18" fill="#D9620F"/>
+    <path d="M27 46l6 6 12-13" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="66" y="30" width="88" height="10" rx="5" fill="#15120F"/>
+    <rect x="66" y="52" width="62" height="10" rx="5" fill="#15120F" opacity=".25"/>
+  </g>
+  <path d="M520 114c-10 40-40 60-80 70" fill="none" stroke="#B4500D" stroke-width="3" stroke-dasharray="6 8"/>
+</svg>

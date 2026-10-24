@@ -147,3 +147,11 @@
     @apply font-sans;
   }
 }
+/* Faint grid on warm white, as on instantmechanic.online. */
+@utility bg-grid {
+  background-color: var(--color-warm-white);
+  background-image:
+    linear-gradient(to right, rgb(21 18 15 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(21 18 15 / 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
