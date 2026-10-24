@@ -11,6 +11,10 @@
 Prints top-1 / top-3 accuracy per category, Phase 1 (wave 1) categories separately.
 
 Run from backend/:  uv run python ../data/eval/run_eval.py [--simulate] [--no-embeddings] [--category CODE]
+
+Harness (reports with a timestamp in data/eval/reports/, see data/eval/README.md):
+  uv run python ../data/eval/run_eval.py run [--engine current|<git ref>|<folder>] [--embeddings] [--category CODE]
+  uv run python ../data/eval/run_eval.py compare --base <engine or report.json> --candidate <engine or report.json>
 """
 
 import argparse
@@ -19,12 +23,17 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-import yaml
-
 ROOT = Path(__file__).resolve().parents[2]
+EVAL_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "backend"))
+sys.path.insert(0, str(EVAL_DIR))
+# `run --engine-path DIR` (used for git refs): that engine package wins over backend/engine.
+if "--engine-path" in sys.argv:
+    sys.path.insert(0, sys.argv[sys.argv.index("--engine-path") + 1])
 os.environ.setdefault("HF_HUB_OFFLINE", "1")  # the model is already cached by the importer
 
+from evalkit.cases import load_yaml_cases  # noqa: E402
+from evalkit.runner import run_case  # noqa: E402
 from sqlalchemy import select  # noqa: E402
 
 from app.config import get_settings  # noqa: E402
@@ -32,22 +41,27 @@ from app.db import make_engine, make_session_factory  # noqa: E402
 from app.diagnosis.knowledge import load_knowledge  # noqa: E402
 from app.enums import ReviewStatus  # noqa: E402
 from app.knowledge.models import CustomerPhrase  # noqa: E402
-from engine import ENGINE_VERSION, Answer, Engine, Request, Vehicle  # noqa: E402
+from engine import ENGINE_VERSION, Engine, Request, Vehicle  # noqa: E402
 from engine.simulate import confused_pairs, has_safety_rule, has_triggered_rule, simulate  # noqa: E402
 
-CASES_DIR = Path(__file__).resolve().parent / "cases"
+CASES_DIR = EVAL_DIR / "cases"
+REPORTS_DIR = EVAL_DIR / "reports"
 
 
-def held_out_phrases(session, knowledge) -> list[tuple[str, int]]:
-    """(text, expected fault id). A phrase of a folded duplicate expects its canonical fault."""
+def held_out_phrases(session, knowledge, with_language: bool = False) -> list[tuple]:
+    """(text, expected fault id[, language tag]). A phrase of a folded duplicate expects its canonical fault."""
     rows = session.execute(
-        select(CustomerPhrase.text, CustomerPhrase.fault_id).where(
+        select(CustomerPhrase.text, CustomerPhrase.fault_id, CustomerPhrase.language).where(
             CustomerPhrase.held_out.is_(True),
             CustomerPhrase.status == ReviewStatus.approved,
             CustomerPhrase.fault_id.in_(list(knowledge.faults) + list(knowledge.alias_of)),
         )
     )
-    return [(t, fid if fid in knowledge.faults else knowledge.canonical(fid)) for t, fid in rows]
+    out = []
+    for t, fid, lang in rows:
+        fid = fid if fid in knowledge.faults else knowledge.canonical(fid)
+        out.append((t, fid, str(lang) if lang else None) if with_language else (t, fid))
+    return out
 
 
 def group_for(knowledge, category: str) -> str | None:
@@ -67,24 +81,9 @@ def hit(result, fault_id: int, k: int) -> bool:
     return same(fault_id) in [same(r.fault_id) for r in result.ranked[:k]]
 
 
-def load_cases(knowledge) -> list[dict]:
-    """YAML cases, with question / option text resolved to ids against the approved questions."""
-    by_key = {f.key: f for f in knowledge.faults.values()}
-    cases = []
-    for path in sorted(CASES_DIR.glob("*.yaml")):
-        for c in yaml.safe_load(path.read_text(encoding="utf-8")) or []:
-            fault = by_key.get(c["expected"])
-            if fault is None:
-                raise SystemExit(f"{path.name} {c['id']}: unknown expected fault {c['expected']}")
-            answers = []
-            for a in c.get("answers", []):
-                q = next((q for q in knowledge.questions.values() if q.text == a["question"]), None)
-                o = q and next((o for o in q.options if o.label == a["option"]), None)
-                if o is None:
-                    raise SystemExit(f"{path.name} {c['id']}: no approved question/option {a}")
-                answers.append(Answer(q.id, o.id))
-            cases.append({**c, "fault": fault, "answers": answers, "file": path.name})
-    return cases
+def load_cases(knowledge) -> list:
+    """YAML cases with an expected fault (the harness runs every case type; this console mode prints these)."""
+    return [c for c in load_yaml_cases(knowledge, CASES_DIR) if c.expected]
 
 
 def table(title: str, rows: dict[str, dict], cols: list, waves: dict[str, float]):
@@ -113,6 +112,10 @@ def table(title: str, rows: dict[str, dict], cols: list, waves: dict[str, float]
 
 
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] in ("run", "compare"):
+        from evalkit.cli import harness
+
+        return harness(sys.argv[1:])
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-embeddings", action="store_true", help="keyword matching only")
     ap.add_argument("--category", help="only this category")
@@ -170,23 +173,13 @@ def main():
         crow: dict[str, dict] = defaultdict(lambda: defaultdict(int))
         print(f"\nYAML cases ({len(cases)})")
         for c in cases:
-            v = c.get("vehicle") or {}
-            req = Request(
-                vehicle=Vehicle(**v) if v else None,
-                group=c.get("group"),
-                category=c.get("category"),
-                text=c.get("text", ""),
-                answers=c["answers"],
-            )
-            res = engine.diagnose(req)
-            fid = c["fault"].id
-            s = crow[c["fault"].category]
+            r = run_case(engine, c)
+            s = crow[c.category]
             s["n"] += 1
-            s["top1"] += hit(res, fid, 1)
-            s["top3"] += hit(res, fid, 3)
-            mark = "ok " if hit(res, fid, 1) else "top3" if hit(res, fid, 3) else "MISS"
-            got = res.ranked[0].fault_key if res.ranked else "-"
-            print(f"  [{mark}] {c['file']} {c['id']}: expected {c['expected']}, got {got}")
+            s["top1"] += r["hit1"]
+            s["top3"] += r["hit3"]
+            mark = "ok " if r["hit1"] else "top3" if r["hit3"] else "MISS"
+            print(f"  [{mark}] {c.id}: expected {'/'.join(c.expected)}, got {(r['got'] or ['-'])[0]}")
         table("YAML cases", crow, ["top1", "top3"], waves)
 
 

@@ -1,0 +1,60 @@
+{
+ "meta": {
+  "stamp": "20261024-074513Z",
+  "label": "v1-baseline-vs-current",
+  "base": {
+   "created_at": "2026-10-24T05:24:01+00:00",
+   "stamp": "20261024-052401Z",
+   "engine_label": "v1-baseline",
+   "engine_version": "1.0.0",
+   "engine_hash": "d54bfab665",
+   "git_commit": "fc2480f",
+   "git_dirty": false,
+   "dataset_version_id": 36,
+   "embeddings": false,
+   "cases": 5479,
+   "cases_by_type": {
+    "chips": 806,
+    "free_text": 2091,
+    "overlap": 1368,
+    "safety": 876,
+    "unlisted": 338
+   },
+   "cases_by_source": {
+    "dataset": 3012,
+    "generated": 1999,
+    "synthetic": 468
+   }
+  },
+  "candidate": {
+   "created_at": "2026-10-24T07:45:13+00:00",
+   "stamp": "20261024-074513Z",
+   "engine_label": "current",
+   "engine_version": "1.0.0",
+   "engine_hash": "d54bfab665",
+   "git_commit": "fc2480f",
+   "git_dirty": false,
+   "dataset_version_id": 36,
+   "embeddings": false,
+   "cases": 5479,
+   "cases_by_type": {
+    "chips": 806,
+    "free_text": 2091,
+    "overlap": 1368,
+    "safety": 876,
+    "unlisted": 338
+   },
+   "cases_by_source": {
+    "dataset": 3012,
+    "generated": 1999,
+    "synthetic": 468
+   }
+  }
+ },
+ "overall": {},
+ "by_type": {},
+ "by_category": {},
+ "only_in_base": [],
+ "only_in_candidate": [],
+ "changes": []
+}

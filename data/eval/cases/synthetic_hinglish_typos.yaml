@@ -1,0 +1,10 @@
+# Hinglish written the way people type on a phone: shorthand and spelling mistakes. SYNTHETIC (the datasets'
+# Hinglish phrases are clean). Typo variants of real held-out phrases are also generated automatically.
+- {id: ac-shorthand, source: synthetic, lang: typo, text: "ac thanda nhi kr rha", expected: [F05-AC-01]}
+- {id: brake-noise, source: synthetic, lang: typo, text: "brek se awaz aa rahi h", expected: [F11-BR-07, F11-BR-08, F11-BR-01]}
+- {id: battery-down, source: synthetic, lang: typo, text: "battry down ho gyi", expected: [F08-BT-03, F08-BT-01, F08-BT-07]}
+- {id: temp-red, source: synthetic, lang: typo, text: "gadi garam ho rhi hai temprature red me", expected: [F02-OH-02, F02-OH-05]}
+- {id: clutch-hard, source: synthetic, lang: hinglish, text: "clutch bahut hard ho gaya hai", expected: [F01-CL-01]}
+- {id: tyre-flat, source: synthetic, lang: typo, text: "tyre flat ho gya puncher", expected: [F04-TY-03]}
+- {id: self-tik, source: synthetic, lang: hinglish, text: "self nahi le rahi sirf tik tik", expected: [F07-SS-07, F07-SS-05, F07-SS-06]}
+- {id: crank-no-start, source: synthetic, lang: typo, text: "gaddi start nai ho rahi crank ho rahi hai", expected: [F09-NS-02, F07-SS-26]}

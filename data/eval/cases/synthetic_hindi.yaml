@@ -1,0 +1,27 @@
+# Hindi (Devanagari) descriptions, 3 per Phase 1 category. SYNTHETIC: written by the team to fill a gap (the
+# datasets have no Devanagari). Replace with real customer messages / mechanic-checked cases when available.
+# Each runs a simulated conversation after the text. `expected` lists every fault that counts as right.
+- {id: battery-slow, source: synthetic, lang: hi, text: "गाड़ी स्टार्ट करने पर बहुत धीरे घूमती है, बैटरी कमजोर लगती है", expected: [F08-BT-01, F07-SS-18, F07-SS-01]}
+- {id: battery-left-on, source: synthetic, lang: hi, text: "रात भर हेडलाइट जली रह गई, अब कुछ नहीं चल रहा", expected: [F08-BT-02, F08-BT-03]}
+- {id: battery-swollen, source: synthetic, lang: hi, text: "बैटरी फूल गई है और गरम हो रही है", expected: [F08-BT-19]}
+- {id: self-ticking, source: synthetic, lang: hi, text: "चाबी घुमाने पर सिर्फ टिक टिक की आवाज़ आती है", expected: [F07-SS-07, F07-SS-05, F07-SS-06]}
+- {id: self-spins, source: synthetic, lang: hi, text: "सेल्फ मोटर घूमती है पर इंजन नहीं घूमता", expected: [F07-SS-08]}
+- {id: self-grinding, source: synthetic, lang: hi, text: "स्टार्ट करते समय पीसने जैसी आवाज़ आती है", expected: [F07-SS-30, F07-SS-14, F07-SS-15]}
+- {id: ns-cranks, source: synthetic, lang: hi, text: "इंजन घूमता है पर गाड़ी स्टार्ट नहीं होती", expected: [F09-NS-02, F07-SS-26]}
+- {id: ns-stopped, source: synthetic, lang: hi, text: "चलते चलते गाड़ी अचानक बंद हो गई", expected: [F09-NS-04]}
+- {id: ns-fuel, source: synthetic, lang: hi, text: "पेट्रोल खत्म हो गया लगता है, मीटर गलत दिखाता है", expected: [F09-NS-25]}
+- {id: cool-red, source: synthetic, lang: hi, text: "टेम्परेचर की सुई लाल निशान की तरफ जा रही है", expected: [F02-OH-02, F02-OH-05]}
+- {id: cool-dropping, source: synthetic, lang: hi, text: "कूलेंट बार बार कम हो जाता है पर रिसाव नहीं दिखता", expected: [F02-OH-06]}
+- {id: cool-traffic, source: synthetic, lang: hi, text: "ट्रैफिक में और एसी चलाने पर गाड़ी गरम हो जाती है", expected: [F02-OH-17]}
+- {id: ac-warm, source: synthetic, lang: hi, text: "एसी ठंडी हवा नहीं दे रहा", expected: [F05-AC-01]}
+- {id: ac-blower, source: synthetic, lang: hi, text: "ब्लोअर चल ही नहीं रहा, हवा नहीं आती", expected: [F05-AC-02]}
+- {id: ac-smell, source: synthetic, lang: hi, text: "एसी चलाने पर बदबू आती है", expected: [F05-AC-18]}
+- {id: clutch-hard, source: synthetic, lang: hi, text: "क्लच बहुत भारी हो गया है", expected: [F01-CL-01]}
+- {id: clutch-slip, source: synthetic, lang: hi, text: "क्लच स्लिप हो रहा है, रेस देने पर स्पीड नहीं बढ़ती", expected: [F01-CL-02, F01-CL-04]}
+- {id: clutch-stuck, source: synthetic, lang: hi, text: "क्लच पेडल नीचे ही अटक गया", expected: [F01-CL-07]}
+- {id: brake-squeal, source: synthetic, lang: hi, text: "ब्रेक लगाने पर चीं चीं की आवाज़ आती है", expected: [F11-BR-07, F11-BR-01]}
+- {id: brake-spongy, source: synthetic, lang: hi, text: "ब्रेक पेडल स्पंजी लगता है, नीचे तक जाता है", expected: [F11-BR-02, F11-BR-17]}
+- {id: brake-judder, source: synthetic, lang: hi, text: "ब्रेक लगाते समय स्टीयरिंग कांपता है", expected: [F11-BR-10]}
+- {id: tyre-flat, source: synthetic, lang: hi, text: "टायर पूरा पंक्चर हो गया", expected: [F04-TY-03]}
+- {id: tyre-slow, source: synthetic, lang: hi, text: "टायर में हवा बार बार कम हो जाती है", expected: [F04-TY-02]}
+- {id: tyre-burst, source: synthetic, lang: hi, text: "टायर फट गया, साइड में उभार है", expected: [F04-TY-05]}

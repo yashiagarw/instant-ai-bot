@@ -1,0 +1,8 @@
+# Problems picked from a tile that covers several categories, where faults in different categories are equally
+# right (e.g. a weak battery is in battery and in self_start). SYNTHETIC.
+- {id: wontstart-weak, source: synthetic, type: overlap, group: wont_start, text: "battery weak hai self dheere ghoomta hai", expected: [F08-BT-01, F07-SS-18, F07-SS-01]}
+- {id: wontstart-click, source: synthetic, type: overlap, group: wont_start, text: "sirf click ki awaaz aati hai", expected: [F07-SS-05, F07-SS-06, F07-SS-07, F08-BT-03]}
+- {id: wontstart-crank, source: synthetic, type: overlap, group: wont_start, text: "crank hota hai par start nahi hota", expected: [F09-NS-02, F07-SS-26]}
+- {id: heat-leak, source: synthetic, type: overlap, group: overheating_leaks, text: "coolant neeche leak ho raha hai", expected: [F02-OH-03, F02-OH-07]}
+- {id: brake-steer, source: synthetic, type: overlap, group: brakes_steering, text: "brake lagane par steering hilta hai", expected: [F11-BR-10]}
+- {id: charge-light, source: synthetic, type: overlap, group: battery_lights, text: "chalte hue battery light jal rahi hai", expected: [F08-BT-08, F08-BT-09, F09-NS-19]}

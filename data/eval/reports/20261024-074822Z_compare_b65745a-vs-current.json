@@ -1,0 +1,129 @@
+{
+ "meta": {
+  "stamp": "20261024-074822Z",
+  "label": "b65745a-vs-current",
+  "base": {
+   "created_at": "2026-10-24T07:46:34+00:00",
+   "stamp": "20261024-074634Z",
+   "engine_label": "b65745a",
+   "engine_version": "1.0.0",
+   "engine_hash": "994a6688f9",
+   "git_commit": "fc2480f",
+   "git_dirty": false,
+   "dataset_version_id": 36,
+   "embeddings": false,
+   "cases": 5479,
+   "cases_by_type": {
+    "chips": 806,
+    "free_text": 2091,
+    "overlap": 1368,
+    "safety": 876,
+    "unlisted": 338
+   },
+   "cases_by_source": {
+    "dataset": 3012,
+    "generated": 1999,
+    "synthetic": 468
+   },
+   "engine_commit": "b65745a"
+  },
+  "candidate": {
+   "created_at": "2026-10-24T07:48:21+00:00",
+   "stamp": "20261024-074821Z",
+   "engine_label": "current",
+   "engine_version": "1.0.0",
+   "engine_hash": "d54bfab665",
+   "git_commit": "fc2480f",
+   "git_dirty": false,
+   "dataset_version_id": 36,
+   "embeddings": false,
+   "cases": 5479,
+   "cases_by_type": {
+    "chips": 806,
+    "free_text": 2091,
+    "overlap": 1368,
+    "safety": 876,
+    "unlisted": 338
+   },
+   "cases_by_source": {
+    "dataset": 3012,
+    "generated": 1999,
+    "synthetic": 468
+   }
+  }
+ },
+ "overall": {
+  "coverage_correct": [
+   0.9911,
+   1.0
+  ]
+ },
+ "by_type": {
+  "unlisted": {
+   "coverage_correct": [
+    0.9911,
+    1.0
+   ]
+  }
+ },
+ "by_category": {
+  "inspection": {
+   "coverage_correct": [
+    0.9,
+    1.0
+   ]
+  },
+  "sensor_ecu": {
+   "coverage_correct": [
+    0.9286,
+    1.0
+   ]
+  },
+  "suspension": {
+   "coverage_correct": [
+    0.95,
+    1.0
+   ]
+  }
+ },
+ "only_in_base": [],
+ "only_in_candidate": [],
+ "changes": [
+  {
+   "id": "unl-mid-ft-F14-IN-01-c3b793ed",
+   "type": "unlisted",
+   "category": "inspection",
+   "verdict": "better",
+   "diff": {
+    "coverage_ok": [
+     false,
+     true
+    ]
+   }
+  },
+  {
+   "id": "unl-mid-ft-F14-SU-14-5412cfa1",
+   "type": "unlisted",
+   "category": "suspension",
+   "verdict": "better",
+   "diff": {
+    "coverage_ok": [
+     false,
+     true
+    ]
+   }
+  },
+  {
+   "id": "unl-mid-ft-F15-SE-16-18815b48",
+   "type": "unlisted",
+   "category": "sensor_ecu",
+   "verdict": "better",
+   "diff": {
+    "coverage_ok": [
+     false,
+     true
+    ]
+   }
+  }
+ ]
+}

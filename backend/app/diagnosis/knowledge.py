@@ -4,6 +4,7 @@ The engine never touches the database; this module is the only bridge. Internal 
 mechanic repair steps, internal notes) are never read here.
 """
 
+import dataclasses
 import re
 
 from sqlalchemy import select
@@ -37,6 +38,13 @@ from engine import types as et
 
 def _vector(v) -> list[float] | None:
     return None if v is None else [float(x) for x in v]
+
+
+def _known(cls, **kwargs):
+    """Build an engine dataclass with only the fields it defines, so an older engine version (data/eval compare
+    mode) can still load today's knowledge. New fields simply stay at their defaults there."""
+    names = {f.name for f in dataclasses.fields(cls)}
+    return cls(**{k: v for k, v in kwargs.items() if k in names})
 
 
 def load_knowledge(session: Session) -> et.Knowledge:
@@ -109,7 +117,8 @@ def load_knowledge(session: Session) -> et.Knowledge:
             texts.append(et.TextEntry(p.fault_id, p.english_gloss, "phrase"))
 
     for c in session.scalars(select(FaultCost).where(FaultCost.fault_id.in_(ids))):
-        faults[c.fault_id].costs[str(c.segment)] = et.Cost(
+        faults[c.fault_id].costs[str(c.segment)] = _known(
+            et.Cost,
             segment=str(c.segment),
             display=str(c.display_mode),
             total=c.total_inr,

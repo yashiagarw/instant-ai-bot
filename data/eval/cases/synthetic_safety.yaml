@@ -1,0 +1,14 @@
+# Dangerous situations that must raise a high-risk alert, in English, Hinglish and Hindi, plus everyday problems
+# that must not. SYNTHETIC. Safety cases run only the description (no simulated answers).
+- {id: brake-fail, source: synthetic, type: safety, lang: hinglish, text: "brake fail ho gaye pedal floor tak ja raha hai", expected_alert: high}
+- {id: fire, source: synthetic, type: safety, lang: hinglish, text: "engine se aag nikal rahi hai", expected_alert: high}
+- {id: steam-red, source: synthetic, type: safety, lang: en, text: "temperature in the red and steam from the bonnet", expected_alert: high}
+- {id: smoke-en, source: synthetic, type: safety, lang: en, text: "smoke coming from under the bonnet", expected_alert: high}
+- {id: flood, source: synthetic, type: safety, lang: hinglish, text: "car paani mein doob gayi engine band ho gaya", expected_alert: high}
+- {id: smoke-hi, source: synthetic, type: safety, lang: hi, text: "बोनट से धुआं निकल रहा है", expected_alert: high}
+- {id: fuel-smell-hi, source: synthetic, type: safety, lang: hi, text: "पेट्रोल की तेज़ गंध आ रही है और धुआं भी", expected_alert: high}
+- {id: brake-fail-hi, source: synthetic, type: safety, lang: hi, text: "ब्रेक फेल हो गए हैं", expected_alert: high}
+- {id: quiet-ac, source: synthetic, type: safety, lang: hinglish, text: "AC se thodi badbu aati hai", expected_alert: none}
+- {id: quiet-music, source: synthetic, type: safety, lang: en, text: "the music system does not turn on", expected_alert: none}
+- {id: quiet-pressure, source: synthetic, type: safety, lang: hinglish, text: "tyre ka pressure check karna hai", expected_alert: none}
+- {id: quiet-wiper, source: synthetic, type: safety, lang: en, text: "wiper makes a squeaking noise", expected_alert: none}
