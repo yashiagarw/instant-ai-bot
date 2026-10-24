@@ -54,6 +54,11 @@ const ICONS: Record<string, LucideIcon> = {
   book_inspection: ClipboardCheck,
 };
 
+export function TopicIcon({ code, className }: { code: string; className?: string }) {
+  const Icon = ICONS[code] ?? Wrench;
+  return <Icon aria-hidden="true" className={className} />;
+}
+
 type State = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; topics: Topic[] };
 
 function TopicLink({ topic, emergency = false }: { topic: Topic; emergency?: boolean }) {

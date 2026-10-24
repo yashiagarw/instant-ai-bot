@@ -183,6 +183,9 @@ def test_full_diagnosis_happy_path(client, knowledge, variant, db_session):
         "text": None,
         "approx_label": top["cost"]["approx_label"],
         "checked_on": top["cost"]["checked_on"],
+        "is_approx": True,
+        "labour": 800,
+        "labour_text": None,
     }
     assert top["evidence"] and "Check voltage" in top["diagnostic_steps"]
     assert top["what_you_can_do"] == ["Switch everything off"] and top["what_the_mechanic_will_do"]
@@ -338,3 +341,134 @@ def test_openapi_documents_the_diagnosis_schemas(client):
     schemas = spec["components"]["schemas"]
     assert {"SessionOut", "AnswerIn", "AnswerOut", "ResultOut", "FeedbackIn", "CategoriesOut"} <= set(schemas)
     assert "description" in schemas["MediaOut"]["properties"]["start_time"]
+
+
+# ---------------------------------------------------------------- web app support (problem step, chat, result)
+
+
+def test_topics_have_hindi_labels_beta_flags_and_follow_the_car(client):
+    topics = {t["code"]: t for t in client.get("/api/categories").json()["topics"]}
+    assert topics["tyres"]["label_hi"] and topics["tyres"]["beta"] is False  # tyre is Phase 1
+    assert topics["ev_hybrid"]["beta"] is True and topics["locked_out"]["beta"] is True
+    assert topics["brakes_steering"]["beta"] is False  # brakes is Phase 1, steering is not: the tile is tuned
+
+    ev = {t["code"]: t for t in client.get("/api/categories", params={"fuel": "ev"}).json()["topics"]}
+    assert ev["out_of_fuel"]["label"] == "Battery ran out" and ev["out_of_fuel"]["categories"] == ["ev_hybrid"]
+    assert "clutch_gearbox" in ev  # gearbox still applies
+    petrol = {t["code"]: t for t in client.get("/api/categories", params={"fuel": "petrol"}).json()["topics"]}
+    assert petrol["out_of_fuel"]["label"] == "Petrol finished" and "ev_hybrid" not in petrol
+    unknown = {t["code"] for t in client.get("/api/categories").json()["topics"]}
+    assert "ev_hybrid" in unknown  # unknown fuel hides nothing
+    assert client.get("/api/categories", params={"fuel": "steam"}).status_code == 422
+
+
+def test_progress_counts_questions(client, knowledge, variant):
+    s = start(client, vehicle={"variant_id": variant.id}, category_ids=["battery"])
+    assert s["progress"] == {"question_number": 1, "questions_about": 8}
+    a1 = answer(client, s["session_id"], knowledge["main"].id, option_id(knowledge["main"], "Car will not start"))
+    assert a1["progress"]["question_number"] == 2 and a1["mode"] == "diagnose"
+
+
+def test_going_back_reopens_the_previous_question_and_keeps_the_history(client, knowledge, variant, db_session):
+    main, follow = knowledge["main"], knowledge["follow"]
+    s = start(client, vehicle={"variant_id": variant.id}, category_ids=["battery"])
+    sid = s["session_id"]
+    first = option_id(main, "Car will not start")
+    assert client.post(f"/api/diagnosis/sessions/{sid}/answers/undo").status_code == 409  # nothing to take back
+    answer(client, sid, main.id, first)
+
+    back = client.post(f"/api/diagnosis/sessions/{sid}/answers/undo")
+    assert back.status_code == 200, back.text
+    body = back.json()
+    assert body["question"]["id"] == main.id and body["previous_option_id"] == first
+    assert body["progress"]["question_number"] == 1 and not body["done"]
+    answer(client, sid, follow.id, "not_sure", expect=422)  # the follow-up is no longer waiting
+
+    a = answer(client, sid, main.id, first)
+    assert a["question"]["id"] == follow.id
+    answer(client, sid, follow.id, "not_sure")
+    assert client.post(f"/api/diagnosis/sessions/{sid}/answers/undo").status_code == 409  # completed
+
+    kinds = [
+        e.event_type
+        for e in db_session.scalars(
+            select(SessionEvent).where(SessionEvent.session_id == uuid.UUID(sid)).order_by(SessionEvent.id)
+        )
+    ]
+    assert kinds.count("answer_given") == 3 and kinds.count("answer_undone") == 1
+    result = client.get(f"/api/diagnosis/sessions/{sid}/result").json()
+    assert [x["question"] for x in result["answers"]] == [main.text_en, follow.text_en]
+
+
+def test_result_has_mode_vehicle_topic_and_towing(client, knowledge, variant):
+    s = start(client, vehicle={"variant_id": variant.id}, topic_id="battery_lights", category_ids=["battery"])
+    result = client.get(f"/api/diagnosis/sessions/{s['session_id']}/result").json()
+    assert result["mode"] == "diagnose" and result["topic"] == "Battery, lights & warning lights"
+    assert result["vehicle"]["listed"] and result["vehicle"]["price_segment"] == "mid"
+    assert variant.name in result["vehicle"]["label"]
+    assert "towing" in result["roadside"]
+
+    u = start(
+        client,
+        vehicle={"unlisted": {"make": "Hindustan", "model": "Ambassador", "year": 2010}},
+        category_ids=["battery"],
+    )
+    vehicle = client.get(f"/api/diagnosis/sessions/{u['session_id']}/result").json()["vehicle"]
+    assert vehicle == {
+        "label": "Hindustan Ambassador 2010",
+        "listed": False,
+        "fuel": None,
+        "transmission": None,
+        "price_segment": None,
+    }
+
+
+def test_media_files_are_served(test_settings, db_session, tmp_path):
+    (tmp_path / "F08").mkdir()
+    (tmp_path / "F08" / "guide.svg").write_text("<svg xmlns='http://www.w3.org/2000/svg'/>")
+    with make_client(test_settings, db_session, media_dir=tmp_path) as c:
+        r = c.get("/media/F08/guide.svg")
+        assert r.status_code == 200 and "svg" in r.headers["content-type"]
+        assert c.get("/media/../.env").status_code == 404
+
+
+def test_session_state_reloads_the_waiting_question(client, knowledge, variant):
+    main = knowledge["main"]
+    s = start(client, vehicle={"variant_id": variant.id}, topic_id="battery_lights", category_ids=["battery"])
+    state = client.get(f"/api/diagnosis/sessions/{s['session_id']}").json()
+    assert (
+        state["question"]["id"] == main.id
+        and not state["done"]
+        and state["topic"] == "Battery, lights & warning lights"
+    )
+    assert state["vehicle"]["price_segment"] == "mid" and state["progress"]["question_number"] == 1
+    answer(client, s["session_id"], main.id, option_id(main, "Car will not start"))
+    assert client.get(f"/api/diagnosis/sessions/{s['session_id']}").json()["question"]["id"] == knowledge["follow"].id
+    assert client.get(f"/api/diagnosis/sessions/{uuid.uuid4()}").status_code == 404
+
+
+def test_safety_words_end_the_session_state_with_alerts(client, knowledge, variant):
+    s = start(client, vehicle={"variant_id": variant.id}, category_ids=["battery"], text="battery smoke aa raha hai")
+    state = client.get(f"/api/diagnosis/sessions/{s['session_id']}").json()
+    assert state["done"] and state["question"] is None and state["safety_alerts"][0]["risk"] == "high"
+
+
+def test_mechanic_only_columns_never_reach_the_customer(client, knowledge, variant):
+    # The fixture fills MECHANIC TASK ("[ ] Load test / [ ] Terminals"), HOW TO REPAIR BY MECHANIC ("1. Test.
+    # 2. Fix.") and the internal notes ("Car example: Maruti WagonR"). ("Load test" alone is also in DIAGNOSIS.)
+    main, follow = knowledge["main"], knowledge["follow"]
+    s = start(client, vehicle={"variant_id": variant.id}, category_ids=["battery"])
+    answer(client, s["session_id"], main.id, option_id(main, "Car will not start"))
+    answer(client, s["session_id"], follow.id, "not_sure")
+    body = client.get(f"/api/diagnosis/sessions/{s['session_id']}/result").text
+    for marker in ("[ ]", "Terminals", "WagonR", "Fix.", "Car example"):
+        assert marker not in body, marker
+    top = client.get(f"/api/diagnosis/sessions/{s['session_id']}/result").json()["ranked"][0]
+    assert top["what_the_mechanic_will_do"]  # from the RESOLUTION column
+
+
+def test_banner_only_has_high_risk_alerts(client, knowledge, variant):
+    s = start(client, vehicle={"variant_id": variant.id}, category_ids=["battery"], text="battery smoke aa raha hai")
+    result = client.get(f"/api/diagnosis/sessions/{s['session_id']}/result").json()
+    assert result["safety_alerts"] and all(a["risk"] == "high" for a in result["safety_alerts"])
+    assert all(a["stop_driving_trigger"] != "Not stated" for a in result["safety_alerts"])

@@ -47,6 +47,8 @@ class Cost:
     checked_on: str | None = None  # ISO date
     is_approx: bool = False
     needs_review: bool = False
+    labour: int | None = None
+    labour_text: str | None = None
 
 
 @dataclass
@@ -194,6 +196,9 @@ class CostOut:
     text: str | None = None
     approx_label: str | None = None
     checked_on: str | None = None
+    is_approx: bool = False
+    labour: int | None = None
+    labour_text: str | None = None
 
 
 @dataclass

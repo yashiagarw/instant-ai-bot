@@ -120,6 +120,8 @@ def load_knowledge(session: Session) -> et.Knowledge:
             checked_on=c.checked_on.isoformat() if c.checked_on else None,
             is_approx=c.is_approx,
             needs_review=c.needs_review,
+            labour=c.labour_inr,
+            labour_text=c.labour_text,
         )
 
     fits = session.execute(

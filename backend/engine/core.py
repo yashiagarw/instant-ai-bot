@@ -104,7 +104,14 @@ def cost_for(fault: Fault, vehicle: Vehicle | None) -> CostOut | None:
     c = fault.costs.get(vehicle.segment)
     if c is None:
         return None
-    base = {"segment": c.segment, "approx_label": c.approx_label, "checked_on": c.checked_on}
+    base = {
+        "segment": c.segment,
+        "approx_label": c.approx_label,
+        "checked_on": c.checked_on,
+        "is_approx": c.is_approx,
+        "labour": c.labour,
+        "labour_text": c.labour_text,
+    }
     if c.needs_review or c.display == "on_inspection":
         return CostOut(display="on_inspection", text=c.text, **base)
     if c.display == "amount":

@@ -1,6 +1,7 @@
 """Settings loaded from environment variables (and backend/.env in development)."""
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -26,6 +27,8 @@ class Settings(BaseSettings):
     session_rate_window_seconds: int = 60
     # Use the first X-Forwarded-For address as the client IP. Only enable behind a proxy you control.
     trust_forwarded_for: bool = False
+    # Fault pictures (drawn guides) served at /media; result `media[].file` paths are relative to it.
+    media_dir: Path = Path(__file__).resolve().parents[2] / "data" / "media"
     # Offline question structuring (app.knowledge.questions). Never used by the live app.
     # Empty key = the SDK's own credential lookup (ANTHROPIC_API_KEY env, `ant auth login` profile).
     llm_provider: Literal["anthropic", "openai"] = "anthropic"

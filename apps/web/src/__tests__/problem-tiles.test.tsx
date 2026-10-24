@@ -17,7 +17,8 @@ test("shows skeletons, then problem tiles and the emergency row linking to the d
   expect(tyres.getAttribute("href")).toBe("/diagnose?topic=tyres");
   const urgent = screen.getByRole("heading", { name: /need help right now/i }).closest("section")!;
   const labels = [...urgent.querySelectorAll("a")].map((a) => a.textContent);
-  expect(labels).toEqual(["Flat tyre", "Book an inspection"]);
+  expect(labels).toHaveLength(9);
+  expect(labels.slice(0, 2)).toEqual(["Battery dead", "Flat tyre"]);
   expect(screen.queryByRole("link", { name: "Flat tyre" })?.getAttribute("href")).toBe("/diagnose?topic=flat_tyre");
 });
 

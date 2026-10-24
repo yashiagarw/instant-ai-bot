@@ -1,45 +1,15 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { CATEGORIES, MAKES, MODELS, SEARCH, VARIANTS } from "../src/__tests__/api-data";
-
-const ROUTES: [string, unknown][] = [
-  ["/api/categories", CATEGORIES],
-  ["/api/vehicles/makes/1/models", MODELS],
-  ["/api/vehicles/makes", MAKES],
-  ["/api/vehicles/models/5/variants", VARIANTS],
-  ["/api/vehicles/search", SEARCH],
-];
-
-async function mockApi(page: Page) {
-  await page.route("http://localhost:8000/api/**", async (route) => {
-    const path = new URL(route.request().url()).pathname;
-    const hit = ROUTES.find(([prefix]) => path.startsWith(prefix));
-    if (!hit) return route.fulfill({ status: 404, body: "not found" });
-    await route.fulfill({ json: hit[1] });
-  });
-}
+import { expectNoSideScroll, expectTouchTargets } from "./checks";
+import { mockApi } from "./mock-api";
 
 async function savedVehicle(page: Page) {
   return page.evaluate(() => JSON.parse(sessionStorage.getItem("im.diagnosis.vehicle") ?? "null"));
 }
 
-async function expectNoSideScroll(page: Page) {
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
-}
-
-/** Every visible button, link and pill toggle on the page is at least 44px tall. */
-async function expectTouchTargets(page: Page) {
-  const small = await page.evaluate(() =>
-    [...document.querySelectorAll("main button, main a, main input:not([type=radio]), main input[type=radio] + label")]
-      .filter((el) => (el as HTMLElement).offsetParent !== null)
-      .map((el) => ({ text: el.textContent?.trim().slice(0, 30), h: el.getBoundingClientRect().height }))
-      .filter((t) => t.h < 44),
-  );
-  expect(small).toEqual([]);
-}
-
-test.beforeEach(async ({ page }) => mockApi(page));
+test.beforeEach(async ({ page }) => {
+  await mockApi(page);
+});
 
 test("landing page: hero, tiles, emergency row and disclaimer", async ({ page }) => {
   await page.goto("/");

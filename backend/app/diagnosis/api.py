@@ -10,12 +10,14 @@ from sqlalchemy.orm import Session
 
 import engine as eng
 from app.db import get_session
+from app.diagnosis import present, service
 from app.diagnosis import schemas as s
-from app.diagnosis import service
 from app.diagnosis.models import DiagnosisSession, SessionStatus
-from app.knowledge.models import Category, ProblemGroup, Question
+from app.enums import Fuel, Transmission
+from app.knowledge.models import Category, GroupType, ProblemGroup, Question
 from app.ratelimit import RateLimiter, client_ip
 from engine import vehicle_allows
+from engine.core import topic_variant
 
 router = APIRouter(prefix="/diagnosis", tags=["diagnosis"])
 categories_router = APIRouter(tags=["diagnosis"])
@@ -68,9 +70,9 @@ def _alerts(alerts) -> list[s.SafetyAlertOut]:
             risk=a.risk,
             reason=a.reason,
             source=a.source,
-            roadside_action=a.roadside_action,
-            stop_driving_trigger=a.stop_trigger,
-            towing=a.towing,
+            roadside_action=present.roadside_text(present.informative(a.roadside_action)),
+            stop_driving_trigger=present.informative(a.stop_trigger),
+            towing=present.towing_text(present.informative(a.towing)),
             fault_key=a.fault_key,
         )
         for a in alerts
@@ -82,6 +84,26 @@ def _question(q) -> s.QuestionOut | None:
         return None
     return s.QuestionOut(
         id=q.id, text=q.text, options=[s.OptionOut(**asdict(o)) for o in q.options], category=q.category
+    )
+
+
+def _progress(session: Session, ds: DiagnosisSession, result) -> s.Progress:
+    number, about = service.progress(session, ds, result)
+    return s.Progress(question_number=number, questions_about=about)
+
+
+def _vehicle_out(snap: dict) -> s.VehicleOut:
+    parts = [snap.get("make"), snap.get("model")]
+    if snap.get("listed"):
+        label = " ".join(p for p in parts if p) + (f" · {snap['variant']}" if snap.get("variant") else "")
+    else:
+        label = " ".join(str(p) for p in [*parts, snap.get("year")] if p)
+    return s.VehicleOut(
+        label=label,
+        listed=bool(snap.get("listed")),
+        fuel=snap.get("fuel"),
+        transmission=snap.get("transmission"),
+        price_segment=snap.get("segment"),
     )
 
 
@@ -97,30 +119,55 @@ def list_categories(
     session: DbSession,
     engine: EngineDep,
     variant_id: int | None = None,
+    fuel: Fuel | None = None,
+    transmission: Transmission | None = None,
 ):
     """All categories and the topics a session can start from (tiles, emergency topics, inspection).
-    With `variant_id`, categories that do not apply to that car (for example CNG on a diesel) are left out."""
+    For a car (`variant_id`, or `fuel` / `transmission` for an unlisted car) categories that do not apply (for
+    example CNG on a diesel) are left out, tiles with nothing left are hidden, and emergency topics use the
+    car's wording ("Battery ran out" instead of "Petrol finished" on an EV)."""
     vehicle = None
     if variant_id is not None:
         snapshot, _, _ = service.resolve_vehicle(session, s.VehicleIn(variant_id=variant_id))
         vehicle = service._vehicle(snapshot)
+    elif fuel is not None or transmission is not None:
+        vehicle = eng.Vehicle(
+            fuel=str(fuel) if fuel else None, transmission=str(transmission) if transmission else None
+        )
+
+    def allowed(code: str) -> bool:
+        return vehicle is None or vehicle_allows(engine.k.categories[code], vehicle)
+
+    rows = {c.code: c for c in session.scalars(select(Category).order_by(Category.wave, Category.code))}
     with_questions = set(session.scalars(select(Question.category_code).where(Question.status == "approved")))
     cats = [
         s.CategoryOut(code=c.code, name=c.name, kind=c.kind, beta=c.beta, has_questions=c.code in with_questions)
-        for c in session.scalars(select(Category).order_by(Category.wave, Category.code))
-        if vehicle is None or vehicle_allows(engine.k.categories[c.code], vehicle)
+        for c in rows.values()
+        if allowed(c.code)
     ]
     mode = {"tile": "diagnose", "emergency": "fast_track", "inspection": "inspect"}
-    topics = [
-        s.TopicOut(
-            code=g.code,
-            type=g.group_type,
-            label=g.label_en,
-            mode=mode[str(g.group_type)],
-            categories=[pc.category_code for pc in g.categories],
+    topics = []
+    for g in session.scalars(select(ProblemGroup).order_by(ProblemGroup.group_type, ProblemGroup.position)):
+        label, label_hi = g.label_en, g.label_hi
+        codes = [pc.category_code for pc in g.categories]
+        variant = topic_variant(engine.k.groups[g.code], vehicle) if vehicle and g.code in engine.k.groups else None
+        if variant:
+            label, label_hi = variant.get("label_en", label), variant.get("label_hi", label_hi)
+            codes = variant.get("categories", codes)
+        codes = [c for c in codes if c in rows and allowed(c)]
+        if g.group_type == GroupType.tile and not codes:
+            continue  # nothing in this tile applies to the car
+        topics.append(
+            s.TopicOut(
+                code=g.code,
+                type=g.group_type,
+                label=label,
+                label_hi=label_hi,
+                mode=mode[str(g.group_type)],
+                categories=codes,
+                beta=all(rows[c].beta for c in codes),
+            )
         )
-        for g in session.scalars(select(ProblemGroup).order_by(ProblemGroup.group_type, ProblemGroup.position))
-    ]
     return s.CategoriesOut(categories=cats, topics=topics)
 
 
@@ -145,12 +192,13 @@ def create_session(body: s.SessionCreate, session: DbSession, engine: EngineDep)
         status=_status(ds),
         mode=result.mode,
         coverage_level=result.coverage,
-        safety_alerts=_alerts(result.safety_alerts),
+        safety_alerts=_alerts(service.banner_alerts(result)[0]),
         question=None if result.done else _question(result.next_question),
         done=result.done,
-        safety_tips=result.safety_tips,
+        safety_tips=service.customer_tips(engine, result),
         actions=result.actions,
         suggested_categories=[c.code for c in result.suggested_categories],
+        progress=_progress(session, ds, result),
         disclaimer=result.disclaimer,
     )
 
@@ -176,9 +224,67 @@ def post_answer(body: s.AnswerIn, ds: SessionDep, session: DbSession, engine: En
         status=_status(ds),
         question=None if result.done else _question(result.next_question),
         done=result.done,
-        new_safety_alerts=_alerts(new),
-        safety_alerts=_alerts(result.safety_alerts),
+        new_safety_alerts=_alerts([a for a in new if a in service.banner_alerts(result)[0]]),
+        safety_alerts=_alerts(service.banner_alerts(result)[0]),
         coverage_level=result.coverage,
+        mode=result.mode,
+        progress=_progress(session, ds, result),
+    )
+
+
+@router.get(
+    "/sessions/{session_id}",
+    response_model=s.SessionStateOut,
+    summary="Current state of a session",
+    responses={404: ERRORS[404]},
+)
+def get_session_state(ds: SessionDep, session: DbSession, engine: EngineDep):
+    """The question waiting for an answer (null when done), all safety alerts, progress, the car and the topic.
+    Lets the chat page be reloaded or opened from a link."""
+    result = service.current_result(session, engine, ds)
+    pending = service.pending_question(session, ds)
+    done = ds.status == SessionStatus.completed or pending is None
+    topic = session.get(ProblemGroup, ds.problem_group_code) if ds.problem_group_code else None
+    return s.SessionStateOut(
+        session_id=ds.id,
+        status=_status(ds),
+        question=None if done else _question(result.next_question),
+        done=done,
+        new_safety_alerts=[],
+        safety_alerts=_alerts(service.banner_alerts(result)[0]),
+        coverage_level=result.coverage,
+        mode=result.mode,
+        progress=_progress(session, ds, result),
+        vehicle=_vehicle_out(ds.vehicle_snapshot),
+        topic=topic.label_en if topic else None,
+    )
+
+
+@router.post(
+    "/sessions/{session_id}/answers/undo",
+    response_model=s.AnswerOut,
+    summary="Go back to the previous question",
+    responses={404: ERRORS[404], 409: ERRORS[409]},
+)
+def undo_answer(ds: SessionDep, session: DbSession, engine: EngineDep):
+    """Take back the last answer: the previous question is returned again, with `previous_option_id` set to the
+    option chosen before. The history keeps both answers. Not possible once the session is completed."""
+    try:
+        result, last = service.undo(session, engine, ds)
+    except service.SessionStateError as e:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
+    session.commit()
+    return s.AnswerOut(
+        session_id=ds.id,
+        status=_status(ds),
+        question=_question(result.next_question),
+        done=False,
+        new_safety_alerts=[],
+        safety_alerts=_alerts(service.banner_alerts(result)[0]),
+        coverage_level=result.coverage,
+        mode=result.mode,
+        progress=_progress(session, ds, result),
+        previous_option_id=last["option_id"],
     )
 
 
@@ -196,9 +302,14 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
     top = result.ranked[:3]
     details = service.public_details(session, engine, [r.fault_id for r in top])
     lead_key = top[0].fault_key if top else None
+    lead = engine.k.faults[top[0].fault_id] if top else None
+    topic = session.get(ProblemGroup, ds.problem_group_code) if ds.problem_group_code else None
     return s.ResultOut(
         session_id=ds.id,
         status=_status(ds),
+        mode=result.mode,
+        vehicle=_vehicle_out(ds.vehicle_snapshot),
+        topic=topic.label_en if topic else None,
         engine_version=result.engine_version,
         coverage_level=result.coverage,
         stop_reason=result.stop_reason,
@@ -217,11 +328,13 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
             )
             for i, r in enumerate(top, start=1)
         ],
-        safety_alerts=_alerts(result.safety_alerts),
+        safety_alerts=_alerts(service.banner_alerts(result)[0]),
         roadside=s.RoadsideOut(
-            verdict=result.roadside.verdict, text=service.clean_codes(engine, result.roadside.text, lead_key)
+            verdict=result.roadside.verdict,
+            text=present.roadside_text(service.clean_codes(engine, result.roadside.text, lead_key)),
+            towing=present.towing_text(service.clean_codes(engine, lead.towing_text, lead_key)) if lead else "",
         ),
-        safety_tips=[service.clean_codes(engine, t, lead_key) for t in result.safety_tips],
+        safety_tips=service.customer_tips(engine, result),
         actions=result.actions,
         disclaimer=result.disclaimer,
         created_at=ds.created_at,

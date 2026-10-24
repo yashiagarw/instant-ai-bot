@@ -26,8 +26,10 @@ class TopicOut(BaseModel):
     code: str = Field(description="Topic id, used in `topic_id`.", examples=["flat_tyre"])
     type: Literal["tile", "emergency", "inspection"]
     label: str = Field(examples=["Flat tyre"])
+    label_hi: str = Field(description="Hindi label (drafts until reviewed).", examples=["टायर पंक्चर"])
     mode: Literal["diagnose", "fast_track", "inspect"]
-    categories: list[str] = Field(description="Category codes this topic covers (before vehicle filters).")
+    categories: list[str] = Field(description="Category codes this topic covers for the car (after vehicle filters).")
+    beta: bool = Field(description="None of its categories is tuned yet (outside Phase 1): show a Beta label.")
 
 
 class CategoriesOut(BaseModel):
@@ -111,6 +113,9 @@ class QuestionOut(BaseModel):
 
 
 class SafetyAlertOut(BaseModel):
+    """A red-banner alert: a high-risk rule (stop driving / do not use) seen in an answer or the description, or
+    belonging to the top fault. Other rules that fired are folded into `safety_tips`."""
+
     rule_id: int
     risk: Literal["low", "medium", "high"]
     reason: str = Field(description="What fired it: an answer, matched words, or the likely cause.")
@@ -124,6 +129,12 @@ class SafetyAlertOut(BaseModel):
 class RoadsideOut(BaseModel):
     verdict: Literal["do_not_drive", "roadside_fix_possible", "roadside_limited", "workshop", "unknown"]
     text: str = ""
+    towing: str = Field(default="", description="When towing is needed, for the top cause.")
+
+
+class Progress(BaseModel):
+    question_number: int = Field(description="Number of the current question, from 1.")
+    questions_about: int = Field(description='About how many questions in all ("Question 3 of about 8").')
 
 
 class SessionOut(BaseModel):
@@ -137,6 +148,7 @@ class SessionOut(BaseModel):
     safety_tips: list[str] = Field(description="Shown for fast_track topics and when the flow is done.")
     actions: list[str] = Field(description="request_mechanic and / or book_inspection.")
     suggested_categories: list[str] = Field(description="Up to 3 categories suggested from free text (no topic).")
+    progress: Progress
     disclaimer: str
 
 
@@ -155,6 +167,18 @@ class AnswerOut(BaseModel):
     new_safety_alerts: list[SafetyAlertOut] = Field(description="Alerts that fired because of this answer.")
     safety_alerts: list[SafetyAlertOut] = Field(description="All alerts currently active.")
     coverage_level: CoverageLevel
+    mode: str = Field(description="diagnose, fast_track, inspect or suggest.")
+    progress: Progress
+    previous_option_id: int | str | None = Field(
+        default=None, description="After going back: the option chosen before, to show it selected."
+    )
+
+
+class SessionStateOut(AnswerOut):
+    """The session as it stands: the question waiting for an answer (or done), alerts, progress and the car."""
+
+    vehicle: "VehicleOut"
+    topic: str | None
 
 
 # ---------------------------------------------------------------- result
@@ -169,6 +193,9 @@ class CostOut(BaseModel):
     text: str | None = None
     approx_label: str | None = Field(default=None, description='Shown with the price, e.g. "approx - ask shop".')
     checked_on: str | None = Field(default=None, description="ISO date the price was checked.")
+    is_approx: bool = False
+    labour: int | None = Field(default=None, description="Labour part of the total, in rupees, when known.")
+    labour_text: str | None = None
 
 
 class MediaOut(BaseModel):
@@ -203,9 +230,20 @@ class AnsweredQuestionOut(BaseModel):
     answered_at: datetime
 
 
+class VehicleOut(BaseModel):
+    label: str = Field(examples=["Maruti Suzuki Swift · 2024- Petrol 1.2 Z-series AMT"])
+    listed: bool
+    fuel: str | None
+    transmission: str | None
+    price_segment: PriceSegment | None
+
+
 class ResultOut(BaseModel):
     session_id: uuid.UUID
     status: Literal["in_progress", "completed"]
+    mode: str = Field(description="diagnose, fast_track, inspect or suggest.")
+    vehicle: VehicleOut
+    topic: str | None = Field(description="Label of the topic the session started from.")
     engine_version: str
     coverage_level: CoverageLevel
     stop_reason: str | None = Field(

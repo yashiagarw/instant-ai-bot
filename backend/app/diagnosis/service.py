@@ -27,6 +27,7 @@ from app.diagnosis.models import (
 )
 from app.knowledge.models import Category, Fault, FaultImage, FaultItem, FaultItemType, ProblemGroup, Question
 from app.vehicles.models import UnlistedVehicle, Variant
+from engine.core import FAST_TRACK_MAX, MAX_QUESTIONS, MAX_TIPS
 
 NOT_SURE = "not_sure"
 PUBLIC_STEP_TYPES = (FaultItemType.diagnosis_step, FaultItemType.resolution_step, FaultItemType.advice)
@@ -79,16 +80,30 @@ def _events(session: Session, ds: DiagnosisSession, kind: EventType | None = Non
     return list(session.scalars(q))
 
 
+def _live(session: Session, ds: DiagnosisSession) -> tuple[list[SessionEvent], list[SessionEvent]]:
+    """(questions asked, answers given) that still count. An answer_undone event takes back the last answer and
+    the question asked after it, so the previous question is waiting again. The events themselves are kept."""
+    asked: list[SessionEvent] = []
+    answers: list[SessionEvent] = []
+    for e in _events(session, ds):
+        if e.event_type == EventType.question_asked:
+            asked.append(e)
+        elif e.event_type == EventType.answer_given:
+            answers.append(e)
+        elif e.event_type == EventType.answer_undone and answers:
+            answers.pop()
+            if len(asked) > len(answers) + 1:
+                asked.pop()
+    return asked, answers
+
+
 def _vehicle(snapshot: dict) -> eng.Vehicle:
     return eng.Vehicle(**{k: snapshot.get(k) for k in eng.Vehicle.__dataclass_fields__})
 
 
 def _request(session: Session, ds: DiagnosisSession) -> eng.Request:
     start = _events(session, ds, EventType.session_started)[0].payload
-    answers = [
-        eng.Answer(e.payload["question_id"], e.payload["option_id"])
-        for e in _events(session, ds, EventType.answer_given)
-    ]
+    answers = [eng.Answer(e.payload["question_id"], e.payload["option_id"]) for e in _live(session, ds)[1]]
     return eng.Request(
         vehicle=_vehicle(ds.vehicle_snapshot),
         group=start.get("topic_id"),
@@ -134,11 +149,17 @@ def _record(session: Session, ds: DiagnosisSession, result: eng.Result) -> list[
 
 def pending_question(session: Session, ds: DiagnosisSession) -> dict | None:
     """The last question asked that has no answer yet."""
-    asked = _events(session, ds, EventType.question_asked)
-    answered = _events(session, ds, EventType.answer_given)
+    asked, answered = _live(session, ds)
     if not asked or len(answered) >= len(asked):
         return None
     return asked[-1].payload
+
+
+def progress(session: Session, ds: DiagnosisSession, result: eng.Result) -> tuple[int, int]:
+    """(number of the current question, about how many questions in all) for "Question 3 of about 8"."""
+    number = len(_live(session, ds)[1]) + 1
+    limit = FAST_TRACK_MAX if result.mode == "fast_track" else MAX_QUESTIONS
+    return number, max(limit, number)
 
 
 # ---------------------------------------------------------------- actions
@@ -241,6 +262,46 @@ def answer(session: Session, engine: eng.Engine, ds: DiagnosisSession, body):
     return result, _record(session, ds, result)
 
 
+def undo(session: Session, engine: eng.Engine, ds: DiagnosisSession) -> tuple[eng.Result, dict]:
+    """Take back the last answer so the previous question can be answered again. Returns the result with that
+    question waiting, and the answer that was taken back."""
+    if ds.status == SessionStatus.completed:
+        raise SessionStateError("this session is already completed")
+    answers = _live(session, ds)[1]
+    if not answers:
+        raise SessionStateError("there is no answer to take back")
+    last = answers[-1].payload
+    _event(session, ds, EventType.answer_undone, {"question_id": last["question_id"], "option_id": last["option_id"]})
+    session.flush()
+    return engine.diagnose(_request(session, ds)), last
+
+
+def banner_alerts(result: eng.Result) -> tuple[list[eng.types.SafetyAlert], list[eng.types.SafetyAlert]]:
+    """(red banner, the rest). The banner keeps only high-risk rules (stop driving / do not use) that were observed
+    in an answer or the description, or that belong to the top fault. Every rule still runs and is stored; the rest
+    are shown as ordinary safety tips."""
+    top = result.ranked[0].fault_key if result.ranked else None
+    banner, rest = [], []
+    for a in result.safety_alerts:
+        for_top = top is not None and top in (a.fault_keys or [a.fault_key])
+        (banner if a.risk == "high" and (a.source != "likely" or for_top) else rest).append(a)
+    return banner, rest
+
+
+def customer_tips(engine: eng.Engine, result: eng.Result) -> list[str]:
+    """Safety tips a driver can follow: the advice of alerts not in the banner first, then the engine's tips.
+    Workshop instructions, placeholders, internal codes and repeats are removed."""
+    _, rest = banner_alerts(result)
+    order = {"high": 0, "medium": 1, "low": 2}
+    lines = [
+        present.informative(a.roadside_action) or present.informative(a.stop_trigger)
+        for a in sorted(rest, key=lambda a: order.get(a.risk, 3))
+    ]
+    lead = result.ranked[0].fault_key if result.ranked else None
+    lines = [clean_codes(engine, t, lead) for t in [*lines, *result.safety_tips] if t]
+    return present.driver_tips(lines, MAX_TIPS)
+
+
 def current_result(session: Session, engine: eng.Engine, ds: DiagnosisSession) -> eng.Result:
     return engine.diagnose(_request(session, ds))
 
@@ -302,9 +363,9 @@ def clean_codes(engine: eng.Engine, text: str, fault_key: str | None) -> str:
 
 
 def answered_questions(session: Session, ds: DiagnosisSession) -> list[dict]:
-    asked = _events(session, ds, EventType.question_asked)
+    asked, answers = _live(session, ds)
     out = []
-    for i, e in enumerate(_events(session, ds, EventType.answer_given)):
+    for i, e in enumerate(answers):
         q = asked[i] if i < len(asked) else None
         out.append(
             {

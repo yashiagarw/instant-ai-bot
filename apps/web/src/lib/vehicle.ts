@@ -1,4 +1,6 @@
 // Vehicle selection helpers: labels, the choices left after each pick, and the saved selection.
+import { useMemo, useSyncExternalStore } from "react";
+
 import type { Fuel, Make, PriceSegment, Transmission, Variant } from "@/lib/api";
 
 export const FUEL_LABELS: Record<Fuel, string> = {
@@ -104,4 +106,28 @@ export function loadVehicle(): VehicleChoice | null {
 /** The API body for this choice (vehicle field of POST /api/diagnosis/sessions). */
 export function vehicleBody(choice: VehicleChoice) {
   return choice.kind === "listed" ? { variant_id: choice.variant_id } : { unlisted: choice.unlisted };
+}
+
+const noSubscribe = () => () => {};
+
+/** The saved selection, read without a hydration mismatch (null on the server and during hydration). */
+export function useSavedVehicle(): VehicleChoice | null {
+  const raw = useSyncExternalStore(
+    noSubscribe,
+    () => {
+      try {
+        return sessionStorage.getItem(STORAGE_KEY);
+      } catch {
+        return null;
+      }
+    },
+    () => null,
+  );
+  return useMemo(() => {
+    try {
+      return raw ? (JSON.parse(raw) as VehicleChoice) : null;
+    } catch {
+      return null;
+    }
+  }, [raw]);
 }

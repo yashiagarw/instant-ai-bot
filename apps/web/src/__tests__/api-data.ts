@@ -25,12 +25,45 @@ export const SEARCH: SearchResult = {
     { variant_id: 16, make: "Maruti Suzuki", model: "Swift", model_id: 5, variant: "Petrol 1.2 AMT", fuel: "petrol", transmission: "amt", year_from: 2024, year_to: null, price_segment: "budget", score: 2 },
   ],
 };
+const EMERGENCY: [string, string, string, boolean][] = [
+  ["battery_dead", "Battery dead", "बैटरी डाउन", false],
+  ["flat_tyre", "Flat tyre", "टायर पंक्चर", false],
+  ["out_of_fuel", "Petrol finished", "पेट्रोल खत्म", true],
+  ["locked_out", "Locked out", "चाबी अंदर, गाड़ी लॉक", true],
+  ["car_stuck", "Car stuck", "गाड़ी फंस गई", true],
+  ["car_in_water", "Car in water", "गाड़ी पानी में", true],
+  ["accident_tow", "Accident / tow", "एक्सीडेंट / टोइंग", true],
+  ["smoke", "Smoke or burning smell", "धुआं या जलने की बदबू", true],
+];
+
 export const CATEGORIES: CategoriesResult = {
   categories: [],
   topics: [
-    { code: "flat_tyre", type: "emergency", label: "Flat tyre", mode: "fast_track", categories: ["tyre"] },
-    { code: "book_inspection", type: "inspection", label: "Book an inspection", mode: "inspect", categories: [] },
-    { code: "tyres", type: "tile", label: "Tyres", mode: "diagnose", categories: ["tyre"] },
-    { code: "ac", type: "tile", label: "AC not cooling", mode: "diagnose", categories: ["ac"] },
+    ...EMERGENCY.map(([code, label, label_hi, beta]) => ({
+      code,
+      type: "emergency" as const,
+      label,
+      label_hi,
+      beta,
+      mode: "fast_track" as const,
+      categories: ["x"],
+    })),
+    { code: "book_inspection", type: "inspection", label: "Book an inspection", label_hi: "जांच बुक करें", beta: true, mode: "inspect", categories: [] },
+    { code: "tyres", type: "tile", label: "Tyres", label_hi: "टायर", beta: false, mode: "diagnose", categories: ["tyre"] },
+    { code: "ac", type: "tile", label: "AC not cooling", label_hi: "AC ठंडा नहीं", beta: false, mode: "diagnose", categories: ["ac"] },
+    { code: "ev_hybrid", type: "tile", label: "EV & hybrid", label_hi: "EV और हाइब्रिड", beta: true, mode: "diagnose", categories: ["ev_hybrid"] },
   ],
 };
+
+/** GET /api/categories for a car: like the real API, EV wording for out_of_fuel and no EV tile on other fuels. */
+export function categoriesFor(url: URL): CategoriesResult {
+  const fuel = url.searchParams.get("fuel") ?? (url.searchParams.get("variant_id") ? "petrol" : null);
+  const topics = CATEGORIES.topics
+    .filter((t) => !(t.code === "ev_hybrid" && fuel && fuel !== "ev" && fuel !== "hybrid"))
+    .map((t) =>
+      t.code === "out_of_fuel" && fuel === "ev"
+        ? { ...t, label: "Battery ran out", label_hi: "बैटरी चार्ज खत्म", categories: ["ev_hybrid"] }
+        : t,
+    );
+  return { categories: [], topics };
+}

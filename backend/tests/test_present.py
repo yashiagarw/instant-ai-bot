@@ -66,3 +66,88 @@ def test_steps_and_repairs_are_split_cleaned_and_deduplicated():
 def test_codes_resolve_within_the_same_file_only():
     assert clean("see TY-05 and XX-99") == 'see "Tyre burst/sidewall damage" and XX-99'
     assert code_replacer(NAMES)("see TY-05", 11) == 'see "Other file"'
+
+
+# ---------------------------------------------------------------- driver-safe tips, yes/no values, plain sentences
+
+from types import SimpleNamespace  # noqa: E402
+
+from app.diagnosis import service  # noqa: E402
+from app.diagnosis.present import driver_safe, driver_tips, roadside_text, towing_text  # noqa: E402
+from engine.types import SafetyAlert  # noqa: E402
+
+
+def test_workshop_instructions_are_removed_from_tips():
+    assert driver_safe("Remove battery wire before work.") == ""
+    assert driver_safe("Do not open the meter circuit while computers wake up.") == ""
+    assert driver_safe("Disconnect the battery before removing the starter") == ""
+    assert driver_safe("Park on flat ground, hazard lights on. Use axle stands, never a jack alone.") == (
+        "Park on flat ground, hazard lights on."
+    )
+    # Plain warnings a driver can follow stay; so does tightening wheel nuts after fitting the spare.
+    assert driver_safe("Never touch exposed or orange high-voltage wiring.") != ""
+    assert driver_safe("Tighten wheel nuts in a cross pattern with the correct torque.") != ""
+    assert driver_tips(
+        ["Yes - Bulb swap.", "Stop in a safe place.", "Stop in a safe place!", "check accessory current draw."], 8
+    ) == ["Bulb swap.", "Stop in a safe place."]
+
+
+def test_leftover_yes_no_column_values_are_stripped():
+    assert roadside_text("Yes Towing is NOT needed for simple low air.") == "Towing is NOT needed for simple low air."
+    assert roadside_text("Limited. A mechanic can check it.") == "A mechanic can check it."
+    assert roadside_text("Tow only if there is smoke. NO.") == "Tow only if there is smoke."
+    assert roadside_text("No part is needed.") == "No part is needed."  # a real sentence, not a column value
+    assert roadside_text("Limited") == ""
+    assert towing_text("NO.") == "Towing is usually not needed."
+    assert towing_text("YES.") == "Towing is needed."
+    assert towing_text("NO in most cases.") == "Towing is not needed in most cases."
+
+
+def test_answer_lines_become_plain_sentences():
+    out = present(
+        diagnosis=[],
+        resolution=[
+            "CHANGE PART WHEN: Yes.",
+            "CHANGE PART WHEN: Yes, when the test confirms.",
+            "CHANGE PART WHEN: None unless fault.",
+            "GO TO GARAGE WHEN: Yes, before driving far.",
+            "QUICK FIX ON ROAD: No.",
+        ],
+        advice=[],
+        clean=lambda t: t,
+    )
+    assert out["what_the_mechanic_will_do"] == [
+        "Parts are replaced only when the test confirms.",
+        "No parts are replaced unless fault.",
+    ]
+    assert out["what_you_can_do"] == [
+        "Take the car to a garage before driving far.",
+        "There is no safe quick fix on the road.",
+    ]
+    assert not any("only when:" in line or ": Yes" in line for line in out["what_the_mechanic_will_do"])
+
+
+def alert(rule_id, risk, source, fault_key=None, action="Stop."):
+    return SafetyAlert(rule_id, risk, "why", "", action, "No.", fault_key=fault_key, source=source)
+
+
+def test_banner_keeps_only_high_risk_rules_for_the_top_fault_or_seen_by_the_driver():
+    result = SimpleNamespace(
+        ranked=[SimpleNamespace(fault_key="F04-TY-02")],
+        safety_alerts=[
+            alert(1, "high", "likely", "F04-TY-02", "Do not drive on it."),  # top fault, high: banner
+            alert(2, "high", "likely", "F04-TY-04", "Do not use the valve."),  # other cause: tips
+            alert(3, "medium", "likely", "F04-TY-02", "Drive slowly to a tyre shop."),  # lower risk: tips
+            alert(4, "high", "text", None, "Get out of the car."),  # seen in the description: banner
+            alert(5, "low", "answer", None, "Not stated"),  # placeholder: nothing to show
+        ],
+        safety_tips=["Use hazard lights.", "Remove battery wire before work."],
+    )
+    banner, rest = service.banner_alerts(result)
+    assert [a.rule_id for a in banner] == [1, 4] and [a.rule_id for a in rest] == [2, 3, 5]
+    engine = SimpleNamespace(k=SimpleNamespace(faults={}))
+    assert service.customer_tips(engine, result) == [
+        "Do not use the valve.",
+        "Drive slowly to a tyre shop.",
+        "Use hazard lights.",
+    ]

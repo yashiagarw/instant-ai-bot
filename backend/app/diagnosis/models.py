@@ -27,6 +27,7 @@ class EventType(StrEnum):
     free_text = "free_text"
     safety_alert = "safety_alert"
     result_computed = "result_computed"
+    answer_undone = "answer_undone"  # the customer went back: the last answer no longer counts
 
 
 class Confidence(StrEnum):

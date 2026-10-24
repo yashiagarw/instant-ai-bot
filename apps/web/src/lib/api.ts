@@ -62,8 +62,10 @@ export interface Topic {
   code: string;
   type: "tile" | "emergency" | "inspection";
   label: string;
+  label_hi: string;
   mode: "diagnose" | "fast_track" | "inspect";
   categories: string[];
+  beta: boolean;
 }
 
 export interface CategoriesResult {
@@ -83,21 +85,54 @@ export class ApiError extends Error {
 }
 
 async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
+  return request<T>(path, { signal });
+}
+
+async function post<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
+async function request<T>(path: string, init: RequestInit): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}/api${path}`, { signal, headers: { Accept: "application/json" } });
+    res = await fetch(`${API_URL}/api${path}`, { ...init, headers: { Accept: "application/json", ...init.headers } });
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") throw e;
     throw new ApiError("We couldn't reach our server. Check your internet connection and try again.");
   }
   if (res.status === 429) throw new ApiError("Too many requests. Please wait a moment and try again.", 429);
   if (res.status === 404) throw new ApiError("We couldn't find that. Please go back and pick again.", 404);
+  if (res.status === 409) throw new ApiError("This step has already moved on. Please refresh the page.", 409);
+  if (res.status === 422) throw new ApiError("Something in your answer didn't look right. Please try again.", 422);
   if (!res.ok) throw new ApiError("Something went wrong on our side. Please try again.", res.status);
   return (await res.json()) as T;
 }
 
+/** Which car the topics are for: a catalogue variant, or what is known about an unlisted car. */
+export type CarFilter = { variant_id: number } | { fuel?: Fuel | null; transmission?: Transmission | null };
+
+function carQuery(car?: CarFilter): string {
+  if (!car) return "";
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(car)) if (v !== null && v !== undefined) params.set(k, String(v));
+  const q = params.toString();
+  return q ? `?${q}` : "";
+}
+
 export const api = {
-  categories: (signal?: AbortSignal) => get<CategoriesResult>("/categories", signal),
+  categories: (signal?: AbortSignal, car?: CarFilter) => get<CategoriesResult>(`/categories${carQuery(car)}`, signal),
+  createSession: (body: SessionCreate) => post<SessionOut>("/diagnosis/sessions", body),
+  session: (id: string, signal?: AbortSignal) => get<SessionState>(`/diagnosis/sessions/${id}`, signal),
+  answer: (id: string, question_id: number | string, option_id: number | string) =>
+    post<AnswerOut>(`/diagnosis/sessions/${id}/answers`, { question_id, option_id }),
+  undo: (id: string) => post<AnswerOut>(`/diagnosis/sessions/${id}/answers/undo`),
+  result: (id: string, signal?: AbortSignal) => get<ResultOut>(`/diagnosis/sessions/${id}/result`, signal),
+  feedback: (id: string, helpful: boolean, comment?: string) =>
+    post<{ id: number }>(`/diagnosis/sessions/${id}/feedback`, { helpful, comment: comment || null }),
   makes: (signal?: AbortSignal) => get<Make[]>("/vehicles/makes", signal),
   models: (makeId: number, signal?: AbortSignal) => get<Model[]>(`/vehicles/makes/${makeId}/models`, signal),
   variants: (modelId: number, signal?: AbortSignal) =>
@@ -108,4 +143,152 @@ export const api = {
 
 export function errorMessage(e: unknown): string {
   return e instanceof ApiError ? e.message : "Something went wrong. Please try again.";
+}
+
+// ---------------------------------------------------------------- diagnosis sessions
+
+export type CoverageLevel = "part_fit_verified" | "segment_estimate" | "general_guidance";
+export type Mode = "diagnose" | "fast_track" | "inspect" | "suggest";
+
+export interface SessionCreate {
+  vehicle: { variant_id: number } | { unlisted: Record<string, unknown> };
+  topic_id?: string | null;
+  category_ids?: string[];
+  text?: string;
+}
+
+export interface Option {
+  id: number | string;
+  label: string;
+  not_sure: boolean;
+}
+
+export interface Question {
+  id: number | string;
+  text: string;
+  options: Option[];
+  category: string | null;
+}
+
+export interface SafetyAlert {
+  rule_id: number;
+  risk: "low" | "medium" | "high";
+  reason: string;
+  source: "answer" | "text" | "likely";
+  roadside_action: string;
+  stop_driving_trigger: string;
+  towing: string;
+  fault_key: string | null;
+}
+
+export interface Progress {
+  question_number: number;
+  questions_about: number;
+}
+
+export interface SessionOut {
+  session_id: string;
+  status: "in_progress" | "completed";
+  mode: Mode;
+  coverage_level: CoverageLevel;
+  safety_alerts: SafetyAlert[];
+  question: Question | null;
+  done: boolean;
+  safety_tips: string[];
+  actions: string[];
+  suggested_categories: string[];
+  progress: Progress;
+  disclaimer: string;
+}
+
+export interface VehicleSummary {
+  label: string;
+  listed: boolean;
+  fuel: Fuel | null;
+  transmission: Transmission | null;
+  price_segment: PriceSegment | null;
+}
+
+export interface AnswerOut {
+  session_id: string;
+  status: "in_progress" | "completed";
+  question: Question | null;
+  done: boolean;
+  new_safety_alerts: SafetyAlert[];
+  safety_alerts: SafetyAlert[];
+  coverage_level: CoverageLevel;
+  mode: Mode;
+  progress: Progress;
+  previous_option_id?: number | string | null;
+}
+
+export interface SessionState extends AnswerOut {
+  vehicle: VehicleSummary;
+  topic: string | null;
+}
+
+export interface Cost {
+  segment: PriceSegment;
+  display: "amount" | "range" | "text" | "on_inspection";
+  amount: number | null;
+  min: number | null;
+  max: number | null;
+  text: string | null;
+  approx_label: string | null;
+  checked_on: string | null;
+  is_approx: boolean;
+  labour: number | null;
+  labour_text: string | null;
+}
+
+export interface Media {
+  file: string;
+  caption: string | null;
+  image_code: string | null;
+  role: "main" | "also";
+  start_time: number | null;
+  estimated_repair_time: string;
+}
+
+export interface RankedFault {
+  rank: number;
+  fault_key: string;
+  name: string;
+  category: string;
+  score: number;
+  confidence: "high" | "medium" | "low";
+  evidence: string[];
+  diagnostic_steps: string[];
+  what_you_can_do: string[];
+  what_the_mechanic_will_do: string[];
+  cost: Cost | null;
+  repair_time: string;
+  media: Media[];
+}
+
+export type RoadsideVerdict = "do_not_drive" | "roadside_fix_possible" | "roadside_limited" | "workshop" | "unknown";
+
+export interface ResultOut {
+  session_id: string;
+  status: "in_progress" | "completed";
+  mode: Mode;
+  vehicle: VehicleSummary;
+  topic: string | null;
+  engine_version: string;
+  coverage_level: CoverageLevel;
+  stop_reason: string | null;
+  ranked: RankedFault[];
+  safety_alerts: SafetyAlert[];
+  roadside: { verdict: RoadsideVerdict; text: string; towing: string };
+  safety_tips: string[];
+  actions: string[];
+  disclaimer: string;
+  created_at: string;
+  completed_at: string | null;
+  answers: { question: string; answer: string; asked_at: string | null; answered_at: string }[];
+}
+
+/** URL of a fault picture (served by the API at /media). */
+export function mediaUrl(file: string): string {
+  return `${API_URL}/media/${file.split("/").map(encodeURIComponent).join("/")}`;
 }

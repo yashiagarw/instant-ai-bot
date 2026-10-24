@@ -9,7 +9,8 @@
    - brand (#F07A2A): accents only, never text or focus rings (2.8:1 on white)
    - cta (#D9620F): CTA fill with white bold text at 18.66px+ (3.7:1, large text)
    - orange-text (#B4500D): orange text and focus rings (5.1:1 on white)
-   - danger (#C62828): safety warnings only */
+   - danger (#C62828): safety warnings only
+   - success / amber: the coverage badge only */
 @theme {
   --color-brand: #f07a2a;
   --color-cta: #d9620f;
@@ -17,6 +18,11 @@
   --color-ink: #15120f;
   --color-warm-white: #fff6ee;
   --color-danger: #c62828;
+  /* Coverage badge only: green = part fit verified, amber = general guidance (AA on their backgrounds). */
+  --color-success: #1b5e20;
+  --color-success-bg: #e8f5e9;
+  --color-amber-text: #7a4b00;
+  --color-amber-bg: #fff3d6;
 }
 
 @theme inline {
