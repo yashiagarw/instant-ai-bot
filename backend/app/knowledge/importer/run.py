@@ -30,11 +30,9 @@ from app.knowledge.importer.loader import (
     sync_taxonomy,
 )
 from app.knowledge.models import (
-    CustomerPhrase,
     DatasetVersion,
     Fault,
     FaultCost,
-    FaultItem,
     FaultLink,
     SourceFile,
 )
@@ -101,31 +99,12 @@ def choose_version(session: Session, config: ImportConfig, entries: list[FileEnt
 
 
 def compute_embeddings(session: Session, version: DatasetVersion, embedder: Embedder | None, log) -> int:
-    """Embed phrases that are not held out, and symptom items, where missing."""
+    """Embed new or changed searchable texts of this version (symptoms, synonyms, faults, diagnostic steps)."""
     if embedder is None:
         return 0
-    in_version = select(Fault.id).where(Fault.dataset_version_id == version.id)
-    phrases = session.scalars(
-        select(CustomerPhrase).where(
-            CustomerPhrase.fault_id.in_(in_version),
-            CustomerPhrase.held_out.is_(False),
-            CustomerPhrase.embedding.is_(None),
-        )
-    ).all()
-    symptoms = session.scalars(
-        select(FaultItem).where(
-            FaultItem.fault_id.in_(in_version), FaultItem.type == "symptom", FaultItem.embedding.is_(None)
-        )
-    ).all()
-    rows = [*phrases, *symptoms]
-    log(f"Embedding {len(phrases)} phrases and {len(symptoms)} symptoms with {embedder.name} ...")
-    batch = 256
-    for i in range(0, len(rows), batch):
-        chunk = rows[i : i + batch]
-        for row, vec in zip(chunk, embedder.encode([r.text for r in chunk]), strict=True):
-            row.embedding = vec
-        session.flush()
-    return len(rows)
+    from app.knowledge.embeddings import sync
+
+    return sync(session, version.id, embedder, log=log).embedded
 
 
 # ---------------------------------------------------------------- duplicates

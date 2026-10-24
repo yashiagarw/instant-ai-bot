@@ -19,9 +19,10 @@ class Settings(BaseSettings):
     web_origin: str = "http://localhost:3000"
     # Seconds to wait for Postgres before the health check reports it unavailable.
     db_connect_timeout: int = 3
-    # Diagnosis API. Embeddings load the sentence-transformers model (about 470 MB) at first use;
-    # off by default because keyword matching scored as well on the dev split.
-    diagnosis_embeddings: bool = False
+    # Free-text matching: hybrid (Postgres full-text + vector similarity + typo correction, merged with RRF, over
+    # the embeddings table; loads the local multilingual MiniLM model, about 470 MB, at first use) or keyword
+    # (the engine's built-in keyword index, no model).
+    diagnosis_search: Literal["hybrid", "keyword"] = "hybrid"
     # Per-IP limit on new diagnosis sessions: at most N per window.
     session_rate_limit: int = 10
     session_rate_window_seconds: int = 60

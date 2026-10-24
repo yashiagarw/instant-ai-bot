@@ -16,6 +16,7 @@ from app.knowledge.models import (
     CustomerPhrase,
     DatasetVersion,
     DiagnosisRuleRaw,
+    Embedding,
     Fault,
     FaultCost,
     FaultImage,
@@ -241,10 +242,12 @@ def test_phrases_split_held_out_and_embedded(db_session, config):
     assert [p.text for p in phrases] == ["gaadi start nahi ho rahi", "car makes a click sound", "battery down hai"]
     assert phrases[0].english_gloss == "Car will not start"
     assert all(p.is_synthetic and p.source == "dataset" and p.status == "approved" for p in phrases)
+    embedded = {(e.owner_type, e.owner_id) for e in db_session.scalars(select(Embedding))}
     for p in db_session.scalars(select(CustomerPhrase)):
-        assert (p.embedding is None) == p.held_out
+        assert (("synonym", p.id) in embedded) != p.held_out  # held-out phrases are evaluation cases
     symptoms = db_session.scalars(select(FaultItem).where(FaultItem.type == "symptom")).all()
-    assert symptoms and all(s.embedding is not None for s in symptoms)
+    assert symptoms and all(("symptom", s.id) in embedded for s in symptoms)
+    assert {o for o, _ in embedded} >= {"synonym", "symptom", "fault"}
 
 
 def test_ev_extra_columns(db_session, config, tmp_path):

@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 import engine as eng
 from app.config import Settings
 from app.diagnosis import present
-from app.diagnosis.knowledge import load_knowledge, sentence_embedder
+from app.diagnosis.knowledge import load_knowledge
 from app.diagnosis.models import (
     Confidence,
     DiagnosisSession,
@@ -25,6 +25,7 @@ from app.diagnosis.models import (
     SessionResult,
     SessionStatus,
 )
+from app.diagnosis.search import HybridSearch
 from app.knowledge.models import Category, Fault, FaultImage, FaultItem, FaultItemType, ProblemGroup, Question
 from app.vehicles.models import UnlistedVehicle, Variant
 from engine.core import FAST_TRACK_MAX, MAX_QUESTIONS, MAX_TIPS
@@ -50,9 +51,20 @@ def get_engine(state, session: Session, settings: Settings) -> eng.Engine:
     """Built once from the database at first use. Restart the API after loading new data or questions."""
     with _engine_lock:
         if getattr(state, "diagnosis_engine", None) is None:
-            embed = sentence_embedder() if settings.diagnosis_embeddings else None
-            state.diagnosis_engine = eng.Engine(load_knowledge(session), embed=embed)
+            search = hybrid_search(state) if settings.diagnosis_search == "hybrid" else None
+            state.diagnosis_engine = eng.Engine(load_knowledge(session), search=search)
         return state.diagnosis_engine
+
+
+def hybrid_search(state) -> HybridSearch:
+    """Hybrid search on its own short transactions (the engine is shared between requests). `state.embedder`
+    can be set (tests); otherwise the local multilingual MiniLM model is loaded."""
+    embedder = getattr(state, "embedder", None)
+    if embedder is None:
+        from app.knowledge.importer.embed import SentenceTransformerEmbedder
+
+        embedder = state.embedder = SentenceTransformerEmbedder()
+    return HybridSearch(state.session_factory.begin, lambda t: embedder.encode([t])[0], embedder.name)
 
 
 # ---------------------------------------------------------------- helpers

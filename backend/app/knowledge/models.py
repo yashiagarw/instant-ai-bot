@@ -14,6 +14,7 @@ from sqlalchemy import (
     ARRAY,
     BigInteger,
     CheckConstraint,
+    Computed,
     Date,
     DateTime,
     ForeignKey,
@@ -24,8 +25,9 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    func,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base, CreatedAtMixin, str_enum
@@ -316,12 +318,6 @@ class FaultItem(Base):
     __table_args__ = (
         UniqueConstraint("fault_id", "type", "position"),
         CheckConstraint("internal = (type IN ('mechanic_task', 'mechanic_step'))", name="internal_matches_type"),
-        Index(
-            "ix_fault_items_embedding_hnsw",
-            "embedding",
-            postgresql_using="hnsw",
-            postgresql_ops={"embedding": "vector_cosine_ops"},
-        ),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -330,8 +326,6 @@ class FaultItem(Base):
     position: Mapped[int] = mapped_column(SmallInteger)
     text: Mapped[str] = mapped_column(Text)
     internal: Mapped[bool] = mapped_column(default=False, server_default="false")
-    # Filled for symptom items only (semantic matching of free text to symptoms).
-    embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
 
     fault: Mapped[Fault] = relationship(back_populates="items")
 
@@ -356,14 +350,6 @@ class InternalNote(Base):
 
 class CustomerPhrase(Base):
     __tablename__ = "customer_phrases"
-    __table_args__ = (
-        Index(
-            "ix_customer_phrases_embedding_hnsw",
-            "embedding",
-            postgresql_using="hnsw",
-            postgresql_ops={"embedding": "vector_cosine_ops"},
-        ),
-    )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     fault_id: Mapped[int] = mapped_column(ForeignKey("faults.id", ondelete="CASCADE"), index=True)
@@ -376,9 +362,45 @@ class CustomerPhrase(Base):
     source: Mapped[PhraseSource] = mapped_column(str_enum(PhraseSource, "source"))
     status: Mapped[ReviewStatus] = mapped_column(str_enum(ReviewStatus, "status"))
     held_out: Mapped[bool] = mapped_column(default=False, server_default="false")
-    embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
 
     fault: Mapped[Fault] = relationship(back_populates="phrases")
+
+
+class EmbeddingOwner(StrEnum):
+    symptom = "symptom"  # fault_items of type symptom
+    synonym = "synonym"  # customer_phrases (approved, not held out): how customers say it
+    fault = "fault"  # faults: name and start of the description
+    diagnosis_step = "diagnosis_step"  # fault_items of type diagnosis_step, customer-facing lines only
+
+
+class Embedding(Base):
+    """Search index for free text: one row per (owner, model). Vector similarity (HNSW), full-text search (`tsv`)
+    and trigram similarity (typos) all run on this table; `fault_id` filters to the faults that apply to the car.
+    `text_hash` (SHA-256 of `text`) lets the sync skip rows whose text did not change."""
+
+    __tablename__ = "embeddings"
+    __table_args__ = (
+        UniqueConstraint("owner_type", "owner_id", "model_name"),
+        Index(
+            "ix_embeddings_vector_hnsw",
+            "vector",
+            postgresql_using="hnsw",
+            postgresql_ops={"vector": "vector_cosine_ops"},
+        ),
+        Index("ix_embeddings_tsv", "tsv", postgresql_using="gin"),
+        Index("ix_embeddings_text_trgm", "text", postgresql_using="gin", postgresql_ops={"text": "gin_trgm_ops"}),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    owner_type: Mapped[EmbeddingOwner] = mapped_column(str_enum(EmbeddingOwner, "owner_type"))
+    owner_id: Mapped[int] = mapped_column(BigInteger)
+    fault_id: Mapped[int] = mapped_column(ForeignKey("faults.id", ondelete="CASCADE"), index=True)
+    model_name: Mapped[str] = mapped_column(Text)
+    text: Mapped[str] = mapped_column(Text)
+    text_hash: Mapped[str] = mapped_column(String(64))
+    vector: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM))
+    tsv: Mapped[str] = mapped_column(TSVECTOR, Computed("to_tsvector('simple'::regconfig, text)", persisted=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class FaultCost(Base):

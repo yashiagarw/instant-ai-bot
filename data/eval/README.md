@@ -15,6 +15,12 @@ uv run python ../data/eval/run_eval.py run --embeddings            # with the em
 uv run python ../data/eval/run_eval.py compare --base 740ea77 --candidate current
 uv run python ../data/eval/run_eval.py compare --base reports/<baseline>.json   # reuse a saved report
 
+# Free-text matching: --search hybrid (default, as the live app) or --search keyword
+uv run python ../data/eval/run_eval.py run --search keyword --label keyword-only
+
+# Tune hybrid search on TRAINING phrases (leave-one-out; never on the eval cases)
+uv run python ../data/eval/tune_search.py
+
 # The original console tables (held-out phrases, simulated conversations, confused pairs)
 uv run python ../data/eval/run_eval.py --simulate --no-embeddings
 ```
@@ -28,6 +34,18 @@ of the engine code (the version string was not bumped between some behaviour cha
 `reports/20261024-052401Z_eval_v1-baseline.{md,json}`: engine 1.0.0 (code `d54bfab665`), dataset version 36,
 embeddings off, 5479 cases. Compare a change against it with
 `compare --base ../data/eval/reports/20261024-052401Z_eval_v1-baseline.json`.
+
+## Reports so far
+
+| Report | Engine | Search | Free text top-1 / top-3 | Hindi | Typos | Safety recall |
+|---|---|---|---|---|---|---|
+| `20261024-052401Z_eval_v1-baseline` | 1.0.0 | keyword | 48.7% / 56.3% | 0.0% / 0.0% | 42.5% / 50.2% | 88.6% |
+| `*_eval_v1.1-keyword` | 1.1.0 | keyword | 49.1% / 56.7% | 33.3% / 33.3% | 42.5% / 50.2% | 88.6% |
+| `*_eval_v1.1-hybrid` | 1.1.0 | hybrid | 49.8% / 57.5% | 33.3% / 33.3% | 43.5% / 52.2% | 88.6% |
+
+The Hindi gain comes from reading Devanagari as Hinglish (engine 1.1, `engine/hindi.py`); hybrid search adds on
+English and typos. The Hindi cases are synthetic and written by the same team as the glossary: expect real
+customer messages to score lower.
 
 ## Cases
 

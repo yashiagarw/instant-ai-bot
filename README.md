@@ -42,11 +42,12 @@ docker compose up -d db
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0005)
+uv run alembic upgrade head                          # all migrations (0001 … 0006)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
 uv run python -m app.knowledge.merges apply          # approved duplicate-fault merges (data/review/merges.yaml)
+uv run python -m app.knowledge.embeddings sync       # search index: embeds only new or changed texts
 cd ..
 
 # Web
@@ -134,7 +135,7 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `ENVIRONMENT` | `development` / `test` / `production` |
 | | `SESSION_RATE_LIMIT`, `SESSION_RATE_WINDOW_SECONDS` | New diagnosis sessions per IP per window |
 | | `TRUST_FORWARDED_FOR` | Use X-Forwarded-For for the client IP (only behind your own proxy) |
-| | `DIAGNOSIS_EMBEDDINGS` | Load the sentence-embedding model for free-text matching (off by default) |
+| | `DIAGNOSIS_SEARCH` | Free-text matching: `hybrid` (default: keyword index plus full-text + vector + typo search over the `embeddings` table; loads the local multilingual MiniLM model, ~470 MB, at first use) or `keyword` |
 | | `MEDIA_DIR` | Fault pictures served at `/media` (default `data/media`) |
 | | `HELPLINE_NUMBER` | Helpline shown on the request form and confirmation (placeholder in `.env.example`) |
 | | `SUPPORT_EMAIL` | New requests are emailed here; empty = no alert (the request is still stored) |
@@ -152,4 +153,6 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 - **429 Too many requests**: the per-IP limits (`SESSION_RATE_LIMIT`, `REQUEST_RATE_LIMIT`); restart the API to reset.
 - **No helpline on the request page / `alert_error = SUPPORT_EMAIL is not set`**: set `HELPLINE_NUMBER` and
   `SUPPORT_EMAIL` in `backend/.env` and restart the API.
+- **First diagnosis after starting the API takes ~10 s**: hybrid search loads the embedding model once. Set
+  `DIAGNOSIS_SEARCH=keyword` to skip it. After importing data, run `python -m app.knowledge.embeddings sync`.
 - **Playwright fails on every test**: another server is already on port 3100 (it is reused); stop it.

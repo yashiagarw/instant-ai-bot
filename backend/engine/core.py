@@ -11,8 +11,9 @@ from __future__ import annotations
 import re
 from itertools import combinations
 
+from engine.hindi import expand as expand_hindi
 from engine.safety import danger_vocabulary, evaluate, global_rule_phrases
-from engine.text import Embed, Match, TextIndex, drop_repeats, pick_lines
+from engine.text import Embed, Match, Search, TextIndex, drop_repeats, pick_lines
 from engine.types import (
     ROUTE_QUESTION,
     Category,
@@ -34,7 +35,7 @@ from engine.types import (
     Vehicle,
 )
 
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.1.0"  # 1.1: hybrid search hook, Hindi (Devanagari) read as Hinglish
 DISCLAIMER = (
     "This is an estimate based on your answers and our data. It is not a replacement for a professional "
     "inspection by a mechanic."
@@ -122,9 +123,12 @@ def cost_for(fault: Fault, vehicle: Vehicle | None) -> CostOut | None:
 
 
 class Engine:
-    def __init__(self, knowledge: Knowledge, embed: Embed | None = None):
+    def __init__(self, knowledge: Knowledge, embed: Embed | None = None, search: Search | None = None):
+        """`search(text, fault_ids) -> {fault_id: Match}` (hybrid search in the app) is used with the built-in keyword
+        index for free-text matching and category suggestion: each fault keeps its better match."""
         self.k = knowledge
         self.embed = embed
+        self.search = search
         self.index = TextIndex(knowledge.texts)
         vocab = danger_vocabulary(knowledge.rules)
         self.rules: list[SafetyRule] = []
@@ -186,8 +190,18 @@ class Engine:
         if hint:
             hinted = {fid for fid in candidates if hint.lower() in k.faults[fid].name.lower()}
             candidates = hinted or candidates
-        query_vec = self.embed(req.text) if self.embed and req.text.strip() else None
-        matches = self.index.match(req.text, query_vec, candidates) if req.text.strip() else {}
+        # Hindi in Devanagari is matched together with its Hinglish form (the knowledge is written in Hinglish).
+        text = expand_hindi(req.text)
+        matches: dict[int, Match] = {}
+        if req.text.strip():
+            query_vec = self.embed(req.text) if self.embed else None
+            matches = self.index.match(text, query_vec, candidates)
+            if self.search is not None:
+                # Keyword index (sharp on exact phrases) and hybrid search (full-text + vectors + typos, which also
+                # reads Hindi and paraphrases): each fault keeps its better match.
+                for fid, m in self.search(req.text, candidates).items():
+                    if fid not in matches or m.score > matches[fid].score:
+                        matches[fid] = m
 
         # Routing: several categories and none picked yet -> free text decides if clearly ahead, else ask.
         suggestions = self._category_scores(cats, matches)
@@ -257,7 +271,7 @@ class Engine:
 
         def safety(likely_any=None):
             return evaluate(
-                self.rules, req.text, answered_opts, candidates, rank, k.faults, option_labels, likely_any, likely_high
+                self.rules, text, answered_opts, candidates, rank, k.faults, option_labels, likely_any, likely_high
             )
 
         alerts = safety()

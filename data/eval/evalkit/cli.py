@@ -34,7 +34,23 @@ def build_cases(knowledge, phrases, cases_dir: Path) -> list:
     ]
 
 
-def evaluate(knowledge, cases, *, label: str, embeddings: bool, extra_meta: dict | None = None) -> dict:
+def make_search(kind: str):
+    """Hybrid search on the configured database and the local model, or None for the keyword index."""
+    if kind != "hybrid":
+        return None
+    from app.config import get_settings
+    from app.db import make_engine, make_session_factory
+    from app.diagnosis.search import HybridSearch
+    from app.knowledge.importer.embed import SentenceTransformerEmbedder
+
+    model = SentenceTransformerEmbedder()
+    factory = make_session_factory(make_engine(get_settings().database_url))
+    return HybridSearch(factory.begin, lambda t: model.encode([t])[0], model.name)
+
+
+def evaluate(
+    knowledge, cases, *, label: str, embeddings: bool, search: str = "keyword", extra_meta: dict | None = None
+) -> dict:
     """Run the cases on the `engine` package this process imported and return the report (meta, summary,
     results)."""
     import engine as engine_pkg
@@ -48,7 +64,9 @@ def evaluate(knowledge, cases, *, label: str, embeddings: bool, extra_meta: dict
         texts = sorted({c.text for c in cases if c.text} | {g.label for g in knowledge.groups.values()} - {""})
         vectors = dict(zip(texts, SentenceTransformerEmbedder().encode(texts), strict=True))
         embed = vectors.__getitem__
-    results = run_all(Engine(knowledge, embed=embed), cases)
+    hybrid = make_search(search)
+    engine = Engine(knowledge, embed=embed, search=hybrid) if hybrid else Engine(knowledge, embed=embed)
+    results = run_all(engine, cases)
     now = datetime.now(UTC)
     meta = {
         "created_at": now.isoformat(timespec="seconds"),
@@ -59,6 +77,7 @@ def evaluate(knowledge, cases, *, label: str, embeddings: bool, extra_meta: dict
         **git_info(),
         "dataset_version_id": knowledge.dataset_version_id,
         "embeddings": embeddings,
+        "search": search,
         "cases": len(cases),
         "cases_by_type": dict(sorted(Counter(c.type for c in cases).items())),
         "cases_by_source": dict(sorted(Counter(c.source for c in cases).items())),
@@ -89,7 +108,14 @@ def run_here(args) -> dict:
     extra = {"category_filter": args.category} if args.category else {}
     if args.engine_ref:
         extra["engine_commit"] = args.engine_ref
-    return evaluate(knowledge, cases, label=args.engine_label or CURRENT, embeddings=args.embeddings, extra_meta=extra)
+    return evaluate(
+        knowledge,
+        cases,
+        label=args.engine_label or CURRENT,
+        embeddings=args.embeddings,
+        search=args.search,
+        extra_meta=extra,
+    )
 
 
 def run_version(spec: str, args, out: Path) -> dict:
@@ -108,6 +134,7 @@ def run_version(spec: str, args, out: Path) -> dict:
     cmd = [sys.executable, str(RUN_EVAL), "run", "--engine-path", str(path), "--engine-label", label, "--out", str(out)]
     cmd += ["--engine-ref", ref] if ref else []
     cmd += ["--embeddings"] if args.embeddings else []
+    cmd += ["--search", args.search]
     cmd += ["--category", args.category] if args.category else []
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode:
@@ -128,7 +155,7 @@ def print_summary(report: dict) -> None:
     m, s = report["meta"], report["summary"]
     print(
         f"\nEngine {m['engine_label']} (version {m['engine_version']}, code {m['engine_hash']}) · "
-        f"dataset {m['dataset_version_id']} · embeddings {'on' if m['embeddings'] else 'off'} · {m['cases']} cases"
+        f"dataset {m['dataset_version_id']} · search {m.get('search', 'keyword')} · {m['cases']} cases"
     )
     for line in rep._table(
         {
@@ -152,7 +179,13 @@ def harness(argv: list[str]) -> None:
     cmp.add_argument("--base", required=True, help="engine (current / git ref / folder) or a report .json")
     cmp.add_argument("--candidate", default=CURRENT, help="engine or report .json (default: current)")
     for p in (run, cmp):
-        p.add_argument("--embeddings", action="store_true", help="use the local embedding model (the live app: off)")
+        p.add_argument("--embeddings", action="store_true", help="keyword index plus the old embedding bonus")
+        p.add_argument(
+            "--search",
+            choices=["hybrid", "keyword"],
+            default=None,
+            help="free-text matching (default: DIAGNOSIS_SEARCH, as in the live app)",
+        )
         p.add_argument("--category", help="only cases of this category")
         p.add_argument("--out", type=Path, default=EVAL_DIR / "reports", help="report folder")
     # Internal: a child process running one engine version.
@@ -160,6 +193,10 @@ def harness(argv: list[str]) -> None:
     run.add_argument("--engine-label", help=argparse.SUPPRESS)
     run.add_argument("--engine-ref", help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
+    if args.search is None:
+        from app.config import get_settings
+
+        args.search = get_settings().diagnosis_search
 
     try:
         if args.cmd == "run" and args.engine_path:  # child process

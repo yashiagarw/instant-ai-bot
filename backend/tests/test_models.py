@@ -8,20 +8,19 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
 
 from app.diagnosis.models import DiagnosisSession, EventType, SessionEvent
-from app.enums import Fuel, PriceSegment, ReviewStatus, RiskLevel, Transmission
+from app.enums import Fuel, PriceSegment, RiskLevel, Transmission
 from app.knowledge.models import (
     EMBEDDING_DIM,
     Category,
     CategoryKind,
     CostDisplay,
-    CustomerPhrase,
     DatasetStatus,
     DatasetVersion,
+    Embedding,
     Fault,
     FaultCost,
     FaultItem,
     FaultItemType,
-    PhraseSource,
     Question,
     QuestionOption,
     SafetyRule,
@@ -188,38 +187,40 @@ def test_text_enum_rejects_unknown_values(db_session, version):
         )
 
 
-# ---------------------------------------------------------------- phrases (pgvector)
+# ---------------------------------------------------------------- embeddings (pgvector, full-text)
 
 
-def test_phrase_embedding_round_trip_and_nearest_neighbour(db_session, version):
+def embedding(fault_id: int, owner_id: int, text: str, vec: list[float], owner="synonym") -> Embedding:
+    return Embedding(
+        owner_type=owner, owner_id=owner_id, fault_id=fault_id, model_name="m", text=text, text_hash="h", vector=vec
+    )
+
+
+def test_embedding_round_trip_nearest_neighbour_and_full_text(db_session, version):
     fault = make_fault(version)
     db_session.add(fault)
     db_session.flush()
     near = [1.0] + [0.0] * (EMBEDDING_DIM - 1)
     far = [0.0, 1.0] + [0.0] * (EMBEDDING_DIM - 2)
-    for t, vec in [("battery down", near), ("tyre flat", far)]:
-        db_session.add(
-            CustomerPhrase(
-                fault_id=fault.id, text=t, source=PhraseSource.dataset, status=ReviewStatus.approved, embedding=vec
-            )
-        )
+    db_session.add_all([embedding(fault.id, 1, "battery down", near), embedding(fault.id, 2, "tyre flat", far)])
     db_session.flush()
     query = [0.9, 0.1] + [0.0] * (EMBEDDING_DIM - 2)
-    nearest = db_session.scalars(
-        select(CustomerPhrase).order_by(CustomerPhrase.embedding.cosine_distance(query)).limit(1)
-    ).one()
-    assert nearest.text == "battery down"
-    assert len(nearest.embedding) == EMBEDDING_DIM
+    nearest = db_session.scalars(select(Embedding).order_by(Embedding.vector.cosine_distance(query)).limit(1)).one()
+    assert nearest.text == "battery down" and len(nearest.vector) == EMBEDDING_DIM
+    hit = db_session.scalars(select(Embedding).where(Embedding.tsv.match("tyre", postgresql_regconfig="simple"))).one()
+    assert hit.text == "tyre flat"  # the generated tsvector column follows the text
 
 
-def test_phrase_embedding_dimension_is_enforced(db_session, version):
+def test_embedding_dimension_and_owner_are_enforced(db_session, version):
     fault = make_fault(version)
     db_session.add(fault)
     db_session.flush()
-    db_session.add(
-        CustomerPhrase(fault_id=fault.id, text="x", source="dataset", status="approved", embedding=[0.1, 0.2, 0.3])
-    )
+    db_session.add(embedding(fault.id, 1, "x", [0.1, 0.2, 0.3]))
     with pytest.raises(Exception, match="dimensions"):
+        db_session.flush()
+    db_session.rollback()
+    db_session.add(embedding(fault.id, 1, "x", [0.0] * EMBEDDING_DIM, owner="question"))
+    with pytest.raises(Exception, match="owner_type"):
         db_session.flush()
     db_session.rollback()
 

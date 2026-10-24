@@ -20,7 +20,10 @@ BACKEND = Path(__file__).resolve().parent.parent
 @pytest.fixture(scope="session")
 def test_settings() -> Settings:
     base = get_settings()
-    return base.model_copy(update={"database_url": base.test_database_url, "environment": "test"})
+    # Keyword matching by default: API tests never load the embedding model (hybrid search has its own tests).
+    return base.model_copy(
+        update={"database_url": base.test_database_url, "environment": "test", "diagnosis_search": "keyword"}
+    )
 
 
 @pytest.fixture(scope="session")

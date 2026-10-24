@@ -36,10 +36,6 @@ from app.knowledge.questions.inputs import target_version
 from engine import types as et
 
 
-def _vector(v) -> list[float] | None:
-    return None if v is None else [float(x) for x in v]
-
-
 def _known(cls, **kwargs):
     """Build an engine dataclass with only the fields it defines, so an older engine version (data/eval compare
     mode) can still load today's knowledge. New fields simply stay at their defaults there."""
@@ -101,7 +97,7 @@ def load_knowledge(session: Session) -> et.Knowledge:
     for it in items:
         assert it.type not in INTERNAL_ITEM_TYPES
         if it.type == FaultItemType.symptom:
-            texts.append(et.TextEntry(it.fault_id, it.text, "symptom", _vector(it.embedding)))
+            texts.append(et.TextEntry(it.fault_id, it.text, "symptom"))
         else:
             faults[it.fault_id].safety_tips.append(it.text)
     phrases = session.scalars(
@@ -112,7 +108,7 @@ def load_knowledge(session: Session) -> et.Knowledge:
         )
     )
     for p in phrases:
-        texts.append(et.TextEntry(p.fault_id, p.text, "phrase", _vector(p.embedding)))
+        texts.append(et.TextEntry(p.fault_id, p.text, "phrase"))
         if p.english_gloss:
             texts.append(et.TextEntry(p.fault_id, p.english_gloss, "phrase"))
 

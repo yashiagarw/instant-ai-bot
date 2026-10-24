@@ -102,6 +102,8 @@ def phrase_in(phrase: str, text_tokens: set[str]) -> bool:
 
 
 Embed = Callable[[str], list[float]]
+# Free text -> best match per fault, among the given (applicable) fault ids. The app passes hybrid search.
+Search = Callable[[str, set[int]], dict[int, Match]]
 
 
 NEAR_DUPLICATE = 0.6  # word overlap (Jaccard) at which two lines say the same thing

@@ -27,7 +27,7 @@ from evalkit.metrics import stats, summarise  # noqa: E402
 from evalkit.runner import run_case  # noqa: E402
 from evalkit.versions import CURRENT, VersionError, engine_hash, materialise  # noqa: E402
 
-from engine import Engine  # noqa: E402
+from engine import ENGINE_VERSION, Engine  # noqa: E402
 from tests.test_engine import knowledge  # noqa: E402, F401 - fixture
 
 PHRASES = [
@@ -295,7 +295,7 @@ def test_full_run_on_fixture_knowledge(knowledge, tmp_path):  # noqa: F811
     assert {c.type for c in cases} == {"free_text", "overlap", "chips", "safety", "unlisted"}
     report = evaluate(knowledge, cases, label="current", embeddings=False)
     assert report["meta"]["cases"] == len(cases) == len(report["results"])
-    assert report["meta"]["engine_version"] == "1.0.0" and len(report["meta"]["engine_hash"]) == 10
+    assert report["meta"]["engine_version"] == ENGINE_VERSION and len(report["meta"]["engine_hash"]) == 10
     assert report["summary"]["by_type"]["safety"]["safety_recall"] is not None
     jpath, mpath = rep.write(report, tmp_path / "reports")
     assert jpath.exists() and mpath.exists()
