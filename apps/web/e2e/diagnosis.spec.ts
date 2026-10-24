@@ -81,6 +81,30 @@ test("full diagnosis: problem tile, questions with a safety alert and Back, resu
   const sessionId = page.url().split("/").at(-2)!;
   expect(fake.sessions.get(sessionId)!.feedback).toEqual([{ helpful: true, comment: null }]);
 
+  // Request a Mechanic: this session had a red safety alert, so the request is urgent (helpline first).
+  await request.click();
+  await expect(page).toHaveURL(new RegExp(`/request\\?session=${sessionId}$`));
+  await expect(page.getByRole("heading", { name: "Get help now" })).toBeVisible();
+  await expect(page.getByTestId("helpline")).toContainText("+91-00000-11111");
+  await expect(page.getByTestId("request-car")).toContainText("Maruti Suzuki Swift");
+  await expect(page.getByTestId("request-diagnosis")).toContainText("Slow/pinhole puncture");
+  await expect(page.getByRole("checkbox")).not.toBeChecked();
+  await page.getByLabel("Your name", { exact: true }).fill("Asha Verma");
+  await page.getByLabel("Mobile number", { exact: true }).fill("12345");
+  await page.getByLabel("Area, sector or landmark").fill("Sector 62, Noida");
+  await page.getByRole("button", { name: "Send urgent request" }).click();
+  await expect(page.getByText(/10-digit Indian mobile/)).toBeVisible();
+  await expect(page.getByText(/Tick the box/)).toBeVisible();
+  await page.getByLabel("Mobile number", { exact: true }).fill("98765 43210");
+  await page.getByRole("checkbox").check();
+  await expectNoSideScroll(page);
+  await expectTouchTargets(page);
+  await page.getByRole("button", { name: "Send urgent request" }).click();
+  await expect(page.getByTestId("reference")).toHaveText("IM-TEST1");
+  await expect(page.getByText("What happens next")).toBeVisible();
+  await expect(page.getByText("Helpline: +91-00000-11111")).toBeVisible();
+  expect(fake.requests[0]).toMatchObject({ session_id: sessionId, consent: true, urgent: true, name: "Asha Verma" });
+
   // The result opens from a shared link in a fresh browser (no saved state).
   const other = await browser.newContext();
   const shared = await other.newPage();
@@ -90,7 +114,7 @@ test("full diagnosis: problem tile, questions with a safety alert and Back, resu
     const answer = fake.handle(req.method(), url.pathname);
     await route.fulfill(answer ? { status: answer.status, json: answer.json } : { status: 404, body: "" });
   });
-  await shared.goto(page.url());
+  await shared.goto(`/diagnose/${sessionId}/result`);
   await expect(shared.getByRole("article", { name: "Slow/pinhole puncture" })).toBeVisible();
   await other.close();
 });
@@ -111,7 +135,7 @@ test("safety case: smoke in the description shows the red banner first on the re
 });
 
 test("unlisted car without a price range gets General guidance and no cost", async ({ page }) => {
-  await mockApi(page);
+  const fake = await mockApi(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/diagnose");
   await page.getByRole("button", { name: /my car isn.t listed/i }).click();
@@ -137,6 +161,29 @@ test("unlisted car without a price range gets General guidance and no cost", asy
   await expect(page.getByTestId("car-summary").locator("visible=true")).toContainText("Hindustan Ambassador 2010");
   await expect(page.getByText(/can't estimate the cost without your car's price range/).first()).toBeVisible();
   await expect(page.getByTestId("cost-total").locator("visible=true")).toHaveCount(0);
+
+  // A normal (not urgent) request with every field, prefilled with the typed car.
+  await page.getByRole("link", { name: "Request a Mechanic" }).locator("visible=true").click();
+  await expect(page.getByRole("heading", { name: "Request a Mechanic" })).toBeVisible();
+  await expect(page.getByTestId("request-car")).toContainText("Hindustan Ambassador 2010");
+  await page.getByLabel("Your name", { exact: true }).fill("Vikram");
+  await page.getByLabel("Mobile number", { exact: true }).fill("+91 70000 12345");
+  await page.getByRole("group", { name: "How should we help?" }).getByText("Workshop visit").click();
+  await page.getByLabel("Area, sector or landmark").fill("Lajpat Nagar");
+  await page.getByLabel("Pincode", { exact: true }).fill("110024");
+  await page.getByLabel("Address (optional)").fill("Block C, near the metro");
+  await page.getByRole("group", { name: "Preferred time (optional)" }).getByText("Tomorrow morning").click();
+  await page.getByLabel("Notes (optional)").fill("Car is old, please bring a battery tester");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Request a Mechanic" }).click();
+  await expect(page.getByTestId("reference")).toHaveText("IM-TEST1");
+  expect(fake.requests[0]).toMatchObject({
+    urgent: false,
+    service_type: "workshop",
+    pincode: "110024",
+    preferred_time: "tomorrow_morning",
+    address: "Block C, near the metro",
+  });
 });
 
 test("fast-track topic: at most 3 questions, then safety tips and a large Request a Mechanic button", async ({ page }) => {
@@ -151,6 +198,19 @@ test("fast-track topic: at most 3 questions, then safety tips and a large Reques
   const button = tips.getByRole("link", { name: "Request a Mechanic" });
   await expect(button).toBeVisible();
   expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(56);
+
+  // Emergency request: helpline first, only the required fields, marked urgent.
+  await button.click();
+  await expect(page.getByRole("heading", { name: "Get help now" })).toBeVisible();
+  await expect(page.getByTestId("helpline")).toContainText("+91-00000-11111");
+  await expect(page.getByLabel("Address (optional)")).toHaveCount(0);
+  await page.getByLabel("Your name", { exact: true }).fill("Ravi");
+  await page.getByLabel("Mobile number", { exact: true }).fill("9876543210");
+  await page.getByLabel("Area, sector or landmark").fill("NH-48 near Manesar toll");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Send urgent request" }).click();
+  await expect(page.getByTestId("confirmation")).toContainText("(urgent)");
+  await expect(page.getByTestId("reference")).toHaveText("IM-TEST1");
 });
 
 test("browser Back from the questions shows usable problem tiles again", async ({ page }) => {

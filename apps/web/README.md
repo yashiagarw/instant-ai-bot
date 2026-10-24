@@ -23,5 +23,9 @@ Brand colour tokens live in `src/app/globals.css` (`bg-brand`, `bg-cta`, `text-o
   gearbox from the catalogue. "My car isn't listed" asks for make, model, year, fuel, gearbox and rough price.
   The choice is saved in sessionStorage (`im.diagnosis.vehicle`) for the Problem step.
 
+- `/diagnose/[sessionId]`: the questions, one at a time. `/diagnose/[sessionId]/result`: the result (shareable).
+- `/request?session=…`: Request a Mechanic, prefilled from the diagnosis; urgent for emergencies; confirmation
+  with a reference number. The consent wording and the helpline come from `GET /api/service-requests/config`.
+
 The backend must be running for live data (`cd backend && uv run uvicorn app.main:app --reload`), and its CORS
 allows only `WEB_ORIGIN` (default `http://localhost:3000`). The Playwright tests mock the API and need no backend.

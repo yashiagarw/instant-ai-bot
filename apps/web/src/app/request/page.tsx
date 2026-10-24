@@ -1,27 +1,25 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Suspense } from "react";
 
+import { RequestPage } from "@/components/request/request-page";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { Skeleton } from "@/components/skeleton";
 
 export const metadata: Metadata = {
   title: "Request a Mechanic · Instant Mechanic",
 };
 
-// Placeholder until the request form is built (next task). Collecting contact details needs the consent flow.
-export default function RequestPage() {
+export default function Page() {
   return (
     <>
       <SiteHeader />
       <main className="flex-1 bg-grid">
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-12 sm:px-8">
-          <h1 className="text-4xl font-black tracking-tight text-ink">Request a Mechanic</h1>
-          <p className="text-lg text-ink/80">
-            The request form is coming soon. If you are in danger, move away from the car and call 112.
-          </p>
-          <Link href="/" className="inline-flex min-h-11 items-center font-bold text-orange-text underline underline-offset-4">
-            Back to home
-          </Link>
+        <div className="mx-auto max-w-2xl px-4 py-8 sm:px-8 sm:py-12">
+          {/* ?session= is request-time data, so the form sits behind Suspense. */}
+          <Suspense fallback={<Skeleton className="h-96 rounded-3xl" />}>
+            <RequestPage />
+          </Suspense>
         </div>
       </main>
       <SiteFooter />

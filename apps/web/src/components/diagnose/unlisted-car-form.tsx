@@ -1,8 +1,9 @@
 "use client";
 
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useState } from "react";
 
 import { ChoiceGroup } from "@/components/choice-group";
+import { TextField } from "@/components/text-field";
 import { Button } from "@/components/ui/button";
 import type { Fuel, PriceSegment, Transmission } from "@/lib/api";
 import { FUEL_LABELS, SEGMENT_LABELS, TRANSMISSION_LABELS, type VehicleChoice } from "@/lib/vehicle";
@@ -32,42 +33,6 @@ interface Errors {
   fuel?: string;
   transmission?: string;
   segment?: string;
-}
-
-function TextField({
-  label,
-  value,
-  onChange,
-  error,
-  ...input
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  error?: string;
-} & Omit<React.ComponentProps<"input">, "value" | "onChange">) {
-  const id = useId();
-  return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={id} className="text-lg font-bold text-ink">
-        {label}
-      </label>
-      <input
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${id}-error` : undefined}
-        className="h-14 rounded-full border-2 border-ink/15 bg-white px-5 text-lg text-ink outline-none focus-visible:border-cta focus-visible:ring-3 focus-visible:ring-ring/40 aria-invalid:border-orange-text"
-        {...input}
-      />
-      {error && (
-        <p id={`${id}-error`} className="text-sm font-semibold text-orange-text">
-          {error}
-        </p>
-      )}
-    </div>
-  );
 }
 
 /** Make, model and year typed in; fuel, transmission and rough price picked. Saved to unlisted_vehicles by the

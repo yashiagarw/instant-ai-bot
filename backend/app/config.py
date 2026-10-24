@@ -27,6 +27,22 @@ class Settings(BaseSettings):
     session_rate_window_seconds: int = 60
     # Use the first X-Forwarded-For address as the client IP. Only enable behind a proxy you control.
     trust_forwarded_for: bool = False
+    # Request a Mechanic. The helpline is shown to customers; no real number is built in.
+    helpline_number: str = ""
+    # New requests are emailed here. Empty = no alert is sent (the request is still stored).
+    support_email: str = ""
+    # Email provider: console (prints the alert, for development), smtp or resend.
+    email_provider: Literal["console", "smtp", "resend"] = "console"
+    email_from: str = "Instant Mechanic <alerts@example.com>"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_starttls: bool = True
+    resend_api_key: str = ""
+    # Per-IP limit on new service requests: at most N per window.
+    request_rate_limit: int = 5
+    request_rate_window_seconds: int = 600
     # Fault pictures (drawn guides) served at /media; result `media[].file` paths are relative to it.
     media_dir: Path = Path(__file__).resolve().parents[2] / "data" / "media"
     # Offline question structuring (app.knowledge.questions). Never used by the live app.

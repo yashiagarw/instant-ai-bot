@@ -163,7 +163,11 @@ export class FakeDiagnosis {
   sessions = new Map<string, FakeSession>();
   private next = 1;
 
+  requests: Record<string, unknown>[] = [];
+
   handle(method: string, path: string, body?: unknown): FakeResponse | null {
+    if (path === "/api/service-requests/config") return ok(REQUEST_CONFIG);
+    if (path === "/api/service-requests" && method === "POST") return this.request(body as Record<string, unknown>);
     const m = path.match(/^\/api\/diagnosis\/sessions(?:\/([^/]+))?(\/.*)?$/);
     if (!m) return null;
     const [, id, rest = ""] = m;
@@ -232,6 +236,33 @@ export class FakeDiagnosis {
     if (this.done(s) || !s.answers.length) return { status: 409, json: { detail: "nothing to take back" } };
     const last = s.answers.pop()!;
     return ok({ ...this.turn(s), previous_option_id: last.optionId });
+  }
+
+  private request(b: Record<string, unknown>): FakeResponse {
+    const phone = String(b.phone ?? "").replace(/[\s().-]/g, "");
+    if (!/^(?:\+?91|0)?[6-9]\d{9}$/.test(phone)) return { status: 422, json: { detail: [{ msg: "mobile" }] } };
+    if (b.consent !== true || b.consent_text_version !== REQUEST_CONFIG.consent_version) {
+      return { status: 422, json: { detail: [{ msg: "consent is required" }] } };
+    }
+    const s = b.session_id ? this.sessions.get(String(b.session_id)) : undefined;
+    const urgent = !!s && (s.mode === "fast_track" || s.alerts.some((a) => a.risk === "high"));
+    if (!urgent && !b.pincode) return { status: 422, json: { detail: "enter a 6-digit pincode" } };
+    this.requests.push({ ...b, urgent });
+    const reference = `IM-TEST${this.requests.length}`;
+    const helpline = REQUEST_CONFIG.helpline_number;
+    return {
+      status: 201,
+      json: {
+        reference,
+        status: "submitted",
+        urgent,
+        created_at: NOW,
+        helpline_number: helpline,
+        next_steps: urgent
+          ? [`We've marked your request urgent. Our team will call you as soon as possible. If you can't wait, call ${helpline}.`]
+          : ["Our team will call you on your mobile to confirm the details and a time.", `Keep your reference ${reference} ready.`],
+      },
+    };
   }
 
   private pending(s: FakeSession): Question | null {
@@ -319,6 +350,19 @@ export class FakeDiagnosis {
 }
 
 const NOW = "2026-10-24T10:00:00Z";
+
+export const REQUEST_CONFIG = {
+  consent_version: "request-v1",
+  consent_text:
+    "I agree that Instant Mechanic's team may use my name, mobile number, location and the car and diagnosis details above to contact me and arrange help for this request.",
+  helpline_number: "+91-00000-11111",
+  preferred_times: [
+    { value: "asap", label: "As soon as possible" },
+    { value: "today", label: "Later today" },
+    { value: "tomorrow_morning", label: "Tomorrow morning" },
+    { value: "tomorrow_evening", label: "Tomorrow evening" },
+  ],
+};
 
 function ok(json: unknown): FakeResponse {
   return { status: 200, json };

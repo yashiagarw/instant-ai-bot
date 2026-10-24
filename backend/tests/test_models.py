@@ -347,6 +347,7 @@ def test_session_has_one_vehicle_source(db_session):
 
 def request_kwargs(**kw):
     base = dict(
+        reference="IM-ABCDE2",
         name="Asha",
         phone="+919800000000",
         consent_given=True,
@@ -360,7 +361,8 @@ def test_service_request_with_consent(db_session):
     r = ServiceRequest(**request_kwargs())
     db_session.add(r)
     db_session.flush()
-    assert r.status == "new" and isinstance(r.id, uuid.UUID)
+    assert r.status == "submitted" and r.service_type == "at_location" and r.urgent is False
+    assert isinstance(r.id, uuid.UUID)
 
 
 @pytest.mark.parametrize(

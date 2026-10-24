@@ -107,7 +107,18 @@ async function request<T>(path: string, init: RequestInit): Promise<T> {
   if (res.status === 429) throw new ApiError("Too many requests. Please wait a moment and try again.", 429);
   if (res.status === 404) throw new ApiError("We couldn't find that. Please go back and pick again.", 404);
   if (res.status === 409) throw new ApiError("This step has already moved on. Please refresh the page.", 409);
-  if (res.status === 422) throw new ApiError("Something in your answer didn't look right. Please try again.", 422);
+  if (res.status === 422) {
+    // Plain-sentence reasons from the API (for example "enter a 6-digit pincode") are shown as they are.
+    const detail = await res
+      .json()
+      .then((b: { detail?: unknown }) => b.detail)
+      .catch(() => null);
+    const message =
+      typeof detail === "string"
+        ? detail.charAt(0).toUpperCase() + detail.slice(1)
+        : "Something in your answer didn't look right. Please check and try again.";
+    throw new ApiError(message, 422);
+  }
   if (!res.ok) throw new ApiError("Something went wrong on our side. Please try again.", res.status);
   return (await res.json()) as T;
 }
@@ -131,6 +142,8 @@ export const api = {
     post<AnswerOut>(`/diagnosis/sessions/${id}/answers`, { question_id, option_id }),
   undo: (id: string) => post<AnswerOut>(`/diagnosis/sessions/${id}/answers/undo`),
   result: (id: string, signal?: AbortSignal) => get<ResultOut>(`/diagnosis/sessions/${id}/result`, signal),
+  requestConfig: (signal?: AbortSignal) => get<RequestConfig>("/service-requests/config", signal),
+  createRequest: (body: ServiceRequestIn) => post<ServiceRequestOut>("/service-requests", body),
   feedback: (id: string, helpful: boolean, comment?: string) =>
     post<{ id: number }>(`/diagnosis/sessions/${id}/feedback`, { helpful, comment: comment || null }),
   makes: (signal?: AbortSignal) => get<Make[]>("/vehicles/makes", signal),
@@ -291,4 +304,38 @@ export interface ResultOut {
 /** URL of a fault picture (served by the API at /media). */
 export function mediaUrl(file: string): string {
   return `${API_URL}/media/${file.split("/").map(encodeURIComponent).join("/")}`;
+}
+
+// ---------------------------------------------------------------- Request a Mechanic
+
+export type ServiceType = "at_location" | "tow" | "workshop";
+
+export interface RequestConfig {
+  consent_version: string;
+  consent_text: string;
+  helpline_number: string;
+  preferred_times: { value: string; label: string }[];
+}
+
+export interface ServiceRequestIn {
+  session_id: string | null;
+  name: string;
+  phone: string;
+  service_type: ServiceType;
+  area: string;
+  pincode: string;
+  address: string;
+  preferred_time: string;
+  notes: string;
+  consent: boolean;
+  consent_text_version: string;
+}
+
+export interface ServiceRequestOut {
+  reference: string;
+  status: string;
+  urgent: boolean;
+  created_at: string;
+  helpline_number: string;
+  next_steps: string[];
 }

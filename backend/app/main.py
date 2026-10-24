@@ -8,6 +8,7 @@ from app.api import health
 from app.config import Settings, get_settings
 from app.db import make_engine, make_session_factory
 from app.diagnosis import api as diagnosis_api
+from app.requests import api as requests_api
 from app.vehicles import api as vehicles_api
 
 
@@ -31,6 +32,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(vehicles_api.router, prefix="/api")
     app.include_router(diagnosis_api.categories_router, prefix="/api")
     app.include_router(diagnosis_api.router, prefix="/api")
+    app.include_router(requests_api.router, prefix="/api")
     if settings.media_dir.is_dir():
         app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
     return app
