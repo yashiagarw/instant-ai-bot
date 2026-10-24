@@ -42,9 +42,11 @@ embeddings off, 5479 cases. Compare a change against it with
 | `20261024-052401Z_eval_v1-baseline` | 1.0.0 | keyword | 48.7% / 56.3% | 0.0% / 0.0% | 42.5% / 50.2% | 88.6% |
 | `*_eval_v1.1-keyword` | 1.1.0 | keyword | 49.1% / 56.7% | 33.3% / 33.3% | 42.5% / 50.2% | 88.6% |
 | `*_eval_v1.1-hybrid` | 1.1.0 | hybrid | 49.8% / 57.5% | 33.3% / 33.3% | 43.5% / 52.2% | 88.6% |
+| `20261024-121453Z_eval_current` | 1.1.0 | hybrid, Devanagari-aware | 49.9% / 57.7% | 45.8% / 45.8% | 43.5% / 52.2% | 88.8% |
 
-The Hindi gain comes from reading Devanagari as Hinglish (engine 1.1, `engine/hindi.py`); hybrid search adds on
-English and typos. The Hindi cases are synthetic and written by the same team as the glossary: expect real
+The Hindi gain comes from reading Devanagari as Hinglish (engine 1.1, `engine/hindi.py`) and, for Devanagari
+queries, from scoring a strong vector match on its own similarity (the indexed text has no Devanagari, so the
+vector list is the only real evidence); hybrid search adds on English and typos. The Hindi cases are synthetic and written by the same team as the glossary: expect real
 customer messages to score lower.
 
 ## Cases

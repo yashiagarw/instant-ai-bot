@@ -11,7 +11,7 @@ from app.knowledge.embeddings import sources, sync, text_hash
 from app.knowledge.importer.embed import FakeEmbedder
 from app.knowledge.models import CustomerPhrase, Embedding, FaultItem
 from engine import Engine, Request, Vehicle
-from engine.hindi import expand, has_devanagari, transliterate
+from engine.hindi import content_words, expand, has_devanagari, transliterate
 from engine.text import Match
 from tests.test_engine import knowledge  # noqa: F401 - fixture
 from tests.test_models import make_fault, version  # noqa: F401 - fixtures
@@ -36,8 +36,11 @@ def test_transliteration(hindi, hinglish):
     assert transliterate(hindi) == hinglish
 
 
-def test_expand_keeps_both_forms():
+def test_expand_keeps_both_forms_without_hindi_grammar_words():
     assert expand("टायर पंक्चर") == "टायर पंक्चर tyre puncture"
+    # "pura ... ho gaya" would match unrelated Hinglish messages: only content words are added.
+    assert expand("टायर पूरा पंक्चर हो गया") == "टायर पूरा पंक्चर हो गया tyre puncture"
+    assert content_words("एसी ठंडी हवा नहीं दे रहा") == "ac thandi hawa"
     assert expand("tyre puncture") == "tyre puncture" and not has_devanagari("tyre")
 
 
@@ -66,6 +69,15 @@ def test_engine_uses_the_search_for_matching_and_category_suggestions(knowledge)
     assert tiled.ranked[0].fault_key == "F04-TY-01" and "tyre puncture flat" in tiled.ranked[0].evidence[0]
 
 
+def test_a_strong_vector_match_beats_keyword_noise_in_category_suggestion(knowledge):  # noqa: F811
+    # Keyword noise for a brakes fault (0.3) and a strong semantic match for a tyre fault from the search (0.8).
+    def search(text, ids):
+        return {4: Match(0.8, "tyre burst bulge", "symptom")}
+
+    r = Engine(knowledge, search=search).diagnose(Request(text="brake se kuch"))
+    assert r.suggested_categories[0].code == "tyre"
+
+
 def test_keyword_fallback_and_safety_read_devanagari(knowledge):  # noqa: F811
     engine = Engine(knowledge)  # no search: the built-in keyword index
     r = engine.diagnose(Request(text="टायर पंक्चर", group="tyres"))
@@ -89,7 +101,7 @@ def test_reciprocal_rank_fusion():
     assert hits[0].ranks == {"fts": 2, "vector": 1} and hits[0].similarity == 0.9 and hits[0].lexical == 0.5
     assert hits[0].fused(10, even) == pytest.approx(1 / 12 + 1 / 11)
     assert hits[0].fused(10) == pytest.approx(1 / 12 + 0.5 / 11)  # the vector list counts half (WEIGHTS)
-    # Score = fused RRF (1.0 when first in every list) x relevance (best of word overlap and vector similarity).
+    # Score = relevance (best of word overlap and scaled vector similarity) x fused RRF (1.0 = first everywhere).
     best = best_per_fault(hits, k=10, weights=even, vector_floor=0.5)
     assert best[20].score == pytest.approx((1 / 12 + 1 / 11) / (3 / 11) * 0.8, abs=1e-4)  # vector (0.9-0.5)/0.5
     assert best[10].score == pytest.approx((1 / 11) / (3 / 11) * 0.8, abs=1e-4)  # lexical 0.8
@@ -97,6 +109,10 @@ def test_reciprocal_rank_fusion():
     exact = Hit("symptom", 9, 90, "x", {"fts": 1, "vector": 1, "fuzzy": 1}, similarity=1.0, lexical=1.0)
     assert best_per_fault([exact], k=10)[90].score == 1.0
     assert best_per_fault([Hit("symptom", 9, 90, "x", {"fuzzy": 3})]) == {}  # no relevance: no match
+    # Devanagari queries (relative): a strong vector-only match keeps its similarity instead of 1/5 of it.
+    semantic = Hit("symptom", 9, 90, "x", {"vector": 1}, similarity=0.9)
+    assert best_per_fault([semantic])[90].score == pytest.approx(0.8 * 0.5 / 2.5)
+    assert best_per_fault([semantic], relative=True)[90].score == pytest.approx(0.8)
 
 
 def test_query_words_and_tsquery():

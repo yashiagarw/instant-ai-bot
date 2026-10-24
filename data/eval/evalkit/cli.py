@@ -78,6 +78,7 @@ def evaluate(
         "dataset_version_id": knowledge.dataset_version_id,
         "embeddings": embeddings,
         "search": search,
+        "vector_model": hybrid.model_name if hybrid else None,
         "cases": len(cases),
         "cases_by_type": dict(sorted(Counter(c.type for c in cases).items())),
         "cases_by_source": dict(sorted(Counter(c.source for c in cases).items())),
@@ -155,7 +156,7 @@ def print_summary(report: dict) -> None:
     m, s = report["meta"], report["summary"]
     print(
         f"\nEngine {m['engine_label']} (version {m['engine_version']}, code {m['engine_hash']}) · "
-        f"dataset {m['dataset_version_id']} · search {m.get('search', 'keyword')} · {m['cases']} cases"
+        f"dataset {m['dataset_version_id']} · {rep._search_label(m)} · {m['cases']} cases"
     )
     for line in rep._table(
         {
@@ -179,7 +180,9 @@ def harness(argv: list[str]) -> None:
     cmp.add_argument("--base", required=True, help="engine (current / git ref / folder) or a report .json")
     cmp.add_argument("--candidate", default=CURRENT, help="engine or report .json (default: current)")
     for p in (run, cmp):
-        p.add_argument("--embeddings", action="store_true", help="keyword index plus the old embedding bonus")
+        p.add_argument(
+            "--embeddings", action="store_true", help="keyword search only: add the old embedding bonus (legacy)"
+        )
         p.add_argument(
             "--search",
             choices=["hybrid", "keyword"],

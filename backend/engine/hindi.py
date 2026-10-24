@@ -121,10 +121,26 @@ def transliterate(text: str) -> str:
     return DEVANAGARI_WORD.sub(word, text)
 
 
+# Hindi grammar words: they say nothing about the fault, and in Hinglish they match every kind of message
+# ("gaya", "nahi", "raha"). Left out of the Hinglish form used for matching.
+FUNCTION_WORDS = frozenset(
+    "है हैं हो था थी थे रहा रही रहे गया गई गयी गए नहीं नही पर से की का के को में मे भी और तो ही ने कि "
+    "पूरा पूरी बहुत दे देता देती आता आती आते जाता जाती जाते लगता लगती लगते कर करता करती करते करने होता होती "
+    "होते हुआ हुई मेरी मेरा मेरे वाला वाली अब कुछ एक बार".split()
+)
+
+
+def content_words(text: str) -> str:
+    """The Hinglish form of the text's content words (Hindi grammar words dropped)."""
+    words = [w for w in DEVANAGARI_WORD.findall(text) if w.replace(NUKTA, "") not in FUNCTION_WORDS]
+    latin = DEVANAGARI_WORD.sub(" ", text)
+    return " ".join(part for part in (transliterate(" ".join(words)), latin.strip()) if part)
+
+
 def has_devanagari(text: str) -> bool:
     return bool(DEVANAGARI_WORD.search(text))
 
 
 def expand(text: str) -> str:
-    """The text plus its Hinglish form when it has Devanagari (both are matched)."""
-    return f"{text} {transliterate(text)}" if has_devanagari(text) else text
+    """The text plus the Hinglish form of its content words when it has Devanagari (both are matched)."""
+    return f"{text} {content_words(text)}" if has_devanagari(text) else text

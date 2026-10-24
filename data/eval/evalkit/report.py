@@ -55,6 +55,14 @@ def _n_key(metric: str) -> str | None:
     }.get(metric)
 
 
+def _search_label(m: dict) -> str:
+    """What free-text matching used: hybrid search (keyword index + full-text + vectors + typos) or the keyword
+    index alone (optionally with its old embedding bonus, `--embeddings`)."""
+    if m.get("search") == "hybrid":
+        return f"search hybrid (keyword index + full-text + vectors from {m.get('vector_model', '?')} + typos)"
+    return "search keyword index" + (" + embedding bonus" if m.get("embeddings") else " only")
+
+
 def markdown(report: dict, misses_per_type: int = 15) -> str:
     m, s = report["meta"], report["summary"]
     lines = [
@@ -62,8 +70,7 @@ def markdown(report: dict, misses_per_type: int = 15) -> str:
         "",
         f"- Run: {m['created_at']} · engine version {m['engine_version']} (code {m['engine_hash']}) · "
         f"git {m['git_commit']}{' (uncommitted changes)' if m.get('git_dirty') else ''}",
-        f"- Knowledge: dataset version {m['dataset_version_id']} · search {m.get('search', 'keyword')} · "
-        f"embeddings {'on' if m['embeddings'] else 'off'} · "
+        f"- Knowledge: dataset version {m['dataset_version_id']} · {_search_label(m)} · "
         f"{m['cases']} cases ({', '.join(f'{k} {v}' for k, v in m['cases_by_source'].items())})",
         "- Synthetic cases (Hindi, typos, unlisted cars, some safety texts) were written to fill gaps; replace them "
         "with mechanic-confirmed cases when available.",

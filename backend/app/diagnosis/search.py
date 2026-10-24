@@ -19,7 +19,7 @@ from functools import lru_cache
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from engine.hindi import transliterate
+from engine.hindi import content_words, has_devanagari
 from engine.text import Match, tokens
 
 RRF_K = 5  # fusion constant: best within-category top-1 on training phrases (data/eval/tune_search.py)
@@ -84,16 +84,23 @@ def best_per_fault(
     k: int = RRF_K,
     weights: dict[str, float] = WEIGHTS,
     vector_floor: float = VECTOR_FLOOR,
+    relative: bool = False,
 ) -> dict[int, Match]:
     """The best row of each fault as an engine Match (score 0..1, like the engine's keyword score).
 
-    Score = fused RRF score (scaled so that ranking first in every list is 1.0) x the row's relevance. RRF alone is
-    rank-based, so neighbours score almost the same; the relevance keeps an exact match sharp and a weak one low,
-    which the engine's routing and stopping rules rely on."""
-    top = sum(weights.values()) / (k + 1)
+    Score = the row's relevance (word overlap or scaled vector similarity) x its fused RRF score, scaled so that
+    ranking first in every list is 1.0. RRF orders and decays the rows; the relevance keeps an exact match sharp and
+    a weak one low, which the engine's routing and stopping rules rely on.
+
+    relative=True (Hindi in Devanagari): the RRF factor is relative to the query's best row instead. The indexed
+    text has no Devanagari, so the vector list is the only real evidence and a strong match there must not be held
+    down for appearing in one list. (Using this for every query cost English / Hinglish / typo accuracy in the eval;
+    for Devanagari it raised the Hindi cases from 8 to 11 of 24.)"""
+    hits = list(hits)
+    top = max((h.fused(k, weights) for h in hits), default=0.0) if relative else sum(weights.values()) / (k + 1)
     out: dict[int, Match] = {}
     for h in hits:
-        score = min(1.0, h.fused(k, weights) / top) * h.relevance(vector_floor)
+        score = min(1.0, h.fused(k, weights) / top) * h.relevance(vector_floor) if top else 0.0
         if score <= 0:
             continue
         if h.fault_id not in out or score > out[h.fault_id].score:
@@ -265,7 +272,8 @@ class HybridSearch:
         if not query or not ids:
             return []
         params = {"model": self.model_name, "ids": ids, "exclude": sorted(set(exclude)), "n": self.per_list}
-        variants = list(dict.fromkeys([query, transliterate(query)]))  # Devanagari: also its Hinglish form
+        # Devanagari: the raw text (the multilingual model reads it) and the Hinglish form of its content words.
+        variants = list(dict.fromkeys([query, content_words(query)])) if has_devanagari(query) else [query]
         q = tsquery(" ".join(variants), self.prefix, self.stopwords)
         with self.connect() as session:
             session.execute(text(f"SET LOCAL hnsw.ef_search = {HNSW_EF_SEARCH}"))
@@ -307,7 +315,9 @@ class HybridSearch:
         return session.execute(VECTOR_EXACT_SQL, params).all()
 
     def _search(self, query: str, ids: tuple[int, ...]) -> dict[int, Match]:
-        return best_per_fault(self.hits(query, ids), self.k, vector_floor=self.vector_floor)
+        return best_per_fault(
+            self.hits(query, ids), self.k, vector_floor=self.vector_floor, relative=has_devanagari(query)
+        )
 
     def __call__(self, query: str, fault_ids: Iterable[int]) -> dict[int, Match]:
         return self._cached(query, tuple(sorted(set(fault_ids))))
