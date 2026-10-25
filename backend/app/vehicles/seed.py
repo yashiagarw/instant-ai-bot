@@ -14,13 +14,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.db import make_engine, make_session_factory
 from app.enums import Fuel, PriceSegment, Transmission
+from app.vehicles.features import FEATURES
 from app.vehicles.models import Make, Model, Variant
 
 DEFAULT_FILE = Path(__file__).resolve().parents[3] / "data" / "catalogue" / "vehicles.yaml"
@@ -31,12 +32,25 @@ FUEL_LABEL = {Fuel.petrol: "Petrol", Fuel.diesel: "Diesel", Fuel.cng: "CNG", Fue
 # ---------------------------------------------------------------- file schema
 
 
+def check_features(features: dict[str, bool]) -> dict[str, bool]:
+    if unknown := sorted(set(features) - set(FEATURES)):
+        raise ValueError(f"unknown features {unknown} (known: {', '.join(FEATURES)})")
+    return features
+
+
 class VariantSpec(BaseModel):
     years: tuple[int, int | None]
     fuel: Fuel
     transmissions: list[Transmission] = Field(min_length=1)
     segment: PriceSegment
     engine: str = ""
+    # Overrides the model's features for this variant (e.g. a turbo engine).
+    features: dict[str, bool] = {}
+
+    @field_validator("features")
+    @classmethod
+    def known_features(cls, v: dict[str, bool]) -> dict[str, bool]:
+        return check_features(v)
 
     @model_validator(mode="after")
     def check_years(self) -> "VariantSpec":
@@ -50,7 +64,14 @@ class ModelSpec(BaseModel):
     name: str
     body: str | None = None
     aliases: list[str] = []
+    # Known true / false features of every variant (app/vehicles/features.py); leave a feature out when unsure.
+    features: dict[str, bool] = {}
     variants: list[VariantSpec] = Field(min_length=1)
+
+    @field_validator("features")
+    @classmethod
+    def known_features(cls, v: dict[str, bool]) -> dict[str, bool]:
+        return check_features(v)
 
 
 class MakeSpec(BaseModel):
@@ -182,6 +203,7 @@ def seed(session: Session, catalogue: CatalogueFile, prune: bool = False) -> See
                         "name": variant_name(spec, transmission),
                         "year_to": spec.years[1],
                         "price_segment": spec.segment,
+                        "features": {**model_spec.features, **spec.features},
                     }
                     if variant is None:
                         variant = Variant(

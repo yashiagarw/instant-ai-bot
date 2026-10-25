@@ -98,7 +98,7 @@ def test_uncertainty_flags():
 
 def test_make_engine_selects_the_version(knowledge):  # noqa: F811
     assert type(make_engine("v1", knowledge)) is Engine and type(make_engine("v2", knowledge)) is EngineV2
-    assert EngineV2(knowledge).diagnose(Request(category="brakes")).engine_version == "2.1.0"
+    assert EngineV2(knowledge).diagnose(Request(category="brakes")).engine_version == "2.2.0"
 
 
 def test_scores_are_probabilities_and_not_sure_makes_no_update(knowledge):  # noqa: F811

@@ -13,7 +13,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `data/raw` | The 18 original Excel datasets. Never edit |
 | `data/schema` | Manifest, column aliases, taxonomy, import rules |
 | `data/catalogue` | Vehicle catalogue seed (editable YAML) |
-| `docs` | Dataset profile, findings, data model |
+| `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md) |
 | `scripts` | Offline data scripts (dataset profiler) |
 | `docker-compose.yml` | PostgreSQL 16 + pgvector |
 
@@ -42,11 +42,12 @@ docker compose up -d db
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0008)
+uv run alembic upgrade head                          # all migrations (0001 … 0009)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
 uv run python -m app.knowledge.merges apply          # approved duplicate-fault merges (data/review/merges.yaml)
+uv run python -m app.knowledge.requirements apply    # what faults need (start-stop, diesel, AMT …): data/review/fault_requirements.yaml
 uv run python -m app.knowledge.embeddings sync       # search index: embeds only new or changed texts
 cd ..
 
@@ -104,6 +105,9 @@ cd backend && uv run python ../data/eval/run_eval.py run --split test --extracti
 cd apps/web && pnpm test                     # Vitest component tests
 cd apps/web && pnpm test:e2e                 # Playwright, phone + desktop (builds and serves the app on :3100;
                                              # the API is mocked, no backend needed)
+# Optional: the same flows against the real API and database, LLM off (own ports, so `pnpm dev` keeps working):
+cd backend && LLM_PROVIDER=none WEB_ORIGIN=http://localhost:3110 uv run uvicorn app.main:app --port 8010
+cd apps/web && E2E_LIVE_API=1 E2E_PORT=3110 NEXT_PUBLIC_API_URL=http://localhost:8010 pnpm exec playwright test e2e/live.spec.ts
 cd apps/web && pnpm lint && pnpm build
 ```
 
@@ -146,10 +150,30 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `REQUEST_RATE_LIMIT`, `REQUEST_RATE_WINDOW_SECONDS` | New service requests per IP per window |
 | | `LLM_PROVIDER` | `none` (default: no LLM calls, every step uses its fallback), `anthropic` (live LLM layer, only with `ANTHROPIC_API_KEY`) or `openai` (offline question drafting only). See [LLM layer](#llm-layer-off-by-default) |
 | | `ANTHROPIC_API_KEY` | Claude API key: empty in `.env.example`; set it only to switch the LLM layer on |
-| | `LLM_EXTRACTION_MODEL`, `LLM_PHRASING_MODEL`, `LLM_EFFORT` | Live LLM models (`claude-haiku-5-5`) and effort (`low`) |
+| | `LLM_EXTRACTION_MODEL`, `LLM_PHRASING_MODEL`, `LLM_EXPLANATION_MODEL`, `LLM_EFFORT` | Live LLM models (`claude-haiku-5-5`) and effort (`low`) |
 | | `LLM_TIMEOUT_SECONDS`, `LLM_DAILY_SPEND_CAP_USD` | Per-call wall-clock timeout (4 s) and daily estimated spend cap (USD, India-time day); past either, the fallback is used |
 | | `QUESTIONS_MODEL`, `QUESTIONS_EFFORT`, `OPENAI_API_KEY`, `OPENAI_MODEL`, … | Offline question drafting (`python -m app.knowledge.questions`, `--provider anthropic\|openai`) |
 | `apps/web/.env.local` | `NEXT_PUBLIC_API_URL` | Backend base URL for the browser |
+
+## Phase 2.5: explanations, typed replies, car features
+
+How it all works: [docs/diagnosis-engine.md](docs/diagnosis-engine.md). With `LLM_PROVIDER=none` (the default)
+everything below works without any API key:
+
+- **Chat**: customers can type a reply at any time (`POST /api/diagnosis/sessions/{id}/messages`). A "We understood:
+  …" chip shows what was taken from it; tapping it offers "Edit my message", which takes the message back
+  (`POST …/messages/undo`) until an option is tapped.
+- **Result**: each cause shows a confidence word (High / Medium / Low) with a 3-step meter and the reason, its evidence
+  (what fits and what doesn't), a short explanation streamed over server-sent events
+  (`GET …/explanations`; templates with the LLM off), uncertainty messages and "If this doesn't fix it".
+- **Safety tips** are full, calm sentences; workshop-only lines are never shown
+  (`uv run python -m app.diagnosis.safety_lines report` lists every dataset line and what customers see; reviewed
+  rewrites: `data/review/safety_tips.yaml`).
+- **Car features**: faults the car cannot have (start-stop on an Alto K10, CNG faults on a petrol car, AMT faults on
+  a manual) are down-ranked. Feature data per model goes into `data/catalogue/vehicles.yaml`; what is still missing is
+  listed in docs/diagnosis-engine.md.
+- **Generated questions**: with the LLM on, questions it proposes when nothing fits are saved to `generated_questions`
+  for review and never asked.
 
 ## LLM layer (off by default)
 
@@ -160,6 +184,7 @@ to ask, ranks the faults and runs every safety rule; prices, part fit and safety
 |---|---|---|
 | Extraction (session text and `POST /api/diagnosis/sessions/{id}/messages`) | The message plus up to 60 candidate symptom lines (with ids) and the waiting question go to Claude as one strict tool call; it returns symptom ids and maybe an answer. Ids not offered and options not offered are dropped. | Engine v2 + hybrid search match the words, as before |
 | Phrasing (each question in a session where the customer typed something) | The chosen question is reworded in the customer's language (English, Hindi or Hinglish); no numbers, prices, links or markup allowed | The original question text |
+| Explanation (result page, streamed) | Two or three plain sentences per cause from the facts the engine found; dropped per cause if it names another fault, a price, a number or a part not in the facts | Template explanations |
 
 How it is kept safe and cheap:
 

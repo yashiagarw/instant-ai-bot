@@ -10,7 +10,8 @@ itself and questions keep their original wording).
 """
 
 import threading
-from dataclasses import asdict
+import uuid
+from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, datetime
 
 from sqlalchemy import select
@@ -18,7 +19,7 @@ from sqlalchemy.orm import Session
 
 import engine as eng
 from app.config import Settings
-from app.diagnosis import present
+from app.diagnosis import explain, present
 from app.diagnosis.knowledge import load_knowledge
 from app.diagnosis.models import (
     Confidence,
@@ -29,13 +30,28 @@ from app.diagnosis.models import (
     SessionResult,
     SessionStatus,
 )
-from app.diagnosis.search import HybridSearch
-from app.knowledge.models import Category, Fault, FaultImage, FaultItem, FaultItemType, ProblemGroup, Question
+from app.diagnosis.search import SEARCH_STOPWORDS, HybridSearch
+from app.knowledge.models import (
+    Category,
+    Fault,
+    FaultImage,
+    FaultItem,
+    FaultItemType,
+    FaultLink,
+    LinkRelation,
+    PartPriceSource,
+    ProblemGroup,
+    Question,
+)
+from app.llm import explanation as llm_explanation
 from app.llm.client import DbRecorder, LLMClient, make_llm_client
 from app.llm.extraction import Extraction, PendingQuestion, extract
+from app.llm.models import GeneratedQuestion
 from app.llm.phrasing import detect_language, phrase
+from app.llm.prompts import load as load_prompt
 from app.vehicles.models import UnlistedVehicle, Variant
-from engine.core import FAST_TRACK_MAX, MAX_QUESTIONS, MAX_TIPS
+from engine.core import FAST_TRACK_MAX, MAX_QUESTIONS, MAX_TIPS, unmet_needs
+from engine.text import tokens
 
 NOT_SURE = "not_sure"
 PUBLIC_STEP_TYPES = (FaultItemType.diagnosis_step, FaultItemType.resolution_step, FaultItemType.advice)
@@ -80,7 +96,15 @@ def hybrid_search(state) -> HybridSearch:
         from app.knowledge.importer.embed import SentenceTransformerEmbedder
 
         embedder = state.embedder = SentenceTransformerEmbedder()
-    return HybridSearch(state.session_factory.begin, lambda t: embedder.encode([t])[0], embedder.name)
+    lock = threading.Lock()
+
+    def embed(text: str) -> list[float]:
+        # One call at a time: the model's first calls from two request threads at once dropped a request (seen when
+        # two customers typed at the same moment after a restart). A query takes milliseconds.
+        with lock:
+            return embedder.encode([text])[0]
+
+    return HybridSearch(state.session_factory.begin, embed, embedder.name)
 
 
 # ---------------------------------------------------------------- helpers
@@ -102,10 +126,12 @@ def _event(session: Session, ds: DiagnosisSession, kind: EventType, payload: dic
 
 
 def _events(session: Session, ds: DiagnosisSession, kind: EventType | None = None) -> list[SessionEvent]:
-    q = select(SessionEvent).where(SessionEvent.session_id == ds.id).order_by(SessionEvent.id)
-    if kind is not None:
-        q = q.where(SessionEvent.event_type == kind)
-    return list(session.scalars(q))
+    """The session's events that still count. A message_undone event voids everything from the message it takes back
+    up to itself (the message, the answer it gave, the question it set aside or asked); the rows are kept."""
+    rows = list(session.scalars(select(SessionEvent).where(SessionEvent.session_id == ds.id).order_by(SessionEvent.id)))
+    voids = [(e.payload["from_event_id"], e.id) for e in rows if e.event_type == EventType.message_undone]
+    live = [e for e in rows if not any(start <= e.id < end for start, end in voids)]
+    return [e for e in live if kind is None or e.event_type == kind]
 
 
 def _live(session: Session, ds: DiagnosisSession) -> tuple[list[SessionEvent], list[SessionEvent]]:
@@ -256,6 +282,7 @@ def resolve_vehicle(session: Session, vehicle_in) -> tuple[dict, int | None, int
             "listed": True,
             "variant_id": v.id,
             "variant": v.name,
+            "features": dict(v.features or {}),
         }
         return snap, v.id, None
     u = vehicle_in.unlisted
@@ -342,12 +369,70 @@ def answer(session: Session, engine: eng.Engine, ds: DiagnosisSession, body, llm
     return result, _record(session, ds, result, llm)
 
 
+UNDERSTOOD_COVER = 0.75  # fallback: a known phrase is shown only when this share of its words is in the message
+UNDERSTOOD_MAX = 3
+
+
+@dataclass
+class MessageTurn:
+    result: eng.Result
+    new_alerts: list[eng.types.SafetyAlert]
+    extraction: Extraction
+    understood: list[str] = field(default_factory=list)  # what we took from the message, in customer words
+
+
+def _content_words(text: str) -> set[str]:
+    return {w for w in tokens(text) if w not in SEARCH_STOPWORDS and len(w) >= 3 and not w.isdigit()}
+
+
+def understood_items(engine: eng.Engine, req: eng.Request, message_text: str, ex: Extraction) -> list[str]:
+    """What we took from one message: the answer and symptoms the LLM found. Without the LLM: known customer
+    phrases nearly all of whose words the customer used (keyword index only, never faults the car cannot have).
+    Nothing certain enough -> [] ("We added this to your description")."""
+    items = []
+    if ex.answer is not None:
+        items.append(f"Your answer: {ex.answer['label']}")
+    items += symptom_labels(engine, ex.symptom_ids)
+    if ex.source != "llm":
+        scope = engine._scope(replace(req, text=message_text, symptoms=[]))
+        said, said_all = _content_words(scope.text), set(tokens(scope.text))
+        matches = engine.index.match(scope.text, None, scope.candidates)
+        for fid, m in sorted(matches.items(), key=lambda kv: (-kv[1].score, kv[0])):
+            words = _content_words(m.text)
+            if not words or unmet_needs(engine.k.faults[fid], req.vehicle):
+                continue
+            # One shared word ("start", "self") is not understanding: a one-word phrase counts only when every word
+            # of it, negations included, is in the message ("gaadi garam ho rahi hai").
+            if len(words) == 1 and not set(tokens(m.text)) <= said_all:
+                continue
+            if len(words & said) / len(words) >= UNDERSTOOD_COVER:
+                items.append(m.text)
+    items = [i.strip() for i in items if i.strip()]
+    return list(dict.fromkeys(i[:1].upper() + i[1:] for i in items))[:UNDERSTOOD_MAX]
+
+
+def _save_proposal(session: Session, ds: DiagnosisSession, ex: Extraction, llm: LLMClient, cats: list[str], text: str):
+    """A question the LLM proposed because nothing offered fitted: stored as generated, for review only."""
+    session.add(
+        GeneratedQuestion(
+            session_id=ds.id,
+            category_code=cats[0] if len(cats) == 1 else None,
+            text=ex.proposal["text"],
+            options=ex.proposal["options"],
+            reason=ex.proposal["reason"],
+            language=detect_language(text) or "",
+            model=llm.models["extraction"],
+            prompt_version=load_prompt("extraction").version,
+        )
+    )
+
+
 def message(
     session: Session, engine: eng.Engine, ds: DiagnosisSession, text: str, llm: LLMClient | None = None
-) -> tuple[eng.Result, list[eng.types.SafetyAlert], Extraction]:
+) -> MessageTurn:
     """A free-text turn. The words join the session's text (so every safety rule reads them), the extraction step
     adds the symptoms it found and may answer the waiting question; a waiting question the message did not answer
-    is withdrawn and the engine chooses the next question again. Returns (result, new alerts, extraction)."""
+    is withdrawn and the engine chooses the next question again."""
     if ds.status == SessionStatus.completed:
         raise SessionStateError("this session is already completed")
     text = text.strip()
@@ -380,7 +465,30 @@ def message(
         _event(session, ds, EventType.question_withdrawn, {"question_id": pending.question_id}, pending.question_id)
     session.flush()
     result = engine.diagnose(_request(session, ds))
-    return result, _record(session, ds, result, llm), ex
+    if ex.proposal and llm is not None:
+        _save_proposal(session, ds, ex, llm, result.active_categories, text)
+    new = _record(session, ds, result, llm)
+    return MessageTurn(result, new, ex, understood_items(engine, req, text, ex))
+
+
+def undo_message(session: Session, engine: eng.Engine, ds: DiagnosisSession) -> tuple[eng.Result, str]:
+    """Take back the last typed message and everything it caused (the answer it gave, the question it set aside).
+    Only while nothing was tapped after it. Returns (result, the message text, to edit and send again)."""
+    if ds.status == SessionStatus.completed:
+        raise SessionStateError("this session is already completed")
+    live = _events(session, ds)
+    actions = [
+        e for e in live if e.event_type in (EventType.free_text, EventType.answer_given, EventType.answer_undone)
+    ]
+    last = next((e for e in reversed(actions) if e.event_type == EventType.free_text), None)
+    if last is None or last.payload.get("source") != "message":
+        raise SessionStateError("there is no typed message to take back")
+    after = actions[actions.index(last) + 1 :]
+    if any(e.event_type != EventType.answer_given or e.payload.get("source") != "message" for e in after):
+        raise SessionStateError("only the last typed message can be taken back")
+    _event(session, ds, EventType.message_undone, {"from_event_id": last.id, "text": last.payload["text"]})
+    session.flush()
+    return engine.diagnose(_request(session, ds)), last.payload["text"]
 
 
 def symptom_labels(engine: eng.Engine, ids: list[int]) -> list[str]:
@@ -501,6 +609,83 @@ def answered_questions(session: Session, ds: DiagnosisSession) -> list[dict]:
             }
         )
     return out
+
+
+# ---------------------------------------------------------------- explanations and next steps
+
+
+def related_faults(session: Session, engine: eng.Engine, fault_id: int) -> list[tuple[str, str]]:
+    """(kind, name) of problems the cross-reference sheet links to a fault: other faults first, then categories."""
+    links = session.execute(
+        select(FaultLink.to_fault_id, FaultLink.to_category_code).where(
+            FaultLink.from_fault_id == fault_id, FaultLink.relation == LinkRelation.related
+        )
+    ).all()
+    faults = [("fault", engine.k.faults[f].name) for f, _ in links if f in engine.k.faults]
+    cats = [("category", engine.k.categories[c].name) for _, c in links if c in engine.k.categories]
+    return list(dict.fromkeys(faults + cats))
+
+
+def part_terms(state, session: Session) -> set[str]:
+    """Part words from the part price sheets (cached per process), for checking LLM explanations."""
+    terms = getattr(state, "part_terms", None)
+    if terms is None:
+        terms = state.part_terms = llm_explanation.part_terms(list(session.scalars(select(PartPriceSource.part))))
+    return terms
+
+
+def other_fault_names(engine: eng.Engine, result: eng.Result) -> list[str]:
+    ranked = {r.fault_id for r in result.ranked}
+    cats = set(result.active_categories)
+    return [f.name for f in engine.k.faults.values() if f.category in cats and f.id not in ranked]
+
+
+@dataclass
+class ExplanationPlan:
+    """Everything the explanation stream needs, read from the database before streaming starts."""
+
+    templates: list[explain.Explanation]
+    facts: list[explain.CauseFacts]
+    other_names: list[str]
+    parts: set[str]
+    language: str
+    cached: list[dict] | None  # stored LLM explanations for this ranking (completed sessions)
+    ranked_keys: list[str]
+    completed: bool
+
+
+def explanation_plan(state, session: Session, engine: eng.Engine, ds: DiagnosisSession) -> ExplanationPlan:
+    result = current_result(session, engine, ds)
+    keys = [r.fault_key for r in result.ranked[:3]]
+    cached = None
+    for e in reversed(_events(session, ds, EventType.explanations)):
+        if e.payload.get("ranked") == keys:
+            cached = e.payload.get("items")
+            break
+    texts = _free_text(session, ds)
+    return ExplanationPlan(
+        templates=explain.templates(result),
+        facts=explain.cause_facts(engine, result),
+        other_names=other_fault_names(engine, result),
+        parts=part_terms(state, session),
+        language=(detect_language(texts[-1]["text"]) if texts else None) or "en",
+        cached=cached,
+        ranked_keys=keys,
+        completed=ds.status == SessionStatus.completed,
+    )
+
+
+def store_explanations(connect, session_id: uuid.UUID, keys: list[str], items: list[explain.Explanation]) -> None:
+    """Cache LLM explanations of a completed session on its own transaction (the stream outlives the request)."""
+    with connect() as s:
+        s.add(
+            SessionEvent(
+                session_id=session_id,
+                event_type=EventType.explanations,
+                payload={"ranked": keys, "items": [asdict(i) for i in items]},
+                created_at=_now(),
+            )
+        )
 
 
 def add_feedback(session: Session, ds: DiagnosisSession, body) -> Feedback:

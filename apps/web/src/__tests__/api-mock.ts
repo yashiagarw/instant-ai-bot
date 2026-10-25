@@ -26,6 +26,9 @@ export function mockApi(overrides: Routes = {}, diagnosis = new FakeDiagnosis())
     const fake = overridden
       ? null
       : diagnosis.handle(init?.method ?? "GET", url.pathname, init?.body ? JSON.parse(String(init.body)) : undefined);
+    if (fake?.text !== undefined) {
+      return new Response(fake.text, { status: fake.status, headers: { "Content-Type": fake.contentType ?? "text/plain" } });
+    }
     if (fake) return new Response(JSON.stringify(fake.json), { status: fake.status, headers: { "Content-Type": "application/json" } });
     const key = Object.keys(routes).find((k) => url.pathname.startsWith(k));
     if (!key) return new Response("not found", { status: 404 });

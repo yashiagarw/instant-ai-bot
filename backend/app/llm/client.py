@@ -148,13 +148,18 @@ class LLMClient:
         *,
         extraction_model: str,
         phrasing_model: str,
+        explanation_model: str = "",
         effort: str = "low",
         timeout: float = 4.0,
         daily_cap_usd: float = 2.0,
         workers: int = 8,
     ):
         self.provider, self.recorder = provider, recorder
-        self.models = {"extraction": extraction_model, "phrasing": phrasing_model}
+        self.models = {
+            "extraction": extraction_model,
+            "phrasing": phrasing_model,
+            "explanation": explanation_model or phrasing_model,
+        }
         self.effort, self.timeout, self.daily_cap_usd = effort, timeout, daily_cap_usd
         self._pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="llm")
 
@@ -261,6 +266,7 @@ def make_llm_client(settings, recorder: Recorder) -> LLMClient | None:
         recorder,
         extraction_model=settings.llm_extraction_model,
         phrasing_model=settings.llm_phrasing_model,
+        explanation_model=settings.llm_explanation_model,
         effort=settings.llm_effort,
         timeout=settings.llm_timeout_seconds,
         daily_cap_usd=settings.llm_daily_spend_cap_usd,

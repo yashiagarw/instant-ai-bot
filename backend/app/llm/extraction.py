@@ -4,11 +4,15 @@ to the waiting question, via one strict tool call.
 The output is checked against what was offered: ids not in the candidate list and answers that are not an
 option of the waiting question are dropped. Fallback (no client, timeout, invalid output, spend cap): no symptom
 ids and no answer; the engine still matches the text itself (v2 + hybrid search), as without an LLM.
+
+When nothing offered fits the message, the model may propose a new follow-up question (`proposed_question`). The
+caller saves it to generated_questions for review; it is never asked until a person approves it.
 """
 
 from __future__ import annotations
 
 import html
+import re
 import uuid
 from dataclasses import dataclass, field, replace
 
@@ -38,11 +42,22 @@ TOOL = ToolSpec(
                     "additionalProperties": False,
                 },
             },
+            "proposed_question": {
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string"},
+                    "options": {"type": "array", "items": {"type": "string"}},
+                    "reason": {"type": "string"},
+                },
+                "required": ["text", "options", "reason"],
+                "additionalProperties": False,
+            },
         },
-        "required": ["symptom_ids", "answers"],
+        "required": ["symptom_ids", "answers", "proposed_question"],
         "additionalProperties": False,
     },
 )
+PROPOSAL_UNSAFE = re.compile(r"<|>|https?://|www\.|₹|\brs\.?\s|\brupees?\b|\bprice|\bcost", re.I)
 
 
 @dataclass(frozen=True)
@@ -65,6 +80,23 @@ class Extraction:
     answer: dict | None = None  # the chosen option of the pending question: {"id", "label", "not_sure"}
     source: str = "fallback"  # llm | fallback
     outcome: str = "disabled"  # an LLMOutcome, or disabled / nothing_to_match
+    # A new question the model proposed because nothing offered fitted: {"text", "options", "reason"}. Saved for
+    # review only.
+    proposal: dict | None = None
+
+
+def clean_proposal(p: object) -> dict | None:
+    """A usable proposal or None: a question of 10-200 characters with 2-5 short options, no markup or prices."""
+    if not isinstance(p, dict) or not isinstance(p.get("text"), str) or not p["text"].strip():
+        return None
+    text = " ".join(p["text"].split())
+    options = [" ".join(o.split()) for o in p.get("options") or [] if isinstance(o, str) and o.strip()]
+    reason = " ".join(str(p.get("reason") or "").split())[:300]
+    if not 10 <= len(text) <= 200 or not 2 <= len(options) <= 5 or any(len(o) > 60 for o in options):
+        return None
+    if any(PROPOSAL_UNSAFE.search(t) for t in [text, *options]):
+        return None
+    return {"text": text, "options": options, "reason": reason}
 
 
 def _symptoms_by_fault(engine: eng.Engine) -> dict[int, list]:
@@ -113,8 +145,12 @@ def validator(candidates: list[Candidate], pending: PendingQuestion | None):
 
     def validate(data: dict) -> tuple[Extraction, int]:
         ids, answers = data.get("symptom_ids"), data.get("answers")
-        if not isinstance(ids, list) or not isinstance(answers, list) or set(data) - {"symptom_ids", "answers"}:
-            raise OutputError("expected {symptom_ids: [...], answers: [...]}")
+        if (
+            not isinstance(ids, list)
+            or not isinstance(answers, list)
+            or set(data) - {"symptom_ids", "answers", "proposed_question"}
+        ):
+            raise OutputError("expected {symptom_ids: [...], answers: [...], proposed_question: {...}}")
         if any(not isinstance(i, int) or isinstance(i, bool) for i in ids):
             raise OutputError("symptom_ids must be integers")
         if any(not isinstance(a, dict) or not {"question_id", "option_id"} <= set(a) for a in answers):
@@ -130,7 +166,9 @@ def validator(candidates: list[Candidate], pending: PendingQuestion | None):
                 chosen = match
             else:
                 dropped += 1  # not the waiting question, not one of its options, or a second answer
-        return Extraction(kept, chosen, "llm"), dropped
+        # A proposal only counts when nothing offered fitted (no symptom kept, no answer).
+        proposal = clean_proposal(data.get("proposed_question")) if not kept and chosen is None else None
+        return Extraction(kept, chosen, "llm", proposal=proposal), dropped
 
     return validate
 

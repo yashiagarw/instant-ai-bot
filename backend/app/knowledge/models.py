@@ -301,6 +301,9 @@ class Fault(Base):
     source_cells: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
     extra: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
     needs_review: Mapped[bool] = mapped_column(default=False, server_default="false")
+    # What the car must have for this fault to be possible, from data/review/fault_requirements.yaml (applied with
+    # `python -m app.knowledge.requirements apply`): [{"feature": "start_stop"}, {"fuel": ["diesel"]}, ...]
+    requires: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
 
     category: Mapped[Category] = relationship()
     items: Mapped[list["FaultItem"]] = relationship(

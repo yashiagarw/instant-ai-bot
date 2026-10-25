@@ -26,15 +26,16 @@ from engine.core import (
     ROUTE_MIN,
     ROUTE_RATIO,
     TEXT_WEIGHT,
+    UNMET_PRIOR_FACTOR,
     Engine,
     cost_for,
     coverage_level,
 )
 from engine.safety import evaluate
 from engine.text import STOPWORDS, tokens
-from engine.types import ROUTE_QUESTION, Question, QuestionOut, RankedFault, Request, Result
+from engine.types import ROUTE_QUESTION, Evidence, Question, QuestionOut, RankedFault, Request, Result
 
-ENGINE_VERSION_V2 = "2.1.0"  # 2.1: Request.symptoms (LLM-extracted symptom ids), shared with v1
+ENGINE_VERSION_V2 = "2.2.0"  # 2.1: Request.symptoms. 2.2: car features / fault requirements, evidence items
 DEFAULTS = {"question_budget": MAX_QUESTIONS, "stop_probability": 0.75, "stop_margin": 0.5, "min_questions": 1}
 FAST_TRACK_ONLY = {"question_budget": FAST_TRACK_MAX, "min_questions": 0}
 # Chosen after tuning on the dev split (data/eval/tune_v2.py): sharper answers (beta 1.5); keeping several
@@ -130,9 +131,11 @@ class EngineV2(Engine):
 
         # Evidence: free text and answers ("Not sure" makes no update).
         evidence: dict[int, list[str]] = {fid: [] for fid in candidates}
+        items: dict[int, list[Evidence]] = {fid: [] for fid in candidates}
         for fid, m in matches.items():
             if fid in evidence:
                 evidence[fid].append(f"Matched {'your words' if m.kind == 'phrase' else 'symptom'}: {m.text}")
+                items[fid].append(Evidence("said" if m.kind == "phrase" else "symptom", m.text))
         answered_q: set[int] = set()
         answered_opts: set[int] = set()
         answers: list[tuple[dict, int]] = []
@@ -162,11 +165,14 @@ class EngineV2(Engine):
                     if q.stage == 2:
                         if w > 0:
                             evidence[fid].append(f"Main problem: {o.label}")
+                            items[fid].append(Evidence("main", o.label, q.text))
                     else:
                         evidence[fid].append(f"{q.text} {o.label} ({'supports' if w > 0 else 'rules out'})")
+                        items[fid].append(Evidence("answer" if w > 0 else "against", o.label, q.text))
+        unmet = self._unmet(candidates, vehicle, evidence, items)
 
         post = bayes.posterior(
-            {f: k.faults[f].prior for f in candidates},
+            {f: k.faults[f].prior * UNMET_PRIOR_FACTOR ** len(unmet.get(f, ())) for f in candidates},
             {f: m.score for f, m in matches.items()},
             answers,
             self.text_strength,
@@ -230,7 +236,7 @@ class EngineV2(Engine):
 
         top = k.faults[order[0]] if order else None
         coverage = coverage_level(req.vehicle, top)
-        ranked = self._ranked_v2(order, prob, evidence, vehicle, asked, coverage)
+        ranked = self._ranked_v2(order, prob, evidence, vehicle, asked, coverage, items)
         # The flow ended, or an emergency (fast-track) topic: the likely faults' safety rules run now. In emergencies
         # they are shown from the first turn, not only after the last question.
         if (done or mode == "fast_track") and ranked:
@@ -311,7 +317,7 @@ class EngineV2(Engine):
             m = self._matrices[qid] = bayes.likelihood_matrix(self.effects[qid], sorted(self.k.faults), self.beta)
         return m
 
-    def _ranked_v2(self, order, prob, evidence, vehicle, answered: int, coverage: str) -> list[RankedFault]:
+    def _ranked_v2(self, order, prob, evidence, vehicle, answered: int, coverage: str, items) -> list[RankedFault]:
         shown = [f for i, f in enumerate(order[:MAX_RANKED]) if i < MIN_RANKED or prob[f] >= SHOW_PROBABILITY]
         gap = prob[order[0]] - (prob[order[1]] if len(order) > 1 else 0.0) if order else 0.0
         out = []
@@ -328,6 +334,7 @@ class EngineV2(Engine):
                     evidence=evidence.get(fid, []),
                     cost=cost_for(f, vehicle),
                     repair_time=f.repair_time_text,
+                    evidence_items=items.get(fid, []),
                 )
             )
         return out

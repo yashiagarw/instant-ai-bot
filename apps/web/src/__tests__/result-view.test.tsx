@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 
 import { ResultView } from "@/components/result/result-view";
 import { mockApi } from "./api-mock";
-import { FakeDiagnosis } from "./fake-diagnosis";
+import { EXPLANATIONS, FakeDiagnosis, IF_NOT_FIXED, UNCERTAIN } from "./fake-diagnosis";
 
 let sessionId = "";
 vi.mock("next/navigation", () => ({ useParams: () => ({ sessionId }), useRouter: () => ({ push: vi.fn() }) }));
@@ -38,7 +38,9 @@ test("listed car: top cause with evidence, roadside verdict, segment cost with l
   const top = await screen.findByRole("article", { name: "Slow/pinhole puncture" });
   expect(screen.getByTestId("coverage").textContent).toContain("Segment estimate");
   expect(within(top).getByText("Why we think this")).toBeDefined();
-  expect(within(top).getAllByRole("listitem").map((li) => li.textContent)).toContain("Answer: Within hours or days");
+  expect(within(top).getAllByRole("listitem").map((li) => li.textContent)).toContain(
+    "You answered “Within hours or days” to: After filling the tyre with air, how soon does it go soft again?",
+  );
 
   const roadside = within(top).getByTestId("roadside");
   expect(roadside.textContent).toContain("Roadside check, then a garage");
@@ -154,4 +156,55 @@ test("no red banner without a high-risk alert; lower-risk advice is in the safet
   expect(screen.queryByTestId("safety-banner")).toBeNull();
   const tips = screen.getByRole("region", { name: "Safety tips" });
   expect(within(tips).getByText("Drive slowly to the nearest tyre shop.")).toBeDefined();
+});
+
+test("confidence shows as a word, a 3-step meter and the reason", async () => {
+  finished({ vehicle: { variant_id: 16 }, topic_id: "tyres" }, [85, 91]);
+  render(<ResultView />);
+  const top = await screen.findByRole("article", { name: "Slow/pinhole puncture" });
+  const meter = within(top).getByTestId("confidence");
+  expect(meter.textContent).toContain("High confidence");
+  expect(meter.textContent).toContain("(3 of 3)");
+  expect(meter.textContent).toContain("Your answers point clearly to this cause.");
+  expect(meter.querySelectorAll("[data-filled]")).toHaveLength(3);
+  expect(within(top).queryByText("What doesn't fit")).toBeNull(); // nothing against the top cause
+
+  // Other causes: the meter (one step for Low), the reasons for and against.
+  fireEvent.click(screen.getByText("Valve issue"));
+  const valve = screen.getByText("Valve issue").closest("details")!;
+  const low = within(valve).getByTestId("confidence");
+  expect(low.textContent).toContain("Low confidence");
+  expect(low.querySelectorAll("[data-filled]")).toHaveLength(1);
+  expect(within(valve).getByText("What doesn't fit")).toBeDefined();
+  expect(within(valve).getByText("Doesn't fit: you answered “No” to: Is the valve cap missing?")).toBeDefined();
+});
+
+test("explanations stream in for every cause (templates when the LLM is off)", async () => {
+  finished({ vehicle: { variant_id: 16 }, topic_id: "tyres" }, [85, 91]);
+  render(<ResultView />);
+  const top = await screen.findByRole("article", { name: "Slow/pinhole puncture" });
+  const text = await within(top).findByTestId("explanation");
+  expect(text.textContent).toBe(EXPLANATIONS["F04-TY-02"]);
+  expect(text.getAttribute("data-source")).toBe("template");
+  fireEvent.click(screen.getByText("Valve issue"));
+  const valve = screen.getByText("Valve issue").closest("details")!;
+  expect(within(valve).getByTestId("explanation").textContent).toBe(EXPLANATIONS["F04-TY-04"]);
+});
+
+test("a failed explanations stream leaves the evidence and the rest of the page", async () => {
+  finished({ vehicle: { variant_id: 16 }, topic_id: "tyres" }, [85, 91]);
+  mockApi({ [`/api/diagnosis/sessions/${sessionId}/explanations`]: "fail" }, fake);
+  render(<ResultView />);
+  const top = await screen.findByRole("article", { name: "Slow/pinhole puncture" });
+  await waitFor(() => expect(top.querySelector('[aria-hidden="true"] .animate-pulse, [data-testid="explanation"]')).toBeNull());
+  expect(within(top).getByText("Why we think this")).toBeDefined();
+});
+
+test("uncertainty and If this doesn't fix it", async () => {
+  finished({ vehicle: { variant_id: 16 }, topic_id: "tyres" }, [85, "not_sure"]);
+  render(<ResultView />);
+  const notice = await screen.findByRole("region", { name: "We're not certain yet" });
+  expect(notice.textContent).toContain(UNCERTAIN);
+  const next = screen.getByRole("region", { name: "If this doesn't fix it" });
+  expect(within(next).getAllByRole("listitem").map((li) => li.textContent)).toEqual(IF_NOT_FIXED);
 });

@@ -21,6 +21,7 @@ from engine.types import (
     CategorySuggestion,
     ChecklistItem,
     CostOut,
+    Evidence,
     Fault,
     Group,
     Knowledge,
@@ -36,7 +37,7 @@ from engine.types import (
     Vehicle,
 )
 
-ENGINE_VERSION = "1.2.0"  # 1.1: hybrid search hook, Hindi (Devanagari) read as Hinglish. 1.2: Request.symptoms
+ENGINE_VERSION = "1.3.0"  # 1.1: hybrid search, Hindi as Hinglish. 1.2: Request.symptoms. 1.3: car requirements
 DISCLAIMER = (
     "This is an estimate based on your answers and our data. It is not a replacement for a professional "
     "inspection by a mechanic."
@@ -57,6 +58,12 @@ HIGH_RISK_SCORE = 3.0  # a high-risk fault's rules fire once its score reaches o
 # Text-match score of a symptom the LLM extraction step found (Request.symptoms). Not tuned yet: choose it on the
 # dev split once real extraction runs (data/eval/run_eval.py run --extraction llm).
 EXTRACTED_SYMPTOM_SCORE = 0.8
+# A fault the car is known not to be able to have (it needs a feature, fuel or gearbox the car lacks) is down-ranked,
+# never hidden: v2 keeps this share of its prior per unmet need (small enough that even a perfect text match,
+# about 20x in v2's likelihood, leaves it below a plausible alternative), v1 subtracts one strong answer per need.
+# Unknown features change nothing. High-risk safety rules ignore this (v2's v1-score check is not penalised).
+UNMET_PRIOR_FACTOR = 0.01
+UNMET_SCORE_PENALTY = 3.0
 LIKELY_TOP = 3  # when the flow ends, every rule of the top 3 faults fires
 MAX_TIPS = 8
 RULE_TIPS = 4  # fast_track: likely faults' rule actions shown before the topic's own lines
@@ -74,6 +81,29 @@ def vehicle_allows(category: Category, vehicle: Vehicle) -> bool:
             if attr in f and value is not None and value not in f[attr]:
                 return False
     return True
+
+
+def unmet_needs(fault: Fault, vehicle: Vehicle | None) -> list[dict]:
+    """The fault's requirements the car is known not to meet. Unknown fuel, gearbox or feature never counts."""
+    if vehicle is None:
+        return []
+    out = []
+    for need in fault.requires:
+        if "feature" in need:
+            if (vehicle.features or {}).get(need["feature"]) is False:
+                out.append(need)
+        else:
+            attr = "fuel" if "fuel" in need else "transmission"
+            value = getattr(vehicle, attr)
+            if value is not None and value not in need.get(attr, []):
+                out.append(need)
+    return out
+
+
+def need_text(need: dict) -> str:
+    """ "feature start_stop", "fuel diesel", "transmission amt or cvt" (the app words it for customers)."""
+    ((kind, value),) = need.items()
+    return f"{kind} {value if isinstance(value, str) else ' or '.join(value)}"
 
 
 def topic_variant(group: Group, vehicle: Vehicle) -> dict | None:
@@ -257,9 +287,11 @@ class Engine:
         # Answers: Stage 2 narrows, follow-ups add their effects.
         scores = {fid: TEXT_WEIGHT * matches[fid].score if fid in matches else 0.0 for fid in candidates}
         evidence: dict[int, list[str]] = {fid: [] for fid in candidates}
+        items: dict[int, list[Evidence]] = {fid: [] for fid in candidates}
         for fid, m in matches.items():
             if fid in evidence:
                 evidence[fid].append(f"Matched {'your words' if m.kind == 'phrase' else 'symptom'}: {m.text}")
+                items[fid].append(Evidence("said" if m.kind == "phrase" else "symptom", m.text))
         answered_q: set[int] = set()
         answered_opts: set[int] = set()
         asked = 0
@@ -285,11 +317,16 @@ class Engine:
                     narrowed = True
                     for fid in supported & candidates:
                         evidence[fid].append(f"Main problem: {o.label}")
+                        items[fid].append(Evidence("main", o.label, q.text))
                 continue
             for fid, w in o.effects.items():
                 if fid in scores:
                     scores[fid] += w
                     evidence[fid].append(f"{q.text} {o.label} ({'supports' if w > 0 else 'rules out'})")
+                    items[fid].append(Evidence("answer" if w > 0 else "against", o.label, q.text))
+        unmet = self._unmet(candidates, vehicle, evidence, items)
+        for fid, needs in unmet.items():
+            scores[fid] -= UNMET_SCORE_PENALTY * len(needs)
 
         order, seen_groups = [], set()
         for fid in sorted(candidates, key=lambda fid: (-scores[fid], fid)):
@@ -347,7 +384,7 @@ class Engine:
         done = stop_reason is not None
 
         backup = sorted((f for f in set_aside if k.canonical(f) not in seen_groups), key=lambda f: (-scores[f], f))
-        ranked = self._ranked(order, scores, evidence, vehicle, narrowed, stop_reason, backup)
+        ranked = self._ranked(order, scores, evidence, vehicle, narrowed, stop_reason, backup, items)
         if done and ranked:  # the flow ended: the likely faults' safety rules always run
             groups = {k.canonical(r.fault_id): r.name for r in ranked[:LIKELY_TOP]}
             alerts = safety(
@@ -435,8 +472,20 @@ class Engine:
                     best, best_value = q, value
         return best
 
+    def _unmet(self, candidates, vehicle, evidence, items) -> dict[int, list[dict]]:
+        """Candidate fault -> requirements the car is known not to meet, noted in the evidence."""
+        out = {}
+        for fid in candidates:
+            needs = unmet_needs(self.k.faults[fid], vehicle)
+            if needs:
+                out[fid] = needs
+                for need in needs:
+                    evidence[fid].append(f"Less likely: your car does not have {need_text(need)}")
+                    items[fid].append(Evidence("lacks", need_text(need), need=need))
+        return out
+
     def _ranked(
-        self, order, scores, evidence, vehicle, narrowed: bool, stop_reason=None, backup=()
+        self, order, scores, evidence, vehicle, narrowed: bool, stop_reason=None, backup=(), items=None
     ) -> list[RankedFault]:
         shown = [fid for fid in order if scores[fid] > 0][:MAX_RANKED]
         if shown or narrowed:
@@ -474,6 +523,7 @@ class Engine:
                     evidence=evidence.get(fid, []),
                     cost=cost_for(f, vehicle),
                     repair_time=f.repair_time_text,
+                    evidence_items=(items or {}).get(fid, []),
                 )
             )
         return out

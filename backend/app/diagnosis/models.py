@@ -30,6 +30,9 @@ class EventType(StrEnum):
     answer_undone = "answer_undone"  # the customer went back: the last answer no longer counts
     # A free-text message did not answer the waiting question: it no longer counts and the engine asks again.
     question_withdrawn = "question_withdrawn"
+    # The customer took back their last typed message: it and everything it caused no longer count.
+    message_undone = "message_undone"
+    explanations = "explanations"  # the per-cause explanations shown on the result (cached once completed)
 
 
 class Confidence(StrEnum):

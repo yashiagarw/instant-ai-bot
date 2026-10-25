@@ -1,20 +1,23 @@
 """Diagnosis API: start a session, answer one question at a time, get the result, leave feedback."""
 
+import json
 import uuid
 from dataclasses import asdict
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 import engine as eng
 from app.db import get_session
-from app.diagnosis import present, service
+from app.diagnosis import explain, present, service
 from app.diagnosis import schemas as s
 from app.diagnosis.models import DiagnosisSession, SessionStatus
 from app.enums import Fuel, Transmission
 from app.knowledge.models import Category, GroupType, ProblemGroup, Question
+from app.llm import explanation as llm_explanation
 from app.llm.client import LLMClient
 from app.ratelimit import RateLimiter, client_ip
 from engine import vehicle_allows
@@ -253,12 +256,13 @@ def post_message(body: s.MessageIn, ds: SessionDep, session: DbSession, engine: 
     on any LLM failure) the engine's own search matches them. If the waiting question was not answered, the engine
     chooses the next question again. Returns the same fields as an answer, plus what was understood."""
     try:
-        result, new, ex = service.message(session, engine, ds, body.text, llm)
+        turn = service.message(session, engine, ds, body.text, llm)
     except service.SessionStateError as e:
         raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
     except service.SessionInputError as e:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e)) from e
     session.commit()
+    result, new, ex = turn.result, turn.new_alerts, turn.extraction
     banner = service.banner_alerts(result)[0]
     return s.MessageOut(
         session_id=ds.id,
@@ -273,8 +277,39 @@ def post_message(body: s.MessageIn, ds: SessionDep, session: DbSession, engine: 
         understood=s.UnderstoodOut(
             source=ex.source,
             symptoms=service.symptom_labels(engine, ex.symptom_ids),
+            items=turn.understood,
             answered_question=ex.answer is not None,
         ),
+    )
+
+
+@router.post(
+    "/sessions/{session_id}/messages/undo",
+    response_model=s.MessageUndoOut,
+    summary="Take back the last typed message",
+    responses={404: ERRORS[404], 409: ERRORS[409]},
+)
+def undo_message(ds: SessionDep, session: DbSession, engine: EngineDep):
+    """For "We understood: ..." corrections: the last typed message and everything it caused (an answer it gave, a
+    question it set aside) no longer count, and its text comes back to be edited. Only before anything was tapped
+    after it, and not once the session is completed."""
+    try:
+        result, text = service.undo_message(session, engine, ds)
+    except service.SessionStateError as e:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
+    session.commit()
+    banner = service.banner_alerts(result)[0]
+    return s.MessageUndoOut(
+        session_id=ds.id,
+        status=_status(ds),
+        question=None if result.done else _question(session, ds, result.next_question),
+        done=result.done,
+        new_safety_alerts=[],
+        safety_alerts=_alerts(banner),
+        coverage_level=result.coverage,
+        mode=result.mode,
+        progress=_progress(session, ds, result),
+        text=text,
     )
 
 
@@ -367,7 +402,12 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
                 category=r.category,
                 score=r.score,
                 confidence=r.confidence,
+                confidence_reason=explain.confidence_reason(result, i - 1),
                 evidence=[service.clean_codes(engine, e, r.fault_key) for e in r.evidence],
+                evidence_items=[
+                    s.EvidenceOut(**{**x, "text": service.clean_codes(engine, x["text"], r.fault_key)})
+                    for x in explain.evidence_out(r)
+                ],
                 cost=s.CostOut(**asdict(r.cost)) if r.cost else None,
                 repair_time=r.repair_time,
                 **details[r.fault_id],
@@ -382,11 +422,65 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
             towing=present.towing_text(service.clean_codes(engine, lead.towing_text, lead_key)) if lead else "",
         ),
         safety_tips=service.customer_tips(engine, result),
+        if_not_fixed=explain.if_not_fixed(
+            engine, result, service.related_faults(session, engine, top[0].fault_id) if top else []
+        )
+        if top
+        else [],
         actions=result.actions,
         disclaimer=result.disclaimer,
         created_at=ds.created_at,
         completed_at=ds.completed_at,
         answers=service.answered_questions(session, ds),
+    )
+
+
+def _sse(event: str, data: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+@router.get(
+    "/sessions/{session_id}/explanations",
+    summary="Explanations of the likely causes (server-sent events)",
+    response_class=StreamingResponse,
+    responses={
+        200: {
+            "content": {"text/event-stream": {}},
+            "description": 'Events: `explanation` {fault_key, text, source: "template" | "llm"} for each cause '
+            "(a template first; an LLM version may follow and replaces it), then `done`.",
+        },
+        404: ERRORS[404],
+    },
+)
+def stream_explanations(request: Request, ds: SessionDep, session: DbSession, engine: EngineDep, llm: LLMDep):
+    """A short, plain-language explanation per likely cause, built only from what the engine found. Every cause
+    gets a template explanation at once; with the LLM on, a checked LLM explanation follows for each cause that
+    passes validation (no other faults, prices or parts named). Completed sessions keep their LLM explanations."""
+    plan = service.explanation_plan(request.app.state, session, engine, ds)
+    connect = request.app.state.session_factory.begin
+    session_id = ds.id
+
+    def events():
+        if plan.cached:
+            for item in plan.cached:
+                yield _sse("explanation", item)
+            yield _sse("done", {"cached": True})
+            return
+        for t in plan.templates:
+            yield _sse("explanation", asdict(t))
+        if llm is not None and plan.facts:
+            items, outcome = llm_explanation.explain(
+                llm, plan.facts, plan.templates, plan.other_names, plan.parts, plan.language, session_id
+            )
+            better = [i for i in items if i.source == "llm"]
+            for i in better:
+                yield _sse("explanation", asdict(i))
+            if better and plan.completed:
+                service.store_explanations(connect, session_id, plan.ranked_keys, items)
+        yield _sse("done", {"cached": False})
+
+    return StreamingResponse(
+        events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
     )
 
 

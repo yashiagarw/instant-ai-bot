@@ -195,6 +195,11 @@ class UnderstoodOut(BaseModel):
         "search only (no LLM configured, timeout, invalid output or the daily spend cap)."
     )
     symptoms: list[str] = Field(description="Known symptom lines the message was matched to by the LLM.")
+    items: list[str] = Field(
+        default_factory=list,
+        description='What we took from the message, for the "We understood: ..." chip: the answer and symptoms '
+        "the LLM found, or (fallback) the known phrases the engine matched best. Empty: added to the description.",
+    )
     answered_question: bool = Field(
         description="The message answered the waiting question. Otherwise that question was set aside and the "
         "engine chose the next question again."
@@ -203,6 +208,10 @@ class UnderstoodOut(BaseModel):
 
 class MessageOut(AnswerOut):
     understood: UnderstoodOut
+
+
+class MessageUndoOut(AnswerOut):
+    text: str = Field(description="The message that was taken back, to edit and send again.")
 
 
 class SessionStateOut(AnswerOut):
@@ -238,6 +247,12 @@ class MediaOut(BaseModel):
     estimated_repair_time: str = Field(description="The fault's repair time, shown in place of a video length.")
 
 
+class EvidenceOut(BaseModel):
+    kind: Literal["said", "symptom", "main", "answer", "against", "lacks"]
+    text: str = Field(description="One reason, as a customer sentence.")
+    supports: bool = Field(description="True: a reason for this cause. False: a reason against it.")
+
+
 class RankedFaultOut(BaseModel):
     rank: int
     fault_key: str = Field(examples=["F04-TY-03"])
@@ -245,7 +260,11 @@ class RankedFaultOut(BaseModel):
     category: str
     score: float
     confidence: Literal["high", "medium", "low"]
-    evidence: list[str] = Field(description="Why this fault ranks here: matched words and answers.")
+    confidence_reason: str = Field(description="Why it has this confidence word, in one customer sentence.")
+    evidence: list[str] = Field(description="Why this fault ranks here: matched words and answers (internal wording).")
+    evidence_items: list[EvidenceOut] = Field(
+        default_factory=list, description="The same reasons as customer sentences: those for first, then against."
+    )
     diagnostic_steps: list[str] = Field(description="How a mechanic confirms it. Agent instructions are left out.")
     what_you_can_do: list[str] = Field(description="Safe things the customer can do now, without duplicates.")
     what_the_mechanic_will_do: list[str] = Field(description="How the mechanic usually fixes it.")
@@ -293,6 +312,11 @@ class ResultOut(BaseModel):
     safety_alerts: list[SafetyAlertOut]
     roadside: RoadsideOut
     safety_tips: list[str]
+    if_not_fixed: list[str] = Field(
+        default_factory=list,
+        description="If this doesn't fix it: the next causes to check, related problems from the cross-reference "
+        "sheet, then a full inspection.",
+    )
     actions: list[str]
     disclaimer: str
     created_at: datetime

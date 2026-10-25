@@ -21,6 +21,7 @@ export async function mockApi(page: Page): Promise<FakeDiagnosis> {
     const url = new URL(req.url());
     if (url.pathname.startsWith("/media/")) return route.fulfill({ contentType: "image/svg+xml", body: PICTURE });
     const answer = fake.handle(req.method(), url.pathname, req.postData() ? JSON.parse(req.postData()!) : undefined);
+    if (answer?.text !== undefined) return route.fulfill({ status: answer.status, body: answer.text, contentType: answer.contentType });
     if (answer) return route.fulfill({ status: answer.status, json: answer.json });
     const hit = ROUTES.find(([prefix]) => url.pathname.startsWith(prefix));
     if (!hit) return route.fulfill({ status: 404, body: "not found" });

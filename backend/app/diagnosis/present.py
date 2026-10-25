@@ -225,10 +225,12 @@ def driver_safe(text: str) -> str:
 
 
 def driver_tips(tips: list[str], limit: int) -> list[str]:
-    """Tips a driver can safely follow, without duplicates (also tips that only repeat others combined)."""
+    """Tips a driver can safely follow, as full calm sentences (app/diagnosis/safety_lines.py), without duplicates
+    (also tips that only repeat others combined)."""
+    from app.diagnosis.safety_lines import customer_line
     from engine.text import pick_lines
 
-    return pick_lines([t for t in (driver_safe(roadside_text(x)) for x in tips) if t], limit)
+    return pick_lines([t for t in (customer_line(roadside_text(x)) for x in tips) if t], limit)
 
 
 # ---------------------------------------------------------------- yes / no column values

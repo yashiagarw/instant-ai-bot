@@ -1,0 +1,61 @@
+# What a car must have for a fault to be possible. The engine down-ranks (never hides) a fault when the car is
+# known not to have it: fuel and gearbox come from the catalogue variant (or what an unlisted car's owner picked);
+# features come from data/catalogue/vehicles.yaml (`features:`), where a missing feature is unknown and changes
+# nothing. Codes: backend/app/vehicles/features.py.
+#
+# Apply after every dataset import (requirements belong to a dataset version), then restart the API:
+#   cd backend && uv run python -m app.knowledge.requirements check
+#   cd backend && uv run python -m app.knowledge.requirements apply
+#
+# Each entry: fault key -> list of needs; all must be met. A need is one of
+#   {feature: <code>}                    the car has this feature
+#   {fuel: [petrol, diesel, cng, hybrid, ev]}            the car's fuel is one of these
+#   {transmission: [mt, amt, cvt, dct, at]}              the car's gearbox is one of these
+#
+# DRAFT, reviewed: false. Drafted from the fault names (Oct 2026); faults where the need was unclear (battery sensor
+# IBS, steering angle sensor, airbag) are left out. Check each line before launch.
+reviewed: false
+
+requirements:
+  # Automatic engine start-stop
+  F07-SS-03: [{feature: start_stop}]  # Automatic Start-Stop Not Working
+  F07-SS-36: [{feature: start_stop}]  # Automatic Start-Stop Battery Sensor Fault
+  F07-SS-37: [{feature: start_stop}]  # Automatic Start-Stop Temporarily Disabled by Normal Conditions
+  F08-BT-25: [{feature: start_stop}]  # Start-Stop Car Battery Problem (AGM / EFB Battery)
+  # Other features
+  F07-SS-38: [{feature: mild_hybrid}]  # Mild-Hybrid Starter-Generator Fault
+  F07-SS-21: [{feature: smart_key}]  # Smart Key / Push-Button Start Detection Fault
+  F07-ST-09: [{feature: epb}]  # Electronic Parking Brake Not Releasing
+  F07-ST-10: [{feature: epb}]  # Electronic Parking Brake Actuator Fault
+  F07-ST-35: [{feature: auto_hold}]  # Hill-Hold / Auto-Hold Release Problem
+  F09-AP-18: [{feature: turbo}]  # Turbo Not Giving Power (Boost Leak / Underboost)
+  F10-DW-06: [{feature: esp}]  # ESP / ESC Light ON (Stability Control)
+  F10-DW-15: [{feature: esp}]  # Yaw Rate / Stability Sensor Fault
+  F10-DW-29: [{feature: tpms}]  # Tyre Pressure (TPMS) Warning Light
+  F10-FD-15: [{feature: direct_injection}]  # Fuel Rail Pressure Sensor Fault (Direct Injection Petrol)
+  # Fuel
+  F09-AP-25: [{fuel: [diesel]}]  # Diesel DPF Blocked (Soot Filter) - Power Loss
+  F09-NS-23: [{fuel: [diesel]}]  # Diesel Air in Fuel Line (Airlock)
+  F09-NS-33: [{fuel: [diesel]}]  # Diesel Thickens in Extreme Cold
+  F10-FD-20: [{fuel: [petrol, cng]}]  # Wrong Fuel Filled (Diesel in Petrol Car)
+  F09-AP-24: [{fuel: [cng]}]  # CNG Mode Weak Pickup / Petrol-CNG Switching Problem
+  F09-NS-28: [{fuel: [cng]}]  # CNG Car Will Not Start or Run on CNG
+  F10-FD-26: [{fuel: [cng]}]  # CNG Car: Petrol Side Not Used for Long
+  # Also fitted as an aftermarket kit to petrol cars: down-ranked (not hidden) on a petrol car. Review.
+  F08-BT-30: [{fuel: [cng]}]  # CNG / LPG Kit Wiring Draining Battery
+  F08-BT-31: [{fuel: [ev]}]  # EV Small 12V Battery Down
+  F08-BT-32: [{fuel: [hybrid]}]  # Hybrid Car Small 12V Battery Weak
+  F06-EV-53: [{fuel: [hybrid]}, {feature: plug_in}]  # Plug-in Hybrid Will Not Charge Externally
+  F06-EV-54: [{fuel: [hybrid]}, {feature: plug_in}]  # Plug-in Hybrid Charges Slowly
+  F06-EV-55: [{fuel: [hybrid]}]  # Hybrid Battery Warning or Reduced Power
+  F06-EV-56: [{fuel: [hybrid]}]  # Hybrid System Fault That Is Not an External Charging Fault
+  F06-EV-57: [{fuel: [hybrid]}]  # Conventional Hybrid Owner Mistakes Regenerative Charging for Plug-in Charging
+  F06-EV-58: [{fuel: [hybrid]}]  # Hybrid 12V Battery Fault Causing Start or System Warnings
+  F06-EV-59: [{fuel: [hybrid]}]  # Hybrid Battery Cooling or Temperature Warning
+  # Gearbox
+  F07-ST-17: [{transmission: [amt, cvt, dct, at]}]  # Automatic Transmission Not Engaging Drive
+  F09-AP-31: [{transmission: [amt, cvt, dct, at]}]  # Automatic / AMT Stuck in One Gear
+  F09-NS-34: [{transmission: [amt, cvt, dct, at]}]  # AMT / Automatic Car Will Not Move or Engage Gear
+  F07-ST-11: [{transmission: [cvt, dct, at]}]  # Automatic Gear Selector Stuck in Park (an AMT has no Park)
+  F07-ST-19: [{transmission: [cvt, dct, at]}]  # CVT / Automatic Transmission Limp Mode
+  F07-ST-18: [{transmission: [amt]}]  # AMT Actuator / Gear Selection Failure

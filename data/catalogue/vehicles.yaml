@@ -8,6 +8,10 @@
 #   transmissions: mt | amt | cvt | dct | at          (cvt includes hybrid e-CVT; at = torque converter / EV single speed)
 #   segment:   budget (below Rs 10 lakh ex-showroom) | mid (10-25 lakh) | premium (above 25 lakh)
 #   engine:    optional; needed when two variants share fuel + transmission + years (e.g. "1.0 Turbo")
+#   features:  optional, on a model (all its variants) or a variant (overrides): known true / false car features
+#              that some faults need, e.g. {start_stop: false}. Codes: backend/app/vehicles/features.py. Leave a
+#              feature out when unsure: unknown never changes a ranking; false down-ranks faults that need it.
+#              Which features are still missing: docs/diagnosis-engine.md ("Car features").
 #
 # REVIEW BEFORE LAUNCH. Years and segments were compiled from public launch dates and
 # ex-showroom price ranges (Oct 2026) and have not been checked by the team. Models whose
@@ -26,6 +30,7 @@ makes:
       - name: Alto K10
         body: hatchback
         aliases: [alto]
+        features: {start_stop: false}  # reported by the team (Oct 2026): no idle start-stop
         variants:
           - {years: [2022, null], fuel: petrol, transmissions: [mt, amt], segment: budget}
           - {years: [2022, null], fuel: cng, transmissions: [mt], segment: budget}

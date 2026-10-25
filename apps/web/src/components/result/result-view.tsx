@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useId, useState } from "react";
-import { ChevronDown, ShieldAlert, Truck, Wrench } from "lucide-react";
+import { ChevronDown, CircleHelp, RotateCcw, ShieldAlert, Truck, Wrench } from "lucide-react";
 
 import { CarSummary } from "@/components/diagnose/car-summary";
 import { ErrorMessage } from "@/components/error-message";
 import { CostCard } from "@/components/result/cost-card";
 import { CoverageBadge } from "@/components/result/coverage-badge";
+import { CauseExplanation, ConfidenceMeter, EvidenceList, useExplanations } from "@/components/result/explanations";
 import { FeedbackForm } from "@/components/result/feedback-form";
 import { SafetyBanner } from "@/components/safety-banner";
 import { DISCLAIMER } from "@/components/site-footer";
@@ -43,7 +44,7 @@ const VERDICT: Record<Exclude<RoadsideVerdict, "unknown">, { label: string; advi
   },
 };
 
-const CONFIDENCE = { high: "Most likely", medium: "Likely", low: "Possible" } as const;
+const CONFIDENCE = { high: "High confidence", medium: "Medium confidence", low: "Low confidence" } as const;
 
 function List({ items, ordered = false }: { items: string[]; ordered?: boolean }) {
   const Tag = ordered ? "ol" : "ul";
@@ -165,6 +166,8 @@ function RequestButton({ sessionId, sticky = false }: { sessionId: string; stick
 
 function Result({ r }: { r: ResultOut }) {
   const [top, ...others] = r.ranked;
+  const explanations = useExplanations(r.session_id);
+  const streaming = explanations.status === "loading";
   const verdict = r.roadside.verdict;
   const roadText = roadsideText(r.roadside.text);
   const towingRaw = towingText(r.roadside.towing);
@@ -209,18 +212,17 @@ function Result({ r }: { r: ResultOut }) {
 
       {top && (
         <article aria-labelledby="top-cause" className="flex flex-col gap-5 rounded-3xl border-2 border-cta bg-white p-5 sm:p-7">
-          <div>
-            <p className="text-sm font-bold tracking-wide text-orange-text uppercase">{CONFIDENCE[top.confidence]} cause</p>
-            <h2 id="top-cause" className="mt-1 text-3xl leading-tight font-black tracking-tight text-ink">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-bold tracking-wide text-orange-text uppercase">Most likely cause</p>
+            <h2 id="top-cause" className="text-3xl leading-tight font-black tracking-tight text-ink">
               {top.name}
             </h2>
+            <ConfidenceMeter level={top.confidence} reason={top.confidence_reason} />
           </div>
-          {top.evidence.length > 0 && (
-            <section className="rounded-2xl bg-warm-white p-4">
-              <h3 className="font-bold text-ink">Why we think this</h3>
-              <List items={top.evidence} />
-            </section>
-          )}
+          <div aria-live="polite">
+            <CauseExplanation explanation={explanations.items[top.fault_key]} loading={streaming} />
+          </div>
+          <EvidenceList fault={top} />
 
           {verdict !== "unknown" && (
             <section className={cn("rounded-2xl border p-4", VERDICT[verdict].tone)} data-testid="roadside">
@@ -242,6 +244,22 @@ function Result({ r }: { r: ResultOut }) {
         </article>
       )}
 
+      {r.uncertainty?.length > 0 && (
+        <section aria-labelledby="uncertainty-heading" className="flex gap-3 rounded-3xl border border-border bg-white p-5">
+          <CircleHelp aria-hidden="true" className="mt-1 size-6 shrink-0 text-orange-text" />
+          <div>
+            <h2 id="uncertainty-heading" className="text-lg font-black text-ink">
+              We&apos;re not certain yet
+            </h2>
+            {r.uncertainty.map((u) => (
+              <p key={u.code} className="mt-1 text-ink/90">
+                {u.message}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
+
       {others.length > 0 && (
         <section aria-labelledby="others-heading" className="flex flex-col gap-3">
           <h2 id="others-heading" className="text-xl font-black text-ink">
@@ -260,17 +278,26 @@ function Result({ r }: { r: ResultOut }) {
                 />
               </summary>
               <div className="flex flex-col gap-4 border-t border-border p-4">
-                {f.evidence.length > 0 && (
-                  <div>
-                    <h3 className="font-bold text-ink">Why it could be this</h3>
-                    <List items={f.evidence} />
-                  </div>
-                )}
+                <ConfidenceMeter level={f.confidence} reason={f.confidence_reason} />
+                <div aria-live="polite">
+                  <CauseExplanation explanation={explanations.items[f.fault_key]} loading={streaming} />
+                </div>
+                <EvidenceList fault={f} />
                 <CostCard cost={f.cost} repairTime={f.repair_time} />
                 <FaultDetails fault={f} verdict="unknown" headingLevel={3} />
               </div>
             </details>
           ))}
+        </section>
+      )}
+
+      {!fastTrack && r.if_not_fixed?.length > 0 && (
+        <section aria-labelledby="not-fixed" className="rounded-3xl border border-border bg-white p-5">
+          <h2 id="not-fixed" className="flex items-center gap-2 text-xl font-black text-ink">
+            <RotateCcw aria-hidden="true" className="size-5 text-orange-text" />
+            If this doesn&apos;t fix it
+          </h2>
+          <List items={r.if_not_fixed} />
         </section>
       )}
 

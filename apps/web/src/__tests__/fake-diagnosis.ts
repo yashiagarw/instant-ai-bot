@@ -4,9 +4,16 @@
 //                          (red banner) and continues; the result also folds a medium alert into the tips
 //   flat_tyre (emergency) → 1 fast-track question, then safety tips
 //   text with "smoke"   → a high safety alert at once, done
+//   typed messages      → like the real API with LLM_PROVIDER=none: the words never answer the question; the
+//                          "We understood" items are the known phrases they match (UNDERSTOOD); the waiting
+//                          question is asked again; "smoke" stops the session. The last message can be taken back.
+//   explanations        → server-sent events with one template explanation per cause
 import type {
   AnswerOut,
   CoverageLevel,
+  Explanation,
+  MessageOut,
+  MessageUndoOut,
   Mode,
   Question,
   RankedFault,
@@ -91,7 +98,16 @@ export const FAULTS: RankedFault[] = [
     category: "tyre",
     score: 3.7,
     confidence: "high",
+    confidence_reason: "Your answers point clearly to this cause.",
     evidence: ["Main problem: The tyre goes soft again after I fill it with air", "Answer: Within hours or days"],
+    evidence_items: [
+      { kind: "main", text: "You said the main problem is “The tyre goes soft again after I fill it with air”.", supports: true },
+      {
+        kind: "answer",
+        text: "You answered “Within hours or days” to: After filling the tyre with air, how soon does it go soft again?",
+        supports: true,
+      },
+    ],
     diagnostic_steps: [],
     what_you_can_do: ["Park safely, check the pressure, do not pull out the nail."],
     what_the_mechanic_will_do: MECHANIC_STEPS,
@@ -108,7 +124,12 @@ export const FAULTS: RankedFault[] = [
     category: "tyre",
     score: 0.8,
     confidence: "low",
+    confidence_reason: "Less likely, but it fits part of what you told us.",
     evidence: ["Answer: Within hours or days"],
+    evidence_items: [
+      { kind: "answer", text: "You answered “Within hours or days”.", supports: true },
+      { kind: "against", text: "Doesn't fit: you answered “No” to: Is the valve cap missing?", supports: false },
+    ],
     diagnostic_steps: ["Put soapy water on the valve."],
     what_you_can_do: ["Keep the valve cap on."],
     what_the_mechanic_will_do: ["Change the valve core."],
@@ -123,7 +144,9 @@ export const FAULTS: RankedFault[] = [
     category: "tyre",
     score: 0,
     confidence: "low",
+    confidence_reason: "Less likely, but it fits part of what you told us.",
     evidence: [],
+    evidence_items: [],
     diagnostic_steps: [],
     what_you_can_do: [],
     what_the_mechanic_will_do: ["Fit the spare wheel."],
@@ -134,6 +157,26 @@ export const FAULTS: RankedFault[] = [
 ];
 
 const TIPS = ["Park safely, away from traffic.", "Switch on the hazard lights."];
+/** Template explanations, as the API streams them with LLM_PROVIDER=none. */
+export const EXPLANATIONS: Record<string, string> = {
+  "F04-TY-02":
+    "This is the most likely cause. It fits because you said the main problem is “The tyre goes soft again after I fill it with air” and you answered “Within hours or days”. A mechanic can confirm it with a quick check.",
+  "F04-TY-04": "This is less likely, but still possible. It fits because you answered “Within hours or days”.",
+  "F04-TY-03": "This is less likely, but still possible.",
+};
+export const IF_NOT_FIXED = [
+  "Ask the mechanic to check: Valve issue.",
+  "Ask the mechanic to check: Flat tyre.",
+  "Related problem to rule out: Bent wheel rim.",
+  "Still not fixed? Ask for a full inspection, and tell the mechanic what has already been checked or replaced.",
+];
+export const UNCERTAIN =
+  "Two causes are about equally likely: Slow/pinhole puncture and Valve issue. A mechanic's check will tell them apart.";
+/** Known phrases a typed message is matched to (the engine's own search, no LLM). */
+export const UNDERSTOOD: [RegExp, string][] = [
+  [/hawa|air|soft|pressure/i, "tyre goes soft again"],
+  [/nail|keel|kil/i, "nail in the tyre"],
+];
 const DISCLAIMER =
   "This is an estimate based on your answers and our data. It is not a replacement for a professional inspection by a mechanic.";
 
@@ -147,11 +190,17 @@ interface FakeSession {
   alerts: SafetyAlert[];
   stopped: boolean;
   feedback: { helpful: boolean; comment: string | null }[];
+  messages: string[];
+  /** The last typed message can be taken back until an option is tapped. */
+  lastMessageUndoable: boolean;
 }
 
 export interface FakeResponse {
   status: number;
-  json: unknown;
+  json?: unknown;
+  /** A text body instead of JSON (server-sent events). */
+  text?: string;
+  contentType?: string;
 }
 
 const TOPICS: Record<string, { label: string; mode: Mode; flow: Question[] }> = {
@@ -177,6 +226,9 @@ export class FakeDiagnosis {
     if (method === "GET" && rest === "") return ok(this.state(s));
     if (method === "POST" && rest === "/answers") return this.answer(s, body as { question_id: number; option_id: number | string });
     if (method === "POST" && rest === "/answers/undo") return this.undo(s);
+    if (method === "POST" && rest === "/messages") return this.message(s, String((body as { text?: string })?.text ?? ""));
+    if (method === "POST" && rest === "/messages/undo") return this.undoMessage(s);
+    if (method === "GET" && rest === "/explanations") return this.explanations(s);
     if (method === "GET" && rest === "/result") return ok(this.result(s));
     if (method === "POST" && rest === "/feedback") {
       const b = body as { helpful: boolean; comment: string | null };
@@ -201,6 +253,8 @@ export class FakeDiagnosis {
       alerts: /smoke|dhuan/i.test(text) ? [ALERT_SMOKE] : [],
       stopped: /smoke|dhuan/i.test(text),
       feedback: [],
+      messages: [],
+      lastMessageUndoable: false,
     };
     this.sessions.set(id, s);
     const out: SessionOut = {
@@ -227,6 +281,7 @@ export class FakeDiagnosis {
     const option = q.options.find((o) => (body.option_id === "not_sure" ? o.not_sure : String(o.id) === String(body.option_id)));
     if (!option) return { status: 422, json: { detail: "unknown option" } };
     s.answers.push({ question: q, optionId: option.id });
+    s.lastMessageUndoable = false;
     const fresh = option.id === 86 && !s.alerts.includes(ALERT_ANSWER) ? [ALERT_ANSWER] : [];
     s.alerts.push(...fresh);
     return ok({ ...this.turn(s), new_safety_alerts: fresh });
@@ -236,6 +291,41 @@ export class FakeDiagnosis {
     if (this.done(s) || !s.answers.length) return { status: 409, json: { detail: "nothing to take back" } };
     const last = s.answers.pop()!;
     return ok({ ...this.turn(s), previous_option_id: last.optionId });
+  }
+
+  private message(s: FakeSession, text: string): FakeResponse {
+    if (this.done(s)) return { status: 409, json: { detail: "this session is already completed" } };
+    if (!text.trim()) return { status: 422, json: { detail: "text must not be empty" } };
+    s.messages.push(text);
+    s.lastMessageUndoable = true;
+    const fresh = /smoke|dhuan/i.test(text) && !s.alerts.includes(ALERT_SMOKE) ? [ALERT_SMOKE] : [];
+    s.alerts.push(...fresh);
+    if (fresh.length) s.stopped = true;
+    const items = UNDERSTOOD.filter(([re]) => re.test(text)).map(([, phrase]) => phrase);
+    const out: MessageOut = {
+      ...this.turn(s),
+      new_safety_alerts: fresh,
+      understood: { source: "fallback", symptoms: [], items, answered_question: false },
+    };
+    return ok(out);
+  }
+
+  private undoMessage(s: FakeSession): FakeResponse {
+    if (this.done(s) || !s.lastMessageUndoable || !s.messages.length) {
+      return { status: 409, json: { detail: "there is no typed message to take back" } };
+    }
+    const text = s.messages.pop()!;
+    s.lastMessageUndoable = false;
+    const out: MessageUndoOut = { ...this.turn(s), text };
+    return ok(out);
+  }
+
+  private explanations(s: FakeSession): FakeResponse {
+    const events = this.result(s).ranked.map((f) => {
+      const e: Explanation = { fault_key: f.fault_key, text: EXPLANATIONS[f.fault_key] ?? "", source: "template" };
+      return `event: explanation\ndata: ${JSON.stringify(e)}\n\n`;
+    });
+    return { status: 200, text: [...events, `event: done\ndata: {"cached": false}\n\n`].join(""), contentType: "text/event-stream" };
   }
 
   private request(b: Record<string, unknown>): FakeResponse {
@@ -335,6 +425,12 @@ export class FakeDiagnosis {
         towing: "No.",
       },
       safety_tips: s.stopped ? TIPS : [MEDIUM_TIP, ...TIPS],
+      // "Not sure" as the last answer leaves the top two close, as the engine reports it.
+      uncertainty:
+        !s.stopped && s.answers.at(-1)?.question.options.find((o) => o.id === s.answers.at(-1)!.optionId)?.not_sure
+          ? [{ code: "two_equally_likely", message: UNCERTAIN }]
+          : [],
+      if_not_fixed: s.stopped ? [] : IF_NOT_FIXED,
       actions: ["request_mechanic"],
       disclaimer: DISCLAIMER,
       created_at: NOW,

@@ -51,6 +51,8 @@ test("full diagnosis: problem tile, questions with a safety alert and Back, resu
   await expect(page.getByTestId("coverage").locator("visible=true")).toContainText("Segment estimate");
   const top = page.getByRole("article", { name: "Slow/pinhole puncture" });
   await expect(top.getByText("Why we think this")).toBeVisible();
+  await expect(top.getByTestId("confidence")).toContainText("High confidence");
+  await expect(top.getByTestId("explanation")).toContainText("This is the most likely cause.");
   await expect(top.getByTestId("roadside")).toContainText("Roadside check, then a garage");
   await expect(top.getByTestId("cost-total")).toHaveText("₹230");
   await expect(top.getByText("Price checked 12 Oct 2026")).toBeVisible();
@@ -62,7 +64,7 @@ test("full diagnosis: problem tile, questions with a safety alert and Back, resu
   await expect(page.getByRole("region", { name: "Safety tips" }).locator("visible=true")).toContainText(
     "Drive slowly to the nearest tyre shop.",
   );
-  await expect(page.getByText("Valve issue")).toBeVisible();
+  await expect(page.getByText("Valve issue", { exact: true })).toBeVisible();
   await expect(page.getByText("Change the valve core.")).toBeHidden(); // collapsed
   await expect(page.getByTestId("disclaimer").locator("visible=true")).toContainText("not a replacement for a professional inspection");
   await expectNoSideScroll(page);
@@ -112,6 +114,7 @@ test("full diagnosis: problem tile, questions with a safety alert and Back, resu
     const req = route.request();
     const url = new URL(req.url());
     const answer = fake.handle(req.method(), url.pathname);
+    if (answer?.text !== undefined) return route.fulfill({ status: answer.status, body: answer.text, contentType: answer.contentType });
     await route.fulfill(answer ? { status: answer.status, json: answer.json } : { status: 404, body: "" });
   });
   await shared.goto(`/diagnose/${sessionId}/result`);
@@ -220,4 +223,82 @@ test("browser Back from the questions shows usable problem tiles again", async (
   await expect(page.getByText("Question 1 of about 8")).toBeVisible();
   await page.goBack();
   await expect(page.getByRole("button", { name: /^Tyres/ })).toBeEnabled();
+});
+
+test("typed replies: what we understood, correcting it, then tapping; the result explains each cause", async ({ page }) => {
+  const fake = await mockApi(page);
+  await pickSwift(page);
+  await page.getByRole("button", { name: /^Tyres/ }).click();
+  await expect(page.getByText("Question 1 of about 8")).toBeVisible();
+
+  // Type instead of tapping: the chip says what we understood; the same question stays (no LLM: words never answer).
+  const box = page.getByLabel("Or type your answer in your own words");
+  await box.fill("hawa 2 din mein kam ho jaati hai");
+  await page.getByRole("button", { name: "Send" }).click();
+  const chip = page.getByRole("button", { name: /We understood: tyre goes soft again/ });
+  await expect(chip).toBeVisible();
+  await expect(box).toHaveValue("");
+  await expect(page.getByText("Question 1 of about 8")).toBeVisible();
+  await expectNoSideScroll(page);
+  await expectTouchTargets(page);
+
+  // Tap the chip to correct it: the message comes back to edit and is no longer counted.
+  await chip.click();
+  await page.getByRole("button", { name: "Edit my message" }).click();
+  await expect(box).toHaveValue("hawa 2 din mein kam ho jaati hai");
+  await expect(box).toBeFocused();
+  await expect(page.getByRole("button", { name: /We understood/ })).toHaveCount(0);
+  const sessionId = page.url().split("/").at(-1)!;
+  expect(fake.sessions.get(sessionId)!.messages).toEqual([]);
+
+  // Send an edited message, then tap: the message can no longer be corrected.
+  await box.fill("nail laga hai, hawa kam ho jaati hai");
+  await box.press("Enter"); // a new line, not a send
+  await page.getByRole("button", { name: "Send" }).click();
+  await expect(page.getByRole("button", { name: /We understood: tyre goes soft again · nail in the tyre/ })).toBeVisible();
+  await page.getByRole("button", { name: "The tyre goes soft again after I fill it with air" }).click();
+  await expect(page.getByText("Question 2 of about 8")).toBeVisible();
+  await expect(page.getByRole("button", { name: /We understood/ })).toHaveCount(0);
+  await expect(page.getByText(/We understood: tyre goes soft again · nail in the tyre/)).toBeVisible();
+  await page.getByRole("button", { name: "Within hours or days" }).click();
+
+  // Result: confidence word, 3-step meter and reason; streamed explanation; evidence; If this doesn't fix it.
+  await expect(page).toHaveURL(/\/result$/);
+  const top = page.getByRole("article", { name: "Slow/pinhole puncture" });
+  const meter = top.getByTestId("confidence");
+  await expect(meter).toContainText("High confidence");
+  await expect(meter).toContainText("Your answers point clearly to this cause.");
+  await expect(meter.locator("[data-filled]")).toHaveCount(3);
+  await expect(top.getByTestId("explanation")).toHaveText(/^This is the most likely cause\. It fits because you said/);
+  await expect(top.getByRole("listitem").filter({ hasText: "You answered “Within hours or days”" })).toBeVisible();
+  const next = page.getByRole("region", { name: "If this doesn't fix it" }).locator("visible=true");
+  await expect(next).toContainText("Ask the mechanic to check: Valve issue.");
+  await expect(next).toContainText("Still not fixed? Ask for a full inspection");
+  await page.getByText("Valve issue", { exact: true }).click();
+  await expect(page.getByText("Doesn't fit: you answered “No” to: Is the valve cap missing?")).toBeVisible();
+  await expectNoSideScroll(page);
+  await expectTouchTargets(page);
+});
+
+test("a typed reply with danger words goes straight to the red banner", async ({ page }) => {
+  await mockApi(page);
+  await pickSwift(page);
+  await page.getByRole("button", { name: /^Tyres/ }).click();
+  await page.getByLabel("Or type your answer in your own words").fill("ab bonnet se smoke aa raha hai");
+  await page.getByRole("button", { name: "Send" }).click();
+  await expect(page).toHaveURL(/\/result$/);
+  await expect(page.getByTestId("safety-banner").locator("visible=true")).toContainText(
+    "Stop the car, switch off the engine and get everyone out.",
+  );
+});
+
+test("when a cause is uncertain the result says so", async ({ page }) => {
+  await mockApi(page);
+  await pickSwift(page);
+  await page.getByRole("button", { name: /^Tyres/ }).click();
+  await page.getByRole("button", { name: "The tyre goes soft again after I fill it with air" }).click();
+  await page.getByRole("button", { name: "Not sure" }).click();
+  await expect(page.getByRole("region", { name: "We're not certain yet" }).locator("visible=true")).toContainText(
+    "Two causes are about equally likely",
+  );
 });

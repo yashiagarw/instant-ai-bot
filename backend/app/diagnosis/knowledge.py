@@ -10,6 +10,7 @@ import re
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from app.diagnosis.safety_lines import customer_line
 from app.enums import ReviewStatus
 from app.knowledge.models import (
     INTERNAL_ITEM_TYPES,
@@ -88,8 +89,12 @@ def load_knowledge(session: Session) -> et.Knowledge:
         for f in rows
     }
     ids = list(faults)
+    fault_fields = {f.name for f in dataclasses.fields(et.Fault)}
+    if "requires" in fault_fields:  # older engine versions (data/eval compare mode) have no requirements
+        for f in rows:
+            faults[f.id].requires = list(f.requires or [])
     # Relative priors for engine v2 (equal when a fault has no row; older engine versions have no prior field).
-    if "prior" in {f.name for f in dataclasses.fields(et.Fault)}:
+    if "prior" in fault_fields:
         for fid, prior in session.execute(
             select(FaultPrior.fault_id, FaultPrior.prior).where(FaultPrior.fault_id.in_(ids))
         ):
@@ -107,8 +112,10 @@ def load_knowledge(session: Session) -> et.Knowledge:
         assert it.type not in INTERNAL_ITEM_TYPES
         if it.type == FaultItemType.symptom:
             texts.append(_known(et.TextEntry, fault_id=it.fault_id, text=it.text, kind="symptom", id=it.id))
-        else:
-            faults[it.fault_id].safety_tips.append(it.text)
+        elif (tip := customer_line(it.text)) and tip not in faults[it.fault_id].safety_tips:
+            # Customer-ready sentences only: workshop instructions and shorthand fragments are left out here, so
+            # the engine picks its tips among lines a driver can act on (app/diagnosis/safety_lines.py).
+            faults[it.fault_id].safety_tips.append(tip)
     phrases = session.scalars(
         select(CustomerPhrase).where(
             CustomerPhrase.fault_id.in_(ids),

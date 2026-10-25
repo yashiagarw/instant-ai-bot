@@ -5,6 +5,7 @@ cases use the fake provider only."""
 import time
 import uuid
 from contextlib import nullcontext
+from types import SimpleNamespace
 
 import pytest
 from sqlalchemy import select
@@ -76,6 +77,8 @@ def llm_app(test_settings, db_session, knowledge):  # noqa: F811
         llm = LLMClient(provider, recorder or DbRecorder(lambda: nullcontext(db_session)), **{**defaults, **kwargs})
         tc = make_client(test_settings, db_session)
         tc.app.state.llm = llm
+        # Writes the app makes on their own transaction (cached explanations) go to the test transaction.
+        tc.app.state.session_factory = SimpleNamespace(begin=lambda: nullcontext(db_session))
         return tc, provider
 
     return build
@@ -95,7 +98,13 @@ def test_without_an_llm_a_message_uses_the_engine_and_asks_again(client, knowled
     assert s["question"]["id"] == main.id and s["question"]["phrased"] is False
 
     m = send(client, sid, "car makes a click sound and will not start")
-    assert m["understood"] == {"source": "fallback", "symptoms": [], "answered_question": False}
+    # Without an LLM the chip shows the known phrase the engine's own search matched best.
+    assert m["understood"] == {
+        "source": "fallback",
+        "symptoms": [],
+        "items": ["Car makes a click sound"],
+        "answered_question": False,
+    }
     assert not m["done"] and m["question"]["text"] in (main.text_en, follow.text_en)
     assert m["progress"]["question_number"] == 1  # nothing was answered
 
@@ -160,7 +169,7 @@ def test_extraction_answers_the_waiting_question(llm_app, knowledge, variant, db
     assert f'<pending_question id="{main.id}">' in req.user and "gaadi start hi nahi ho rahi" in req.user
     calls = db_session.scalars(select(LLMCall).order_by(LLMCall.id)).all()
     assert [(x.purpose, x.outcome) for x in calls][0] == ("extraction", "ok")
-    assert calls[0].prompt_version == "extraction.v1" and str(calls[0].session_id) == sid
+    assert calls[0].prompt_version == load("extraction").version == "extraction.v2" and str(calls[0].session_id) == sid
     assert calls[0].input_tokens == 300 and float(calls[0].cost_usd) > 0 and calls[0].model == "claude-haiku-5-5"
 
 
@@ -188,7 +197,12 @@ def test_messages_report_the_symptoms_they_matched(llm_app, knowledge, variant, 
     with c:
         sid = start_battery(c, variant)["session_id"]
         m = send(c, sid, "tik tik ki awaaz aati hai")
-    assert m["understood"] == {"source": "llm", "symptoms": ["Clicking sound"], "answered_question": False}
+    assert m["understood"] == {
+        "source": "llm",
+        "symptoms": ["Clicking sound"],
+        "items": ["Clicking sound"],
+        "answered_question": False,
+    }
 
 
 def test_timeout_falls_back_and_is_logged(llm_app, knowledge, variant):  # noqa: F811
@@ -246,7 +260,7 @@ def test_prompt_injection_cannot_choose_ids_answers_or_wording(llm_app, knowledg
     with c:
         sid = start_battery(c, variant)["session_id"]
         m = send(c, sid, attack)
-    assert m["understood"] == {"source": "llm", "symptoms": [], "answered_question": False}
+    assert m["understood"] == {"source": "llm", "symptoms": [], "items": [], "answered_question": False}
     assert m["question"]["text"] in (main.text_en, follow.text_en) and m["question"]["phrased"] is False
     assert events(db_session, sid, "answer_given") == []
     assert "symptom_ids" not in events(db_session, sid, "free_text")[0].payload

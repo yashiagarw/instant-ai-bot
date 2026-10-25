@@ -77,3 +77,57 @@ test("an unknown session shows a clear message", async () => {
   render(<QuestionChat />);
   expect((await screen.findByRole("alert")).textContent).toMatch(/couldn't find that/);
 });
+
+test("a typed reply shows what we understood and the same question comes back", async () => {
+  startSession({ vehicle: { variant_id: 16 }, topic_id: "tyres" });
+  render(<QuestionChat />);
+  await screen.findByRole("heading", { name: /What problem are you facing/ });
+  const box = screen.getByLabelText("Or type your answer in your own words");
+  fireEvent.change(box, { target: { value: "hawa 2 din mein kam ho jaati hai" } });
+  fireEvent.click(screen.getByRole("button", { name: "Send" }));
+  const chip = await screen.findByRole("button", { name: /We understood: tyre goes soft again/ });
+  expect(chip.getAttribute("aria-expanded")).toBe("false");
+  expect(screen.getByText("hawa 2 din mein kam ho jaati hai")).toBeDefined();
+  expect((box as HTMLTextAreaElement).value).toBe("");
+  expect(screen.getByText("Question 1 of about 8")).toBeDefined(); // typed words never answer it on their own
+  expect(fake.sessions.get(sessionId)!.messages).toEqual(["hawa 2 din mein kam ho jaati hai"]);
+});
+
+test("tapping the chip lets you take the message back and edit it", async () => {
+  startSession({ vehicle: { variant_id: 16 }, topic_id: "tyres" });
+  render(<QuestionChat />);
+  await screen.findByRole("heading", { name: /What problem are you facing/ });
+  const box = screen.getByLabelText("Or type your answer in your own words") as HTMLTextAreaElement;
+  fireEvent.change(box, { target: { value: "kuch ajeeb awaaz" } });
+  fireEvent.click(screen.getByRole("button", { name: "Send" }));
+  fireEvent.click(await screen.findByRole("button", { name: /We added this to your description/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Edit my message" }));
+  await waitFor(() => expect(box.value).toBe("kuch ajeeb awaaz"));
+  expect(document.activeElement).toBe(box);
+  expect(screen.queryByText(/We added this to your description/)).toBeNull();
+  expect(fake.sessions.get(sessionId)!.messages).toEqual([]);
+});
+
+test("after tapping an answer, the earlier message can no longer be corrected", async () => {
+  startSession({ vehicle: { variant_id: 16 }, topic_id: "tyres" });
+  render(<QuestionChat />);
+  await screen.findByRole("heading", { name: /What problem are you facing/ });
+  fireEvent.change(screen.getByLabelText("Or type your answer in your own words"), { target: { value: "nail laga hai" } });
+  fireEvent.click(screen.getByRole("button", { name: "Send" }));
+  await screen.findByRole("button", { name: /We understood: nail in the tyre/ });
+  fireEvent.click(screen.getByRole("button", { name: "One tyre looks a little soft" }));
+  await screen.findByText("Question 2 of about 8");
+  expect(screen.queryByRole("button", { name: /We understood/ })).toBeNull();
+  expect(screen.getByText(/We understood: nail in the tyre/)).toBeDefined(); // still shown, as plain text
+});
+
+test("an empty reply asks for words; smoke in a reply goes to the result", async () => {
+  startSession({ vehicle: { variant_id: 16 }, topic_id: "tyres" });
+  render(<QuestionChat />);
+  await screen.findByRole("heading", { name: /What problem are you facing/ });
+  fireEvent.click(screen.getByRole("button", { name: "Send" }));
+  expect(screen.getByText(/Type a few words first/)).toBeDefined();
+  fireEvent.change(screen.getByLabelText("Or type your answer in your own words"), { target: { value: "bonnet se smoke" } });
+  fireEvent.click(screen.getByRole("button", { name: "Send" }));
+  await waitFor(() => expect(replace).toHaveBeenCalledWith(`/diagnose/${sessionId}/result`));
+});

@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 
 PROMPTS_DIR = Path(__file__).resolve().parent
-VERSIONS = {"extraction": "v1", "phrasing": "v1"}
+VERSIONS = {"extraction": "v2", "phrasing": "v1", "explanation": "v1"}
 
 
 @dataclass(frozen=True)

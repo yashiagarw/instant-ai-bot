@@ -141,6 +141,8 @@ export const api = {
   answer: (id: string, question_id: number | string, option_id: number | string) =>
     post<AnswerOut>(`/diagnosis/sessions/${id}/answers`, { question_id, option_id }),
   undo: (id: string) => post<AnswerOut>(`/diagnosis/sessions/${id}/answers/undo`),
+  message: (id: string, text: string) => post<MessageOut>(`/diagnosis/sessions/${id}/messages`, { text }),
+  undoMessage: (id: string) => post<MessageUndoOut>(`/diagnosis/sessions/${id}/messages/undo`),
   result: (id: string, signal?: AbortSignal) => get<ResultOut>(`/diagnosis/sessions/${id}/result`, signal),
   requestConfig: (signal?: AbortSignal) => get<RequestConfig>("/service-requests/config", signal),
   createRequest: (body: ServiceRequestIn) => post<ServiceRequestOut>("/service-requests", body),
@@ -181,6 +183,7 @@ export interface Question {
   text: string;
   options: Option[];
   category: string | null;
+  phrased?: boolean;
 }
 
 export interface SafetyAlert {
@@ -235,6 +238,23 @@ export interface AnswerOut {
   previous_option_id?: number | string | null;
 }
 
+export interface Understood {
+  source: "llm" | "fallback";
+  symptoms: string[];
+  /** What we took from the message, for the "We understood: ..." chip. Empty: added to the description. */
+  items: string[];
+  answered_question: boolean;
+}
+
+export interface MessageOut extends AnswerOut {
+  understood: Understood;
+}
+
+export interface MessageUndoOut extends AnswerOut {
+  /** The message that was taken back, to edit and send again. */
+  text: string;
+}
+
 export interface SessionState extends AnswerOut {
   vehicle: VehicleSummary;
   topic: string | null;
@@ -263,14 +283,24 @@ export interface Media {
   estimated_repair_time: string;
 }
 
+export type Confidence = "high" | "medium" | "low";
+
+export interface Evidence {
+  kind: "said" | "symptom" | "main" | "answer" | "against" | "lacks";
+  text: string;
+  supports: boolean;
+}
+
 export interface RankedFault {
   rank: number;
   fault_key: string;
   name: string;
   category: string;
   score: number;
-  confidence: "high" | "medium" | "low";
+  confidence: Confidence;
+  confidence_reason: string;
   evidence: string[];
+  evidence_items: Evidence[];
   diagnostic_steps: string[];
   what_you_can_do: string[];
   what_the_mechanic_will_do: string[];
@@ -294,11 +324,52 @@ export interface ResultOut {
   safety_alerts: SafetyAlert[];
   roadside: { verdict: RoadsideVerdict; text: string; towing: string };
   safety_tips: string[];
+  uncertainty: { code: "two_equally_likely" | "no_known_pattern"; message: string }[];
+  /** If this doesn't fix it: next causes, related problems, then a full inspection. */
+  if_not_fixed: string[];
   actions: string[];
   disclaimer: string;
   created_at: string;
   completed_at: string | null;
   answers: { question: string; answer: string; asked_at: string | null; answered_at: string }[];
+}
+
+export interface Explanation {
+  fault_key: string;
+  text: string;
+  source: "template" | "llm";
+}
+
+/** Read the explanations stream (server-sent events): each `explanation` event is passed to `onExplanation` (a
+ * later one for the same cause replaces the template); resolves on `done` or when the stream ends. */
+export async function streamExplanations(
+  id: string,
+  onExplanation: (e: Explanation) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch(`${API_URL}/api/diagnosis/sessions/${id}/explanations`, {
+    headers: { Accept: "text/event-stream" },
+    signal,
+  });
+  if (!res.ok || !res.body) throw new ApiError("We couldn't load the explanations.", res.status);
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value, { stream: !done });
+    let end: number;
+    while ((end = buffer.indexOf("\n\n")) >= 0) {
+      const block = buffer.slice(0, end);
+      buffer = buffer.slice(end + 2);
+      const fields = Object.fromEntries(
+        block.split("\n").map((line) => [line.slice(0, line.indexOf(":")), line.slice(line.indexOf(":") + 1).trim()]),
+      );
+      if (fields.event === "done") return;
+      if (fields.event === "explanation" && fields.data) onExplanation(JSON.parse(fields.data) as Explanation);
+    }
+    if (done) return;
+  }
 }
 
 /** URL of a fault picture (served by the API at /media). */

@@ -68,6 +68,8 @@ class Fault:
     part_fit_texts: list[str] = field(default_factory=list)  # approved + checked part price sources
     alias_keys: list[str] = field(default_factory=list)  # merged duplicates of this fault (canonical only)
     prior: float = 1.0  # relative prior (fault_priors table; equal when missing). Used by engine v2.
+    # What the car must have: [{"feature": "start_stop"}, {"fuel": ["diesel"]}, {"transmission": ["amt"]}]
+    requires: list[dict] = field(default_factory=list)
 
 
 @dataclass
@@ -152,6 +154,8 @@ class Vehicle:
     segment: Segment | None = None
     listed: bool = False
     variant_id: int | None = None
+    # Known features, {"start_stop": False, ...}. A feature that is not listed is unknown.
+    features: dict[str, bool] | None = None
 
 
 @dataclass
@@ -208,6 +212,16 @@ class CostOut:
 
 
 @dataclass
+class Evidence:
+    """One reason for or against a ranked fault, for the customer's evidence list and the explanations."""
+
+    kind: str  # said (customer phrase) | symptom | main (main complaint) | answer | against | lacks
+    text: str  # matched words, symptom line or chosen option; lacks: the requirement, e.g. "feature start_stop"
+    question: str = ""  # main / answer / against: the question that was answered
+    need: dict | None = None  # lacks: the requirement the car does not meet
+
+
+@dataclass
 class RankedFault:
     fault_id: int
     fault_key: str
@@ -218,6 +232,7 @@ class RankedFault:
     evidence: list[str]
     cost: CostOut | None
     repair_time: str
+    evidence_items: list[Evidence] = field(default_factory=list)
 
 
 @dataclass

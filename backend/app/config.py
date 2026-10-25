@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     # Live LLM layer (app.llm): extraction of symptoms / answers from free text, and question phrasing.
     llm_extraction_model: str = "claude-haiku-5-5"
     llm_phrasing_model: str = "claude-haiku-5-5"
+    llm_explanation_model: str = "claude-haiku-5-5"
     llm_effort: str = "low"  # output_config.effort for live calls
     llm_timeout_seconds: float = 4.0  # wall clock per call; slower calls fall back
     # Estimated USD per day (India time) across all live calls; once reached, every step falls back.

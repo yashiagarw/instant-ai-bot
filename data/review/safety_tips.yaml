@@ -1,0 +1,198 @@
+# How short safety lines from the datasets read to customers. The datasets hold many shorthand lines written for
+# mechanics ("Acid burns.", "Stands.", "Battery OFF for wiring."). On the result page a customer sees only full,
+# calm sentences they can act on:
+#   1. a line listed under `rewrite` is shown as its sentence ("" = never shown);
+#   2. otherwise workshop instructions (tools, lifts, fuses, wiring, tests: patterns in
+#      backend/app/diagnosis/safety_lines.py) and fragments (under 4 words, "X = Y" shorthand) are left out;
+#   3. what remains is shown with calm capitalisation (OFF -> off).
+# Keys: the line in lower case without its final full stop. Several dataset lines can share one sentence.
+# Check every line's result with:  cd backend && uv run python -m app.diagnosis.safety_lines report
+#
+# DRAFT, reviewed: false (Oct 2026). Have the team read every sentence before launch.
+reviewed: false
+
+rewrite:
+  # Battery
+  acid burns: &acid "Battery acid can burn your skin, so don't touch a leaking or swollen battery."
+  can burst. acid burns: *acid
+  hot acid: *acid
+  clean acid properly: ""
+  battery gas can catch fire: &batgas "Battery gas can catch fire, so keep flames and sparks away from the battery."
+  no sparks near battery: *batgas
+  no sparks near battery (gas): *batgas
+  battery safety: ""
+  normal battery safety: ""
+  correct jump order: &jump "When jump-starting, connect the red cable to + first and the black cable to bare engine metal, away from the battery."
+  correct jump-start order: *jump
+  normal jump-start safety: *jump
+  connect + and - correctly: *jump
+  red to + , black to engine metal: *jump
+  never jump-start a frozen battery: "Never jump-start a frozen battery."
+  # High voltage (EV / hybrid)
+  high voltage danger: &hv "Don't touch orange high-voltage cables or parts; they can give a dangerous shock."
+  high voltage: *hv
+  ev high-voltage danger: *hv
+  "hv: qualified only": *hv
+  "ev / hybrid hv: qualified only": *hv
+  "ev / hybrid: high-voltage - qualified only": *hv
+  high voltage from coil: ""
+  high voltage - engine off: ""
+  # Heat
+  hot coolant burns: &coolant "Don't open the radiator or coolant cap while the engine is hot; hot coolant and steam can burn you."
+  hot coolant: *coolant
+  hot coolant can burn badly: *coolant
+  hot coolant - let cool: *coolant
+  never open hot radiator cap: *coolant
+  steam burns: *coolant
+  open the cap only when cold: *coolant
+  do not open the cap when hot: *coolant
+  do not open a hot system: *coolant
+  hot oil burns: &oil "Engine oil stays very hot after driving, so let the engine cool before you check it."
+  hot oil: *oil
+  hot exhaust: &exhaust "The exhaust gets very hot, so don't touch it after driving."
+  hot exhaust burns: *exhaust
+  hot exhaust - burns: *exhaust
+  hot exhaust/catalyst: *exhaust
+  hot exhaust parts: *exhaust
+  exhaust is hot: *exhaust
+  exhaust very hot: *exhaust
+  very hot exhaust: *exhaust
+  hot brakes: &brakes "Brakes get very hot after driving, so don't touch the wheels or brakes straight away."
+  hot brakes burn: *brakes
+  hot brakes - burns: *brakes
+  hot engine: &engine "Parts under the bonnet stay hot after driving, so let the engine cool before you touch anything."
+  hot engine parts: *engine
+  hot parts: *engine
+  engine parts are hot: *engine
+  alternator is hot after driving: *engine
+  turbo is very hot: *engine
+  turbo very hot: *engine
+  turbo pipes very hot: *engine
+  do not touch hot hoses: *engine
+  hot engine - let it cool: *engine
+  hot parts - wait to cool: *engine
+  hot engine parts - be careful: *engine
+  # Fire, fuel and gas
+  fire risk: ""
+  fire risk if fuel/oil: ""
+  fumes risk: ""
+  fuel smell = fire risk: &fuel "If you smell fuel, don't smoke or use a flame near the car; move away and call for help."
+  fuel smell = no sparks: *fuel
+  petrol smell - no sparks nearby: *fuel
+  no smoking near fuel smell: *fuel
+  no smoking near any fuel smell: *fuel
+  no smoking near leak: *fuel
+  fuel - no flames: *fuel
+  "fuel: no flames": *fuel
+  fuel - no sparks: *fuel
+  no flames / sparks near leak: *fuel
+  no smoking or flames: &noflame "Don't smoke or use a flame near the car."
+  no sparks or smoking: *noflame
+  no open flame: *noflame
+  no flame: *noflame
+  gas leak = fire risk: &cng "If you smell CNG gas, stop, switch off the engine, keep flames and sparks away and move everyone away from the car."
+  gas leak fire risk: *cng
+  gas smell = stop: *cng
+  no flames near gas: *cng
+  wipe spilled petrol: &spill "If fuel spills, wipe it up and keep flames away."
+  catch spilled fuel: *spill
+  "use funnel; wipe spills": *spill
+  approved metal/hdpe fuel can only: "If you carry spare fuel, use only an approved metal or HDPE fuel can."
+  exhaust fumes are poisonous: "Exhaust fumes are poisonous, so never run the engine in a closed garage."
+  boot open = fumes risk: "Don't drive with the boot open; exhaust fumes can get into the car."
+  # Driving and stopping
+  do not drive: "Please don't drive the car until a mechanic has checked it."
+  do not open the bonnet: "Don't open the bonnet; wait for help."
+  brake failure risk: &brake "If the brake pedal feels soft or sinks, don't drive the car."
+  "weak brakes: do not drive": *brake
+  never drive with sinking pedal: *brake
+  bonnet can fly open: &bonnet "Make sure the bonnet is fully closed before you drive; it can fly open."
+  bonnet must latch: *bonnet
+  never drive with unlatched bonnet: *bonnet
+  door must latch: "Don't drive if a door doesn't stay firmly shut."
+  heavy steering = accident risk: "If the steering suddenly feels heavy, slow down and stop in a safe place."
+  low tyre = blowout risk: "Driving on a very low tyre can make it burst, so stop and check it."
+  tyre contact = stop: "If anything is rubbing on a tyre, stop and don't drive on."
+  blinking = stop: &blink "If a warning light is blinking, stop in a safe place and switch off the engine."
+  blinking light: *blink
+  red lights - stop safely: "If a red warning light comes on, stop in a safe place."
+  stop if overheating: &hot "If the temperature gauge goes high, stop in a safe place and switch off the engine."
+  stop if temperature is high: *hot
+  stop in a safe place: &safe "Stop in a safe place away from traffic and switch on your hazard lights."
+  stop in safe place: *safe
+  stop safely: *safe
+  steer to safe place: *safe
+  stand away from traffic: *safe
+  stay off the road lane: *safe
+  traffic: *safe
+  traffic danger: *safe
+  park safely, away from traffic: *safe
+  hazard lights + warning triangle: *safe
+  handbrake on: &handbrake "Put the handbrake on before you get out of the car."
+  car in p/n, handbrake on: *handbrake
+  hill start - use handbrake: "On a slope, use the handbrake when you start moving."
+  hold brake while selecting gear: "Keep your foot on the brake while you select a gear."
+  check behind before reversing: "Check behind you before reversing."
+  mountain roads - drive carefully: "Drive slowly and carefully on mountain roads."
+  no cranking: &crank "Don't try to start the engine again; it could cause more damage."
+  no cranking after deep water: *crank
+  no cranking until engine checked: *crank
+  no restart: *crank
+  no over-cranking: ""
+  no entry into moving water: "Never drive or walk into moving water."
+  keep people away: "Keep other people away from the car."
+  do not touch fan: &fan "Keep your hands away from the radiator fan; it can start on its own."
+  keep hands away from the fan: *fan
+  fingers clear of glass: "Keep fingers clear of the window glass while it moves."
+  adjust settings only when parked: &parked "Change these settings only when the car is parked."
+  set up only when parked: *parked
+  do not fill above max: "When topping up, don't fill above the MAX mark."
+  do not use gas cans: &gascan "Don't use AC gas cans or leak-seal chemicals from the market; they can damage the AC."
+  do not add gas cans: *gascan
+  do not use leak-seal chemicals: *gascan
+  ask for proof before paying: "Ask the workshop to show you the old part before you pay."
+  keep bill and report: "Keep the bill and the repair report."
+  clear water is normal: "Clear water dripping under the car when the AC is on is normal."
+  roof load limit: "Don't put more weight on the roof than your car's manual allows."
+  # Fuses (a driver may change a fuse)
+  correct fuse rating: &fuse "If a fuse blows, replace it only with one of the same rating; never fit a bigger fuse."
+  correct fuse rating only: *fuse
+  correct rating only: *fuse
+  never bigger fuse: *fuse
+  never oversize fuse: *fuse
+  do not use higher fuse: *fuse
+  same-rating fuse only: *fuse
+  use only correct fuse rating: *fuse
+  use a correct-rating fuse: *fuse
+  never bypass or upsize fuses: *fuse
+  do not put a thicker fuse: *fuse
+  never a bigger fuse or wire: *fuse
+  # Jacks (a driver may change a wheel)
+  never put any body part under a car held by a jack: &jack "Never put any part of your body under a car that is held up only by a jack."
+  never put any body part under a car held only by a jack: *jack
+  use jacking points only. never go under the car on a jack: *jack
+  use only the maker's jacking points: "Lift the car only at the jacking points shown in your car's manual."
+  # Emergencies
+  ask about injuries first - injuries, fire, trapped people or dangerous traffic = call 112 first: "If anyone is hurt or trapped, there is a fire, or the traffic is dangerous, call 112 first."
+  call fire emergency 101 / 112: "If there is a fire, call 101 or 112."
+  if burning smell → stop and call help: "If you smell burning, stop in a safe place and call for help."
+  if temperature rises → stop safely and follow overheating safety steps: *hot
+  treat steam as dangerous. stay back: "Stay back from any steam; it can burn you."
+  electric shock risk in flooded basement: "If the car is in a flooded basement, don't touch it; there may be a risk of electric shock."
+  no crawling under on road: "Never crawl under the car at the roadside."
+  pedal problem = do not drive in traffic: "If a pedal isn't working properly, don't drive in traffic."
+  hot turbo and exhaust - do not touch: *exhaust
+  # Battery and fuel
+  no fire or smoking near the battery: *batgas
+  no fire or sparks near battery: *batgas
+  no jump on swollen, leaking or frozen battery: "Never jump-start a swollen, leaking or frozen battery."
+  no smoking while pouring fuel: "Don't smoke while pouring fuel."
+  # Stopping at the roadside
+  park away from traffic. hazard lights and triangle: &triangle "Stop in a safe place away from traffic, switch on your hazard lights and put out the warning triangle."
+  stop far from traffic. hazard lights and warning triangle: *triangle
+  wheel blocks, handbrake and hazard lights: *triangle
+  # Changing a wheel
+  tighten wheel nuts in a cross pattern: &nuts "After changing a wheel, tighten the wheel nuts in a cross pattern and have them checked at a tyre shop."
+  tighten wheel nuts in a cross pattern with the correct torque: *nuts
+  tighten the wheel nuts in a cross pattern with the correct torque: *nuts
+  tighten nuts in a cross pattern to the correct torque: *nuts

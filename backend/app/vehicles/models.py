@@ -1,6 +1,7 @@
 """Vehicle catalogue: make -> model -> variant, plus cars users type in that we do not list."""
 
 from sqlalchemy import CheckConstraint, ForeignKey, Index, SmallInteger, Text, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base, CreatedAtMixin, str_enum
@@ -64,6 +65,8 @@ class Variant(Base):
     year_from: Mapped[int] = mapped_column(SmallInteger)
     year_to: Mapped[int | None] = mapped_column(SmallInteger)  # null = still on sale
     price_segment: Mapped[PriceSegment] = mapped_column(str_enum(PriceSegment, "price_segment"))
+    # Known features, {"start_stop": false, ...} (app/vehicles/features.py). A missing key means unknown.
+    features: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
 
     model: Mapped[Model] = relationship(back_populates="variants")
 

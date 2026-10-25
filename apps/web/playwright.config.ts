@@ -1,8 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// The API is mocked in each test (page.route), so the backend does not need to run.
-// The app runs as a production build on its own port, separate from `pnpm dev`.
-const PORT = 3100;
+// The API is mocked in each test (page.route), so the backend does not need to run (except e2e/live.spec.ts, which
+// is opt-in). The app runs as a production build on its own port, separate from `pnpm dev`; E2E_PORT and
+// NEXT_PUBLIC_API_URL change the port and the API it calls (for the live test).
+const PORT = Number(process.env.E2E_PORT ?? 3100);
 
 export default defineConfig({
   testDir: "e2e",

@@ -27,5 +27,6 @@ def test_env_example_keeps_the_llm_off_and_holds_no_key():
     assert values["LLM_PROVIDER"] == "none" and values["ANTHROPIC_API_KEY"] == ""
     s = Settings(_env_file=None)
     assert values["LLM_EXTRACTION_MODEL"] == s.llm_extraction_model and values["LLM_EFFORT"] == s.llm_effort
+    assert values["LLM_EXPLANATION_MODEL"] == s.llm_explanation_model
     assert float(values["LLM_TIMEOUT_SECONDS"]) == s.llm_timeout_seconds
     assert float(values["LLM_DAILY_SPEND_CAP_USD"]) == s.llm_daily_spend_cap_usd

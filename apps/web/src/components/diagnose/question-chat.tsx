@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, LoaderCircle } from "lucide-react";
 
 import { CarSummary } from "@/components/diagnose/car-summary";
+import { type Note, ReplyBox } from "@/components/diagnose/reply-box";
 import { ErrorMessage } from "@/components/error-message";
 import { SafetyBanner } from "@/components/safety-banner";
 import { Skeleton } from "@/components/skeleton";
@@ -29,7 +30,8 @@ function ChatSkeleton() {
   );
 }
 
-/** One question at a time. Answers go to the API; the next question, new safety alerts or the result come back. */
+/** One question at a time. Answers (tapped, or typed in the reply box) go to the API; the next question, new safety
+ * alerts or the result come back. Each typed message shows what we understood, and the last one can be corrected. */
 export function QuestionChat() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const router = useRouter();
@@ -37,7 +39,10 @@ export function QuestionChat() {
   const [latest, setLatest] = useState<AnswerOut | null>(null);
   const [sending, setSending] = useState<string | null>(null); // option id being sent, or "back"
   const [error, setError] = useState<string | null>(null);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [draft, setDraft] = useState("");
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const replyRef = useRef<HTMLTextAreaElement>(null);
 
   const start = initial.state.status === "ready" ? initial.state.data : null;
   const turn: AnswerOut | null = latest ?? start;
@@ -48,10 +53,14 @@ export function QuestionChat() {
     if (turn?.done) router.replace(resultUrl);
   }, [turn?.done, router, resultUrl]);
 
-  // Each new question gets focus, so keyboard and screen reader users start reading it.
+  // Each new question gets focus, so keyboard and screen reader users start reading it. A typed reply that brings
+  // the same question back leaves focus where the person is typing.
   const questionKey = turn?.question ? `${turn.question.id}:${turn.progress.question_number}` : null;
+  const focusedKey = useRef<string | null>(null);
   useEffect(() => {
-    if (questionKey && latest) headingRef.current?.focus();
+    if (!questionKey) return;
+    if (latest && questionKey !== focusedKey.current) headingRef.current?.focus();
+    focusedKey.current = questionKey;
   }, [questionKey, latest]);
 
   async function send(action: () => Promise<AnswerOut>, key: string) {
@@ -59,7 +68,10 @@ export function QuestionChat() {
     setSending(key);
     setError(null);
     try {
-      setLatest(await action());
+      const next = await action();
+      // A tap (or going back) after a typed message means that message can no longer be taken back.
+      if (key !== "message" && key !== "undo-message") setNotes((ns) => ns.map((n) => ({ ...n, correctable: false })));
+      setLatest(next);
     } catch (e) {
       setError(errorMessage(e));
     } finally {
@@ -77,6 +89,22 @@ export function QuestionChat() {
   const { question_number: number, questions_about: about } = turn.progress;
   const answer = (o: Option) =>
     send(() => api.answer(sessionId, q!.id, o.not_sure ? NOT_SURE : o.id), String(o.id));
+  const sendMessage = () =>
+    send(async () => {
+      const text = draft.trim();
+      const out = await api.message(sessionId, text);
+      setNotes((ns) => [...ns.map((n) => ({ ...n, correctable: false })), { text, items: out.understood.items, correctable: true }]);
+      setDraft("");
+      return out;
+    }, "message");
+  const correctMessage = () =>
+    send(async () => {
+      const out = await api.undoMessage(sessionId);
+      setNotes((ns) => ns.slice(0, -1));
+      setDraft(out.text);
+      replyRef.current?.focus();
+      return out;
+    }, "undo-message");
 
   return (
     <div className="flex flex-col gap-6">
@@ -193,6 +221,18 @@ export function QuestionChat() {
             </Button>
           )}
         </section>
+      )}
+
+      {q && (
+        <ReplyBox
+          notes={notes}
+          draft={draft}
+          onDraft={setDraft}
+          onSend={sendMessage}
+          onCorrect={correctMessage}
+          sending={sending}
+          inputRef={replyRef}
+        />
       )}
     </div>
   );

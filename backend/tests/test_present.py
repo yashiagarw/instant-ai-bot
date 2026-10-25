@@ -89,7 +89,7 @@ def test_workshop_instructions_are_removed_from_tips():
     assert driver_safe("Tighten wheel nuts in a cross pattern with the correct torque.") != ""
     assert driver_tips(
         ["Yes - Bulb swap.", "Stop in a safe place.", "Stop in a safe place!", "check accessory current draw."], 8
-    ) == ["Bulb swap.", "Stop in a safe place."]
+    ) == ["Stop in a safe place away from traffic and switch on your hazard lights."]  # fragments never shown
 
 
 def test_leftover_yes_no_column_values_are_stripped():
@@ -141,7 +141,7 @@ def test_banner_keeps_only_high_risk_rules_for_the_top_fault_or_seen_by_the_driv
             alert(4, "high", "text", None, "Get out of the car."),  # seen in the description: banner
             alert(5, "low", "answer", None, "Not stated"),  # placeholder: nothing to show
         ],
-        safety_tips=["Use hazard lights.", "Remove battery wire before work."],
+        safety_tips=["Switch on the hazard lights and wait.", "Remove battery wire before work."],
     )
     banner, rest = service.banner_alerts(result)
     assert [a.rule_id for a in banner] == [1, 4] and [a.rule_id for a in rest] == [2, 3, 5]
@@ -149,5 +149,5 @@ def test_banner_keeps_only_high_risk_rules_for_the_top_fault_or_seen_by_the_driv
     assert service.customer_tips(engine, result) == [
         "Do not use the valve.",
         "Drive slowly to a tyre shop.",
-        "Use hazard lights.",
+        "Switch on the hazard lights and wait.",
     ]
