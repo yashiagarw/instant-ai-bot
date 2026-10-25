@@ -425,4 +425,6 @@ def make_provider(name: str, settings: Any, model: str = "", effort: str = "") -
         )
     if name == "fake":
         return FakeProvider(model="fake")
+    if name == "none":
+        raise LLMError("LLM_PROVIDER is none: pass --provider anthropic|openai or set LLM_PROVIDER in backend/.env")
     raise LLMError(f"unknown LLM provider '{name}' (use one of: {', '.join(PROVIDERS)})")

@@ -1,5 +1,6 @@
-"""`run_eval.py run` and `run_eval.py compare`. Fully offline: the database, the engine and (optionally) the
-locally cached embedding model; no LLM or network calls."""
+"""`run_eval.py run` and `run_eval.py compare`. Offline by default: the database, the engine and (optionally) the
+locally cached embedding model. `run --extraction llm` adds the live app's LLM extraction step on free-text cases;
+it calls an LLM only when LLM_PROVIDER=anthropic and ANTHROPIC_API_KEY are set (otherwise it is the fallback)."""
 
 from __future__ import annotations
 
@@ -56,6 +57,7 @@ def evaluate(
     embeddings: bool,
     search: str = "keyword",
     diagnosis_engine: str = "v1",
+    extraction: str = "none",
     extra_meta: dict | None = None,
 ) -> dict:
     """Run the cases on the `engine` package this process imported and return the report (meta, summary,
@@ -79,7 +81,9 @@ def evaluate(
         engine = EngineV2(knowledge, **kwargs)
     else:
         engine = Engine(knowledge, **kwargs)
-    results = run_all(engine, cases)
+    extract, llm_meta = make_extract(extraction)
+    results = run_all(engine, cases, extract)
+    llm_meta = llm_meta()
     now = datetime.now(UTC)
     meta = {
         "created_at": now.isoformat(timespec="seconds"),
@@ -96,9 +100,38 @@ def evaluate(
         "cases": len(cases),
         "cases_by_type": dict(sorted(Counter(c.type for c in cases).items())),
         "cases_by_source": dict(sorted(Counter(c.source for c in cases).items())),
+        **llm_meta,
         **(extra_meta or {}),
     }
     return {"meta": meta, "summary": summarise(results), "results": results}
+
+
+def make_extract(kind: str):
+    """(extract callable or None, meta() -> report fields read after the run). `llm`: the live extraction step
+    (app.llm.extraction) on each case's text, with an in-memory call log; with LLM_PROVIDER=none (or no key) it
+    returns no ids, which is exactly the fallback."""
+    if kind != "llm":
+        return None, dict
+    from app.config import get_settings
+    from app.llm.client import MemoryRecorder, make_llm_client
+    from app.llm.extraction import extract
+
+    settings = get_settings()
+    recorder = MemoryRecorder()
+    client = make_llm_client(settings, recorder)
+
+    def run(engine, request):
+        return extract(client, engine, request, request.text).symptom_ids
+
+    def meta() -> dict:
+        return {
+            "extraction": "llm" if client else "llm (fallback: no LLM client)",
+            "llm_provider": settings.llm_provider,
+            "llm_model": settings.llm_extraction_model if client else None,
+            "llm_usage": recorder.summary(),
+        }
+
+    return run, meta
 
 
 def _load(category: str | None, split: str = "all"):
@@ -133,6 +166,7 @@ def run_here(args) -> dict:
         embeddings=args.embeddings,
         search=args.search,
         diagnosis_engine=args.diagnosis_engine,
+        extraction=getattr(args, "extraction", "none"),
         extra_meta=extra,
     )
 
@@ -145,6 +179,8 @@ def run_version(spec: str, args, out: Path) -> dict:
         paths = rep.write(report, out)
         print(f"wrote {paths[1]}")
         return report
+    if getattr(args, "extraction", "none") != "none":
+        raise SystemExit("--extraction llm runs on the current engine only")
     path = materialise(spec)
     ref = None
     if not Path(spec).is_dir():
@@ -221,6 +257,13 @@ def harness(argv: list[str]) -> None:
             help="dev (tune on it) or test (report on it); synthetic cases are always test",
         )
         p.add_argument("--out", type=Path, default=EVAL_DIR / "reports", help="report folder")
+    run.add_argument(
+        "--extraction",
+        choices=["none", "llm"],
+        default="none",
+        help="llm: free-text cases go through the live LLM extraction step (current engine only; it is the "
+        "no-LLM fallback unless LLM_PROVIDER=anthropic and ANTHROPIC_API_KEY are set)",
+    )
     # Internal: a child process running one engine version.
     run.add_argument("--engine-path", help=argparse.SUPPRESS)
     run.add_argument("--engine-label", help=argparse.SUPPRESS)

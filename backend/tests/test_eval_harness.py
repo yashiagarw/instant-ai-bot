@@ -313,3 +313,46 @@ def test_dev_test_split_keeps_variants_together_and_people_written_cases_in_test
     written = Case("synthetic_hindi:x", "free_text", "synthetic", "tyre", ["F04-TY-03"], text="टायर")
     assert split_of(written) == "test"  # never tuned on
     assert split_of(cases[0]) == split_of(cases[0])  # stable
+
+
+# ---------------------------------------------------------------- LLM extraction (run --extraction llm)
+
+
+def test_extract_hook_adds_symptom_ids_once_per_text_case(knowledge):  # noqa: F811
+    import copy
+
+    from engine import types as et
+
+    k = copy.deepcopy(knowledge)
+    k.texts.append(et.TextEntry(3, "Steering wheel shakes when braking", "symptom", id=501))
+    engine = Engine(k)
+    seen = []
+
+    def extract(eng, request):
+        seen.append(request.text)
+        return [501]
+
+    case = Case(
+        id="x", type="free_text", source="synthetic", text="steering shakes", category="brakes", expected=["F11-BR-03"]
+    )
+    out = run_case(engine, case, extract)
+    assert seen == ["steering shakes"] and out["got"][0] == "F11-BR-03"
+    run_case(engine, Case(id="y", type="chips", source="synthetic", category="brakes", group="brakes_clutch"), extract)
+    assert seen == ["steering shakes"]  # no text: no extraction
+
+
+def test_llm_extraction_with_provider_none_is_the_fallback(knowledge, monkeypatch):  # noqa: F811
+    """LLM_PROVIDER=none: --extraction llm gives the same results as no extraction and makes no call."""
+    from evalkit.cli import make_extract
+
+    from app.config import Settings
+
+    monkeypatch.setattr("app.config.get_settings", lambda: Settings(_env_file=None))
+    extract, meta = make_extract("llm")
+    cases = build_cases(knowledge, PHRASES, ROOT / "data" / "eval" / "cases" / "missing")
+    engine = Engine(knowledge)
+    assert [run_case(engine, c, extract) for c in cases] == [run_case(engine, c) for c in cases]
+    m = meta()
+    assert m["extraction"].startswith("llm (fallback") and m["llm_provider"] == "none"
+    assert m["llm_usage"]["calls"] == 0 and m["llm_usage"]["cost_usd_estimate"] == 0
+    assert rep._extraction_label(m).endswith("estimated $0")

@@ -1,8 +1,12 @@
 """Diagnosis sessions on top of the stateless engine.
 
-Every call rebuilds the engine request from the stored session (vehicle snapshot, topic, categories, text) and
-its answer events, so the database is the only state. Each question asked, answer given, safety alert and the
-final result is stored in session_events with its timestamp.
+Every call rebuilds the engine request from the stored session (vehicle snapshot, topic, categories) and its
+events (free text with the symptom ids extracted from it, answers), so the database is the only state. Each
+question asked, answer given, message, safety alert and the final result is stored in session_events with its
+timestamp.
+
+The LLM layer (app.llm) is optional: with no client every step uses its fallback (the engine matches the text
+itself and questions keep their original wording).
 """
 
 import threading
@@ -27,6 +31,9 @@ from app.diagnosis.models import (
 )
 from app.diagnosis.search import HybridSearch
 from app.knowledge.models import Category, Fault, FaultImage, FaultItem, FaultItemType, ProblemGroup, Question
+from app.llm.client import DbRecorder, LLMClient, make_llm_client
+from app.llm.extraction import Extraction, PendingQuestion, extract
+from app.llm.phrasing import detect_language, phrase
 from app.vehicles.models import UnlistedVehicle, Variant
 from engine.core import FAST_TRACK_MAX, MAX_QUESTIONS, MAX_TIPS
 
@@ -54,6 +61,15 @@ def get_engine(state, session: Session, settings: Settings) -> eng.Engine:
             search = hybrid_search(state) if settings.diagnosis_search == "hybrid" else None
             state.diagnosis_engine = eng.make_engine(settings.diagnosis_engine, load_knowledge(session), search=search)
         return state.diagnosis_engine
+
+
+def get_llm(state) -> LLMClient | None:
+    """The live LLM client, or None when LLM_PROVIDER is not anthropic or ANTHROPIC_API_KEY is empty. Tests set
+    `state.llm` to a client on the fake provider."""
+    with _engine_lock:
+        if not hasattr(state, "llm"):
+            state.llm = make_llm_client(state.settings, DbRecorder(state.session_factory.begin))
+        return state.llm
 
 
 def hybrid_search(state) -> HybridSearch:
@@ -106,6 +122,8 @@ def _live(session: Session, ds: DiagnosisSession) -> tuple[list[SessionEvent], l
             answers.pop()
             if len(asked) > len(answers) + 1:
                 asked.pop()
+        elif e.event_type == EventType.question_withdrawn and len(asked) > len(answers):
+            asked.pop()
     return asked, answers
 
 
@@ -113,31 +131,66 @@ def _vehicle(snapshot: dict) -> eng.Vehicle:
     return eng.Vehicle(**{k: snapshot.get(k) for k in eng.Vehicle.__dataclass_fields__})
 
 
+def _free_text(session: Session, ds: DiagnosisSession) -> list[dict]:
+    """The customer's words in order: the text the session started with, then each message."""
+    return [e.payload for e in _events(session, ds, EventType.free_text)]
+
+
 def _request(session: Session, ds: DiagnosisSession) -> eng.Request:
     start = _events(session, ds, EventType.session_started)[0].payload
     answers = [eng.Answer(e.payload["question_id"], e.payload["option_id"]) for e in _live(session, ds)[1]]
+    texts = _free_text(session, ds)
+    symptoms = list(dict.fromkeys(i for t in texts for i in t.get("symptom_ids", [])))
     return eng.Request(
         vehicle=_vehicle(ds.vehicle_snapshot),
         group=start.get("topic_id"),
         categories=start.get("category_ids", []),
-        text=ds.entry_text or "",
+        text=" ".join(t["text"] for t in texts),
         answers=answers,
+        **({"symptoms": symptoms} if symptoms else {}),
     )
+
+
+def _free_text_payload(text: str, ex: Extraction, source: str) -> dict:
+    payload = {"text": text, "source": source, "extraction": ex.source, "extraction_outcome": ex.outcome}
+    if ex.symptom_ids:
+        payload["symptom_ids"] = ex.symptom_ids
+    return payload
 
 
 def _question_payload(q: eng.types.QuestionOut) -> dict:
     return {"question_id": q.id, "text": q.text, "options": [asdict(o) for o in q.options], "category": q.category}
 
 
-def _record(session: Session, ds: DiagnosisSession, result: eng.Result) -> list[eng.types.SafetyAlert]:
-    """Store what the engine decided: new alerts, the next question, completion. Returns the new alerts."""
+def _phrased(session: Session, ds: DiagnosisSession, q: eng.types.QuestionOut, llm: LLMClient | None) -> dict:
+    """The question in the customer's language (from their latest words), as extra question_asked payload. A
+    question already phrased in this session for the same language is reused. Sessions without free text keep
+    the original wording."""
+    texts = _free_text(session, ds)
+    language = detect_language(texts[-1]["text"]) if texts else None
+    if llm is None or language is None:
+        return {}
+    for e in reversed(_events(session, ds, EventType.question_asked)):
+        p = e.payload
+        if str(p.get("question_id")) == str(q.id) and p.get("language") == language and p.get("phrased_text"):
+            return {"phrased_text": p["phrased_text"], "language": language}
+    out = phrase(llm, q.text, [o.label for o in q.options], language, ds.id)
+    return {"phrased_text": out.text, "language": language} if out.phrased else {}
+
+
+def _record(
+    session: Session, ds: DiagnosisSession, result: eng.Result, llm: LLMClient | None = None
+) -> list[eng.types.SafetyAlert]:
+    """Store what the engine decided: new alerts, the next question (with its phrasing), completion. Returns the
+    new alerts."""
     seen = {e.payload.get("rule_id") for e in _events(session, ds, EventType.safety_alert)}
     new = [a for a in result.safety_alerts if a.rule_id not in seen]
     for a in new:
         _event(session, ds, EventType.safety_alert, asdict(a))
     ds.coverage_level = result.coverage
     if result.next_question is not None:
-        _event(session, ds, EventType.question_asked, _question_payload(result.next_question), result.next_question.id)
+        q = result.next_question
+        _event(session, ds, EventType.question_asked, {**_question_payload(q), **_phrased(session, ds, q, llm)}, q.id)
     if result.done and ds.status != SessionStatus.completed:
         ds.status = SessionStatus.completed
         ds.completed_at = _now()
@@ -165,6 +218,16 @@ def pending_question(session: Session, ds: DiagnosisSession) -> dict | None:
     if not asked or len(answered) >= len(asked):
         return None
     return asked[-1].payload
+
+
+def question_text(session: Session, ds: DiagnosisSession, q: eng.types.QuestionOut | None) -> tuple[str, bool]:
+    """(text to show, phrased) for the engine's next question: the stored phrasing when it is the waiting one."""
+    if q is None:
+        return "", False
+    pending = pending_question(session, ds)
+    if pending and str(pending["question_id"]) == str(q.id) and pending.get("phrased_text"):
+        return pending["phrased_text"], True
+    return q.text, False
 
 
 def progress(session: Session, ds: DiagnosisSession, result: eng.Result) -> tuple[int, int]:
@@ -219,7 +282,9 @@ def resolve_vehicle(session: Session, vehicle_in) -> tuple[dict, int | None, int
     return snap, None, row.id
 
 
-def create_session(session: Session, engine: eng.Engine, body) -> tuple[DiagnosisSession, eng.Result]:
+def create_session(
+    session: Session, engine: eng.Engine, body, llm: LLMClient | None = None
+) -> tuple[DiagnosisSession, eng.Result]:
     if body.topic_id and session.get(ProblemGroup, body.topic_id) is None:
         raise SessionInputError(f"unknown topic_id {body.topic_id}")
     known = set(session.scalars(select(Category.code).where(Category.code.in_(body.category_ids))))
@@ -240,13 +305,16 @@ def create_session(session: Session, engine: eng.Engine, body) -> tuple[Diagnosi
     session.flush()
     _event(session, ds, EventType.session_started, {"topic_id": body.topic_id, "category_ids": body.category_ids})
     if ds.entry_text:
-        _event(session, ds, EventType.free_text, {"text": ds.entry_text})
+        req = _request(session, ds)
+        req.text = ds.entry_text
+        ex = extract(llm, engine, req, ds.entry_text, session_id=ds.id)
+        _event(session, ds, EventType.free_text, _free_text_payload(ds.entry_text, ex, "start"))
     result = engine.diagnose(_request(session, ds))
-    _record(session, ds, result)
+    _record(session, ds, result, llm)
     return ds, result
 
 
-def answer(session: Session, engine: eng.Engine, ds: DiagnosisSession, body):
+def answer(session: Session, engine: eng.Engine, ds: DiagnosisSession, body, llm: LLMClient | None = None):
     if ds.status == SessionStatus.completed:
         raise SessionStateError("this session is already completed")
     pending = pending_question(session, ds)
@@ -271,7 +339,52 @@ def answer(session: Session, engine: eng.Engine, ds: DiagnosisSession, body):
     )
     session.flush()
     result = engine.diagnose(_request(session, ds))
-    return result, _record(session, ds, result)
+    return result, _record(session, ds, result, llm)
+
+
+def message(
+    session: Session, engine: eng.Engine, ds: DiagnosisSession, text: str, llm: LLMClient | None = None
+) -> tuple[eng.Result, list[eng.types.SafetyAlert], Extraction]:
+    """A free-text turn. The words join the session's text (so every safety rule reads them), the extraction step
+    adds the symptoms it found and may answer the waiting question; a waiting question the message did not answer
+    is withdrawn and the engine chooses the next question again. Returns (result, new alerts, extraction)."""
+    if ds.status == SessionStatus.completed:
+        raise SessionStateError("this session is already completed")
+    text = text.strip()
+    if not text:
+        raise SessionInputError("text must not be empty")
+    payload = pending_question(session, ds)
+    pending = (
+        PendingQuestion(payload["question_id"], payload["text"], payload["options"]) if payload is not None else None
+    )
+    req = _request(session, ds)
+    req.text = f"{req.text} {text}".strip()
+    ex = extract(llm, engine, req, text, pending, ds.id)
+    _event(session, ds, EventType.free_text, _free_text_payload(text, ex, "message"))
+    if pending is not None and ex.answer is not None:
+        chosen = ex.answer
+        _event(
+            session,
+            ds,
+            EventType.answer_given,
+            {
+                "question_id": pending.question_id,
+                "option_id": chosen["id"],
+                "label": chosen["label"],
+                "source": "message",
+            },
+            pending.question_id,
+            chosen["id"],
+        )
+    elif pending is not None:
+        _event(session, ds, EventType.question_withdrawn, {"question_id": pending.question_id}, pending.question_id)
+    session.flush()
+    result = engine.diagnose(_request(session, ds))
+    return result, _record(session, ds, result, llm), ex
+
+
+def symptom_labels(engine: eng.Engine, ids: list[int]) -> list[str]:
+    return [engine.symptom_entries[i].text for i in ids if i in engine.symptom_entries]
 
 
 def undo(session: Session, engine: eng.Engine, ds: DiagnosisSession) -> tuple[eng.Result, dict]:

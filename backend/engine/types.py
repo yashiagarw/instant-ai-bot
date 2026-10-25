@@ -78,6 +78,7 @@ class TextEntry:
     text: str
     kind: str  # phrase | symptom
     vector: list[float] | None = None
+    id: int | None = None  # symptom lines: the fault item id (the ids the LLM extraction step may return)
 
 
 @dataclass
@@ -167,6 +168,9 @@ class Request:
     categories: list[str] = field(default_factory=list)  # several categories picked directly (no tile)
     text: str = ""
     answers: list[Answer] = field(default_factory=list)
+    # Symptom ids (TextEntry.id) the LLM extraction step found in the customer's words. Added to the free-text
+    # matches; the text itself is still matched and still runs every safety rule.
+    symptoms: list[int] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------- result

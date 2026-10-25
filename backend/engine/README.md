@@ -42,6 +42,10 @@ The engine is stateless: send the whole session (vehicle, tile, text, all answer
 
 ## Free-text matching
 
+`Request.symptoms` takes symptom ids (`TextEntry.id`, the fault item ids) found by the app's LLM extraction step
+(`app/llm/extraction.py`); each counts as a text match of `EXTRACTED_SYMPTOM_SCORE` for its fault (ids outside the
+candidates are ignored). The text itself is still matched and still runs every safety rule. Empty = no change.
+
 IDF-weighted keyword overlap against approved customer phrases (held-out ones excluded) and symptom lines,
 plus a small embedding-similarity bonus (`EMBED_WEIGHT`, `EMBED_FLOOR` in `text.py`, chosen on a dev split of
 the indexed phrases, not on the held-out evaluation set). Evaluate with `data/eval/run_eval.py`; add `--simulate`

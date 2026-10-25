@@ -49,10 +49,20 @@ class Settings(BaseSettings):
     request_rate_window_seconds: int = 600
     # Fault pictures (drawn guides) served at /media; result `media[].file` paths are relative to it.
     media_dir: Path = Path(__file__).resolve().parents[2] / "data" / "media"
-    # Offline question structuring (app.knowledge.questions). Never used by the live app.
-    # Empty key = the SDK's own credential lookup (ANTHROPIC_API_KEY env, `ant auth login` profile).
-    llm_provider: Literal["anthropic", "openai"] = "anthropic"
+    # LLM provider. none (default): every live LLM step uses its non-LLM fallback (engine + hybrid search for
+    # extraction, the original question text for phrasing). anthropic: the live layer (app.llm) calls Claude, but
+    # only when ANTHROPIC_API_KEY is set. openai: offline question drafting only (the live layer falls back).
+    # Offline question structuring (app.knowledge.questions) uses anthropic or openai (or --provider); there an
+    # empty key means the SDK's own credential lookup.
+    llm_provider: Literal["none", "anthropic", "openai"] = "none"
     anthropic_api_key: str = ""
+    # Live LLM layer (app.llm): extraction of symptoms / answers from free text, and question phrasing.
+    llm_extraction_model: str = "claude-haiku-5-5"
+    llm_phrasing_model: str = "claude-haiku-5-5"
+    llm_effort: str = "low"  # output_config.effort for live calls
+    llm_timeout_seconds: float = 4.0  # wall clock per call; slower calls fall back
+    # Estimated USD per day (India time) across all live calls; once reached, every step falls back.
+    llm_daily_spend_cap_usd: float = 2.0
     questions_model: str = "claude-opus-5-5"
     questions_effort: str = "high"
     # OpenAI (used when LLM_PROVIDER=openai). No default model: set the one you want to pay for.

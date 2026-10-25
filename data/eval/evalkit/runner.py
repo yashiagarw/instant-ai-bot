@@ -26,18 +26,19 @@ def _fault_ids(knowledge, keys: list[str]) -> set[int]:
     return {knowledge.canonical(by_key[k]) for k in keys if k in by_key}
 
 
-def _converse(engine: Engine, case: Case, fault) -> tuple[object, set[str], set[int]]:
+def _converse(engine: Engine, case: Case, fault, extract=None) -> tuple[object, set[str], set[int]]:
     """A conversation with a customer who knows `fault`. Returns the final result and every alert seen
-    (fault keys and rule ids), because an alert may show mid-flow and the questions continue."""
+    (fault keys and rule ids), because an alert may show mid-flow and the questions continue. `extract(engine,
+    request) -> symptom ids` runs once on the customer's text (the live app's LLM extraction step)."""
     vehicle = _vehicle(case.vehicle)
     answers = [Answer(q, o) for q, o in case.answers]
+    base = {"vehicle": vehicle, "group": case.group, "category": case.category_pick, "text": case.text}
+    symptoms = extract(engine, Request(**base)) if extract is not None and case.text else []
+    if symptoms:  # only engines from 2.1 / 1.2 take symptom ids
+        base["symptoms"] = symptoms
 
     def ask():
-        return engine.diagnose(
-            Request(
-                vehicle=vehicle, group=case.group, category=case.category_pick, text=case.text, answers=list(answers)
-            )
-        )
+        return engine.diagnose(Request(**base, answers=list(answers)))
 
     result = ask()
     keys: set[str] = set()
@@ -68,13 +69,13 @@ def _alert_matches(alert, expected: dict, knowledge) -> bool:
     return RISK_ORDER.get(alert.risk, -1) >= RISK_ORDER[expected.get("risk", "low")]
 
 
-def run_case(engine: Engine, case: Case) -> dict:
+def run_case(engine: Engine, case: Case, extract=None) -> dict:
     k = engine.k
     expected_ids = _fault_ids(k, case.expected)
     # The simulated customer has the first listed fault; the others also count as right answers.
     first = _fault_ids(k, case.expected[:1])
     fault = k.faults.get(next(iter(first))) if first else None
-    result, seen_keys, _ = _converse(engine, case, fault)
+    result, seen_keys, _ = _converse(engine, case, fault, extract)
     ranked = [k.canonical(r.fault_id) for r in result.ranked]
     out: dict = {
         "id": case.id,
@@ -123,5 +124,5 @@ def _ids_for(knowledge, keys: set[str]) -> list[int]:
     return [by_key[key] for key in keys if key in by_key]
 
 
-def run_all(engine: Engine, cases: list[Case]) -> list[dict]:
-    return [run_case(engine, c) for c in cases]
+def run_all(engine: Engine, cases: list[Case], extract=None) -> list[dict]:
+    return [run_case(engine, c, extract) for c in cases]

@@ -7,7 +7,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | Path | What |
 |---|---|
 | `apps/web` | Customer site: Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
-| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `notify` (email alerts) |
+| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `notify` (email alerts), `llm` (optional LLM layer, off by default) |
 | `backend/engine` | Diagnosis engine, plain Python with no web imports |
 | `backend/alembic` | Database migrations |
 | `data/raw` | The 18 original Excel datasets. Never edit |
@@ -42,7 +42,7 @@ docker compose up -d db
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0006)
+uv run alembic upgrade head                          # all migrations (0001 … 0008)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -100,6 +100,7 @@ docker compose up -d db                      # backend tests need the database
 cd backend && uv run pytest -q               # API, engine, importer, migrations, requests
 cd backend && uv run ruff check . && uv run ruff format --check .
 cd backend && uv run python ../data/eval/run_eval.py --simulate   # diagnosis quality on golden + simulated cases
+cd backend && uv run python ../data/eval/run_eval.py run --split test --extraction llm   # through the LLM extraction step (fallback when LLM_PROVIDER=none)
 cd apps/web && pnpm test                     # Vitest component tests
 cd apps/web && pnpm test:e2e                 # Playwright, phone + desktop (builds and serves the app on :3100;
                                              # the API is mocked, no backend needed)
@@ -143,8 +144,63 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `EMAIL_PROVIDER` | `console` (default, prints the email), `smtp` or `resend` |
 | | `EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_STARTTLS`, `RESEND_API_KEY` | Email provider settings |
 | | `REQUEST_RATE_LIMIT`, `REQUEST_RATE_WINDOW_SECONDS` | New service requests per IP per window |
-| | `LLM_PROVIDER`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, … | Offline question drafting only; never used by the live app |
+| | `LLM_PROVIDER` | `none` (default: no LLM calls, every step uses its fallback), `anthropic` (live LLM layer, only with `ANTHROPIC_API_KEY`) or `openai` (offline question drafting only). See [LLM layer](#llm-layer-off-by-default) |
+| | `ANTHROPIC_API_KEY` | Claude API key: empty in `.env.example`; set it only to switch the LLM layer on |
+| | `LLM_EXTRACTION_MODEL`, `LLM_PHRASING_MODEL`, `LLM_EFFORT` | Live LLM models (`claude-haiku-5-5`) and effort (`low`) |
+| | `LLM_TIMEOUT_SECONDS`, `LLM_DAILY_SPEND_CAP_USD` | Per-call wall-clock timeout (4 s) and daily estimated spend cap (USD, India-time day); past either, the fallback is used |
+| | `QUESTIONS_MODEL`, `QUESTIONS_EFFORT`, `OPENAI_API_KEY`, `OPENAI_MODEL`, … | Offline question drafting (`python -m app.knowledge.questions`, `--provider anthropic\|openai`) |
 | `apps/web/.env.local` | `NEXT_PUBLIC_API_URL` | Backend base URL for the browser |
+
+## LLM layer (off by default)
+
+`backend/app/llm` adds two optional steps, each with a non-LLM fallback. The engine always decides which question
+to ask, ranks the faults and runs every safety rule; prices, part fit and safety rules come only from the database.
+
+| Step | With the LLM | Fallback (and with `LLM_PROVIDER=none`) |
+|---|---|---|
+| Extraction (session text and `POST /api/diagnosis/sessions/{id}/messages`) | The message plus up to 60 candidate symptom lines (with ids) and the waiting question go to Claude as one strict tool call; it returns symptom ids and maybe an answer. Ids not offered and options not offered are dropped. | Engine v2 + hybrid search match the words, as before |
+| Phrasing (each question in a session where the customer typed something) | The chosen question is reworded in the customer's language (English, Hindi or Hinglish); no numbers, prices, links or markup allowed | The original question text |
+
+How it is kept safe and cheap:
+
+- Phones, emails and number plates are masked before anything is sent (`app/llm/mask.py`). Customer text sits
+  inside `<customer_message>` (escaped) in the user turn, never in the system prompt; the prompt says it is data.
+- About 4 s per call (`LLM_TIMEOUT_SECONDS`), no retries; on timeout, refusal, invalid output or an API error the
+  fallback is used and the session carries on.
+- `LLM_DAILY_SPEND_CAP_USD` (estimated, India-time day): once reached, no calls until midnight.
+- Every call is logged in `llm_calls` (purpose, model, prompt version, tokens, latency, estimated cost, outcome:
+  `ok`, `dropped`, `invalid`, `refused`, `timeout`, `error`, `spend_cap`). The customer's text is never logged there.
+- Prompts are versioned files in `backend/app/llm/prompts/` (`extraction.v1.md`, `phrasing.v1.md`); to change one,
+  add `*.v2.md` and point `VERSIONS` in `prompts/__init__.py` at it.
+
+### Free-text turns
+
+`POST /api/diagnosis/sessions/{id}/messages` with `{"text": "..."}` (1-1000 characters). The words join the
+session's description (so safety words fire alerts at once). If they answer the waiting question, it is recorded
+as the answer; otherwise that question is set aside (`question_withdrawn` event) and the engine picks the next one
+again. The response is like an answer's, plus `understood: {source: llm|fallback, symptoms, answered_question}`.
+Questions carry `phrased: true` when the text was reworded.
+
+```bash
+curl -s -X POST localhost:8000/api/diagnosis/sessions/<session id>/messages \
+  -H 'Content-Type: application/json' -d '{"text": "battery se tik tik awaaz aati hai"}'
+```
+
+### Switching it on later
+
+1. Get a Claude API key and put it in `backend/.env` (never in `.env.example` or git):
+   `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY=sk-ant-...`.
+2. Optionally set `LLM_DAILY_SPEND_CAP_USD` (default 2) and the models (default `claude-haiku-5-5`; a model must
+   have a price in `backend/app/llm/pricing.py` or it is never called).
+3. Restart the API. Check calls with
+   `docker compose exec db psql -U autocare -d autocare -c "select created_at, purpose, model, outcome, input_tokens, output_tokens, latency_ms, cost_usd from llm_calls order by id desc limit 20;"`
+   and today's spend with `select sum(cost_usd) from llm_calls where created_at >= date_trunc('day', now() at time zone 'Asia/Kolkata') at time zone 'Asia/Kolkata';`.
+4. Measure extraction before relying on it: `cd backend && uv run python ../data/eval/run_eval.py run --split test
+   --extraction llm --label llm-extraction`, then `compare` against the `--extraction none` report. The report shows
+   the calls, outcomes, tokens and estimated cost. `EXTRACTED_SYMPTOM_SCORE` in `engine/core.py` (0.8) is not tuned
+   yet: tune it on `--split dev`.
+
+To switch it off again, set `LLM_PROVIDER=none` (or empty the key) and restart.
 
 ## Troubleshooting
 

@@ -489,18 +489,18 @@ def test_v2_is_the_default_engine_and_stops_when_the_cause_is_likely(client, kno
     a1 = answer(client, s["session_id"], main.id, option_id(main, "Car will not start"))
     assert a1["done"]  # the text and the main complaint make Weak battery likely enough (>= 0.75)
     result = client.get(f"/api/diagnosis/sessions/{s['session_id']}/result").json()
-    assert result["engine_version"] == "2.0.0" and result["stop_reason"] in ("probability", "margin")
+    assert result["engine_version"] == "2.1.0" and result["stop_reason"] in ("probability", "margin")
     top = result["ranked"][0]
     assert top["fault_key"] == "F08-BT-01" and 0.75 <= top["score"] <= 1
     assert sum(f["score"] for f in result["ranked"]) <= 1.0001  # probabilities
     assert top["confidence"] == "medium"  # High needs at least two answers
     assert isinstance(result["uncertainty"], list)
     ds = db_session.get(DiagnosisSession, uuid.UUID(s["session_id"]))
-    assert ds.engine_version == "2.0.0"
+    assert ds.engine_version == "2.1.0"
 
 
 def test_v1_is_still_selectable(client_v1, knowledge, variant, db_session):
     s = start(client_v1, vehicle={"variant_id": variant.id}, category_ids=["battery"])
     result = client_v1.get(f"/api/diagnosis/sessions/{s['session_id']}/result").json()
-    assert result["engine_version"] == "1.1.0" and result["uncertainty"] == []
-    assert db_session.get(DiagnosisSession, uuid.UUID(s["session_id"])).engine_version == "1.1.0"
+    assert result["engine_version"] == "1.2.0" and result["uncertainty"] == []
+    assert db_session.get(DiagnosisSession, uuid.UUID(s["session_id"])).engine_version == "1.2.0"

@@ -28,6 +28,8 @@ class EventType(StrEnum):
     safety_alert = "safety_alert"
     result_computed = "result_computed"
     answer_undone = "answer_undone"  # the customer went back: the last answer no longer counts
+    # A free-text message did not answer the waiting question: it no longer counts and the engine asks again.
+    question_withdrawn = "question_withdrawn"
 
 
 class Confidence(StrEnum):

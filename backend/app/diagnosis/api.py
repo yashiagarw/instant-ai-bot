@@ -15,6 +15,7 @@ from app.diagnosis import schemas as s
 from app.diagnosis.models import DiagnosisSession, SessionStatus
 from app.enums import Fuel, Transmission
 from app.knowledge.models import Category, GroupType, ProblemGroup, Question
+from app.llm.client import LLMClient
 from app.ratelimit import RateLimiter, client_ip
 from engine import vehicle_allows
 from engine.core import topic_variant
@@ -35,6 +36,13 @@ def get_engine(request: Request, session: DbSession) -> eng.Engine:
 
 
 EngineDep = Annotated[eng.Engine, Depends(get_engine)]
+
+
+def get_llm(request: Request) -> LLMClient | None:
+    return service.get_llm(request.app.state)
+
+
+LLMDep = Annotated[LLMClient | None, Depends(get_llm)]
 
 
 def limit_session_creation(request: Request) -> None:
@@ -79,11 +87,12 @@ def _alerts(alerts) -> list[s.SafetyAlertOut]:
     ]
 
 
-def _question(q) -> s.QuestionOut | None:
+def _question(session: Session, ds: DiagnosisSession, q) -> s.QuestionOut | None:
     if q is None:
         return None
+    text, phrased = service.question_text(session, ds, q)
     return s.QuestionOut(
-        id=q.id, text=q.text, options=[s.OptionOut(**asdict(o)) for o in q.options], category=q.category
+        id=q.id, text=text, options=[s.OptionOut(**asdict(o)) for o in q.options], category=q.category, phrased=phrased
     )
 
 
@@ -179,11 +188,11 @@ def list_categories(
     responses={422: ERRORS[422], 429: {"description": "Too many new sessions from this address"}},
     dependencies=[Depends(limit_session_creation)],
 )
-def create_session(body: s.SessionCreate, session: DbSession, engine: EngineDep):
+def create_session(body: s.SessionCreate, session: DbSession, engine: EngineDep, llm: LLMDep):
     """Start a session for a catalogue variant or an unlisted car (saved for review), from a topic, categories
     and / or free text. Returns the session id, coverage level, safety alerts and the first question."""
     try:
-        ds, result = service.create_session(session, engine, body)
+        ds, result = service.create_session(session, engine, body, llm)
     except service.SessionInputError as e:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e)) from e
     session.commit()
@@ -193,7 +202,7 @@ def create_session(body: s.SessionCreate, session: DbSession, engine: EngineDep)
         mode=result.mode,
         coverage_level=result.coverage,
         safety_alerts=_alerts(service.banner_alerts(result)[0]),
-        question=None if result.done else _question(result.next_question),
+        question=None if result.done else _question(session, ds, result.next_question),
         done=result.done,
         safety_tips=service.customer_tips(engine, result),
         actions=result.actions,
@@ -209,11 +218,11 @@ def create_session(body: s.SessionCreate, session: DbSession, engine: EngineDep)
     summary="Answer the current question",
     responses={404: ERRORS[404], 409: ERRORS[409], 422: ERRORS[422]},
 )
-def post_answer(body: s.AnswerIn, ds: SessionDep, session: DbSession, engine: EngineDep):
+def post_answer(body: s.AnswerIn, ds: SessionDep, session: DbSession, engine: EngineDep, llm: LLMDep):
     """Answer the question returned last. Send `option_id: "not_sure"` for Not sure. Returns the next question
     (or `done`), any safety alerts this answer fired, and all active alerts."""
     try:
-        result, new = service.answer(session, engine, ds, body)
+        result, new = service.answer(session, engine, ds, body, llm)
     except service.SessionStateError as e:
         raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
     except service.SessionInputError as e:
@@ -222,13 +231,50 @@ def post_answer(body: s.AnswerIn, ds: SessionDep, session: DbSession, engine: En
     return s.AnswerOut(
         session_id=ds.id,
         status=_status(ds),
-        question=None if result.done else _question(result.next_question),
+        question=None if result.done else _question(session, ds, result.next_question),
         done=result.done,
         new_safety_alerts=_alerts([a for a in new if a in service.banner_alerts(result)[0]]),
         safety_alerts=_alerts(service.banner_alerts(result)[0]),
         coverage_level=result.coverage,
         mode=result.mode,
         progress=_progress(session, ds, result),
+    )
+
+
+@router.post(
+    "/sessions/{session_id}/messages",
+    response_model=s.MessageOut,
+    summary="Send a free-text message",
+    responses={404: ERRORS[404], 409: ERRORS[409], 422: ERRORS[422]},
+)
+def post_message(body: s.MessageIn, ds: SessionDep, session: DbSession, engine: EngineDep, llm: LLMDep):
+    """The customer types instead of tapping. The words join the session's description (every safety rule reads
+    them). With the LLM on, they are matched to known symptoms and may answer the waiting question; otherwise (and
+    on any LLM failure) the engine's own search matches them. If the waiting question was not answered, the engine
+    chooses the next question again. Returns the same fields as an answer, plus what was understood."""
+    try:
+        result, new, ex = service.message(session, engine, ds, body.text, llm)
+    except service.SessionStateError as e:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
+    except service.SessionInputError as e:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e)) from e
+    session.commit()
+    banner = service.banner_alerts(result)[0]
+    return s.MessageOut(
+        session_id=ds.id,
+        status=_status(ds),
+        question=None if result.done else _question(session, ds, result.next_question),
+        done=result.done,
+        new_safety_alerts=_alerts([a for a in new if a in banner]),
+        safety_alerts=_alerts(banner),
+        coverage_level=result.coverage,
+        mode=result.mode,
+        progress=_progress(session, ds, result),
+        understood=s.UnderstoodOut(
+            source=ex.source,
+            symptoms=service.symptom_labels(engine, ex.symptom_ids),
+            answered_question=ex.answer is not None,
+        ),
     )
 
 
@@ -248,7 +294,7 @@ def get_session_state(ds: SessionDep, session: DbSession, engine: EngineDep):
     return s.SessionStateOut(
         session_id=ds.id,
         status=_status(ds),
-        question=None if done else _question(result.next_question),
+        question=None if done else _question(session, ds, result.next_question),
         done=done,
         new_safety_alerts=[],
         safety_alerts=_alerts(service.banner_alerts(result)[0]),
@@ -277,7 +323,7 @@ def undo_answer(ds: SessionDep, session: DbSession, engine: EngineDep):
     return s.AnswerOut(
         session_id=ds.id,
         status=_status(ds),
-        question=_question(result.next_question),
+        question=_question(session, ds, result.next_question),
         done=False,
         new_safety_alerts=[],
         safety_alerts=_alerts(service.banner_alerts(result)[0]),

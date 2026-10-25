@@ -107,9 +107,14 @@ class OptionOut(BaseModel):
 
 class QuestionOut(BaseModel):
     id: int | str = Field(description='Send back as `question_id`. "route:category" asks which category is closest.')
-    text: str
+    text: str = Field(description="The question to show: in the customer's language when `phrased`.")
     options: list[OptionOut]
     category: str | None = None
+    phrased: bool = Field(
+        default=False,
+        description="The text was reworded by the LLM in the customer's language (English, Hindi or Hinglish). The "
+        "engine chose the question; its meaning and options are unchanged.",
+    )
 
 
 class SafetyAlertOut(BaseModel):
@@ -172,6 +177,32 @@ class AnswerOut(BaseModel):
     previous_option_id: int | str | None = Field(
         default=None, description="After going back: the option chosen before, to show it selected."
     )
+
+
+class MessageIn(BaseModel):
+    """A free-text turn: the customer types instead of (or as well as) tapping an option."""
+
+    model_config = ConfigDict(
+        extra="forbid", json_schema_extra={"examples": [{"text": "haan lights flicker karti hain start karte waqt"}]}
+    )
+
+    text: str = Field(min_length=1, max_length=1000, description="English, Hindi or Hinglish. No personal details.")
+
+
+class UnderstoodOut(BaseModel):
+    source: Literal["llm", "fallback"] = Field(
+        description="llm: the message was read by the LLM extraction step. fallback: matched by the engine's own "
+        "search only (no LLM configured, timeout, invalid output or the daily spend cap)."
+    )
+    symptoms: list[str] = Field(description="Known symptom lines the message was matched to by the LLM.")
+    answered_question: bool = Field(
+        description="The message answered the waiting question. Otherwise that question was set aside and the "
+        "engine chose the next question again."
+    )
+
+
+class MessageOut(AnswerOut):
+    understood: UnderstoodOut
 
 
 class SessionStateOut(AnswerOut):

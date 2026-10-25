@@ -22,7 +22,12 @@ def test_settings() -> Settings:
     base = get_settings()
     # Keyword matching by default: API tests never load the embedding model (hybrid search has its own tests).
     return base.model_copy(
-        update={"database_url": base.test_database_url, "environment": "test", "diagnosis_search": "keyword"}
+        update={
+            "database_url": base.test_database_url,
+            "environment": "test",
+            "diagnosis_search": "keyword",
+            "llm_provider": "none",
+        }
     )
 
 

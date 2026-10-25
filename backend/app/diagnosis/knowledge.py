@@ -106,7 +106,7 @@ def load_knowledge(session: Session) -> et.Knowledge:
     for it in items:
         assert it.type not in INTERNAL_ITEM_TYPES
         if it.type == FaultItemType.symptom:
-            texts.append(et.TextEntry(it.fault_id, it.text, "symptom"))
+            texts.append(_known(et.TextEntry, fault_id=it.fault_id, text=it.text, kind="symptom", id=it.id))
         else:
             faults[it.fault_id].safety_tips.append(it.text)
     phrases = session.scalars(

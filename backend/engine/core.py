@@ -36,7 +36,7 @@ from engine.types import (
     Vehicle,
 )
 
-ENGINE_VERSION = "1.1.0"  # 1.1: hybrid search hook, Hindi (Devanagari) read as Hinglish
+ENGINE_VERSION = "1.2.0"  # 1.1: hybrid search hook, Hindi (Devanagari) read as Hinglish. 1.2: Request.symptoms
 DISCLAIMER = (
     "This is an estimate based on your answers and our data. It is not a replacement for a professional "
     "inspection by a mechanic."
@@ -54,6 +54,9 @@ MAX_SUGGESTIONS = 3
 ROUTE_MIN = 0.25  # free text picks a category by itself only above this similarity ...
 ROUTE_RATIO = 1.5  # ... and this far ahead of the next category
 HIGH_RISK_SCORE = 3.0  # a high-risk fault's rules fire once its score reaches one strong answer
+# Text-match score of a symptom the LLM extraction step found (Request.symptoms). Not tuned yet: choose it on the
+# dev split once real extraction runs (data/eval/run_eval.py run --extraction llm).
+EXTRACTED_SYMPTOM_SCORE = 0.8
 LIKELY_TOP = 3  # when the flow ends, every rule of the top 3 faults fires
 MAX_TIPS = 8
 RULE_TIPS = 4  # fast_track: likely faults' rule actions shown before the topic's own lines
@@ -146,6 +149,7 @@ class Engine:
         self.embed = embed
         self.search = search
         self.index = TextIndex(knowledge.texts)
+        self.symptom_entries = {e.id: e for e in knowledge.texts if e.kind == "symptom" and e.id is not None}
         vocab = danger_vocabulary(knowledge.rules)
         self.rules: list[SafetyRule] = []
         for r in knowledge.rules:
@@ -220,6 +224,11 @@ class Engine:
                 for fid, m in self.search(req.text, candidates).items():
                     if fid not in matches or m.score > matches[fid].score:
                         matches[fid] = m
+        for sid in req.symptoms:  # symptoms the extraction step found (ids outside the candidates are ignored)
+            e = self.symptom_entries.get(sid)
+            if e is not None and e.fault_id in candidates:
+                if e.fault_id not in matches or matches[e.fault_id].score < EXTRACTED_SYMPTOM_SCORE:
+                    matches[e.fault_id] = Match(EXTRACTED_SYMPTOM_SCORE, e.text, "symptom")
 
         return Scope(vehicle, group, mode, cats, hint, route_answer, candidates, text, matches)
 

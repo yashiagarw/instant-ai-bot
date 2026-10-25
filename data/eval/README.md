@@ -1,7 +1,7 @@
 # Engine evaluation harness
 
-Runs fully offline: the local database, the engine and (only with `--embeddings`) the locally cached embedding
-model. No LLM or network calls. Run everything from `backend/`.
+Runs offline: the local database, the engine and (with hybrid search or `--embeddings`) the locally cached
+embedding model. No LLM or network calls, except `run --extraction llm` with an LLM provider configured. Run everything from `backend/`.
 
 ```bash
 # One engine version -> data/eval/reports/<UTC timestamp>_eval_<label>.{md,json}
@@ -24,6 +24,11 @@ uv run python ../data/eval/tune_search.py
 # Engine v1 or v2 (default: DIAGNOSIS_ENGINE), and the dev / test split
 uv run python ../data/eval/run_eval.py run --diagnosis-engine v2 --split test
 uv run python ../data/eval/tune_v2.py            # tune v2 on the DEV split only (--focus: focus_top check)
+
+# Free-text cases through the live LLM extraction step (app.llm.extraction), current engine only. It calls Claude
+# only when LLM_PROVIDER=anthropic and ANTHROPIC_API_KEY are set; otherwise it is the fallback (no symptom ids), and
+# the results equal a run without --extraction. The report shows calls, outcomes, tokens and estimated cost.
+uv run python ../data/eval/run_eval.py run --split test --extraction llm --label llm-extraction
 
 # The original console tables (held-out phrases, simulated conversations, confused pairs)
 uv run python ../data/eval/run_eval.py --simulate --no-embeddings

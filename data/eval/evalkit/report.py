@@ -63,6 +63,17 @@ def _search_label(m: dict) -> str:
     return "search keyword index" + (" + embedding bonus" if m.get("embeddings") else " only")
 
 
+def _extraction_label(m: dict) -> str:
+    """LLM extraction on free-text cases (run --extraction llm): provider, calls, outcomes, tokens and cost."""
+    u = m.get("llm_usage") or {}
+    outcomes = ", ".join(f"{k} {v}" for k, v in sorted(u.get("outcomes", {}).items())) or "none"
+    return (
+        f"- Extraction: {m['extraction']} · LLM_PROVIDER={m.get('llm_provider')} · model {m.get('llm_model') or '-'} · "
+        f"{u.get('calls', 0)} calls ({outcomes}) · {u.get('input_tokens', 0)} in / {u.get('output_tokens', 0)} out "
+        f"tokens · estimated ${u.get('cost_usd_estimate', 0)}"
+    )
+
+
 def markdown(report: dict, misses_per_type: int = 15) -> str:
     m, s = report["meta"], report["summary"]
     lines = [
@@ -73,6 +84,7 @@ def markdown(report: dict, misses_per_type: int = 15) -> str:
         f"git {m['git_commit']}{' (uncommitted changes)' if m.get('git_dirty') else ''}",
         f"- Knowledge: dataset version {m['dataset_version_id']} · {_search_label(m)} · "
         f"{m['cases']} cases ({', '.join(f'{k} {v}' for k, v in m['cases_by_source'].items())})",
+        *([_extraction_label(m)] if m.get("extraction") else []),
         "- Synthetic cases (Hindi, typos, unlisted cars, some safety texts) were written to fill gaps; replace them "
         "with mechanic-confirmed cases when available.",
         "",

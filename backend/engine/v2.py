@@ -34,7 +34,7 @@ from engine.safety import evaluate
 from engine.text import STOPWORDS, tokens
 from engine.types import ROUTE_QUESTION, Question, QuestionOut, RankedFault, Request, Result
 
-ENGINE_VERSION_V2 = "2.0.0"
+ENGINE_VERSION_V2 = "2.1.0"  # 2.1: Request.symptoms (LLM-extracted symptom ids), shared with v1
 DEFAULTS = {"question_budget": MAX_QUESTIONS, "stop_probability": 0.75, "stop_margin": 0.5, "min_questions": 1}
 FAST_TRACK_ONLY = {"question_budget": FAST_TRACK_MAX, "min_questions": 0}
 # Chosen after tuning on the dev split (data/eval/tune_v2.py): sharper answers (beta 1.5); keeping several

@@ -17,3 +17,15 @@ def test_defaults_match_env_example(monkeypatch):
     s = Settings(_env_file=None)
     assert s.web_origin == "http://localhost:3000"
     assert s.test_database_url.endswith("/autocare_test")
+
+
+def test_env_example_keeps_the_llm_off_and_holds_no_key():
+    from pathlib import Path
+
+    lines = (Path(__file__).resolve().parents[1] / ".env.example").read_text().splitlines()
+    values = dict(line.split("=", 1) for line in lines if "=" in line and not line.startswith("#"))
+    assert values["LLM_PROVIDER"] == "none" and values["ANTHROPIC_API_KEY"] == ""
+    s = Settings(_env_file=None)
+    assert values["LLM_EXTRACTION_MODEL"] == s.llm_extraction_model and values["LLM_EFFORT"] == s.llm_effort
+    assert float(values["LLM_TIMEOUT_SECONDS"]) == s.llm_timeout_seconds
+    assert float(values["LLM_DAILY_SPEND_CAP_USD"]) == s.llm_daily_spend_cap_usd

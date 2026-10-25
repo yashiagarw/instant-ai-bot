@@ -1,0 +1,78 @@
+{
+ "meta": {
+  "stamp": "20261025-071540Z",
+  "label": "current-vs-llm-none",
+  "base": {
+   "created_at": "2026-10-25T06:20:03+00:00",
+   "stamp": "20261025-062003Z",
+   "engine_label": "current",
+   "engine_version": "2.0.0",
+   "diagnosis_engine": "v2",
+   "engine_hash": "3df74b2d3e",
+   "git_commit": "9d33fce",
+   "git_dirty": true,
+   "dataset_version_id": 36,
+   "embeddings": false,
+   "search": "hybrid",
+   "vector_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+   "cases": 2765,
+   "cases_by_type": {
+    "chips": 378,
+    "free_text": 1086,
+    "overlap": 691,
+    "safety": 444,
+    "unlisted": 166
+   },
+   "cases_by_source": {
+    "dataset": 1524,
+    "generated": 967,
+    "synthetic": 274
+   },
+   "split": "test"
+  },
+  "candidate": {
+   "created_at": "2026-10-25T07:15:25+00:00",
+   "stamp": "20261025-071525Z",
+   "engine_label": "llm-none",
+   "engine_version": "2.1.0",
+   "diagnosis_engine": "v2",
+   "engine_hash": "8379d00fa2",
+   "git_commit": "f6288b2",
+   "git_dirty": true,
+   "dataset_version_id": 36,
+   "embeddings": false,
+   "search": "hybrid",
+   "vector_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+   "cases": 2765,
+   "cases_by_type": {
+    "chips": 378,
+    "free_text": 1086,
+    "overlap": 691,
+    "safety": 444,
+    "unlisted": 166
+   },
+   "cases_by_source": {
+    "dataset": 1524,
+    "generated": 967,
+    "synthetic": 274
+   },
+   "extraction": "llm (fallback: no LLM client)",
+   "llm_provider": "none",
+   "llm_model": null,
+   "llm_usage": {
+    "calls": 0,
+    "outcomes": {},
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd_estimate": 0
+   },
+   "split": "test"
+  }
+ },
+ "overall": {},
+ "by_type": {},
+ "by_category": {},
+ "only_in_base": [],
+ "only_in_candidate": [],
+ "changes": []
+}

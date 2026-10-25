@@ -98,7 +98,7 @@ def test_uncertainty_flags():
 
 def test_make_engine_selects_the_version(knowledge):  # noqa: F811
     assert type(make_engine("v1", knowledge)) is Engine and type(make_engine("v2", knowledge)) is EngineV2
-    assert EngineV2(knowledge).diagnose(Request(category="brakes")).engine_version == "2.0.0"
+    assert EngineV2(knowledge).diagnose(Request(category="brakes")).engine_version == "2.1.0"
 
 
 def test_scores_are_probabilities_and_not_sure_makes_no_update(knowledge):  # noqa: F811
@@ -226,3 +226,33 @@ def test_chosen_defaults():
         "focus_top": None,
     }
     assert (DEFAULTS["stop_probability"], DEFAULTS["stop_margin"]) == (0.75, 0.5)
+
+
+# ---------------------------------------------------------------- symptoms from the LLM extraction step
+
+
+@pytest.mark.parametrize("version", ["v1", "v2"])
+def test_extracted_symptoms_count_as_text_matches(knowledge, version):  # noqa: F811
+    import copy
+
+    from engine import types as et
+    from engine.core import EXTRACTED_SYMPTOM_SCORE
+
+    k = copy.deepcopy(knowledge)
+    k.texts.append(et.TextEntry(3, "Steering wheel shakes when braking", "symptom", id=501))
+    k.texts.append(et.TextEntry(4, "Tyre flat", "symptom", id=502))
+    engine = make_engine(version, k)
+    match = engine._scope(Request(category="brakes", symptoms=[501])).matches[3]
+    assert (match.score, match.text, match.kind) == (
+        EXTRACTED_SYMPTOM_SCORE,
+        "Steering wheel shakes when braking",
+        "symptom",
+    )
+    # Ids of faults outside the scope (a tyre fault) and unknown ids are ignored.
+    assert engine._scope(Request(category="brakes", symptoms=[502, 999])).matches == {}
+    if version == "v2":
+        plain = engine.diagnose(Request(category="brakes"))
+        with_symptom = engine.diagnose(Request(category="brakes", symptoms=[501]))
+        assert plain.ranked[0].fault_id != 3 and with_symptom.ranked[0].fault_id == 3
+        assert "Matched symptom: Steering wheel shakes when braking" in with_symptom.ranked[0].evidence
+    assert 0 < EXTRACTED_SYMPTOM_SCORE <= 1

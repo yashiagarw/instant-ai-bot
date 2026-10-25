@@ -40,9 +40,16 @@ def test_llm_provider_setting_reads_environment(monkeypatch):
     assert s.llm_provider == "openai" and s.openai_model == "some-model"
 
 
-def test_llm_provider_defaults_to_anthropic(monkeypatch):
+def test_llm_provider_defaults_to_none(monkeypatch):
     monkeypatch.delenv("LLM_PROVIDER", raising=False)
-    assert Settings(_env_file=None).llm_provider == "anthropic"
+    assert Settings(_env_file=None).llm_provider == "none"
+
+
+def test_offline_generation_needs_a_real_provider_when_the_setting_is_none():
+    s = settings(llm_provider="none")
+    assert provider_name(Namespace(provider=None), s) == "none"
+    with pytest.raises(LLMError, match="LLM_PROVIDER is none"):
+        make_provider("none", s)
 
 
 def test_llm_provider_rejects_unknown_values(monkeypatch):
