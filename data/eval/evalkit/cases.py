@@ -54,6 +54,7 @@ class Case:
     expected_alert: dict | None = None  # {"risk": "high"} / {"rule_id": 12} / {"none": True}
     expected_coverage: list[str] = field(default_factory=list)
     note: str = ""
+    split_key: str = ""  # cases sharing a key stay on the same side of the dev / test split (see split_of)
 
     def to_json(self) -> dict:
         return {
@@ -142,6 +143,7 @@ def phrase_cases(knowledge, phrases: list[tuple[str, int, str | None]], typo_eve
                 id=f"ft-{f.key}-{short_hash(text)}",
                 type="free_text",
                 source="dataset",
+                split_key=f"phrase:{short_hash(text)}",
                 category=f.category,
                 expected=[f.key],
                 lang=language(text, tag),
@@ -157,6 +159,7 @@ def phrase_cases(knowledge, phrases: list[tuple[str, int, str | None]], typo_eve
                         id=f"typo-{f.key}-{short_hash(text)}",
                         type="free_text",
                         source="synthetic",
+                        split_key=f"phrase:{short_hash(text)}",
                         category=f.category,
                         expected=[f.key],
                         lang="typo",
@@ -172,6 +175,7 @@ def phrase_cases(knowledge, phrases: list[tuple[str, int, str | None]], typo_eve
                     id=f"ovl-{f.key}-{short_hash(text)}",
                     type="overlap",
                     source="dataset",
+                    split_key=f"phrase:{short_hash(text)}",
                     category=f.category,
                     expected=[f.key],
                     lang=language(text, tag),
@@ -198,6 +202,7 @@ def chip_cases(knowledge) -> list[Case]:
                 id=f"chips-{f.key}",
                 type="chips",
                 source="generated",
+                split_key=f"fault:{f.key}",
                 category=f.category,
                 expected=[f.key],
                 group=group,
@@ -227,6 +232,7 @@ def safety_cases(knowledge, rules) -> list[Case]:
                     id=f"safety-rule{r.id}-opt{oid}",
                     type="safety",
                     source="generated",
+                    split_key=f"rule:{r.id}",
                     category=f.category,
                     category_pick=q.category,
                     answers=[(q.id, oid)],
@@ -239,6 +245,7 @@ def safety_cases(knowledge, rules) -> list[Case]:
                     id=f"safety-rule{r.id}-{short_hash(phrase)}",
                     type="safety",
                     source="generated",
+                    split_key=f"rule:{r.id}",
                     category=f.category,
                     lang=language(phrase),
                     category_pick=f.category,
@@ -261,6 +268,7 @@ def unlisted_variants(cases: list[Case], every: int = 10) -> list[Case]:
                     id=f"unl-{segment or 'noseg'}-{c.id}",
                     type="unlisted",
                     source="generated",
+                    split_key=c.split_key,
                     category=c.category,
                     expected=c.expected,
                     lang=c.lang,
@@ -271,6 +279,19 @@ def unlisted_variants(cases: list[Case], every: int = 10) -> list[Case]:
                 )
             )
     return out
+
+
+# ---------------------------------------------------------------- dev / test split
+
+
+def split_of(case: Case) -> str:
+    """dev or test. Tune only on dev; report on test. Cases written by people (synthetic, mechanic: Hindi, typed
+    typos, unlisted cars, safety texts) are always test, so nothing is tuned on them. Generated typo variants follow
+    their phrase. The rest is split 50/50 by a stable hash of the split key (phrase, fault or rule)."""
+    if case.source in ("synthetic", "mechanic") and not case.split_key:
+        return "test"
+    key = case.split_key or case.id
+    return "dev" if int(hashlib.sha1(key.encode()).hexdigest(), 16) % 2 == 0 else "test"
 
 
 # ---------------------------------------------------------------- YAML cases (written by people)

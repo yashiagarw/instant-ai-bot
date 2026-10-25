@@ -21,6 +21,10 @@ uv run python ../data/eval/run_eval.py run --search keyword --label keyword-only
 # Tune hybrid search on TRAINING phrases (leave-one-out; never on the eval cases)
 uv run python ../data/eval/tune_search.py
 
+# Engine v1 or v2 (default: DIAGNOSIS_ENGINE), and the dev / test split
+uv run python ../data/eval/run_eval.py run --diagnosis-engine v2 --split test
+uv run python ../data/eval/tune_v2.py            # tune v2 on the DEV split only (--focus: focus_top check)
+
 # The original console tables (held-out phrases, simulated conversations, confused pairs)
 uv run python ../data/eval/run_eval.py --simulate --no-embeddings
 ```
@@ -48,6 +52,12 @@ The Hindi gain comes from reading Devanagari as Hinglish (engine 1.1, `engine/hi
 queries, from scoring a strong vector match on its own similarity (the indexed text has no Devanagari, so the
 vector list is the only real evidence); hybrid search adds on English and typos. The Hindi cases are synthetic and written by the same team as the glossary: expect real
 customer messages to score lower.
+
+## Dev / test split
+
+`--split dev|test|all`. Tune on dev, report on test. Cases built from one held-out phrase (free text, its typo
+variant, overlap and unlisted variants) stay together; chips split by fault, generated safety cases by rule;
+cases written by people (`synthetic`, `mechanic`, all Hindi) are always test. 2,714 dev / 2,765 test cases.
 
 ## Cases
 

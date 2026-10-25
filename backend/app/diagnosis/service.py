@@ -52,7 +52,7 @@ def get_engine(state, session: Session, settings: Settings) -> eng.Engine:
     with _engine_lock:
         if getattr(state, "diagnosis_engine", None) is None:
             search = hybrid_search(state) if settings.diagnosis_search == "hybrid" else None
-            state.diagnosis_engine = eng.Engine(load_knowledge(session), search=search)
+            state.diagnosis_engine = eng.make_engine(settings.diagnosis_engine, load_knowledge(session), search=search)
         return state.diagnosis_engine
 
 
@@ -233,7 +233,7 @@ def create_session(session: Session, engine: eng.Engine, body) -> tuple[Diagnosi
         price_segment=snapshot.get("segment"),
         problem_group_code=body.topic_id,
         entry_text=body.text.strip() or None,
-        engine_version=eng.ENGINE_VERSION,
+        engine_version=engine.version,
         dataset_version_id=engine.k.dataset_version_id,
     )
     session.add(ds)

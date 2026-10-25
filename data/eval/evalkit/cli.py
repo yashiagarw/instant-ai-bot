@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from evalkit import report as rep
-from evalkit.cases import chip_cases, load_yaml_cases, phrase_cases, safety_cases, unlisted_variants
+from evalkit.cases import chip_cases, load_yaml_cases, phrase_cases, safety_cases, split_of, unlisted_variants
 from evalkit.metrics import summarise
 from evalkit.versions import CURRENT, VersionError, engine_hash, git, git_info, materialise
 
@@ -49,12 +49,19 @@ def make_search(kind: str):
 
 
 def evaluate(
-    knowledge, cases, *, label: str, embeddings: bool, search: str = "keyword", extra_meta: dict | None = None
+    knowledge,
+    cases,
+    *,
+    label: str,
+    embeddings: bool,
+    search: str = "keyword",
+    diagnosis_engine: str = "v1",
+    extra_meta: dict | None = None,
 ) -> dict:
     """Run the cases on the `engine` package this process imported and return the report (meta, summary,
     results)."""
     import engine as engine_pkg
-    from engine import ENGINE_VERSION, Engine
+    from engine import Engine
     from evalkit.runner import run_all
 
     embed = None
@@ -65,14 +72,21 @@ def evaluate(
         vectors = dict(zip(texts, SentenceTransformerEmbedder().encode(texts), strict=True))
         embed = vectors.__getitem__
     hybrid = make_search(search)
-    engine = Engine(knowledge, embed=embed, search=hybrid) if hybrid else Engine(knowledge, embed=embed)
+    kwargs = {"embed": embed, **({"search": hybrid} if hybrid else {})}
+    if diagnosis_engine == "v2":
+        from engine import EngineV2  # not in engine versions before 2.0
+
+        engine = EngineV2(knowledge, **kwargs)
+    else:
+        engine = Engine(knowledge, **kwargs)
     results = run_all(engine, cases)
     now = datetime.now(UTC)
     meta = {
         "created_at": now.isoformat(timespec="seconds"),
         "stamp": rep.timestamp(now),
         "engine_label": label,
-        "engine_version": ENGINE_VERSION,
+        "engine_version": engine.version if hasattr(engine, "version") else engine_pkg.ENGINE_VERSION,
+        "diagnosis_engine": diagnosis_engine,
         "engine_hash": engine_hash(Path(engine_pkg.__file__).parent),
         **git_info(),
         "dataset_version_id": knowledge.dataset_version_id,
@@ -87,7 +101,7 @@ def evaluate(
     return {"meta": meta, "summary": summarise(results), "results": results}
 
 
-def _load(category: str | None):
+def _load(category: str | None, split: str = "all"):
     """Knowledge, held-out phrases (with language) and every case, from the configured database."""
     from run_eval import CASES_DIR, held_out_phrases
 
@@ -101,12 +115,15 @@ def _load(category: str | None):
     cases = build_cases(knowledge, phrases, CASES_DIR)
     if category:
         cases = [c for c in cases if c.category == category]
+    if split != "all":
+        cases = [c for c in cases if split_of(c) == split]
     return knowledge, cases
 
 
 def run_here(args) -> dict:
-    knowledge, cases = _load(args.category)
+    knowledge, cases = _load(args.category, args.split)
     extra = {"category_filter": args.category} if args.category else {}
+    extra["split"] = args.split
     if args.engine_ref:
         extra["engine_commit"] = args.engine_ref
     return evaluate(
@@ -115,6 +132,7 @@ def run_here(args) -> dict:
         label=args.engine_label or CURRENT,
         embeddings=args.embeddings,
         search=args.search,
+        diagnosis_engine=args.diagnosis_engine,
         extra_meta=extra,
     )
 
@@ -135,7 +153,7 @@ def run_version(spec: str, args, out: Path) -> dict:
     cmd = [sys.executable, str(RUN_EVAL), "run", "--engine-path", str(path), "--engine-label", label, "--out", str(out)]
     cmd += ["--engine-ref", ref] if ref else []
     cmd += ["--embeddings"] if args.embeddings else []
-    cmd += ["--search", args.search]
+    cmd += ["--search", args.search, "--diagnosis-engine", args.diagnosis_engine, "--split", args.split]
     cmd += ["--category", args.category] if args.category else []
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode:
@@ -184,22 +202,34 @@ def harness(argv: list[str]) -> None:
             "--embeddings", action="store_true", help="keyword search only: add the old embedding bonus (legacy)"
         )
         p.add_argument(
+            "--diagnosis-engine",
+            choices=["v1", "v2"],
+            default=None,
+            help="engine algorithm for current runs (default: DIAGNOSIS_ENGINE, as in the live app)",
+        )
+        p.add_argument(
             "--search",
             choices=["hybrid", "keyword"],
             default=None,
             help="free-text matching (default: DIAGNOSIS_SEARCH, as in the live app)",
         )
         p.add_argument("--category", help="only cases of this category")
+        p.add_argument(
+            "--split",
+            choices=["all", "dev", "test"],
+            default="all",
+            help="dev (tune on it) or test (report on it); synthetic cases are always test",
+        )
         p.add_argument("--out", type=Path, default=EVAL_DIR / "reports", help="report folder")
     # Internal: a child process running one engine version.
     run.add_argument("--engine-path", help=argparse.SUPPRESS)
     run.add_argument("--engine-label", help=argparse.SUPPRESS)
     run.add_argument("--engine-ref", help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
-    if args.search is None:
-        from app.config import get_settings
+    from app.config import get_settings
 
-        args.search = get_settings().diagnosis_search
+    args.search = args.search or get_settings().diagnosis_search
+    args.diagnosis_engine = args.diagnosis_engine or get_settings().diagnosis_engine
 
     try:
         if args.cmd == "run" and args.engine_path:  # child process

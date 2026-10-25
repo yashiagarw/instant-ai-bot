@@ -366,6 +366,19 @@ class CustomerPhrase(Base):
     fault: Mapped[Fault] = relationship(back_populates="phrases")
 
 
+class FaultPrior(Base):
+    """Relative prior of a fault for engine v2 (how common it is among cars that reach us). Missing = equal.
+    Values are relative: only their ratios matter. `source` says where the number came from (e.g. job records)."""
+
+    __tablename__ = "fault_priors"
+    __table_args__ = (CheckConstraint("prior > 0", name="prior_positive"),)
+
+    fault_id: Mapped[int] = mapped_column(ForeignKey("faults.id", ondelete="CASCADE"), primary_key=True)
+    prior: Mapped[Decimal] = mapped_column(Numeric(8, 4))
+    source: Mapped[str] = mapped_column(Text, default="", server_default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class EmbeddingOwner(StrEnum):
     symptom = "symptom"  # fault_items of type symptom
     synonym = "synonym"  # customer_phrases (approved, not held out): how customers say it

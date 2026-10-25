@@ -299,3 +299,17 @@ def test_full_run_on_fixture_knowledge(knowledge, tmp_path):  # noqa: F811
     assert report["summary"]["by_type"]["safety"]["safety_recall"] is not None
     jpath, mpath = rep.write(report, tmp_path / "reports")
     assert jpath.exists() and mpath.exists()
+
+
+def test_dev_test_split_keeps_variants_together_and_people_written_cases_in_test(knowledge):  # noqa: F811
+    from evalkit.cases import split_of
+
+    cases = phrase_cases(knowledge, PHRASES, typo_every=1) + chip_cases(knowledge)
+    by_phrase: dict[str, set[str]] = {}
+    for c in cases:
+        by_phrase.setdefault(c.split_key, set()).add(split_of(c))
+    assert all(len(sides) == 1 for sides in by_phrase.values())  # free text, typo and overlap of a phrase together
+    assert {split_of(c) for c in cases} <= {"dev", "test"}
+    written = Case("synthetic_hindi:x", "free_text", "synthetic", "tyre", ["F04-TY-03"], text="टायर")
+    assert split_of(written) == "test"  # never tuned on
+    assert split_of(cases[0]) == split_of(cases[0])  # stable

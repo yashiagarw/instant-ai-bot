@@ -223,6 +223,11 @@ class RankedFaultOut(BaseModel):
     media: list[MediaOut]
 
 
+class UncertaintyOut(BaseModel):
+    code: Literal["two_equally_likely", "no_known_pattern"]
+    message: str = Field(description="Shown to the customer as it is.")
+
+
 class AnsweredQuestionOut(BaseModel):
     question: str
     answer: str
@@ -251,6 +256,9 @@ class ResultOut(BaseModel):
         "inspect, no_category; null while in progress."
     )
     ranked: list[RankedFaultOut] = Field(description="Up to 3 likely causes (fewer only when fewer are possible).")
+    uncertainty: list[UncertaintyOut] = Field(
+        default_factory=list, description="Engine v2: two causes equally likely, or symptoms matching no pattern."
+    )
     safety_alerts: list[SafetyAlertOut]
     roadside: RoadsideOut
     safety_tips: list[str]

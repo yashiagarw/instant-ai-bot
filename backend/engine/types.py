@@ -21,6 +21,7 @@ class Category:
     filters: list[dict] = field(default_factory=list)  # [{"name":..., "fuel": [...], "transmission": [...]}]
     wave: float = 1.0
     source_files: tuple[int, ...] = ()
+    config: dict = field(default_factory=dict)  # per-category engine settings (categories.config): budget, thresholds
 
 
 @dataclass
@@ -66,6 +67,7 @@ class Fault:
     costs: dict[str, Cost] = field(default_factory=dict)
     part_fit_texts: list[str] = field(default_factory=list)  # approved + checked part price sources
     alias_keys: list[str] = field(default_factory=list)  # merged duplicates of this fault (canonical only)
+    prior: float = 1.0  # relative prior (fault_priors table; equal when missing). Used by engine v2.
 
 
 @dataclass
@@ -259,3 +261,4 @@ class Result:
     active_categories: list[str]
     disclaimer: str
     stop_reason: str | None = None  # why the flow ended: leader_clear, single_candidate, question_limit, ...
+    uncertainty: list[str] = field(default_factory=list)  # v2: two_equally_likely, no_known_pattern

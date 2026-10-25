@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # the embeddings table; loads the local multilingual MiniLM model, about 470 MB, at first use) or keyword
     # (the engine's built-in keyword index, no model).
     diagnosis_search: Literal["hybrid", "keyword"] = "hybrid"
+    # Diagnosis engine: v2 (Bayesian posterior, information gain; the default since the 2.3 test-split comparison)
+    # or v1 (scores and fixed rules).
+    diagnosis_engine: Literal["v1", "v2"] = "v2"
     # Per-IP limit on new diagnosis sessions: at most N per window.
     session_rate_limit: int = 10
     session_rate_window_seconds: int = 60

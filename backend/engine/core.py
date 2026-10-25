@@ -9,6 +9,7 @@ changes nothing.
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from itertools import combinations
 
 from engine.hindi import expand as expand_hindi
@@ -122,7 +123,22 @@ def cost_for(fault: Fault, vehicle: Vehicle | None) -> CostOut | None:
     return CostOut(display="text", text=c.text, **base)
 
 
+@dataclass
+class Scope:
+    vehicle: Vehicle
+    group: Group | None
+    mode: str  # diagnose | fast_track | inspect | suggest
+    cats: list[str]
+    hint: str | None
+    route_answer: object | None
+    candidates: set[int]
+    text: str  # the free text, with the Hinglish form of any Devanagari
+    matches: dict[int, Match]
+
+
 class Engine:
+    version = ENGINE_VERSION
+
     def __init__(self, knowledge: Knowledge, embed: Embed | None = None, search: Search | None = None):
         """`search(text, fault_ids) -> {fault_id: Match}` (hybrid search in the app) is used with the built-in keyword
         index for free-text matching and category suggestion: each fault keeps its better match."""
@@ -157,7 +173,9 @@ class Engine:
 
     # ------------------------------------------------------------ main entry
 
-    def diagnose(self, req: Request) -> Result:
+    def _scope(self, req: Request) -> Scope:
+        """Shared by v1 and v2: the car, the topic, the categories in play, the candidate faults and the free-text
+        matches (keyword index plus hybrid search)."""
         k = self.k
         vehicle = req.vehicle or Vehicle()
         group = k.groups.get(req.group) if req.group else None
@@ -202,6 +220,14 @@ class Engine:
                 for fid, m in self.search(req.text, candidates).items():
                     if fid not in matches or m.score > matches[fid].score:
                         matches[fid] = m
+
+        return Scope(vehicle, group, mode, cats, hint, route_answer, candidates, text, matches)
+
+    def diagnose(self, req: Request) -> Result:
+        k = self.k
+        sc = self._scope(req)
+        vehicle, group, mode, cats, route_answer = sc.vehicle, sc.group, sc.mode, sc.cats, sc.route_answer
+        candidates, text, matches = sc.candidates, sc.text, sc.matches
 
         # Routing: several categories and none picked yet -> free text decides if clearly ahead, else ask.
         suggestions = self._category_scores(cats, matches)

@@ -119,6 +119,13 @@ def client(test_settings, db_session, knowledge):
 
 
 @pytest.fixture
+def client_v1(test_settings, db_session, knowledge):
+    """Engine v1 (DIAGNOSIS_ENGINE=v1): still selectable after v2 became the default."""
+    with make_client(test_settings, db_session, diagnosis_engine="v1") as c:
+        yield c
+
+
+@pytest.fixture
 def variant(db_session):
     return db_session.scalars(select(Variant).where(Variant.fuel == "petrol", Variant.price_segment == "mid")).first()
 
@@ -159,7 +166,8 @@ def test_categories_filtered_by_vehicle(client, db_session):
 # ---------------------------------------------------------------- happy path
 
 
-def test_full_diagnosis_happy_path(client, knowledge, variant, db_session):
+def test_full_diagnosis_happy_path_v1(client_v1, knowledge, variant, db_session):
+    client = client_v1  # this test follows v1's flow (main complaint, then the follow-up, then stop)
     main, follow = knowledge["main"], knowledge["follow"]
     s = start(client, vehicle={"variant_id": variant.id}, category_ids=["battery"], text="car makes a click sound")
     sid = uuid.UUID(s["session_id"])
@@ -472,3 +480,27 @@ def test_banner_only_has_high_risk_alerts(client, knowledge, variant):
     result = client.get(f"/api/diagnosis/sessions/{s['session_id']}/result").json()
     assert result["safety_alerts"] and all(a["risk"] == "high" for a in result["safety_alerts"])
     assert all(a["stop_driving_trigger"] != "Not stated" for a in result["safety_alerts"])
+
+
+def test_v2_is_the_default_engine_and_stops_when_the_cause_is_likely(client, knowledge, variant, db_session):
+    main = knowledge["main"]
+    s = start(client, vehicle={"variant_id": variant.id}, category_ids=["battery"], text="car makes a click sound")
+    assert s["question"]["id"] == main.id
+    a1 = answer(client, s["session_id"], main.id, option_id(main, "Car will not start"))
+    assert a1["done"]  # the text and the main complaint make Weak battery likely enough (>= 0.75)
+    result = client.get(f"/api/diagnosis/sessions/{s['session_id']}/result").json()
+    assert result["engine_version"] == "2.0.0" and result["stop_reason"] in ("probability", "margin")
+    top = result["ranked"][0]
+    assert top["fault_key"] == "F08-BT-01" and 0.75 <= top["score"] <= 1
+    assert sum(f["score"] for f in result["ranked"]) <= 1.0001  # probabilities
+    assert top["confidence"] == "medium"  # High needs at least two answers
+    assert isinstance(result["uncertainty"], list)
+    ds = db_session.get(DiagnosisSession, uuid.UUID(s["session_id"]))
+    assert ds.engine_version == "2.0.0"
+
+
+def test_v1_is_still_selectable(client_v1, knowledge, variant, db_session):
+    s = start(client_v1, vehicle={"variant_id": variant.id}, category_ids=["battery"])
+    result = client_v1.get(f"/api/diagnosis/sessions/{s['session_id']}/result").json()
+    assert result["engine_version"] == "1.1.0" and result["uncertainty"] == []
+    assert db_session.get(DiagnosisSession, uuid.UUID(s["session_id"])).engine_version == "1.1.0"

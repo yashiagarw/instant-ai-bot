@@ -21,6 +21,7 @@ from app.knowledge.models import (
     FaultItem,
     FaultItemType,
     FaultLink,
+    FaultPrior,
     InspectionChecklistItem,
     LinkRelation,
     OptionEffect,
@@ -47,13 +48,15 @@ def load_knowledge(session: Session) -> et.Knowledge:
     version = target_version(session)
 
     categories = {
-        c.code: et.Category(
+        c.code: _known(
+            et.Category,
             code=c.code,
             name=c.name,
             kind=str(c.kind),
             filters=list(c.vehicle_filters or []),
             wave=float(c.wave),
             source_files=tuple(sorted({s.file_no for s in c.sources})),
+            config=dict(c.config or {}),
         )
         for c in session.scalars(select(Category).options(selectinload(Category.sources)))
     }
@@ -85,6 +88,12 @@ def load_knowledge(session: Session) -> et.Knowledge:
         for f in rows
     }
     ids = list(faults)
+    # Relative priors for engine v2 (equal when a fault has no row; older engine versions have no prior field).
+    if "prior" in {f.name for f in dataclasses.fields(et.Fault)}:
+        for fid, prior in session.execute(
+            select(FaultPrior.fault_id, FaultPrior.prior).where(FaultPrior.fault_id.in_(ids))
+        ):
+            faults[fid].prior = float(prior)
 
     texts: list[et.TextEntry] = []
     items = session.scalars(

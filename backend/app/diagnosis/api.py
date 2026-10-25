@@ -328,6 +328,7 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
             )
             for i, r in enumerate(top, start=1)
         ],
+        uncertainty=[s.UncertaintyOut(code=c, message=m) for c, m in eng.uncertainty_messages(result)],
         safety_alerts=_alerts(service.banner_alerts(result)[0]),
         roadside=s.RoadsideOut(
             verdict=result.roadside.verdict,

@@ -68,7 +68,8 @@ def markdown(report: dict, misses_per_type: int = 15) -> str:
     lines = [
         f"# Engine evaluation: {m['engine_label']}",
         "",
-        f"- Run: {m['created_at']} · engine version {m['engine_version']} (code {m['engine_hash']}) · "
+        f"- Run: {m['created_at']} · engine {m.get('diagnosis_engine', 'v1')} version {m['engine_version']} "
+        f"(code {m['engine_hash']}) · "
         f"git {m['git_commit']}{' (uncommitted changes)' if m.get('git_dirty') else ''}",
         f"- Knowledge: dataset version {m['dataset_version_id']} · {_search_label(m)} · "
         f"{m['cases']} cases ({', '.join(f'{k} {v}' for k, v in m['cases_by_source'].items())})",
@@ -211,7 +212,7 @@ def compare_markdown(cmp: dict, limit: int = 100) -> str:
         "",
         *(
             f"- {role}: {m['engine_label']} (version {m['engine_version']}, code {m['engine_hash']}, "
-            f"search {m.get('search', 'keyword')}, run {m['created_at']})"
+            f"engine {m.get('diagnosis_engine', 'v1')}, search {m.get('search', 'keyword')}, run {m['created_at']})"
             for role, m in (("Base", mb), ("Candidate", mc))
         ),
         "",
