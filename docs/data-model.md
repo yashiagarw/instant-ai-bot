@@ -307,6 +307,27 @@ Every question has exactly one `is_not_sure` option, which has no effects. Stage
 
 QUALITY_AUDIT rows are not imported as data. The importer copies their result into the import report, and their key lists (APPROX keys, fit-to-confirm keys) become a fallback fault link for file 9's part sources.
 
+## Parts catalogue (migration 0010, task 3.1)
+
+Built from the reference tables above by `python -m app.parts build` (code: `backend/app/parts`). Part types, brands and
+parts are upserted by natural key, so ids stay stable; the version's prices, fits, fault links and labour are replaced
+on every build.
+
+| Table | Columns (main) | Notes |
+|---|---|---|
+| part_types | key (lower case), name | from the part name without trailing brackets ("Clutch plate (Maruti part ...)" -> "Clutch plate") |
+| brands | name, kind (`oem`, `oes`, `aftermarket`, `unspecified`) | "Any good brand", "Market price" are no brand; "(via Motrparts)" is dropped |
+| parts | part_key, part_type, brand, part_number, quantity, description, generic, segment | `PN:<brand>:<number>:<qty>`; `SRC:<F12-KEY>` (no number, model named); `GEN:<segment>:<description>` (generic, never fits a car) |
+| part_images | part, image, source (`picture_id`) | "Picture ID" -> the file's image with that code |
+| part_compatibility (dv) | part, model (required), variant, year_from, year_to, fuel, transmission, verification_status (`listed`, `confirm_fit`), fit_text, source, source_ref, source_url | parsed from "Vehicle (fit)" (`app/parts/fit.py`); only models in the vehicle catalogue |
+| part_prices (dv) | part, segment, price_inr, price_max_inr, price_basis, gst_text, gst_included, fitting_included, supplier, source_url, checked_on, verification_status, model_verified, source, source_ref | `model_verified = false` for segment-column prices |
+| fault_parts | fault (canonical after merges), part, segment, source_fault_key, link_source, status, in_total | only `approved` links are shown |
+| labour_rates (dv) | repair, segment, city, amount_inr, workshop_type, basis, status, checked_on, source_file_no | one row per segment; 0 in the sheet = does not apply |
+
+A part's fit for a variant (`app/parts/fit.py: fit_for_variant`): a compatibility row of the same model whose fuel and
+gearbox (when given) match and whose years overlap the variant's. A row that covers only part of the variant's years
+counts as `confirm_fit`. No row, no fit: the API shows the part as "fit not verified".
+
 ## Catalogue, sessions and requests
 
 Implemented with the knowledge tables in migration `0002` (task 1.3). Code: `backend/app/vehicles`, `backend/app/diagnosis`, `backend/app/requests`.
@@ -329,11 +350,11 @@ Value sets (fuel, transmission, segment, statuses) are text columns with CHECK c
 
 | Level | When |
 |---|---|
-| `part_fit_verified` | a `part_price_sources` row for the top fault has `verification_status = checked` and its structured `vehicle_fit` includes the user's model |
+| `part_fit_verified` | a `part_compatibility` record lists a part of the fault for the user's car with status `listed` (parts API, task 3.1). The diagnosis result still decides it with its own text match on `vehicle_fit_text` (`engine/core.py: coverage_level`); moving it onto `part_compatibility` is a follow-up |
 | `segment_estimate` | the car's price segment is known (catalogue variant or the "what did it cost new" answer) |
 | `general_guidance` | segment unknown, or the category does not apply cleanly |
 
-`vehicle_fit` is free text today ("Listed on Maruti WagonR periodic-maintenance page"), so `part_fit_verified` cannot fire until a reviewed structured fit list exists.
+`vehicle_fit` stays free text in `part_price_sources`; the structured fit is `part_compatibility` (task 3.1).
 
 ## Field mapping: main template
 

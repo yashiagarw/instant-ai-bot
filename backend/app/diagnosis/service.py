@@ -521,9 +521,10 @@ def banner_alerts(result: eng.Result) -> tuple[list[eng.types.SafetyAlert], list
     return banner, rest
 
 
-def customer_tips(engine: eng.Engine, result: eng.Result) -> list[str]:
+def customer_tips(engine: eng.Engine, result: eng.Result, fuel: str | None = None) -> list[str]:
     """Safety tips a driver can follow: the advice of alerts not in the banner first, then the engine's tips.
-    Workshop instructions, placeholders, internal codes and repeats are removed."""
+    Workshop instructions, placeholders, internal codes and repeats are removed, and EV / hybrid tips unless the
+    car's fuel is ev or hybrid. Every rule still runs: the banner is not filtered."""
     _, rest = banner_alerts(result)
     order = {"high": 0, "medium": 1, "low": 2}
     lines = [
@@ -532,7 +533,7 @@ def customer_tips(engine: eng.Engine, result: eng.Result) -> list[str]:
     ]
     lead = result.ranked[0].fault_key if result.ranked else None
     lines = [clean_codes(engine, t, lead) for t in [*lines, *result.safety_tips] if t]
-    return present.driver_tips(lines, MAX_TIPS)
+    return present.driver_tips(lines, MAX_TIPS, fuel)
 
 
 def current_result(session: Session, engine: eng.Engine, ds: DiagnosisSession) -> eng.Result:

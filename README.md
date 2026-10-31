@@ -7,12 +7,12 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | Path | What |
 |---|---|
 | `apps/web` | Customer site: Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
-| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `notify` (email alerts), `llm` (optional LLM layer, off by default) |
+| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `notify` (email alerts), `llm` (optional LLM layer, off by default), `parts` (parts catalogue) |
 | `backend/engine` | Diagnosis engine, plain Python with no web imports |
 | `backend/alembic` | Database migrations |
 | `data/raw` | The 18 original Excel datasets. Never edit |
-| `data/schema` | Manifest, column aliases, taxonomy, import rules |
-| `data/catalogue` | Vehicle catalogue seed (editable YAML) |
+| `data/schema` | Manifest, column aliases, taxonomy, import rules, CSV templates for price sources (`templates/`) |
+| `data/catalogue` | Vehicle catalogue seed (editable YAML); team price sources in `parts/` |
 | `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md) |
 | `scripts` | Offline data scripts (dataset profiler) |
 | `docker-compose.yml` | PostgreSQL 16 + pgvector |
@@ -42,13 +42,14 @@ docker compose up -d db
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0009)
+uv run alembic upgrade head                          # all migrations (0001 … 0010)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
 uv run python -m app.knowledge.merges apply          # approved duplicate-fault merges (data/review/merges.yaml)
 uv run python -m app.knowledge.requirements apply    # what faults need (start-stop, diesel, AMT …): data/review/fault_requirements.yaml
 uv run python -m app.knowledge.embeddings sync       # search index: embeds only new or changed texts
+uv run python -m app.parts build                     # parts catalogue (after merges): prices, fits, fault links, labour
 cd ..
 
 # Web
@@ -174,6 +175,39 @@ everything below works without any API key:
   listed in docs/diagnosis-engine.md.
 - **Generated questions**: with the LLM on, questions it proposes when nothing fits are saved to `generated_questions`
   for review and never asked.
+
+## Phase 3.1: parts catalogue
+
+Built from the price sheets by `cd backend && uv run python -m app.parts build` (re-run after every re-import and after
+`merges apply`; it prints what was loaded per file). Tables (migration 0010): `part_types`, `brands` (oem / oes /
+aftermarket), `parts`, `part_images`, `part_compatibility`, `part_prices`, `fault_parts`, `labour_rates`.
+
+- **Price sheets** (files 9, 12, 14, 18): PARTS_PRICE_SOURCES rows become parts, prices (basis, GST, fitting, supplier,
+  source URL, date, verification) and pictures (Picture ID). "Fault IDs using it" gives the fault links; file 9 has no
+  such column, so its links are drafts in `data/review/parts/F09-fault-links.csv` until someone types yes in `approved`.
+  Links follow `data/review/merges.yaml` to the canonical fault. LABOUR_PRICE_RESEARCH / LABOUR_AND_RECOVERY_RESEARCH
+  become one labour rate per repair, segment and city (0 = does not apply, skipped).
+- **Fit**: "Vehicle (fit)" text becomes a `part_compatibility` row only when it names a model in the vehicle catalogue
+  (with years, fuel and gearbox when given), status `listed` or `confirm_fit` ("confirm by VIN"). "Mid-range car -
+  check fit", "Any car" and models outside the catalogue give none; those are listed in `data/review/parts/fit-unmatched.csv`.
+  **No part is shown as fitting a car without a compatibility record for that car.**
+- **Other files** (1-8, 10, 11, 13, 15-17): `uv run python -m app.parts review` writes their segment parts columns
+  (file 5: PRICE BREAKDOWN) to `data/review/parts/F01.csv` … one row per part and segment, marked "not model-verified".
+  Approved rows (`approved` = yes) are loaded by `build` as segment prices; re-running `review` keeps decisions and edits.
+- **Team price sources**: copy `data/schema/templates/part_price_sources.csv` / `labour_rates.csv` to
+  `data/catalogue/parts/F07-part_price_sources.csv` (etc.); `build` reads them like the sheets. Columns:
+  `data/schema/templates/README.md`.
+
+API (customer-safe; source refs and review status stay internal):
+
+| Endpoint | What |
+|---|---|
+| `GET /api/faults/{key}/parts?variant_id=` | Parts listed for the car first (`fit.status` `listed`, then `confirm_fit`), then the car's segment parts with `not_verified`. `segment=` for unlisted cars. Coverage level and disclaimer included. A merged key answers for its canonical fault |
+| `GET /api/parts/{id}?variant_id=` | One part: prices, compatibility records, pictures, faults it is used for |
+| `GET /api/parts/compare?ids=1,2&variant_id=` | Up to 6 parts side by side |
+
+Safety tips about high-voltage / EV / hybrid parts are now shown only when the car's fuel is `ev` or `hybrid`
+(red banner rules are unchanged and always run).
 
 ## LLM layer (off by default)
 

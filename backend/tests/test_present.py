@@ -151,3 +151,23 @@ def test_banner_keeps_only_high_risk_rules_for_the_top_fault_or_seen_by_the_driv
         "Drive slowly to a tyre shop.",
         "Switch on the hazard lights and wait.",
     ]
+
+
+def test_ev_and_hybrid_tips_only_for_ev_or_hybrid_cars():
+    """ "Don't touch orange high-voltage cables or parts" showed for an Alto K10 CNG: high-voltage tips need a car
+    whose fuel is ev or hybrid. The banner is not filtered (every rule still runs)."""
+    result = SimpleNamespace(
+        ranked=[SimpleNamespace(fault_key="F18-WL-03")],
+        safety_alerts=[
+            alert(1, "high", "likely", "F18-WL-03", "EV high-voltage danger."),  # top fault, high: banner
+            alert(2, "medium", "likely", "F18-WL-03", "HV: qualified only."),
+        ],
+        safety_tips=["EV / hybrid: high-voltage - qualified only.", "Switch on the hazard lights and wait."],
+    )
+    engine = SimpleNamespace(k=SimpleNamespace(faults={}))
+    hv = "Don't touch orange high-voltage cables or parts; they can give a dangerous shock."
+    for fuel in ("cng", "petrol", "diesel", None):
+        assert service.customer_tips(engine, result, fuel) == ["Switch on the hazard lights and wait."]
+    for fuel in ("ev", "hybrid"):
+        assert service.customer_tips(engine, result, fuel) == [hv, "Switch on the hazard lights and wait."]
+    assert [a.rule_id for a in service.banner_alerts(result)[0]] == [1]

@@ -224,13 +224,24 @@ def driver_safe(text: str) -> str:
     return " ".join(kept)
 
 
-def driver_tips(tips: list[str], limit: int) -> list[str]:
+# EV / hybrid tips ("Don't touch orange high-voltage cables or parts ...") only make sense for a car with a high-voltage
+# system: they are shown only when the car's fuel is ev or hybrid (not for an Alto K10 CNG, nor when fuel is unknown).
+HIGH_VOLTAGE = re.compile(
+    r"high[- ]voltage|\bhv\b|orange (cables?|wiring|wires?|parts?)|\b(ev|hybrid)s?\b|traction battery", re.I
+)
+HIGH_VOLTAGE_FUELS = {"ev", "hybrid"}
+
+
+def driver_tips(tips: list[str], limit: int, fuel: str | None = None) -> list[str]:
     """Tips a driver can safely follow, as full calm sentences (app/diagnosis/safety_lines.py), without duplicates
-    (also tips that only repeat others combined)."""
+    (also tips that only repeat others combined). EV / hybrid tips only when the car's fuel is ev or hybrid."""
     from app.diagnosis.safety_lines import customer_line
     from engine.text import pick_lines
 
-    return pick_lines([t for t in (customer_line(roadside_text(x)) for x in tips) if t], limit)
+    lines = [t for t in (customer_line(roadside_text(x)) for x in tips) if t]
+    if fuel not in HIGH_VOLTAGE_FUELS:
+        lines = [t for t in lines if not HIGH_VOLTAGE.search(t)]
+    return pick_lines(lines, limit)
 
 
 # ---------------------------------------------------------------- yes / no column values

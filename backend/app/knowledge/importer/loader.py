@@ -147,8 +147,13 @@ class PendingLink:
 
 
 def col(row: dict, *names: str) -> object:
-    """Value of the first header that starts with one of the names (case-insensitive)."""
+    """Value of the header equal to one of the names, else of the first header that starts with one
+    (case-insensitive). Exact names win, so "Part" never reads "Part number" in file 9, where the part
+    name is under "Exact part" and the columns come in a different order."""
     lowered = {k.lower(): v for k, v in row.items()}
+    for name in names:
+        if name.lower() in lowered:
+            return lowered[name.lower()]
     for name in names:
         for header, value in lowered.items():
             if header.startswith(name.lower()):

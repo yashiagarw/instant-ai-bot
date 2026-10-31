@@ -207,7 +207,7 @@ def create_session(body: s.SessionCreate, session: DbSession, engine: EngineDep,
         safety_alerts=_alerts(service.banner_alerts(result)[0]),
         question=None if result.done else _question(session, ds, result.next_question),
         done=result.done,
-        safety_tips=service.customer_tips(engine, result),
+        safety_tips=service.customer_tips(engine, result, (ds.vehicle_snapshot or {}).get("fuel")),
         actions=result.actions,
         suggested_categories=[c.code for c in result.suggested_categories],
         progress=_progress(session, ds, result),
@@ -421,7 +421,7 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
             text=present.roadside_text(service.clean_codes(engine, result.roadside.text, lead_key)),
             towing=present.towing_text(service.clean_codes(engine, lead.towing_text, lead_key)) if lead else "",
         ),
-        safety_tips=service.customer_tips(engine, result),
+        safety_tips=service.customer_tips(engine, result, (ds.vehicle_snapshot or {}).get("fuel")),
         if_not_fixed=explain.if_not_fixed(
             engine, result, service.related_faults(session, engine, top[0].fault_id) if top else []
         )
