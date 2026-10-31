@@ -7,7 +7,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | Path | What |
 |---|---|
 | `apps/web` | Customer site: Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
-| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `notify` (email and SMS), `llm` (optional LLM layer, off by default), `parts` (parts catalogue) |
+| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `uploads` (customer photos), `notify` (email and SMS), `llm` (optional LLM layer, off by default), `parts` (parts catalogue) |
 | `backend/engine` | Diagnosis engine, plain Python with no web imports |
 | `backend/alembic` | Database migrations |
 | `data/raw` | The 18 original Excel datasets. Never edit |
@@ -15,7 +15,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `data/catalogue` | Vehicle catalogue seed (editable YAML); team price sources in `parts/` |
 | `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md) |
 | `scripts` | Offline data scripts (dataset profiler) |
-| `docker-compose.yml` | PostgreSQL 16 + pgvector |
+| `docker-compose.yml` | PostgreSQL 16 + pgvector, and S3-compatible storage for photos (SeaweedFS) |
 
 ## Requirements
 
@@ -36,13 +36,13 @@ cp .env.example .env
 cp backend/.env.example backend/.env
 cp apps/web/.env.example apps/web/.env.local
 
-# Database: PostgreSQL 16 + pgvector, plus an autocare_test database for pytest
-docker compose up -d db
+# Database: PostgreSQL 16 + pgvector, plus an autocare_test database for pytest; photo storage (S3, SeaweedFS)
+docker compose up -d db storage
 
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0012)
+uv run alembic upgrade head                          # all migrations (0001 … 0013)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -50,6 +50,7 @@ uv run python -m app.knowledge.merges apply          # approved duplicate-fault 
 uv run python -m app.knowledge.requirements apply    # what faults need (start-stop, diesel, AMT …): data/review/fault_requirements.yaml
 uv run python -m app.knowledge.phrases load          # reviewed extra customer phrases (spellings, Hindi): data/review/phrases
 uv run python -m app.knowledge.safety_triggers apply # reviewed phrases for global emergency rules: data/review/safety_global_triggers.yaml
+uv run python -m app.uploads.storage setup           # private photo bucket (needs S3_ACCESS_KEY / S3_SECRET_KEY in backend/.env)
 uv run python -m app.knowledge.embeddings sync       # search index: embeds only new or changed texts
 uv run python -m app.parts build                     # parts catalogue (after merges): prices, fits, fault links, labour
 cd ..
@@ -156,7 +157,10 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, `MSG91_SENDER_ID` | MSG91 OTP sending (placeholders; see "Going live with MSG91") |
 | | `OTP_TTL_SECONDS`, `OTP_MAX_ATTEMPTS`, `OTP_PHONE_LIMIT`, `OTP_PHONE_WINDOW_SECONDS`, `OTP_IP_LIMIT`, `OTP_IP_WINDOW_SECONDS`, `OTP_VERIFY_IP_LIMIT`, `OTP_VERIFY_IP_WINDOW_SECONDS` | Code lifetime, tries and rate limits |
 | | `AUTH_SESSION_DAYS`, `COOKIE_SECURE` | Login length; Secure flag on cookies (keep true) |
-| | `UPLOADS_DIR` | Customer uploads, one folder per user, deleted with the account |
+| | `UPLOADS_DIR` | Customer files outside the bucket (none yet), one folder per user, deleted with the account |
+| | `S3_ACCESS_KEY`, `S3_SECRET_KEY` | Photo storage key pair (placeholders in `.env.example`; the local `storage` container reads the same pair) |
+| | `S3_ENDPOINT_URL`, `S3_PUBLIC_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET` | Where the API reaches the storage, the address in links given to browsers, region, private bucket |
+| | `UPLOAD_MAX_BYTES`, `UPLOAD_MAX_PX`, `UPLOAD_URL_TTL_SECONDS`, `UPLOAD_VIEW_TTL_SECONDS`, `UPLOADS_PER_SESSION`, `UPLOAD_RATE_LIMIT`, `UPLOAD_RATE_WINDOW_SECONDS` | 10 MB, 2000 px, upload-form and view-link lifetimes, photos per diagnosis, uploads per IP |
 | | `LLM_PROVIDER` | `none` (default: no LLM calls, every step uses its fallback), `anthropic` (live LLM layer, only with `ANTHROPIC_API_KEY`) or `openai` (offline question drafting only). See [LLM layer](#llm-layer-off-by-default) |
 | | `ANTHROPIC_API_KEY` | Claude API key: empty in `.env.example`; set it only to switch the LLM layer on |
 | | `LLM_EXTRACTION_MODEL`, `LLM_PHRASING_MODEL`, `LLM_EXPLANATION_MODEL`, `LLM_EFFORT` | Live LLM models (`claude-haiku-5-5`) and effort (`low`) |
@@ -319,6 +323,49 @@ Type it, tick the consent box and press **Log in**. Diagnoses you made in that b
    serve the web app and API on one site (e.g. instantmechanic.online and api.instantmechanic.online) over HTTPS, and
    set `TRUST_FORWARDED_FOR=true` only behind your own proxy so the per-IP limits see real client addresses.
 6. Send a test code to a team phone and check MSG91's delivery report.
+
+## Phase 4.1: photo uploads
+
+An optional **Add a photo** box sits under the questions in the chat. It never blocks the diagnosis: skip it, or
+answer questions while it uploads; an error only affects the photo. Phones show **Take a photo** (back camera) and
+**Choose from gallery**; desktops **Choose a photo**. You get a preview, retake / choose another, an upload progress
+bar, plain error messages (wrong type, over 10 MB, upload failed, storage down) with **Try again**, and remove.
+
+How it is kept safe:
+
+- `POST /api/uploads` answers a **presigned POST** form for `incoming/<id>` in a **private bucket**; its signed policy
+  limits the file to 10 MB, so the storage itself refuses bigger files. The browser posts straight to the storage.
+- `POST /api/uploads/{id}/complete`: the API reads the file, decides its type from its **own bytes** (JPEG, PNG, WebP,
+  HEIC; never the name or the declared type), refuses anything else, files over 10 MB and decompression bombs, turns
+  the photo upright, resizes it to at most **2000 px**, and saves a **new JPEG with no metadata at all** (EXIF, GPS,
+  XMP, ICC, comments) as `photos/<id>.jpg`. The raw upload is always deleted (a lifecycle rule also expires
+  `incoming/` after a day).
+- Only the **owner of the diagnosis session** (the logged-in customer, or the browser's anonymous cookie until login
+  attaches it) can add, see, list or delete its photos; anyone else gets 404. `GET /api/uploads/{id}` answers a
+  **signed link valid 5 minutes**; nothing is public. At most 5 photos per diagnosis; uploads are rate-limited per IP.
+- **Account deletion** removes the photos from storage first; if the storage cannot be reached, nothing is deleted
+  and the customer is asked to try again.
+- Image analysis is not done yet: photos are stored for the mechanic.
+
+### Local storage
+
+MinIO no longer publishes free container images, so docker-compose runs **SeaweedFS** (Apache-2.0, S3-compatible)
+as the `storage` service. The backend talks plain S3, so any S3 (AWS S3, Cloudflare R2, a MinIO you host) works in
+production by changing the `S3_*` settings.
+
+```bash
+# backend/.env: your own local key pair (backend/.env.example has placeholders)
+#   S3_ACCESS_KEY=...  S3_SECRET_KEY=...  S3_ENDPOINT_URL=http://localhost:8333  S3_PUBLIC_ENDPOINT_URL=http://localhost:8333
+docker compose up -d storage                       # reads the key pair from backend/.env
+cd backend && uv run python -m app.uploads.storage setup   # private bucket + 1-day expiry of incoming/
+```
+
+Try it: start a diagnosis at http://localhost:3000, and under the first question choose **Add a photo**. Tests:
+`uv run pytest tests/test_uploads_imaging.py tests/test_uploads_api.py` (no storage needed) and
+`tests/test_uploads_storage.py` (real presigned uploads against the local storage; skipped when it is not running).
+
+In production, also set the bucket's CORS to allow `POST` from the web app's origin, and `S3_PUBLIC_ENDPOINT_URL` to
+the address browsers use for the storage.
 
 ## LLM layer (off by default)
 

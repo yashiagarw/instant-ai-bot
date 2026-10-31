@@ -99,3 +99,4 @@ class DeleteAccountOut(BaseModel):
     sessions: int
     requests: int
     vehicles: int
+    photos: int = 0

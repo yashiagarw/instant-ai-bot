@@ -69,7 +69,22 @@ class Settings(BaseSettings):
     # Login cookies are HttpOnly, SameSite=Lax and Secure. Browsers accept Secure cookies on http://localhost;
     # set false only if yours does not (never in production).
     cookie_secure: bool = True
-    # Files customers upload (none yet): deleted with the account, one folder per user id.
+    # Customer photos: an S3-compatible private bucket (the docker-compose `storage` service locally). The endpoint is
+    # where the API reaches the storage; the public endpoint is the address in presigned links given to browsers.
+    s3_endpoint_url: str = "http://localhost:8333"
+    s3_public_endpoint_url: str = ""  # empty = s3_endpoint_url
+    s3_region: str = "ap-south-1"
+    s3_access_key: str = ""
+    s3_secret_key: str = ""
+    s3_bucket: str = "autocare-uploads"
+    upload_max_bytes: int = 10 * 1024 * 1024
+    upload_max_px: int = 2000  # longest side after resizing
+    upload_url_ttl_seconds: int = 600  # presigned upload form
+    upload_view_ttl_seconds: int = 300  # signed link to see a photo
+    uploads_per_session: int = 5
+    upload_rate_limit: int = 20  # new uploads per IP per window
+    upload_rate_window_seconds: int = 600
+    # Files customers upload outside the bucket (none yet): deleted with the account, one folder per user id.
     uploads_dir: Path = Path(__file__).resolve().parents[2] / "data" / "uploads"
     # Fault pictures (drawn guides) served at /media; result `media[].file` paths are relative to it.
     media_dir: Path = Path(__file__).resolve().parents[2] / "data" / "media"

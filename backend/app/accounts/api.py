@@ -345,7 +345,19 @@ def my_request(request_id: uuid.UUID, user: RequiredUser, session: DbSession):
 def delete_me(body: S.DeleteAccountIn, request: Request, response: Response, user: RequiredUser, session: DbSession):
     """Delete the account and all personal data linked to it: phone, saved cars, diagnosis history, requests (with
     contact details and consent records) and uploads. Cannot be undone."""
-    report = service.delete_account(session, request.app.state.settings, user)
+    from app.uploads.api import get_storage
+    from app.uploads.storage import StorageError
+
+    try:
+        report = service.delete_account(session, request.app.state.settings, user, get_storage(request))
+    except StorageError as e:
+        session.rollback()
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "We couldn't delete your photos just now. Nothing was deleted; please try again.",
+        ) from e
     session.commit()
     clear_login_cookie(response, request.app.state.settings)
-    return S.DeleteAccountOut(sessions=report.sessions, requests=report.requests, vehicles=report.vehicles)
+    return S.DeleteAccountOut(
+        sessions=report.sessions, requests=report.requests, vehicles=report.vehicles, photos=report.photos
+    )

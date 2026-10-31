@@ -127,7 +127,15 @@ async function request<T>(path: string, init: RequestInit): Promise<T> {
   if (res.status === 401) throw new ApiError("Please log in to see this.", 401);
   if (res.status === 204) return undefined as T;
   if (res.status === 404) throw new ApiError("We couldn't find that. Please go back and pick again.", 404);
-  if (res.status === 409) throw new ApiError("This step has already moved on. Please refresh the page.", 409);
+  if (res.status === 409 || res.status === 503) {
+    // A plain sentence from the API ("You can add up to 5 photos…", "We couldn't reach our photo storage…").
+    const detail = await res
+      .json()
+      .then((b: { detail?: unknown }) => b.detail)
+      .catch(() => null);
+    if (typeof detail === "string") throw new ApiError(detail, res.status);
+    if (res.status === 409) throw new ApiError("This step has already moved on. Please refresh the page.", 409);
+  }
   if (res.status === 422 || res.status === 400) {
     // Plain-sentence reasons from the API (for example "enter a 6-digit pincode") are shown as they are.
     const detail = await res
@@ -672,4 +680,63 @@ export const accountApi = {
   request: (id: string, signal?: AbortSignal) => get<RequestDetail>(`/requests/${encodeURIComponent(id)}`, signal),
   deleteAccount: () =>
     del<{ deleted: boolean; sessions: number; requests: number; vehicles: number }>("/me", { confirm: "DELETE" }),
+};
+
+// ---------------------------------------------------------------- Photos (backend/app/uploads)
+
+export const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+export const PHOTO_MAX_BYTES = 10 * 1024 * 1024;
+
+export interface UploadForm {
+  upload_id: string;
+  url: string;
+  fields: Record<string, string>;
+  max_bytes: number;
+  expires_in: number;
+}
+
+export interface Photo {
+  id: string;
+  status: "pending" | "ready" | "rejected";
+  width: number | null;
+  height: number | null;
+  url: string | null;
+  expires_in: number | null;
+}
+
+/** The type to declare for a file: browsers often leave HEIC photos untyped, so the extension decides then. */
+export function photoType(file: File): string | null {
+  const t = file.type.toLowerCase();
+  if (PHOTO_TYPES.includes(t)) return t;
+  if (!t && /\.(heic|heif)$/i.test(file.name)) return "image/heic";
+  return null;
+}
+
+/** Send a file to the storage with a presigned POST form, reporting progress (0-1). */
+export function sendToStorage(form: UploadForm, file: File, onProgress: (p: number) => void, signal?: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const body = new FormData();
+    for (const [k, v] of Object.entries(form.fields)) body.append(k, v);
+    body.append("file", file);
+    xhr.open("POST", form.url);
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
+    xhr.onload = () =>
+      xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(new ApiError("The photo didn't upload. Please try again.", xhr.status));
+    xhr.onerror = () => reject(new ApiError("The photo didn't upload. Check your connection and try again."));
+    xhr.onabort = () => reject(new DOMException("aborted", "AbortError"));
+    signal?.addEventListener("abort", () => xhr.abort());
+    xhr.send(body);
+  });
+}
+
+export const photosApi = {
+  start: (sessionId: string, contentType: string, size: number) =>
+    post<UploadForm>("/uploads", { session_id: sessionId, content_type: contentType, size }),
+  complete: (id: string) => post<Photo>(`/uploads/${id}/complete`),
+  list: (sessionId: string, signal?: AbortSignal) =>
+    get<Photo[]>(`/uploads?session_id=${encodeURIComponent(sessionId)}`, signal),
+  remove: (id: string) => del<void>(`/uploads/${id}`),
 };

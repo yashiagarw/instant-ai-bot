@@ -25,6 +25,8 @@ from app.config import Settings
 from app.diagnosis.models import DiagnosisSession
 from app.llm.models import GeneratedQuestion
 from app.requests.models import ServiceRequest
+from app.uploads.models import Upload
+from app.uploads.storage import Storage
 from app.vehicles.models import UnlistedVehicle
 
 CONSENT_VERSION = "account-v1"
@@ -207,9 +209,21 @@ def claim(session: Session, row: DiagnosisSession | ServiceRequest, user: User |
     session.flush()
 
 
+def owns(row: DiagnosisSession | Upload, user: User | None, anon_token: str | None) -> bool:
+    """The caller owns the row: it is their account's, or (not yet in an account) this browser's anonymous cookie's.
+    Rows made before accounts existed have no owner and belong to nobody."""
+    if row.user_id is not None:
+        return user is not None and row.user_id == user.id
+    return (
+        bool(anon_token)
+        and row.anon_key_hash is not None
+        and hmac.compare_digest(row.anon_key_hash, token_hash(anon_token))
+    )
+
+
 def attach_anonymous(session: Session, user: User, anon_token: str | None) -> dict:
     if not anon_token:
-        return {"sessions": 0, "requests": 0}
+        return {"sessions": 0, "requests": 0, "photos": 0}
     h = token_hash(anon_token)
     sessions = session.scalars(
         select(DiagnosisSession).where(DiagnosisSession.anon_key_hash == h, DiagnosisSession.user_id.is_(None))
@@ -222,7 +236,12 @@ def attach_anonymous(session: Session, user: User, anon_token: str | None) -> di
         .where(ServiceRequest.anon_key_hash == h, ServiceRequest.user_id.is_(None))
         .values(user_id=user.id, anon_key_hash=None)
     ).rowcount
-    return {"sessions": len(sessions), "requests": n_requests}
+    n_photos = session.execute(
+        update(Upload)
+        .where(Upload.anon_key_hash == h, Upload.user_id.is_(None))
+        .values(user_id=user.id, anon_key_hash=None)
+    ).rowcount
+    return {"sessions": len(sessions), "requests": n_requests, "photos": n_photos}
 
 
 # ---------------------------------------------------------------- account deletion
@@ -233,14 +252,22 @@ class DeletionReport:
     sessions: int
     requests: int
     vehicles: int
+    photos: int
     uploads: bool
 
 
-def delete_account(session: Session, settings: Settings, user: User) -> DeletionReport:
+def delete_account(session: Session, settings: Settings, user: User, storage: Storage) -> DeletionReport:
     """Delete the user and everything personal linked to them (DPDP Act): logins, codes, saved cars, diagnosis
     sessions with their answers, typed messages and results, typed-in unlisted cars, service requests with their
-    contact details and consent records, and the user's uploads folder. A count-only receipt is kept."""
+    contact details and consent records, photos (the stored objects first) and the user's uploads folder. A
+    count-only receipt is kept. If the storage cannot be reached nothing is deleted (StorageError): try again."""
     ids = list(session.scalars(select(DiagnosisSession.id).where(DiagnosisSession.user_id == user.id)))
+    mine = Upload.user_id == user.id
+    photos = session.scalars(select(Upload).where(mine | Upload.session_id.in_(ids) if ids else mine)).all()
+    # Objects first: if this fails the transaction is rolled back and the account stays as it was.
+    storage.delete([k for u in photos for k in (u.incoming_key, u.object_key)])
+    for u in photos:
+        session.delete(u)
     unlisted = [
         u
         for u in session.scalars(
@@ -264,7 +291,9 @@ def delete_account(session: Session, settings: Settings, user: User) -> Deletion
     if uploads:
         shutil.rmtree(folder)
     session.delete(user)  # auth sessions and saved cars cascade
-    report = DeletionReport(sessions=len(ids), requests=requests, vehicles=vehicles or 0, uploads=uploads)
+    report = DeletionReport(
+        sessions=len(ids), requests=requests, vehicles=vehicles or 0, photos=len(photos), uploads=uploads
+    )
     session.add(AccountDeletion(counts=report.__dict__))
     session.flush()
     return report

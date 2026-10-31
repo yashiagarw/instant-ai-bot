@@ -18,6 +18,8 @@ from app.diagnosis.models import DiagnosisSession, SessionEvent
 from app.main import create_app
 from app.notify.sms import ConsoleSms, Msg91Sms, SmsError, make_sms, mask_phone
 from app.requests.models import RequestStatus, ServiceRequest
+from app.uploads.models import Upload
+from app.uploads.storage import MemoryStorage
 from app.vehicles.models import UnlistedVehicle
 from tests.test_diagnosis_api import db_connection, knowledge, seeded_connection, variant  # noqa: F401
 from tests.test_service_requests import body as request_body
@@ -33,6 +35,7 @@ def app_factory(test_settings, db_session, knowledge, tmp_path):  # noqa: F811
         app = create_app(test_settings.model_copy(update={"uploads_dir": tmp_path / "uploads", **overrides}))
         app.dependency_overrides[get_session] = lambda: db_session
         app.state.sms_sender = ConsoleSms()
+        app.state.storage = MemoryStorage()
         return app
 
     return make
@@ -244,7 +247,7 @@ def test_anonymous_diagnosis_still_works_and_is_attached_on_login(app, db_sessio
     other_sid = start_session(stranger, variant.id)
 
     attached = login(app, c).json()["attached"]
-    assert attached == {"sessions": 1, "requests": 1}
+    assert attached == {"sessions": 1, "requests": 1, "photos": 0}
     user = db_session.scalar(select(User))
     assert db_session.get(DiagnosisSession, sid).user_id == user.id
     assert db_session.get(DiagnosisSession, other_sid).user_id is None
@@ -302,6 +305,7 @@ def test_deleting_the_account_removes_personal_data_cars_history_and_uploads(app
         json={"vehicle": {"unlisted": {"make": "Hindustan", "model": "Ambassador"}}, "category_ids": ["battery"]},
     )
     c.post("/api/service-requests", json=request_body(session_id=sid))
+    photo_ids = [add_photo(app, c, sid) for _ in range(2)]
     user = db_session.scalar(select(User))
     uploads = tmp_path / "uploads" / str(user.id)
     uploads.mkdir(parents=True)
@@ -312,7 +316,7 @@ def test_deleting_the_account_removes_personal_data_cars_history_and_uploads(app
 
     assert c.request("DELETE", "/api/me", json={"confirm": "yes"}).status_code == 422
     r = c.request("DELETE", "/api/me", json={"confirm": "DELETE"})
-    assert r.status_code == 200 and r.json()["sessions"] == 2 and r.json()["requests"] == 1
+    assert r.status_code == 200 and r.json()["sessions"] == 2 and r.json()["requests"] == 1 and r.json()["photos"] == 2
     assert "im_session=" in r.headers["set-cookie"]
 
     def count(model, *where):
@@ -326,10 +330,37 @@ def test_deleting_the_account_removes_personal_data_cars_history_and_uploads(app
     assert count(UnlistedVehicle, UnlistedVehicle.typed_model == "Ambassador") == 0
     assert count(AuthSession, AuthSession.user_id == user.id) == 0
     assert not uploads.exists()
+    assert not [k for k in app.state.storage.objects if any(p in k for p in photo_ids)]  # objects gone from storage
+    assert count(Upload, Upload.id.in_(photo_ids)) == 0
     assert c.get("/api/me").status_code == 401
     receipt = db_session.scalar(select(AccountDeletion))
     assert receipt.counts["requests"] == 1 and E164 not in json.dumps(receipt.counts)
     assert db_session.get(DiagnosisSession, other_sid) is not None  # someone else's data stays
+
+
+def add_photo(app, client, sid) -> str:
+    from tests.test_uploads_imaging import photo
+
+    data = photo("JPEG", size=(200, 100))
+    form = client.post("/api/uploads", json={"session_id": sid, "content_type": "image/jpeg", "size": len(data)}).json()
+    app.state.storage.put(form["fields"]["key"], data, "image/jpeg")
+    assert client.post(f"/api/uploads/{form['upload_id']}/complete").status_code == 200
+    return form["upload_id"]
+
+
+def test_deletion_stops_and_keeps_everything_when_photo_storage_is_down(app, db_session, variant):  # noqa: F811
+    c = browser(app)
+    login(app, c)
+    sid = start_session(c, variant.id)
+    pid = add_photo(app, c, sid)
+    app.state.storage.fail = True
+    r = c.request("DELETE", "/api/me", json={"confirm": "DELETE"})
+    assert r.status_code == 503 and "Nothing was deleted" in r.json()["detail"]
+    assert c.get("/api/me").status_code == 200  # still logged in, account intact
+    assert db_session.get(DiagnosisSession, sid) is not None and db_session.get(Upload, pid) is not None
+    app.state.storage.fail = False
+    assert c.request("DELETE", "/api/me", json={"confirm": "DELETE"}).status_code == 200
+    assert not [k for k in app.state.storage.objects if pid in k]
 
 
 # ---------------------------------------------------------------- SMS providers and configuration

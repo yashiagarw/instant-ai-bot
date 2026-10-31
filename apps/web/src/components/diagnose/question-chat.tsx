@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, LoaderCircle } from "lucide-react";
 
 import { CarSummary } from "@/components/diagnose/car-summary";
+import { PhotoStep } from "@/components/diagnose/photo-step";
 import { type Note, ReplyBox } from "@/components/diagnose/reply-box";
 import { ErrorMessage } from "@/components/error-message";
 import { SafetyBanner } from "@/components/safety-banner";
@@ -234,6 +235,9 @@ export function QuestionChat() {
           inputRef={replyRef}
         />
       )}
+
+      {/* Optional and separate from the questions: it never blocks answering. */}
+      {q && <PhotoStep sessionId={sessionId} />}
     </div>
   );
 }

@@ -353,6 +353,11 @@ and `session_results.cost_snapshot` are built from it. Rules: README "Phase 3.2"
 | auth_sessions | user, token_hash (SHA-256 of the cookie token), expires_at, revoked_at | |
 | account_deletions | counts | receipt of a deletion, no personal data |
 
+`uploads` (migration 0013): id (UUID), session (cascade), user / anon_key_hash (the session's owner), status
+(`pending` / `ready` / `rejected`), declared_type (never trusted), detected_type (from the bytes), original_bytes,
+stored_bytes, width, height, reject_reason. Objects: `incoming/<id>` (raw, deleted after the check) and
+`photos/<id>.jpg` (re-encoded, no metadata) in a private bucket.
+
 `diagnosis_sessions` and `service_requests` gain `user_id` (the owner) and `anon_key_hash` (SHA-256 of the browser's
 anonymous cookie until login attaches the row). Code: `backend/app/accounts`; rules: README "Phase 4.0".
 
