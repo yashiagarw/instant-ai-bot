@@ -54,6 +54,11 @@ class FaultPartSource(StrEnum):
     segment_review = "segment_review"
 
 
+class PartKind(StrEnum):
+    part = "part"
+    consumable = "consumable"  # coolant, oil, grease, refrigerant ... (shown as consumables in estimates)
+
+
 class PartImageSource(StrEnum):
     picture_id = "picture_id"  # "Picture ID" column of the price sheet -> image_code
 
@@ -96,6 +101,7 @@ class Part(CreatedAtMixin, Base):
     description: Mapped[str] = mapped_column(Text)
     generic: Mapped[bool] = mapped_column(default=False, server_default="false")
     segment: Mapped[PriceSegment | None] = mapped_column(str_enum(PriceSegment, "segment"))
+    kind: Mapped[PartKind] = mapped_column(str_enum(PartKind, "kind"), default=PartKind.part, server_default="part")
 
     part_type: Mapped[PartType] = relationship()
     brand: Mapped[Brand | None] = relationship()
@@ -181,6 +187,27 @@ class FaultPart(Base):
     in_total: Mapped[bool | None] = mapped_column()  # segment columns: in the parts total or "only if needed"
 
     part: Mapped[Part] = relationship()
+
+
+class FaultServiceCharge(VersionedRow, Base):
+    """A service line of a fault's price list (wheel alignment, diagnostic scan, towing): labour, never a part.
+    From the price sheets ("Wheel alignment (service)", OEM / aftermarket = "Service") and approved segment rows."""
+
+    __tablename__ = "fault_service_charges"
+    __table_args__ = (
+        CheckConstraint("amount_inr >= 0", name="amount_not_negative"),
+        CheckConstraint("amount_max_inr IS NULL OR amount_max_inr >= amount_inr", name="amount_range"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    fault_id: Mapped[int] = mapped_column(ForeignKey("faults.id", ondelete="CASCADE"), index=True)
+    segment: Mapped[PriceSegment] = mapped_column(str_enum(PriceSegment, "segment"))
+    name: Mapped[str] = mapped_column(Text)
+    amount_inr: Mapped[int] = mapped_column(Integer)
+    amount_max_inr: Mapped[int | None] = mapped_column(Integer)
+    verification_status: Mapped[PartVerification] = mapped_column(str_enum(PartVerification, "verification_status"))
+    checked_on: Mapped[date | None] = mapped_column(Date)
+    source_url: Mapped[str | None] = mapped_column(Text)
 
 
 class LabourRate(VersionedRow, Base):

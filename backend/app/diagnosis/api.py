@@ -382,6 +382,7 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
     result = service.current_result(session, engine, ds)
     top = result.ranked[:3]
     details = service.public_details(session, engine, [r.fault_id for r in top])
+    costs = service.estimated_costs(session, ds, [r.fault_id for r in top])  # one source of truth: app.estimates
     lead_key = top[0].fault_key if top else None
     lead = engine.k.faults[top[0].fault_id] if top else None
     topic = session.get(ProblemGroup, ds.problem_group_code) if ds.problem_group_code else None
@@ -408,7 +409,7 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
                     s.EvidenceOut(**{**x, "text": service.clean_codes(engine, x["text"], r.fault_key)})
                     for x in explain.evidence_out(r)
                 ],
-                cost=s.CostOut(**asdict(r.cost)) if r.cost else None,
+                cost=s.CostOut(**costs[r.fault_id]) if costs.get(r.fault_id) else None,
                 repair_time=r.repair_time,
                 **details[r.fault_id],
             )

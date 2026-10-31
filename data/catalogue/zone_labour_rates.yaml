@@ -1,0 +1,19 @@
+# Mechanic labour rate per hour of work, by Delhi NCR zone and car price segment (rupees, incl. GST as charged).
+#
+# Empty (null) means "not known": estimates then use the sheet's labour for the fault ("Delhi NCR metro estimate").
+# When a zone's rate for a segment is filled in WITH a source and checked_on date, estimates for cars in that zone use
+# hours x rate instead, where hours come from the fault's repair time ("1-2 hours" -> 1 to 2 hours).
+#
+# A rate can be one number (650) or a range ([500, 800]). Example, once researched:
+#   gurugram: {budget: [500, 700], mid: [700, 1000], premium: [1200, 1800],
+#              source: "5 independent garages, Sector 14-56, phone survey", checked_on: 2026-11-05}
+#
+# After editing, restart the API. Nothing here is invented: every value must come from your own research.
+reviewed: false
+
+zones:
+  delhi: {budget: null, mid: null, premium: null, source: "", checked_on: null}
+  noida: {budget: null, mid: null, premium: null, source: "", checked_on: null}
+  gurugram: {budget: null, mid: null, premium: null, source: "", checked_on: null}
+  ghaziabad: {budget: null, mid: null, premium: null, source: "", checked_on: null}
+  faridabad: {budget: null, mid: null, premium: null, source: "", checked_on: null}

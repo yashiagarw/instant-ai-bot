@@ -47,3 +47,10 @@ and fuel match). Everything else is shown as "fit not verified".
 | Source / basis | Where the figure came from | |
 | Date | Date checked | `31-Oct-2026` |
 | Status | `APPROX` or `LISTED` | `APPROX` |
+
+## Zone labour rates
+
+Per-zone hourly labour rates go in `data/catalogue/zone_labour_rates.yaml` (zone x segment, one number or a range, with
+`source` and `checked_on`). A rate without a source and a date is ignored. Once filled, estimates for cars in that zone
+use hours (from the fault's repair time) x rate instead of the sheet's labour ("Delhi NCR metro estimate"). Pincodes to
+zones: `data/schema/zones.yaml`.

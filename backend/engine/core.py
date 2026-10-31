@@ -8,7 +8,6 @@ changes nothing.
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from itertools import combinations
 
@@ -37,7 +36,8 @@ from engine.types import (
     Vehicle,
 )
 
-ENGINE_VERSION = "1.3.0"  # 1.1: hybrid search, Hindi as Hinglish. 1.2: Request.symptoms. 1.3: car requirements
+ENGINE_VERSION = "1.4.0"  # 1.1: hybrid search, Hindi as Hinglish. 1.2: Request.symptoms. 1.3: car requirements.
+# 1.4: part_fit_verified from part_compatibility records (Fault.fit_variant_ids), no longer from fit text
 DISCLAIMER = (
     "This is an estimate based on your answers and our data. It is not a replacement for a professional "
     "inspection by a mechanic."
@@ -115,19 +115,10 @@ def topic_variant(group: Group, vehicle: Vehicle) -> dict | None:
     return None
 
 
-def model_listed(model: str, fit_text: str) -> bool:
-    return bool(re.search(rf"(?<![a-z0-9]){re.escape(model.lower())}(?![a-z0-9])", fit_text.lower()))
-
-
 def coverage_level(vehicle: Vehicle | None, top: Fault | None) -> str:
     if vehicle is None or vehicle.segment is None:
         return "general_guidance"
-    if (
-        top is not None
-        and vehicle.listed
-        and vehicle.model
-        and any(model_listed(vehicle.model, t) for t in top.part_fit_texts)
-    ):
+    if top is not None and vehicle.listed and vehicle.variant_id in top.fit_variant_ids:
         return "part_fit_verified"
     return "segment_estimate"
 

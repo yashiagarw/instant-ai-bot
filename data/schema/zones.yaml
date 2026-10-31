@@ -1,0 +1,21 @@
+# Delhi NCR service zones and the pincodes that map to them (used by GET /api/estimates).
+# Ranges are inclusive 6-digit pincodes from India Post district ranges. DRAFT, reviewed: false (31 Oct 2026):
+# check the edges (Greater Noida is counted as Noida; Loni as Ghaziabad) before launch.
+reviewed: false
+
+zones:
+  delhi:
+    label: Delhi
+    pincodes: [[110001, 110099]]
+  noida:
+    label: Noida
+    pincodes: [[201301, 201318]]  # Noida and Greater Noida (Gautam Buddh Nagar)
+  gurugram:
+    label: Gurugram
+    pincodes: [[122001, 122018], [122050, 122052], [122101, 122103]]
+  ghaziabad:
+    label: Ghaziabad
+    pincodes: [[201001, 201021], [201102, 201102]]  # 201102 = Loni
+  faridabad:
+    label: Faridabad
+    pincodes: [[121001, 121013]]

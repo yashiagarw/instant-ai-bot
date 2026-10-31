@@ -3,6 +3,8 @@
 - F01.csv ... F17.csv: for every file without a PARTS_PRICE_SOURCES sheet, one row per part line of the segment parts
   columns (file 5: its PRICE BREAKDOWN parts lines), with the price for that segment. All are "not model-verified".
   Type yes in `approved` to load a row (no = rejected); you may correct part, part_type, brand, part_number, price.
+- excluded.csv: every line that is never used as a price (copied totals, quotation-only, cross-references, lines
+  not understood), with the reason. Service lines (wheel alignment ...) are kept with kind "service": labour.
 - F09-fault-links.csv: file 9 has no "Fault IDs using it" column, so its fault links were drafted from QUALITY_AUDIT
   keys and part numbers quoted in the fault's price text. Type yes / no in `approved`.
 
@@ -41,6 +43,7 @@ SEGMENT_FIELDS = [
     "line_no",
     "part",
     "part_type",
+    "kind",
     "brand",
     "part_number",
     "quantity",
@@ -56,8 +59,10 @@ SEGMENT_FIELDS = [
     "note",
     "source_hash",
     "approved",
+    "reviewed_by",
     "reviewer_note",
 ]
+EXCLUDED_FIELDS = ["file_no", "fault_key", "segment", "line_no", "part", "price_inr", "parse_status", "reason"]
 LINK_FIELDS = [
     "source_ref",
     "segment",
@@ -70,6 +75,7 @@ LINK_FIELDS = [
     "link_source",
     "source_hash",
     "approved",
+    "reviewed_by",
     "reviewer_note",
 ]
 TIERS = {"budget": "budget", "mid-range": "mid", "mid": "mid", "premium": "premium"}
@@ -83,6 +89,9 @@ class ReviewStats:
     lines: int = 0
     needs_review: int = 0
     no_price: int = 0
+    copied_total: int = 0
+    cross_reference: int = 0
+    services: int = 0
     kept: int = 0  # rows kept from the earlier file (unchanged source)
     approved: int = 0
     by_segment: dict[str, int] = field(default_factory=lambda: defaultdict(int))
@@ -94,8 +103,10 @@ class ReviewStats:
             "part lines (budget / mid / premium)": "{} ({} / {} / {})".format(
                 self.lines, self.by_segment["budget"], self.by_segment["mid"], self.by_segment["premium"]
             ),
-            "needs review": self.needs_review,
-            "no price (quotation)": self.no_price,
+            "excluded: copied total / quotation / cross-ref / not understood": (
+                f"{self.copied_total} / {self.no_price} / {self.cross_reference} / {self.needs_review}"
+            ),
+            "service lines (labour)": self.services,
             "kept from earlier run": self.kept,
             "approved": self.approved,
         }
@@ -159,7 +170,7 @@ def segment_review(session: Session, version: DatasetVersion, review_dir: Path =
     by_file: dict[int, list[tuple[Fault, FaultCost]]] = defaultdict(list)
     for fault, cost in costs:
         by_file[fault.source_file_no].append((fault, cost))
-    out = []
+    out, excluded = [], []
     for file_no, items in sorted(by_file.items()):
         stats = ReviewStats(file_no, faults=len({f.id for f, _ in items}))
         path = review_dir / f"F{file_no:02d}.csv"
@@ -200,6 +211,7 @@ def segment_review(session: Session, version: DatasetVersion, review_dir: Path =
                         "line_no": line.line_no,
                         "part": line.part,
                         "part_type": part_type_name(line.part),
+                        "kind": line.kind,
                         "brand": line.brand,
                         "part_number": line.part_number,
                         "quantity": line.quantity,
@@ -215,16 +227,36 @@ def segment_review(session: Session, version: DatasetVersion, review_dir: Path =
                         "note": line.note,
                         "source_hash": h,
                         "approved": "",
+                        "reviewed_by": "",
                         "reviewer_note": "",
                     }
+                row["kind"] = row.get("kind") or line.kind  # rows kept from before the kind column existed
                 rows.append(row)
                 stats.lines += 1
                 stats.by_segment[segment] += 1
-                stats.needs_review += row["parse_status"] == "needs_review"
-                stats.no_price += row["parse_status"] == "no_price"
+                status = row["parse_status"]
+                stats.needs_review += status == "needs_review"
+                stats.no_price += status == "no_price"
+                stats.copied_total += status == "copied_total"
+                stats.cross_reference += status == "cross_reference"
+                stats.services += row["kind"] == "service"
+                if status != "ok":
+                    excluded.append(
+                        {
+                            "file_no": file_no,
+                            "fault_key": fault.fault_key,
+                            "segment": segment,
+                            "line_no": row["line_no"],
+                            "part": row["part"],
+                            "price_inr": row["price_inr"],
+                            "parse_status": status,
+                            "reason": row["note"],
+                        }
+                    )
                 stats.approved += (row.get("approved") or "").strip().lower() in {"yes", "y", "true", "1", "approved"}
         _write(path, rows, SEGMENT_FIELDS)
         out.append(stats)
+    _write(review_dir / "excluded.csv", excluded, EXCLUDED_FIELDS)
     return out
 
 
@@ -256,6 +288,7 @@ def f09_links_review(session: Session, version: DatasetVersion, review_dir: Path
             "link_source": str(link.link_source),
             "source_hash": h,
             "approved": "",
+            "reviewed_by": "",
             "reviewer_note": "",
         }
         rows.append(row)

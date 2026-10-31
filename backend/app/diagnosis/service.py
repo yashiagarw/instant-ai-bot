@@ -220,6 +220,7 @@ def _record(
     if result.done and ds.status != SessionStatus.completed:
         ds.status = SessionStatus.completed
         ds.completed_at = _now()
+        costs = estimated_costs(session, ds, [r.fault_id for r in result.ranked[:3]])
         for rank, r in enumerate(result.ranked[:3], start=1):
             session.add(
                 SessionResult(
@@ -230,12 +231,23 @@ def _record(
                     score=r.score,
                     confidence=Confidence(r.confidence),
                     evidence=r.evidence,
-                    cost_snapshot=asdict(r.cost) if r.cost else {},
+                    cost_snapshot=costs.get(r.fault_id) or {},
                 )
             )
         _event(session, ds, EventType.result_computed, {"ranked": [r.fault_key for r in result.ranked[:3]]})
     session.flush()
     return new
+
+
+def estimated_costs(session: Session, ds: DiagnosisSession, fault_ids: list[int]) -> dict[int, dict | None]:
+    """Fault id -> the result page's cost, from the estimate service (app.estimates), so the result page and
+    GET /api/estimates never disagree. The zone comes from a service request made from the session, if any."""
+    from app.estimates import service as estimates
+    from app.knowledge.questions.inputs import target_version
+
+    zone = estimates.resolve_zone(session, ds.id, None, None).zone
+    found = estimates.estimate_faults(session, target_version(session), fault_ids, ds.vehicle_snapshot or {}, zone)
+    return {e.fault_id: estimates.cost_out(e) for e in found}
 
 
 def pending_question(session: Session, ds: DiagnosisSession) -> dict | None:

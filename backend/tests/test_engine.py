@@ -62,7 +62,7 @@ def knowledge():
             "yes",
             "Roadside pad check",
             costs=costs,
-            part_fit_texts=["Maruti site lists: Swift 2018+, Dzire 2017+"],
+            fit_variant_ids={10},  # a listed compatibility record fits catalogue variant 10
             repair_time_text="1-2 hours",
             safety_tips=["Pump the pedal before driving."],
         ),
@@ -209,14 +209,16 @@ def test_emergency_topic_variant_and_fault_hint_for_ev(engine):
 
 
 def test_coverage_levels(knowledge):
+    """part_fit_verified only through a compatibility record for the car's variant, never from the model's name."""
     pads = knowledge.faults[1]
+    swift = {"model": "Swift", "segment": "budget"}
     assert coverage_level(None, pads) == "general_guidance"
-    assert coverage_level(Vehicle(model="Swift"), pads) == "general_guidance"  # segment unknown
-    assert coverage_level(Vehicle(model="Swift", segment="budget", listed=True), pads) == "part_fit_verified"
-    assert coverage_level(Vehicle(model="Swift", segment="budget"), pads) == "segment_estimate"  # unlisted car
-    assert coverage_level(Vehicle(model="Swift Dzire Tour", segment="budget", listed=True), pads) == "segment_estimate"
-    assert coverage_level(Vehicle(model="Baleno", segment="budget", listed=True), pads) == "segment_estimate"
-    assert coverage_level(Vehicle(model="Swift", segment="budget", listed=True), None) == "segment_estimate"
+    assert coverage_level(Vehicle(model="Swift", variant_id=10), pads) == "general_guidance"  # segment unknown
+    assert coverage_level(Vehicle(**swift, listed=True, variant_id=10), pads) == "part_fit_verified"
+    assert coverage_level(Vehicle(**swift, variant_id=10), pads) == "segment_estimate"  # unlisted car
+    assert coverage_level(Vehicle(**swift, listed=True, variant_id=11), pads) == "segment_estimate"  # other variant
+    assert coverage_level(Vehicle(**swift, listed=True), pads) == "segment_estimate"  # the name alone never counts
+    assert coverage_level(Vehicle(**swift, listed=True, variant_id=10), None) == "segment_estimate"
 
 
 def test_costs_come_from_the_segment_with_label_and_date(knowledge):
@@ -235,7 +237,7 @@ def test_costs_come_from_the_segment_with_label_and_date(knowledge):
 
 
 def test_result_carries_version_coverage_disclaimer_and_costs(engine):
-    v = Vehicle(model="Swift", segment="budget", listed=True)
+    v = Vehicle(model="Swift", segment="budget", listed=True, variant_id=10)
     r = engine.diagnose(Request(group="brakes_clutch", category="brakes", text="brake squeal", vehicle=v))
     assert r.engine_version == ENGINE_VERSION and r.dataset_version_id == 7 and r.disclaimer == DISCLAIMER
     assert keys(r)[0] == "F11-BR-01" and r.coverage == "part_fit_verified"

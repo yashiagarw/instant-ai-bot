@@ -1,0 +1,288 @@
+file_no,fault_key,segment,line_no,part,price_inr,parse_status,reason
+1,F01-CL-02,budget,1,"If the clutch kit is needed: parts Rs 4,805 + labour Rs 2,000 - 4,500 (about Rs 7,805 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-02,mid,1,"If the clutch kit is needed: parts Rs 12,300 + labour Rs 3,500 - 7,500 (about Rs 17,300 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-02,premium,1,"If the clutch kit is needed: parts Rs 24,000 + labour Rs 9,000 - 22,000 (about Rs 38,000 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-08,budget,3,"If the main or helper cylinder is weak: see CL-07 (Rs 1,345 - 1,499)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-08,mid,3,"If the main or helper cylinder is weak: see CL-07 (about Rs 3,800)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-08,premium,3,"If the main or helper cylinder is weak: see CL-07 (Rs 6,500 - 9,500)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-09,budget,1,"If the clutch kit is needed: parts Rs 4,805 + labour Rs 2,000 - 4,500 (about Rs 7,805 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-09,mid,1,"If the clutch kit is needed: parts Rs 12,300 + labour Rs 3,500 - 7,500 (about Rs 17,300 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-09,premium,1,"If the clutch kit is needed: parts Rs 24,000 + labour Rs 9,000 - 22,000 (about Rs 38,000 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-10,budget,3,"If the gear ring (synchro) is worn, gearbox repair: about Rs 8,000 - 18,000 extra",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-10,mid,3,"If the gear ring (synchro) is worn, gearbox repair: about Rs 15,000 - 35,000 extra",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-10,premium,3,"If the gear ring (synchro) is worn, gearbox repair: about Rs 30,000 - 80,000 extra",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-11,budget,3,"If the clutch kit is needed: parts Rs 4,805 + labour Rs 2,000 - 4,500 (about Rs 7,805 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-11,mid,3,"If the clutch kit is needed: parts Rs 12,300 + labour Rs 3,500 - 7,500 (about Rs 17,300 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-11,premium,4,"If the clutch kit is needed: parts Rs 24,000 + labour Rs 9,000 - 22,000 (about Rs 38,000 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-13,budget,4,If the noise is only from the clutch bearing: see CL-06,,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-13,budget,5,"If the whole gearbox is damaged: gearbox repair or new gearbox Rs 25,000 - 60,000 extra",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-13,mid,4,If the noise is only from the clutch bearing: see CL-06,,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-13,mid,5,"If the whole gearbox is damaged: gearbox repair or new gearbox Rs 50,000 - 1,20,000 extra",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-13,premium,4,If the noise is only from the clutch bearing: see CL-06,,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-13,premium,5,"If the whole gearbox is damaged: gearbox repair or new gearbox Rs 1,00,000 - 3,00,000 extra",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-16,budget,3,"If the clutch kit is needed: parts Rs 4,805 + labour Rs 2,000 - 4,500 (about Rs 7,805 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-16,mid,3,"If the clutch kit is needed: parts Rs 12,300 + labour Rs 3,500 - 7,500 (about Rs 17,300 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+1,F01-CL-16,premium,3,"If the clutch kit is needed: parts Rs 24,000 + labour Rs 9,000 - 22,000 (about Rs 38,000 in all, see CL-04)",,cross_reference,Refers to another fault or an optional extra job
+6,F06-EV-01,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-01,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-01,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-02,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-02,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-02,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-03,budget,1,Diagnostic scan + coding,,no_price,Quotation required
+6,F06-EV-03,mid,2,Diagnostic scan + coding,,no_price,Quotation required
+6,F06-EV-03,premium,1,"Onboard charger, premium EV — India price",,no_price,Quotation required
+6,F06-EV-04,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-04,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-04,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-05,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-05,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-05,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-06,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-06,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-06,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-07,budget,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-07,mid,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-07,premium,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-08,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-08,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-08,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-09,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-09,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-09,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-10,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-10,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-10,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-11,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-11,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-11,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-12,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-12,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-12,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-13,budget,1,Software update / calibration at authorised centre,,no_price,Quotation required
+6,F06-EV-13,mid,1,Software update / calibration at authorised centre,,no_price,Quotation required
+6,F06-EV-13,premium,1,Software update / calibration at authorised centre,,no_price,Quotation required
+6,F06-EV-14,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-14,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-14,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-15,premium,1,"Combined CCS2 inlet, premium EV (e.g. Kia EV6 91683-CV111) — India price",,no_price,Quotation required
+6,F06-EV-16,premium,1,"Locking actuator / inlet, premium EV — India price",,no_price,Quotation required
+6,F06-EV-18,premium,1,"Combined CCS2 inlet, premium EV (e.g. Kia EV6 91683-CV111) — India price",,no_price,Quotation required
+6,F06-EV-19,premium,1,"Locking actuator / inlet, premium EV — India price",,no_price,Quotation required
+6,F06-EV-21,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-21,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-21,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-23,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-23,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-23,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-25,budget,2,Electrician fitting / wiring check,,no_price,Quotation required
+6,F06-EV-25,mid,2,Electrician fitting / wiring check,,no_price,Quotation required
+6,F06-EV-25,premium,1,Wallbox 7.4–11 kW for a premium EV,,no_price,Quotation required
+6,F06-EV-26,budget,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-26,mid,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-26,premium,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-27,budget,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-27,mid,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-27,premium,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-28,budget,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-28,mid,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-28,premium,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-32,budget,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-32,mid,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-32,premium,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-33,budget,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-33,mid,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-33,premium,2,Dedicated earthing or wiring correction (licensed electrician),,no_price,Quotation required
+6,F06-EV-34,budget,1,Diagnostic scan + coding,,no_price,Quotation required
+6,F06-EV-34,mid,2,Diagnostic scan + coding,,no_price,Quotation required
+6,F06-EV-34,premium,1,"Onboard charger, premium EV — India price",,no_price,Quotation required
+6,F06-EV-35,budget,1,Diagnostic scan + coding,,no_price,Quotation required
+6,F06-EV-35,mid,2,Diagnostic scan + coding,,no_price,Quotation required
+6,F06-EV-35,premium,1,"Onboard charger, premium EV — India price",,no_price,Quotation required
+6,F06-EV-36,budget,1,Diagnostic scan + coding,,no_price,Quotation required
+6,F06-EV-36,mid,2,Diagnostic scan + coding,,no_price,Quotation required
+6,F06-EV-36,premium,1,"Onboard charger, premium EV — India price",,no_price,Quotation required
+6,F06-EV-40,budget,1,Software update / calibration at authorised centre,,no_price,Quotation required
+6,F06-EV-40,mid,1,Software update / calibration at authorised centre,,no_price,Quotation required
+6,F06-EV-40,premium,1,Software update / calibration at authorised centre,,no_price,Quotation required
+6,F06-EV-43,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-43,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-43,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-44,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-44,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-44,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-45,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-45,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-45,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-46,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-46,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-46,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-47,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-47,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-47,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-48,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-48,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-48,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-49,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-49,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-49,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-50,budget,1,12V battery or DC-DC converter + fitting (model-specific),,no_price,Quotation required
+6,F06-EV-50,mid,1,12V battery or DC-DC converter + fitting (model-specific),,no_price,Quotation required
+6,F06-EV-50,premium,1,12V battery or DC-DC converter + fitting (model-specific),,no_price,Quotation required
+6,F06-EV-51,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-51,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-51,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-52,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-52,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-52,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-53,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-53,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-53,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-54,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-54,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-54,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-55,budget,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-55,mid,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-55,premium,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-56,budget,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-56,mid,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-56,premium,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-58,budget,1,12V battery or DC-DC converter + fitting (model-specific),,no_price,Quotation required
+6,F06-EV-58,mid,1,12V battery or DC-DC converter + fitting (model-specific),,no_price,Quotation required
+6,F06-EV-58,premium,1,12V battery or DC-DC converter + fitting (model-specific),,no_price,Quotation required
+6,F06-EV-59,budget,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-59,mid,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-59,premium,1,Hybrid-system diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-60,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-60,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-60,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-61,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-61,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-61,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-62,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-62,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-62,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-63,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-63,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-63,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-64,premium,1,"Combined CCS2 inlet, premium EV (e.g. Kia EV6 91683-CV111) — India price",,no_price,Quotation required
+6,F06-EV-65,budget,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-65,mid,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-65,premium,1,HV diagnosis and confirmed repair (model-specific),,no_price,Quotation required
+6,F06-EV-66,budget,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-66,mid,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+6,F06-EV-66,premium,1,Authorised-centre diagnostic scan / HV checks,,no_price,Quotation required
+7,F07-SS-01,budget,1,12V car battery (with old-battery exchange),4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-01,budget,2,Battery terminal clamp / earth strap / ground cable,4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-01,mid,1,12V car battery (with old-battery exchange),7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-01,mid,2,Battery terminal clamp / earth strap / ground cable,7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-01,premium,1,12V car battery (with old-battery exchange),14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-01,premium,2,Battery terminal clamp / earth strap / ground cable,14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-03,budget,1,Start-stop battery sensor (IBS) / current sensor,4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-03,budget,2,12V car battery (with old-battery exchange),4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-03,mid,1,Start-stop battery sensor (IBS) / current sensor,7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-03,mid,2,12V car battery (with old-battery exchange),7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-03,premium,1,Start-stop battery sensor (IBS) / current sensor,14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-03,premium,2,12V car battery (with old-battery exchange),14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-07,budget,1,12V car battery (with old-battery exchange),4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-07,budget,2,Battery terminal clamp / earth strap / ground cable,4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-07,mid,1,12V car battery (with old-battery exchange),7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-07,mid,2,Battery terminal clamp / earth strap / ground cable,7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-07,premium,1,12V car battery (with old-battery exchange),14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-07,premium,2,Battery terminal clamp / earth strap / ground cable,14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-18,budget,1,12V car battery (with old-battery exchange),4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-18,budget,2,Battery terminal clamp / earth strap / ground cable,4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-18,mid,1,12V car battery (with old-battery exchange),7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-18,mid,2,Battery terminal clamp / earth strap / ground cable,7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-18,premium,1,12V car battery (with old-battery exchange),14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-18,premium,2,Battery terminal clamp / earth strap / ground cable,14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-21,budget,1,Key fob / smart key + immobilizer programming,900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-21,budget,2,"Wiring repair kit (connectors, terminals, loom, soldering)",900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-21,mid,1,Key fob / smart key + immobilizer programming,1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-21,mid,2,"Wiring repair kit (connectors, terminals, loom, soldering)",1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-21,premium,1,Key fob / smart key + immobilizer programming,2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-21,premium,2,"Wiring repair kit (connectors, terminals, loom, soldering)",2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-22,budget,1,Key fob / smart key + immobilizer programming,900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-22,budget,2,"BCM / ECU module (supply, coding, repair or reman)",900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-22,mid,1,Key fob / smart key + immobilizer programming,1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-22,mid,2,"BCM / ECU module (supply, coding, repair or reman)",1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-22,premium,1,Key fob / smart key + immobilizer programming,2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-22,premium,2,"BCM / ECU module (supply, coding, repair or reman)",2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-28,budget,1,12V car battery (with old-battery exchange),4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-28,budget,2,Battery terminal clamp / earth strap / ground cable,4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-28,mid,1,12V car battery (with old-battery exchange),7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-28,mid,2,Battery terminal clamp / earth strap / ground cable,7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-28,premium,1,12V car battery (with old-battery exchange),14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-28,premium,2,Battery terminal clamp / earth strap / ground cable,14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-33,budget,1,"BCM / ECU module (supply, coding, repair or reman)",900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-33,budget,2,"Wiring repair kit (connectors, terminals, loom, soldering)",900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-33,mid,1,"BCM / ECU module (supply, coding, repair or reman)",1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-33,mid,2,"Wiring repair kit (connectors, terminals, loom, soldering)",1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-33,premium,1,"BCM / ECU module (supply, coding, repair or reman)",2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-33,premium,2,"Wiring repair kit (connectors, terminals, loom, soldering)",2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-34,budget,1,Wiring harness section replacement,900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-34,budget,2,"Wiring repair kit (connectors, terminals, loom, soldering)",900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-34,mid,1,Wiring harness section replacement,1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-34,mid,2,"Wiring repair kit (connectors, terminals, loom, soldering)",1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-34,premium,1,Wiring harness section replacement,2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-34,premium,2,"Wiring repair kit (connectors, terminals, loom, soldering)",2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-36,budget,1,Start-stop battery sensor (IBS) / current sensor,4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-36,budget,2,12V car battery (with old-battery exchange),4500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-36,mid,1,Start-stop battery sensor (IBS) / current sensor,7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-36,mid,2,12V car battery (with old-battery exchange),7650,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-36,premium,1,Start-stop battery sensor (IBS) / current sensor,14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-SS-36,premium,2,12V car battery (with old-battery exchange),14400,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-02,budget,1,"Parking-brake (handbrake) cable, each",900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-02,budget,2,Rear drum brake shoe set + wheel cylinder,900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-02,mid,1,"Parking-brake (handbrake) cable, each",1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-02,mid,2,Rear drum brake shoe set + wheel cylinder,1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-02,premium,1,"Parking-brake (handbrake) cable, each",2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-02,premium,2,Rear drum brake shoe set + wheel cylinder,2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-06,budget,1,Rear drum brake shoe set + wheel cylinder,900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-06,budget,2,"Parking-brake (handbrake) cable, each",900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-06,mid,1,Rear drum brake shoe set + wheel cylinder,1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-06,mid,2,"Parking-brake (handbrake) cable, each",1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-06,premium,1,Rear drum brake shoe set + wheel cylinder,2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-06,premium,2,"Parking-brake (handbrake) cable, each",2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-14,budget,1,"Clutch hydraulics / cable (master, slave, hose)",3500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-14,budget,2,Gear selector cable / linkage set,3500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-14,mid,1,"Clutch hydraulics / cable (master, slave, hose)",5950,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-14,mid,2,Gear selector cable / linkage set,5950,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-14,premium,1,"Clutch hydraulics / cable (master, slave, hose)",11200,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-14,premium,2,Gear selector cable / linkage set,11200,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-15,budget,1,"Clutch hydraulics / cable (master, slave, hose)",3500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-15,budget,2,Clutch kit (pressure plate + disc + release bearing),3500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-15,mid,1,"Clutch hydraulics / cable (master, slave, hose)",5950,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-15,mid,2,Clutch kit (pressure plate + disc + release bearing),5950,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-15,premium,1,"Clutch hydraulics / cable (master, slave, hose)",11200,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-15,premium,2,Clutch kit (pressure plate + disc + release bearing),11200,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-20,budget,1,CV joint kit (joint + boot + grease),900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-20,budget,2,Drive shaft / axle assembly (each),900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-20,mid,1,CV joint kit (joint + boot + grease),1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-20,mid,2,Drive shaft / axle assembly (each),1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-20,premium,1,CV joint kit (joint + boot + grease),2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-20,premium,2,Drive shaft / axle assembly (each),2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-21,budget,1,"Recovery / towing service (flatbed or crane, within ~25 km)",1500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-21,budget,2,"Differential / final-drive repair kit (bearings, gears)",1500,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-21,mid,1,"Recovery / towing service (flatbed or crane, within ~25 km)",2550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-21,mid,2,"Differential / final-drive repair kit (bearings, gears)",2550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-21,premium,1,"Recovery / towing service (flatbed or crane, within ~25 km)",4800,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-21,premium,2,"Differential / final-drive repair kit (bearings, gears)",4800,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-23,budget,1,Caliper slide-pin kit + brake grease service,900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-23,budget,2,Rear drum brake shoe set + wheel cylinder,900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-23,mid,1,Caliper slide-pin kit + brake grease service,1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-23,mid,2,Rear drum brake shoe set + wheel cylinder,1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-23,premium,1,Caliper slide-pin kit + brake grease service,2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-23,premium,2,Rear drum brake shoe set + wheel cylinder,2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-26,budget,1,Drive shaft / axle assembly (each),900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-26,budget,2,CV joint kit (joint + boot + grease),900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-26,mid,1,Drive shaft / axle assembly (each),1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-26,mid,2,CV joint kit (joint + boot + grease),1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-26,premium,1,Drive shaft / axle assembly (each),2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-26,premium,2,CV joint kit (joint + boot + grease),2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-31,budget,1,"Parking-brake (handbrake) cable, each",900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-31,budget,2,Rear drum brake shoe set + wheel cylinder,900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-31,mid,1,"Parking-brake (handbrake) cable, each",1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-31,mid,2,Rear drum brake shoe set + wheel cylinder,1550,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-31,premium,1,"Parking-brake (handbrake) cable, each",2900,copied_total,"Same amount on every line: the total, not a part."
+7,F07-ST-31,premium,2,Rear drum brake shoe set + wheel cylinder,2900,copied_total,"Same amount on every line: the total, not a part."

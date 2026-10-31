@@ -45,6 +45,40 @@ def _known(cls, **kwargs):
     return cls(**{k: v for k, v in kwargs.items() if k in names})
 
 
+def part_fit_variants(session: Session, fault_ids: list[int]) -> dict[int, set[int]]:
+    """Fault id -> catalogue variant ids that a `listed` compatibility record of one of its approved parts fits
+    (app.parts.fit.fit_for_variant: same model, matching fuel / gearbox, years covering the variant). This is what
+    makes a result `part_fit_verified`; "confirm by VIN" records do not count."""
+    from app.parts.fit import VariantFacts, fit_for_variant
+    from app.parts.models import FaultPart, FitStatus, PartCompatibility
+    from app.vehicles.models import Variant
+
+    rows = session.execute(
+        select(FaultPart.fault_id, PartCompatibility)
+        .join(PartCompatibility, PartCompatibility.part_id == FaultPart.part_id)
+        .join(Fault, Fault.id == FaultPart.fault_id)
+        .where(
+            FaultPart.fault_id.in_(fault_ids),
+            FaultPart.status == ReviewStatus.approved,
+            PartCompatibility.dataset_version_id == Fault.dataset_version_id,
+            PartCompatibility.verification_status == FitStatus.listed,
+        )
+    ).all()
+    if not rows:
+        return {}
+    variants = session.scalars(select(Variant).where(Variant.model_id.in_({c.model_id for _, c in rows}))).all()
+    out: dict[int, set[int]] = {}
+    for fault_id, c in rows:
+        for v in variants:
+            facts = VariantFacts(v.model_id, v.year_from, v.year_to, str(v.fuel), str(v.transmission))
+            fit = fit_for_variant(
+                c.model_id, c.year_from, c.year_to, c.fuel, c.transmission, c.verification_status, facts
+            )
+            if fit == FitStatus.listed and c.variant_id in (None, v.id):
+                out.setdefault(fault_id, set()).add(v.id)
+    return out
+
+
 def load_knowledge(session: Session) -> et.Knowledge:
     version = target_version(session)
 
@@ -145,13 +179,20 @@ def load_knowledge(session: Session) -> et.Knowledge:
             labour_text=c.labour_text,
         )
 
-    fits = session.execute(
-        select(PartPriceSourceFault.fault_id, PartPriceSource.vehicle_fit_text)
-        .join(PartPriceSource, PartPriceSource.id == PartPriceSourceFault.part_price_source_id)
-        .where(
-            PartPriceSourceFault.fault_id.in_(ids),
-            PartPriceSourceFault.status == ReviewStatus.approved,
-            PartPriceSource.verification_status == PartVerification.checked,
+    if "fit_variant_ids" in fault_fields:
+        for fault_id, variant_ids in part_fit_variants(session, ids).items():
+            faults[fault_id].fit_variant_ids |= variant_ids
+    fits = (
+        []
+        if "fit_variant_ids" in fault_fields
+        else session.execute(  # older engine versions (data/eval compare mode) read the fit text
+            select(PartPriceSourceFault.fault_id, PartPriceSource.vehicle_fit_text)
+            .join(PartPriceSource, PartPriceSource.id == PartPriceSourceFault.part_price_source_id)
+            .where(
+                PartPriceSourceFault.fault_id.in_(ids),
+                PartPriceSourceFault.status == ReviewStatus.approved,
+                PartPriceSource.verification_status == PartVerification.checked,
+            )
         )
     )
     for fault_id, fit_text in fits:
@@ -233,7 +274,10 @@ def fold_aliases(faults, texts, questions, rules, alias_of: dict[int, int]) -> d
             if t.fault_id == alias:
                 t.fault_id = canonical
         c.safety_tips += [x for x in a.safety_tips if x not in c.safety_tips]
-        c.part_fit_texts += [x for x in a.part_fit_texts if x not in c.part_fit_texts]
+        if hasattr(c, "fit_variant_ids"):
+            c.fit_variant_ids |= a.fit_variant_ids
+        else:
+            c.part_fit_texts += [x for x in a.part_fit_texts if x not in c.part_fit_texts]
         for q in questions.values():
             for o in q.options:
                 if alias in o.effects:

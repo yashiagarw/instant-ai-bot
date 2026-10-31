@@ -9,8 +9,15 @@ The files write these cells in a few layouts:
 - file 1: the parts cell is numbered, the price cell repeats the numbers: "1. Rs 2,530 (range Rs 2,200 - 3,000)"
 - file 6: "• Name — ₹800–₹3,000 × 1  [Published indicative estimate; source S1] Note: ..." or "— Quotation required"
 
-Lines that match none of these (and are not totals, labour or headings) come back with parse_status
-"needs_review" so a person can fix them in the review CSV. Service and labour lines are not parts and are left out.
+Every line gets a kind: part, consumable (coolant, oil, grease, refrigerant ...) or service (wheel alignment, scan,
+towing: counted as labour, never as a part). Lines that cannot be used as a price get a parse_status other than "ok"
+and are never loaded:
+
+- no_price: "Quotation required" (file 6)
+- copied_total: the same amount on every line of the cell, i.e. the total copied onto each part (file 7). With a stated
+  "Parts total" the lines count as copied only when each equals that total (file 2: coolant Rs 700 = 2 x Rs 350 is real)
+- cross_reference: "If the clutch kit is needed: ... see CL-04", "... gearbox repair: about Rs 8,000 - 18,000 extra"
+- needs_review: a line in none of the layouts above
 """
 
 import re
@@ -38,7 +45,7 @@ LINE_E = re.compile(
 )
 LINE_E_QUOTE = re.compile(BULLET + r"(?P<name>.+?)\s+—\s+Quotation required", re.I)
 ITEM_C = re.compile(
-    r"(?P<name>[^;:.]+?):\s*Rs\s*(?P<unit>[\d,]+)\s*x\s*(?P<qty>\d+)\s*=\s*Rs\s*(?P<total>[\d,]+)\s*\[(?P<tag>\w+)\]"
+    r"(?P<name>(?:[^;:.()]|\([^)]*\))+?):\s*Rs\s*(?P<unit>[\d,]+)\s*x\s*(?P<qty>\d+)\s*=\s*Rs\s*(?P<total>[\d,]+)\s*\[(?P<tag>\w+)\]"
 )
 NUMBERED_PRICE = re.compile(r"^(\d{1,2})\.\s*" + AMOUNT + r"(?P<rest>.*)$")
 NUMBERED_NAME = re.compile(r"^(\d{1,2})\.\s*(.+)$")
@@ -48,8 +55,9 @@ SKIP = re.compile(
     r"not used for this car|(?:Rs\.?|₹)\s*0\b|no part or repair)",
     re.I,
 )
-SERVICE = re.compile(
-    r"\((?:workshop service|service|labour)[^)]*\)|\btowing service\b|^labour\b|\blabour\s*\("
+LABOUR_ONLY = re.compile(r"\(labour[^)]*\)|^labour\b|\blabour\s*\(", re.I)  # labour lines: neither part nor service
+SERVICE = re.compile(  # "(service / repair)" is a part that may be repaired, not a service
+    r"\((?:workshop service|service)\)|\((?:labour)[^)]*\)|\btowing service\b|^labour\b|\blabour\s*\("
     r"|^(diagnostic|inspection)\b.*\bscan\b",
     re.I,
 )
@@ -72,7 +80,30 @@ class SegmentLine:
     in_total: bool | None = None
     fit_text: str = ""
     note: str = ""
-    parse_status: str = "ok"  # ok / no_price / needs_review
+    parse_status: str = "ok"  # ok / no_price / copied_total / cross_reference / needs_review
+    kind: str = "part"  # part / consumable / service
+
+
+CROSS_REFERENCE = re.compile(r"\bsee [A-Z]{2}-\d{2}\b|^if (the|a|an|only)\b.*:|\bextra\s*$", re.I)
+CONSUMABLE = re.compile(
+    r"\b(coolant|oil|fluid|grease|refrigerant|gas|cleaner|sealant|lubricant|distilled water|polish|adhesive|"
+    r"anti-?rust|wax|consumables?|top-?up)\b",
+    re.I,
+)
+NOT_CONSUMABLE = re.compile(  # "Coolant hose clamp", "Oil filter", "Gas strut" are parts
+    r"\b(seal|filter|pump|cooler|pan|sump|pressure|spring|strut|cap|tank|line|hose|clamp|pipe|valve|sensor|switch"
+    r"|reservoir|gauge|cylinder|kit|bottle)s?\b",
+    re.I,
+)
+
+
+def line_kind(part: str) -> str:
+    """part / consumable / service. Services (wheel alignment, scans, towing) are labour, never part prices."""
+    if SERVICE.search(part):
+        return "service"
+    if CONSUMABLE.search(part) and not NOT_CONSUMABLE.search(part):
+        return "consumable"
+    return "part"
 
 
 def part_type_name(part: str) -> str:
@@ -108,8 +139,6 @@ def _parse_file3(text: str) -> list[SegmentLine]:
     for m in ITEM_C.finditer(text):
         name = m.group("name").strip()
         name = re.sub(r"^.*?\.\s+(?=[A-Z])", "", name)  # drop a sentence glued in front
-        if SERVICE.search(name):
-            continue
         tag = "checked" if m.group("tag").upper() == "VERIFIED" else "approx"
         out.append(
             SegmentLine(
@@ -119,6 +148,7 @@ def _parse_file3(text: str) -> list[SegmentLine]:
                 price_inr=P.to_int(m.group("total")),
                 price_tag=tag,
                 checked_on=P.parse_date(checked.group(1)) if checked and tag == "checked" else None,
+                kind=line_kind(name),
             )
         )
     return out
@@ -147,10 +177,13 @@ def parse_segment(parts_text: str, prices_text: str) -> list[SegmentLine]:
         if m := LINE_A.match(line):
             tag, checked = price_tag(m.group("tag"))
             pn, qty = _qty(m.group("pn") or "")
+            name, brand = m.group("name").strip(), (m.group("brand") or "").strip()
+            if pn and not (re.search(r"\d", pn) and brand[:1].isalpha()):  # "(5 L petrol, approx)": a description
+                name, brand, pn, qty = f"{name} ({brand}, {m.group('pn')})", "", "", 1
             item = SegmentLine(
                 n,
-                m.group("name").strip(),
-                brand=(m.group("brand") or "").strip(),
+                name,
+                brand=brand,
                 part_number=pn,
                 quantity=qty,
                 price_inr=P.to_int(_amount_after_equals(line)),
@@ -193,21 +226,24 @@ def parse_segment(parts_text: str, prices_text: str) -> list[SegmentLine]:
         else:
             item = SegmentLine(n, line.lstrip("•- ").strip(), parse_status="needs_review", note="line not understood")
         item.part = re.sub(r"^\d+\s*[×x]\s*", "", item.part)  # "1 × Caliper kit"
-        if SERVICE.search(item.part):
+        if LABOUR_ONLY.search(item.part):
             continue
+        item.kind = line_kind(item.part)
+        if CROSS_REFERENCE.search(item.part):
+            item.parse_status, item.note = "cross_reference", "Refers to another fault or an optional extra job"
         if item.price_max_inr is not None and item.price_inr is not None and item.price_max_inr < item.price_inr:
             item.price_max_inr = None
         out.append(item)
     for i, item in enumerate(out, 1):
         item.line_no = i
-    priced = [x.price_inr for x in out if x.price_inr]
+    priced = [x.price_inr for x in out if x.price_inr and x.parse_status == "ok"]
     untagged = untagged_lines >= len(out)  # "name: ₹n" lines only; tagged lines give a real price each
-    if untagged and len(priced) > 1 and len(set(priced)) == 1:  # file 7: the total written on every line
+    stated = P.parts_total(prices_text)
+    if untagged and len(priced) > 1 and len(set(priced)) == 1 and (stated is None or stated == priced[0]):
         for item in out:
-            item.parse_status = "needs_review"
-            item.note = (
-                item.note + " " if item.note else ""
-            ) + "Every line shows the same amount: it may be the total."
+            if item.parse_status == "ok":
+                item.parse_status = "copied_total"
+                item.note = (item.note + " " if item.note else "") + "Same amount on every line: the total, not a part."
     return out
 
 

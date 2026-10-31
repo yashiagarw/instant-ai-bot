@@ -712,3 +712,47 @@ def test_customer_api_has_no_internal_fields(client, catalogue):
     text = client.get("/api/faults/F12-EN-01/parts", params={"variant_id": catalogue.cars["wagonr"].id}).text
     for internal in ("source_ref", "link_source", "part_key", "source_fault_key", '"status": "approved"'):
         assert internal not in text
+
+
+# ---------------------------------------------------------------- 3.2 follow-ups
+
+
+def test_excluded_rows_are_never_loaded_even_if_approved(client, db_session, catalogue):
+    path = catalogue.review_dir / "F07.csv"
+    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    for r in rows:
+        r["approved"] = "yes"
+        if r["part"] == "Starter solenoid" and r["segment"] == "budget":
+            r["parse_status"] = "copied_total"
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    result = catalogue.rebuild()
+    assert result.files[7].excluded == {"copied_total": 1}
+    names = [p["name"] for p in parts_for(client, "F07-SS-01", catalogue.cars["wagonr"])["parts"]]
+    assert names == ["Starter motor"]
+
+
+def test_duplicate_brands_merge_and_parts_keep_their_ids(db_session, catalogue):
+    plug = db_session.scalar(select(Part).where(Part.part_number == "1885032080"))
+    old = Brand(name="Hyundai Genuine (Mobis)", kind="oem")
+    db_session.add(old)
+    db_session.flush()
+    plug.brand, plug.part_key = old, "PN:hyundai genuine (mobis):1885032080:1"
+    db_session.flush()
+    plug_id = plug.id
+    catalogue.rebuild()
+    assert {b.name for b in db_session.scalars(select(Brand))} == {"Maruti Genuine", "Hyundai Genuine"}
+    plug = db_session.get(Part, plug_id)
+    assert (plug.brand.name, plug.part_key) == ("Hyundai Genuine", "PN:hyundai genuine:1885032080:1")
+
+
+def test_autoreview_of_file9_links_checks_the_fault_text(db_session, catalogue):
+    from app.parts.autoreview import review_f09_links
+
+    d = review_f09_links(db_session, version(db_session), catalogue.review_dir)
+    rows = {r["fault_key"]: r for r in csv.DictReader((catalogue.review_dir / "F09-fault-links.csv").open())}
+    assert rows["F09-AP-01"]["approved"] == "yes"  # its price text quotes 13400M68P10
+    assert rows["F09-NS-01"]["approved"] == "" and rows["F09-NS-01"]["reviewer_note"].startswith("FLAG")
+    assert (d.approved, len(d.flagged)) == (1, 1)

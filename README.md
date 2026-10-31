@@ -42,7 +42,7 @@ docker compose up -d db
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0010)
+uv run alembic upgrade head                          # all migrations (0001 … 0011)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -208,6 +208,33 @@ API (customer-safe; source refs and review status stay internal):
 
 Safety tips about high-voltage / EV / hybrid parts are now shown only when the car's fuel is `ev` or `hybrid`
 (red banner rules are unchanged and always run).
+
+## Phase 3.2: repair estimates
+
+`GET /api/estimates?session_id=&zone=&pincode=` gives, for each of the top 3 causes: parts, consumables, labour (with
+service charges) and a total range rounded to the nearest Rs 50, every input with its source and check date, and
+`flags.needs_check` when any input is older than 90 days, undated or unverified. A cause with no labour figure or no
+usable part prices gets `status: "not_enough_data"` and the reasons, never a number.
+
+- **One source of truth.** The result page's `cost` is built from the same estimate (same JSON shape as before), and so
+  is the stored `session_results.cost_snapshot`. With no car-specific parts and no zone rate the estimate equals the
+  sheet total within rounding (2,655 of the 2,658 sheet prices; F07-ST-29's sheet range adds 30% that its listed parts
+  and labour do not explain). Costs code: `backend/app/estimates/` (`maths.py` has no database).
+- **Parts.** The sheet's needed part lines (not "only if needed"), matched to approved catalogue rows. Parts listed for
+  the customer's car (`part_compatibility`) give the min-max of their current prices; otherwise the line's segment
+  price ("fit not verified"). If any line has no approved price (copied totals in file 7, quotations in file 6, rows
+  under review), the sheet's own parts total, or total minus labour, is used and the reason is listed.
+- **Labour.** Hours from the fault's repair time x the zone's hourly rate from `data/catalogue/zone_labour_rates.yaml`
+  (empty until the team researches it; a rate needs a source and a date). Otherwise the sheet's labour, labelled
+  "Delhi NCR metro estimate". Service lines (wheel alignment, scans, towing) count as labour, never as parts.
+- **Zone.** `zone=` (delhi, noida, gurugram, ghaziabad, faridabad), else `pincode=`, else the pincode of a service
+  request made from the session (`data/schema/zones.yaml`, reviewed: false); without one, the metro estimate is used and
+  the response says so.
+- **Parts review.** `uv run python -m app.parts review` then `autoreview` (first review by
+  `claude_code (auto, pending mechanic sign-off)`, rules in `app/parts/autoreview.py`), then `build`. What a mechanic
+  must check: `data/review/parts/REVIEW_NOTES.md`; lines never used as prices: `data/review/parts/excluded.csv`.
+- `part_fit_verified` on the diagnosis result now comes from `part_compatibility` records for the car's variant
+  (engine 1.4.0 / 2.3.0), not from words in the fit text.
 
 ## LLM layer (off by default)
 

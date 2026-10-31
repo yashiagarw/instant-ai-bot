@@ -35,7 +35,8 @@ from engine.safety import evaluate
 from engine.text import STOPWORDS, tokens
 from engine.types import ROUTE_QUESTION, Evidence, Question, QuestionOut, RankedFault, Request, Result
 
-ENGINE_VERSION_V2 = "2.2.0"  # 2.1: Request.symptoms. 2.2: car features / fault requirements, evidence items
+ENGINE_VERSION_V2 = "2.3.0"  # 2.1: Request.symptoms. 2.2: car features / fault requirements, evidence items.
+# 2.3: part_fit_verified from part_compatibility records
 DEFAULTS = {"question_budget": MAX_QUESTIONS, "stop_probability": 0.75, "stop_margin": 0.5, "min_questions": 1}
 FAST_TRACK_ONLY = {"question_budget": FAST_TRACK_MAX, "min_questions": 0}
 # Chosen after tuning on the dev split (data/eval/tune_v2.py): sharper answers (beta 1.5); keeping several

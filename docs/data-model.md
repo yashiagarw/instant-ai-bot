@@ -317,16 +317,31 @@ on every build.
 |---|---|---|
 | part_types | key (lower case), name | from the part name without trailing brackets ("Clutch plate (Maruti part ...)" -> "Clutch plate") |
 | brands | name, kind (`oem`, `oes`, `aftermarket`, `unspecified`) | "Any good brand", "Market price" are no brand; "(via Motrparts)" is dropped |
-| parts | part_key, part_type, brand, part_number, quantity, description, generic, segment | `PN:<brand>:<number>:<qty>`; `SRC:<F12-KEY>` (no number, model named); `GEN:<segment>:<description>` (generic, never fits a car) |
+| parts | part_key, part_type, brand, part_number, quantity, description, generic, segment, kind (`part` / `consumable`, migration 0011) | `PN:<brand>:<number>:<qty>`; `SRC:<F12-KEY>` (no number, model named); `GEN:<segment>:<description>` (generic, never fits a car) |
 | part_images | part, image, source (`picture_id`) | "Picture ID" -> the file's image with that code |
 | part_compatibility (dv) | part, model (required), variant, year_from, year_to, fuel, transmission, verification_status (`listed`, `confirm_fit`), fit_text, source, source_ref, source_url | parsed from "Vehicle (fit)" (`app/parts/fit.py`); only models in the vehicle catalogue |
 | part_prices (dv) | part, segment, price_inr, price_max_inr, price_basis, gst_text, gst_included, fitting_included, supplier, source_url, checked_on, verification_status, model_verified, source, source_ref | `model_verified = false` for segment-column prices |
 | fault_parts | fault (canonical after merges), part, segment, source_fault_key, link_source, status, in_total | only `approved` links are shown |
+| fault_service_charges (dv, migration 0011) | fault (canonical), segment, name, amount_inr, amount_max_inr, verification_status, checked_on, source, source_ref | service lines ("Wheel alignment (service)", OEM / aftermarket = "Service", towing): labour, never parts |
 | labour_rates (dv) | repair, segment, city, amount_inr, workshop_type, basis, status, checked_on, source_file_no | one row per segment; 0 in the sheet = does not apply |
+
+Brands are merged by name without notes or model codes ("Hyundai Genuine (Mobis)" -> "Hyundai Genuine"; aliases in
+`app/parts/build.py: BRAND_ALIASES`); parts keep their ids. Parts that nothing points at any more are pruned on build.
+
+Segment price lines that are never used as prices (`parse_status` other than `ok`, listed in
+`data/review/parts/excluded.csv`): `copied_total` (file 7: the total on every line), `no_price` (file 6 quotations),
+`cross_reference` (file 1: "see CL-07", optional extra jobs), `needs_review`.
 
 A part's fit for a variant (`app/parts/fit.py: fit_for_variant`): a compatibility row of the same model whose fuel and
 gearbox (when given) match and whose years overlap the variant's. A row that covers only part of the variant's years
 counts as `confirm_fit`. No row, no fit: the API shows the part as "fit not verified".
+
+## Repair estimates (task 3.2)
+
+No tables: computed per request by `backend/app/estimates` from `fault_costs` (sheet lines, labour, totals), the parts
+catalogue (approved fault links, prices, compatibility, service charges), `data/catalogue/zone_labour_rates.yaml` and
+`data/schema/zones.yaml`. The estimate is the single source of the price a customer sees: the result page's `cost`
+and `session_results.cost_snapshot` are built from it. Rules: README "Phase 3.2".
 
 ## Catalogue, sessions and requests
 
@@ -350,7 +365,7 @@ Value sets (fuel, transmission, segment, statuses) are text columns with CHECK c
 
 | Level | When |
 |---|---|
-| `part_fit_verified` | a `part_compatibility` record lists a part of the fault for the user's car with status `listed` (parts API, task 3.1). The diagnosis result still decides it with its own text match on `vehicle_fit_text` (`engine/core.py: coverage_level`); moving it onto `part_compatibility` is a follow-up |
+| `part_fit_verified` | a `part_compatibility` record with status `listed` fits the user's catalogue variant, for an approved part of the top fault (`app/diagnosis/knowledge.py: part_fit_variants` -> `Fault.fit_variant_ids`; engine 1.4.0 / 2.3.0) |
 | `segment_estimate` | the car's price segment is known (catalogue variant or the "what did it cost new" answer) |
 | `general_guidance` | segment unknown, or the category does not apply cleanly |
 

@@ -44,15 +44,17 @@ from app.parts.models import (
     CatalogueSource,
     FaultPart,
     FaultPartSource,
+    FaultServiceCharge,
     LabourRate,
     Part,
     PartCompatibility,
     PartImage,
     PartImageSource,
+    PartKind,
     PartPrice,
     PartType,
 )
-from app.parts.segment_text import part_type_name
+from app.parts.segment_text import line_kind, part_type_name
 from app.vehicles.models import Make, Model, Variant
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -61,7 +63,7 @@ TEAM_DIR = REPO_ROOT / "data" / "catalogue" / "parts"
 
 NO_NUMBER = re.compile(r"^(model specific|-+|–|n/?a|none|not stated)?$", re.I)
 NO_BRAND = re.compile(r"^(any good brand|market price|authorised hsrp maker)", re.I)
-BRAND_TAIL = re.compile(r"\s*\((?:via [^)]*|aftermarket)\)\s*$", re.I)
+BRAND_NOTE = re.compile(r"\s*\([^)]*\)")  # "(Mobis)", "(via Motrparts)", "(aftermarket)"
 APPROVED = {"yes", "y", "true", "1", "approved"}
 REJECTED = {"no", "n", "false", "0", "rejected"}
 SEGMENTS = {s.value for s in PriceSegment}
@@ -87,6 +89,8 @@ class FileStats:
     labour_not_applicable: int = 0
     segment_rows: int = 0
     segment_approved: int = 0
+    services: int = 0
+    excluded: dict[str, int] = field(default_factory=lambda: defaultdict(int))  # parse status -> approved rows skipped
 
     def row(self) -> dict:
         return {
@@ -105,6 +109,8 @@ class FileStats:
             "pictures": self.images,
             "labour rates (n/a skipped)": f"{self.labour} ({self.labour_not_applicable})",
             "segment rows approved / total": f"{self.segment_approved} / {self.segment_rows}",
+            "service charges (labour)": self.services,
+            "excluded (not loaded)": ", ".join(f"{k} {v}" for k, v in sorted(self.excluded.items())) or "0",
         }
 
 
@@ -167,6 +173,24 @@ def brand_kind(oem_text: str) -> BrandKind:
     return BrandKind.unspecified
 
 
+# Product lines sold under one maker's part numbers (AAM-FL-... is listed as "Amaron FLO" and as "Amaron").
+BRAND_ALIASES = {"amaron flo": "Amaron"}
+
+
+def canonical_brand(name: str) -> str:
+    """One brand per maker: "Hyundai Genuine (Mobis)" -> "Hyundai Genuine", "Amaron FLO 40B20L" -> "Amaron"
+    (a trailing model code is not part of the brand)."""
+    words = BRAND_NOTE.sub("", name or "").split()
+    while len(words) > 1 and re.search(r"\d", words[-1]):
+        words.pop()
+    joined = " ".join(words)
+    return BRAND_ALIASES.get(joined.lower(), joined)
+
+
+def is_service(part: str, oem_text: str = "") -> bool:
+    return (oem_text or "").strip().lower() == "service" or line_kind(part) == "service"
+
+
 def split_part_number(text: str) -> tuple[str | None, int]:
     """ "09482M00636 x 3" -> ("09482M00636", 3); placeholders ("Model specific", "-") -> (None, 1)."""
     t = (text or "").strip()
@@ -191,6 +215,7 @@ class Builder:
         self.stats: dict[int, FileStats] = {}
         self.unmatched: list[dict] = []
         self.types = {t.key: t for t in session.scalars(select(PartType))}
+        self.merge_brands()
         self.brands = {b.name.lower(): b for b in session.scalars(select(Brand))}
         self.parts = {p.part_key: p for p in session.scalars(select(Part))}
         faults = session.scalars(select(Fault).where(Fault.dataset_version_id == version.id)).all()
@@ -213,6 +238,40 @@ class Builder:
             )
         self.links: dict[tuple[int, int, str], FaultPart] = {}
 
+    def merge_brands(self) -> None:
+        """Fold brands that differ only by a note or a model code into one; parts keep their ids (a part whose new
+        key already exists is folded into that part: its prices, fits and links are rebuilt anyway)."""
+        brands = {b.name.lower(): b for b in self.s.scalars(select(Brand))}
+        for b in list(brands.values()):
+            canon = canonical_brand(b.name)
+            if canon == b.name:
+                continue
+            target = brands.get(canon.lower())
+            if target is None or target is b:
+                b.name = canon
+                brands[canon.lower()] = b
+                continue
+            for part in self.s.scalars(select(Part).where(Part.brand_id == b.id)):
+                part.brand = target
+            self.s.flush()
+            self.s.delete(b)
+        self.s.flush()
+        by_key = {p.part_key: p for p in self.s.scalars(select(Part))}
+        for part in list(by_key.values()):
+            if not part.part_key.startswith("PN:") or part.brand is None:
+                continue
+            _, _, number, qty = part.part_key.split(":", 3)
+            key = f"PN:{part.brand.name.lower()}:{number}:{qty}"
+            if key == part.part_key:
+                continue
+            if key in by_key:
+                self.s.delete(part)
+            else:
+                del by_key[part.part_key]
+                part.part_key = key
+                by_key[key] = part
+        self.s.flush()
+
     def file(self, file_no: int) -> FileStats:
         return self.stats.setdefault(file_no, FileStats(file_no))
 
@@ -226,13 +285,17 @@ class Builder:
         return self.types[key]
 
     def brand(self, name: str, oem_text: str) -> Brand | None:
-        name = BRAND_TAIL.sub("", (name or "").strip())
+        name = canonical_brand((name or "").strip())
         if not name or NO_BRAND.match(name):
             return None
+        kind = brand_kind(oem_text)
         if name.lower() not in self.brands:
-            self.brands[name.lower()] = Brand(name=name, kind=brand_kind(oem_text))
+            self.brands[name.lower()] = Brand(name=name, kind=kind)
             self.s.add(self.brands[name.lower()])
-        return self.brands[name.lower()]
+        b = self.brands[name.lower()]
+        if b.kind == BrandKind.unspecified and kind != BrandKind.unspecified:  # a source that says which kind wins
+            b.kind = kind
+        return b
 
     def part(self, row: SourceRow, has_fit: bool) -> Part:
         number, qty = split_part_number(row.part_number)
@@ -244,7 +307,10 @@ class Builder:
             key = f"SRC:{row.source_ref}"
         else:
             key = f"GEN:{row.segment}:{description.lower()}"
+        kind = PartKind.consumable if line_kind(description) == "consumable" else PartKind.part
         part = self.parts.get(key)
+        if part is not None and part.kind != kind:
+            part.kind = kind
         if part is None:
             part = Part(
                 part_key=key,
@@ -255,6 +321,7 @@ class Builder:
                 description=description,
                 generic=not number and not has_fit,
                 segment=None if number else row.segment,
+                kind=kind,
             )
             self.s.add(part)
             self.parts[key] = part
@@ -262,8 +329,34 @@ class Builder:
 
     # ------------------------------------------------------------ one price row
 
+    def add_service(self, row: SourceRow, fault_ids: list[int], price_max: int | None = None) -> None:
+        """A service line (wheel alignment, scan, towing) is labour for each approved fault, never a part."""
+        if row.price_inr is None:
+            self.file(row.file_no).no_price += 1
+            return
+        for fault_id in dict.fromkeys(self.canonical.get(f, f) for f in fault_ids):
+            self.s.add(
+                FaultServiceCharge(
+                    dataset_version_id=self.version.id,
+                    source=row.source,
+                    source_ref=row.source_ref,
+                    fault_id=fault_id,
+                    segment=row.segment,
+                    name=re.sub(r"\s+", " ", row.part).strip(),
+                    amount_inr=row.price_inr,
+                    amount_max_inr=price_max if price_max is not None and price_max >= row.price_inr else None,
+                    verification_status=row.verification,
+                    checked_on=row.checked_on,
+                    source_url=row.source_url,
+                )
+            )
+            self.file(row.file_no).services += 1
+
     def add_source_row(self, row: SourceRow) -> None:
         stats = self.file(row.file_no)
+        if is_service(row.part, row.oem_text):
+            self.add_service(row, [f for f, _, status in row.links if status == ReviewStatus.approved])
+            return
         claims = self.fit_claims(row)
         part = self.part(row, has_fit=bool(claims))
         self.s.flush()
@@ -498,6 +591,9 @@ class Builder:
                 stats.segment_rows += 1
                 if decision(r.get("approved", "")) != ReviewStatus.approved:
                     continue
+                if (r.get("parse_status") or "ok") != "ok":  # copied totals, quotations, cross-references: never prices
+                    stats.excluded[r["parse_status"]] += 1
+                    continue
                 fault = self.fault_by_key.get(r.get("fault_key", ""))
                 segment = r.get("segment", "")
                 if fault is None or segment not in SEGMENTS or not r.get("part"):
@@ -511,7 +607,13 @@ class Builder:
                     part=r["part"],
                     brand=r.get("brand", ""),
                     part_number=r.get("part_number", ""),
+                    price_inr=num(r.get("price_inr")),
+                    checked_on=P.parse_date(r.get("checked_on")),
+                    verification=part_verification(r.get("price_tag")),
                 )
+                if (r.get("kind") or line_kind(row.part)) == "service":
+                    self.add_service(row, [fault.id], num(r.get("price_max_inr")))
+                    continue
                 part = self.part(row, has_fit=False)
                 self.s.flush()
                 stats.parts.add(part.id)
@@ -608,9 +710,23 @@ class Builder:
 
     # ------------------------------------------------------------ run
 
+    def prune(self) -> int:
+        """Delete parts nothing points at any more (no price, fit or fault link in any version), then brands and part
+        types without parts. Parts in use keep their ids."""
+        used = (
+            select(PartPrice.part_id)
+            .union(select(PartCompatibility.part_id), select(FaultPart.part_id))
+            .scalar_subquery()
+        )
+        n = self.s.execute(delete(Part).where(Part.id.not_in(used))).rowcount
+        self.s.execute(delete(Brand).where(Brand.id.not_in(select(Part.brand_id).where(Part.brand_id.is_not(None)))))
+        self.s.execute(delete(PartType).where(PartType.id.not_in(select(Part.part_type_id))))
+        self.s.flush()
+        return n
+
     def clear(self) -> None:
         v = self.version.id
-        for table in (PartCompatibility, PartPrice, LabourRate):
+        for table in (PartCompatibility, PartPrice, LabourRate, FaultServiceCharge):
             self.s.execute(delete(table).where(table.dataset_version_id == v))
         self.s.execute(delete(FaultPart).where(FaultPart.fault_id.in_(list(self.fault_by_id))))
         self.s.execute(delete(PartImage))
@@ -625,6 +741,7 @@ class Builder:
         self.segment_rows()
         self.labour()
         self.s.flush()
+        self.pruned = self.prune()
         for link in self.links.values():
             stats = self.file(int(link.source_fault_key[1:3]))
             stats.links[str(link.status)] += 1

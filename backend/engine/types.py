@@ -65,7 +65,9 @@ class Fault:
     stage2_choices: list[str] = field(default_factory=list)
     safety_tips: list[str] = field(default_factory=list)  # customer-facing safety items only
     costs: dict[str, Cost] = field(default_factory=dict)
-    part_fit_texts: list[str] = field(default_factory=list)  # approved + checked part price sources
+    # Catalogue variants that a `listed` part_compatibility record of one of the fault's approved parts fits
+    # (filled by the app's knowledge loader; the engine never reads fit text).
+    fit_variant_ids: set[int] = field(default_factory=set)
     alias_keys: list[str] = field(default_factory=list)  # merged duplicates of this fault (canonical only)
     prior: float = 1.0  # relative prior (fault_priors table; equal when missing). Used by engine v2.
     # What the car must have: [{"feature": "start_stop"}, {"fuel": ["diesel"]}, {"transmission": ["amt"]}]
