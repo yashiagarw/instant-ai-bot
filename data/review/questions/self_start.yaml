@@ -813,6 +813,76 @@ questions:
   - label: Not sure
     not_sure: true
     effects: []
+- id: self_start-sep-01
+  status: approved
+  stage: 3
+  text: What do you hear when you start the car?
+  source_faults:
+  - F07-SS-29
+  - F07-SS-30
+  separates:
+  - F07-SS-29
+  - F07-SS-30
+  reviewed_by: claude_code (auto, pending mechanic sign-off)
+  basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: fault names: starter keeps running
+    after start / grinding noise while starting'
+  options:
+  - label: The starter keeps whirring after the engine has started
+    effects:
+    - fault: F07-SS-29
+      effect: supports
+      strength: strong
+    - fault: F07-SS-30
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: A grinding noise while it cranks
+    effects:
+    - fault: F07-SS-30
+      effect: supports
+      strength: strong
+    - fault: F07-SS-29
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
+- id: self_start-sep-02
+  status: approved
+  stage: 3
+  text: When you turn the key, how does the click sound?
+  source_faults:
+  - F07-SS-05
+  - F07-SS-07
+  separates:
+  - F07-SS-05
+  - F07-SS-07
+  reviewed_by: claude_code (auto, pending mechanic sign-off)
+  basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: fault names: starter clicking
+    but not cranking / repeated rapid clicking'
+  options:
+  - label: One click, then nothing
+    effects:
+    - fault: F07-SS-05
+      effect: supports
+      strength: strong
+    - fault: F07-SS-07
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Fast repeated clicking (tak-tak-tak)
+    effects:
+    - fault: F07-SS-07
+      effect: supports
+      strength: strong
+    - fault: F07-SS-05
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
 faults:
   F07-SS-01:
     status: approved
@@ -822,10 +892,14 @@ faults:
     - Starts sometimes, not always
     confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
       replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-02:
     status: approved
     name: Intermittent Self Not Taking
@@ -834,10 +908,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the battery, control circuit and starter operation. Do not replace
       parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-03:
     status: approved
     name: Automatic Start-Stop Not Working
@@ -845,10 +923,14 @@ faults:
     - Auto start-stop not working
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-04:
     status: approved
     name: Self Motor Failure — Complete Non-Start
@@ -856,10 +938,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-05:
     status: approved
     name: Starter Clicking but Engine Not Cranking
@@ -868,10 +954,14 @@ faults:
     - Strange noise when starting
     confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-06:
     status: approved
     name: Single Click During Starting
@@ -880,10 +970,14 @@ faults:
     - Strange noise when starting
     confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-07:
     status: approved
     name: Repeated Rapid Clicking During Starting
@@ -892,10 +986,14 @@ faults:
     - Strange noise when starting
     confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
       replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-08:
     status: approved
     name: Starter Motor Spinning but Engine Not Turning
@@ -904,10 +1002,14 @@ faults:
     - Strange noise when starting
     confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-09:
     status: approved
     name: Starter Solenoid Failure
@@ -915,10 +1017,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-10:
     status: approved
     name: Starter Relay Failure
@@ -926,10 +1032,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-11:
     status: approved
     name: Starter Fuse / Fusible Link Fault
@@ -937,10 +1047,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the starter control circuit, relay, fuse, solenoid and battery.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-12:
     status: approved
     name: Starter Motor Brush Wear
@@ -948,10 +1062,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-13:
     status: approved
     name: Starter Motor Armature / Internal Failure
@@ -959,10 +1077,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-14:
     status: approved
     name: Starter Bendix / Pinion Gear Fault
@@ -971,10 +1093,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-15:
     status: approved
     name: Flywheel Ring Gear Teeth Damage
@@ -983,10 +1109,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic check of the flywheel ring gear teeth and starter engagement. Do not replace parts
       until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-16:
     status: approved
     name: Starter Wiring Loose / Damaged
@@ -994,10 +1124,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the wiring damage, moisture, mechanical rotation and safety. Do
       not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-17:
     status: approved
     name: Poor Engine Ground / Earthing
@@ -1005,10 +1139,14 @@ faults:
     - Engine turns slowly
     confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
       replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-18:
     status: approved
     name: Weak Battery Causing Slow Cranking
@@ -1016,10 +1154,14 @@ faults:
     - Engine turns slowly
     confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
       replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-19:
     status: approved
     name: Battery Terminal Corrosion / Loose Connection
@@ -1028,10 +1170,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
       replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-20:
     status: approved
     name: Ignition Switch / Start Button Failure
@@ -1039,10 +1185,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-21:
     status: approved
     name: Smart Key / Push-Button Start Detection Fault
@@ -1050,10 +1200,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-22:
     status: approved
     name: Immobilizer / Key Recognition Problem
@@ -1062,10 +1216,14 @@ faults:
     - Engine turns but does not start
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-23:
     status: approved
     name: Clutch Safety Switch Fault
@@ -1073,10 +1231,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-24:
     status: approved
     name: Brake Pedal Switch Preventing Start
@@ -1084,10 +1246,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-25:
     status: approved
     name: Park / Neutral Safety Switch Fault
@@ -1095,10 +1261,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-26:
     status: approved
     name: Engine Cranks Normally but Does Not Start
@@ -1106,10 +1276,14 @@ faults:
     - Engine turns but does not start
     confirmation_test: Mechanic component test of the battery, control circuit and starter operation. Do not replace
       parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-27:
     status: approved
     name: Starter Fails When Engine Is Hot
@@ -1117,10 +1291,14 @@ faults:
     - Starts sometimes, not always
     confirmation_test: Mechanic component test of the battery, control circuit and starter operation. Do not replace
       parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-28:
     status: approved
     name: Difficult Starting During Cold Weather
@@ -1129,10 +1307,14 @@ faults:
     - Starts sometimes, not always
     confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
       replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-29:
     status: approved
     name: Starter Keeps Running After Engine Starts
@@ -1141,10 +1323,14 @@ faults:
     - Other
     confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-30:
     status: approved
     name: Grinding Noise While Starting
@@ -1152,10 +1338,14 @@ faults:
     - Strange noise when starting
     confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-31:
     status: approved
     name: Starter Motor Overheating
@@ -1167,11 +1357,31 @@ faults:
     - smoke
     - burning smell
     - starter hot
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: self_start-q05
       option: A burning smell or heat
     - question: self_start-q05
       option: Smoke
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-32:
     status: approved
     name: Engine Seized / Engine Cannot Rotate
@@ -1184,9 +1394,29 @@ faults:
     - burning smell
     - engine jammed
     - engine cannot rotate
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: self_start-q14
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-33:
     status: approved
     name: ECU / BCM Starting Authorization Fault
@@ -1195,10 +1425,14 @@ faults:
     - Engine turns but does not start
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-34:
     status: approved
     name: Rodent-Damaged Starter Wiring
@@ -1206,10 +1440,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the wiring damage, moisture, mechanical rotation and safety. Do
       not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-35:
     status: approved
     name: Waterlogging / Flood-Damaged Starting Circuit
@@ -1223,9 +1461,33 @@ faults:
     - burning smell
     - flood
     - water in the car
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - paani bhar
+    - pani bhar
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: self_start-q11
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - paani bhar
+    - pani bhar
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-36:
     status: approved
     name: Automatic Start-Stop Battery Sensor Fault
@@ -1233,10 +1495,14 @@ faults:
     - Auto start-stop not working
     confirmation_test: Mechanic component test of the battery, terminals, charging system and voltage drop. Do not
       replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-37:
     status: approved
     name: Automatic Start-Stop Temporarily Disabled by Normal Conditions
@@ -1244,10 +1510,14 @@ faults:
     - Auto start-stop not working
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F07-SS-38:
     status: approved
     name: Mild-Hybrid Starter-Generator Fault
@@ -1256,10 +1526,14 @@ faults:
     - Engine does not turn
     confirmation_test: Mechanic component test of the switch, sensor, authorization, fault codes and system conditions.
       Do not replace parts until a test confirms the fault.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - smoke
     - burning smell
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
 safety_rules:
 - id: self_start-s-F07-SS-01
   status: approved

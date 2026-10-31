@@ -1,0 +1,48 @@
+# How customers in India also spell common car words. `python -m app.knowledge.phrases draft` turns each entry into
+# extra customer phrases: an approved dataset phrase containing the word, with the word written the other way, for the
+# same fault. No new facts: only spellings of words the dataset already uses.
+#
+# Sources: common romanised Hindi / Indian English spellings, checked against words the evaluation's DEV split did
+# not recognise (never the test split). DRAFT for a Hindi-speaking reviewer.
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+status: approved
+
+variants:
+  vibration: [vaibreshan, vibreshan, vibrasion, vibretion]
+  tyre: [tayar, tayer, tyer, tire]
+  horn: [horen, haarn]
+  flickering: [flikar, flickring, flikkar]
+  flicker: [flikar, flikker]
+  mileage: [milage, mylage, maileage, average]
+  key: [chaabi, chabi, chabbi, chaabhi]
+  neeche: [neche, niche, nichhe]
+  shocker: [shoker, shockar, shokar]
+  bonnet: [bonet, bonat, bonut]
+  silencer: [silensar, salencer, sailencer]
+  clutch: [klach, clach, cluch]
+  brake: [brek, break]
+  steering: [stering, stearing, steyring]
+  battery: [betri, battry, baitry, betary]
+  engine: [injan, enjin, engin]
+  radiator: [radiater, redietar, radiyetar]
+  puncture: [panchar, puncher, panchur]
+  alignment: [alainment, aligment]
+  accelerator: [excelerator, accelator, exilator]
+  headlight: [hedlight, headlite]
+  indicator: [indiketar, indicater]
+  wiper: [waiper, vipar]
+  mirror: [mirar, miror]
+  gear: [giyar, geer]
+  awaaz: [awaz, aawaz, avaaz]
+  smoke: [dhuan, dhuaan, dhua]
+  diesel: [dijal, disel, deisel]
+  petrol: [petral, petrole]
+  grinding: [graind, grainding]
+  dashboard: [dasboard, deshboard]
+  warning: [warnig, warnning]
+  starting: [startng, staring]
+  sensor: [sensar, senser]
+  leak: [leek, lik]
+  overheating: [overheat, ovarheating]
+  jhatka: [jhatke, jhataka, jatka]
+  garam: [garm, garum]

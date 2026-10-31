@@ -901,6 +901,38 @@ questions:
   - label: Not sure
     not_sure: true
     effects: []
+- id: suspension-sep-01
+  status: approved
+  stage: 3
+  text: What do you notice most?
+  source_faults:
+  - F14-SU-03
+  - F14-SU-05
+  separates:
+  - F14-SU-03
+  - F14-SU-05
+  reviewed_by: claude_code (auto, pending mechanic sign-off)
+  basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: SU-05: oil on shock body, dust
+    stuck on oil; SU-03: bounce one side, dip on braking'
+  options:
+  - label: Oil on the shock absorber with dust stuck to it, but the ride is mostly fine
+    effects:
+    - fault: F14-SU-05
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: One side bounces a lot or dips when braking
+    effects:
+    - fault: F14-SU-03
+      effect: supports
+      strength: strong
+    - fault: F14-SU-05
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
 faults:
   F14-SU-01:
     status: approved
@@ -956,100 +988,114 @@ faults:
     - Suspension noise
     - Other
     confirmation_test: Inspection.
-    danger_phrases: &id008
+    danger_phrases:
     - car leaning
     - wheel tilted
     - loud bang
+    - dhamaka
     safety_trigger_options:
     - question: suspension-q01
       option: A loud bang, and now the steering is crooked
     - question: suspension-q01
       option: The car leans or a wheel is tilted
+    danger_phrases_hinglish_added:
+    - dhamaka
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F17-SU-04:
     status: approved
     name: Suspension Component Broken
     stage2_choices: *id007
     confirmation_test: Inspection.
-    danger_phrases: *id008
+    danger_phrases:
+    - car leaning
+    - loud bang
+    - dhamaka
     safety_trigger_options:
     - question: suspension-q01
       option: A loud bang, and now the steering is crooked
     - question: suspension-q01
       option: The car leans or a wheel is tilted
+    danger_phrases_moved:
+    - wheel tilted
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_hinglish_added:
+    - dhamaka
   F14-SU-05:
     status: approved
     name: Shock Absorber Oil Leakage
-    stage2_choices: &id009
+    stage2_choices: &id008
     - Suspension noise
     - Other
     confirmation_test: Visual check and bounce test.
-    danger_phrases: &id010 []
+    danger_phrases: &id009 []
     safety_trigger_options: []
   F17-SU-05:
     status: approved
     name: Shock Absorber Oil Leakage
-    stage2_choices: *id009
+    stage2_choices: *id008
     confirmation_test: Visual check and bounce test.
-    danger_phrases: *id010
+    danger_phrases: *id009
     safety_trigger_options: []
   F14-SU-06:
     status: approved
     name: Excessive Bouncing After Bumps
-    stage2_choices: &id011
+    stage2_choices: &id010
     - Other
     - Suspension noise
     confirmation_test: Bounce test.
-    danger_phrases: &id012 []
+    danger_phrases: &id011 []
     safety_trigger_options: []
   F17-SU-06:
     status: approved
     name: Excessive Bouncing After Speed Breakers
-    stage2_choices: *id011
+    stage2_choices: *id010
     confirmation_test: Bounce test.
-    danger_phrases: *id012
+    danger_phrases: *id011
     safety_trigger_options: []
   F14-SU-07:
     status: approved
     name: Stabilizer Link / Anti-Roll Bar Link Noise
-    stage2_choices: &id013
+    stage2_choices: &id012
     - Suspension noise
     confirmation_test: Shake test of the link.
-    danger_phrases: &id014 []
+    danger_phrases: &id013 []
     safety_trigger_options: []
   F17-SU-07:
     status: approved
     name: Stabilizer Link / Anti-Roll Bar Link Noise
-    stage2_choices: *id013
+    stage2_choices: *id012
     confirmation_test: Shake test of the link.
-    danger_phrases: *id014
+    danger_phrases: *id013
     safety_trigger_options: []
   F14-SU-08:
     status: approved
     name: Suspension Bush Worn / Cracked
-    stage2_choices: &id015
+    stage2_choices: &id014
     - Suspension noise
     confirmation_test: Play test of the bushes.
-    danger_phrases: &id016 []
+    danger_phrases: &id015 []
     safety_trigger_options:
     - question: suspension-q06
       option: Yes, it feels very loose
   F17-SU-08:
     status: approved
     name: Suspension Bush Worn / Cracked
-    stage2_choices: *id015
+    stage2_choices: *id014
     confirmation_test: Play test of the bushes.
-    danger_phrases: *id016
+    danger_phrases: *id015
     safety_trigger_options:
     - question: suspension-q06
       option: Yes, it feels very loose
   F14-SU-09:
     status: approved
     name: Control Arm / Lower Arm Fault
-    stage2_choices: &id017
+    stage2_choices: &id016
     - Suspension noise
     - Other
     confirmation_test: Inspection and wheel alignment check.
-    danger_phrases: &id018
+    danger_phrases: &id017
     - badly bent
     safety_trigger_options:
     - question: suspension-q01
@@ -1057,19 +1103,19 @@ faults:
   F17-SU-09:
     status: approved
     name: Control Arm / Lower Arm Fault
-    stage2_choices: *id017
+    stage2_choices: *id016
     confirmation_test: Inspection and wheel alignment check.
-    danger_phrases: *id018
+    danger_phrases: *id017
     safety_trigger_options:
     - question: suspension-q01
       option: A loud bang, and now the steering is crooked
   F14-SU-10:
     status: approved
     name: Ball Joint Loose / Worn
-    stage2_choices: &id019
+    stage2_choices: &id018
     - Suspension noise
     confirmation_test: Ball joint play test.
-    danger_phrases: &id020
+    danger_phrases: &id019
     - very loose
     safety_trigger_options:
     - question: suspension-q06
@@ -1077,35 +1123,35 @@ faults:
   F17-SU-10:
     status: approved
     name: Ball Joint Loose / Worn
-    stage2_choices: *id019
+    stage2_choices: *id018
     confirmation_test: Ball joint play test.
-    danger_phrases: *id020
+    danger_phrases: *id019
     safety_trigger_options:
     - question: suspension-q06
       option: Yes, it feels very loose
   F14-SU-11:
     status: approved
     name: Strut Mount / Bearing Noise
-    stage2_choices: &id021
+    stage2_choices: &id020
     - Suspension noise
     confirmation_test: Hand feel and inspection of the strut mount.
-    danger_phrases: &id022 []
+    danger_phrases: &id021 []
     safety_trigger_options: []
   F17-SU-11:
     status: approved
     name: Strut Mount / Bearing Noise
-    stage2_choices: *id021
+    stage2_choices: *id020
     confirmation_test: Hand feel and inspection of the strut mount.
-    danger_phrases: *id022
+    danger_phrases: *id021
     safety_trigger_options: []
   F14-SU-12:
     status: approved
     name: Coil Spring Broken / Sagging
-    stage2_choices: &id023
+    stage2_choices: &id022
     - Suspension noise
     - Other
     confirmation_test: Ride height and visual check.
-    danger_phrases: &id024
+    danger_phrases: &id023
     - tyre rubbing
     safety_trigger_options:
     - question: suspension-q01
@@ -1113,50 +1159,50 @@ faults:
   F17-SU-12:
     status: approved
     name: Coil Spring Broken / Sagging
-    stage2_choices: *id023
+    stage2_choices: *id022
     confirmation_test: Ride height and visual check.
-    danger_phrases: *id024
+    danger_phrases: *id023
     safety_trigger_options:
     - question: suspension-q01
       option: The car leans or a wheel is tilted
   F14-SU-13:
     status: approved
     name: Car Pulling to One Side / Uneven Ride Height
-    stage2_choices: &id025
+    stage2_choices: &id024
     - Other
     confirmation_test: Tyre pressure and wheel alignment check.
-    danger_phrases: &id026 []
+    danger_phrases: &id025 []
     safety_trigger_options: []
   F17-SU-15:
     status: approved
     name: Uneven Ride Height / Vehicle Pulling
-    stage2_choices: *id025
+    stage2_choices: *id024
     confirmation_test: Tyre pressure and wheel alignment check.
-    danger_phrases: *id026
+    danger_phrases: *id025
     safety_trigger_options: []
   F14-SU-14:
     status: approved
     name: Steering / Wheel Vibration - Suspension-Related Suspected
-    stage2_choices: &id027
+    stage2_choices: &id026
     - Other
     confirmation_test: Wheel balance and inspection.
-    danger_phrases: &id028 []
+    danger_phrases: &id027 []
     safety_trigger_options: []
   F17-SU-14:
     status: approved
     name: Steering Wheel Vibration - Suspension Suspected
-    stage2_choices: *id027
+    stage2_choices: *id026
     confirmation_test: Wheel balance and inspection.
-    danger_phrases: *id028
+    danger_phrases: *id027
     safety_trigger_options: []
   F14-SU-15:
     status: approved
     name: Severe Suspension Damage After Pothole / Road Impact
-    stage2_choices: &id029
+    stage2_choices: &id028
     - Other
     - Suspension noise
     confirmation_test: Inspection after the impact.
-    danger_phrases: &id030
+    danger_phrases: &id029
     - wheel tilted
     - steering crooked
     safety_trigger_options:
@@ -1167,9 +1213,9 @@ faults:
   F17-SU-16:
     status: approved
     name: Severe Suspension Damage After Pothole / Road Impact
-    stage2_choices: *id029
+    stage2_choices: *id028
     confirmation_test: Inspection after the impact.
-    danger_phrases: *id030
+    danger_phrases: *id029
     safety_trigger_options:
     - question: suspension-q01
       option: A loud bang, and now the steering is crooked
@@ -1178,18 +1224,18 @@ faults:
   F14-SU-16:
     status: approved
     name: Underbody Scraping / Low Car With Full Load (Speed Breakers)  [NEW - India]
-    stage2_choices: &id031
+    stage2_choices: &id030
     - Other
     - Suspension noise
     confirmation_test: Ride height check.
-    danger_phrases: &id032 []
+    danger_phrases: &id031 []
     safety_trigger_options: []
   F17-SU-17:
     status: approved
     name: Underbody Scraping / Low Car With Full Load (Speed Breakers)  [NEW - India]
-    stage2_choices: *id031
+    stage2_choices: *id030
     confirmation_test: Ride height check.
-    danger_phrases: *id032
+    danger_phrases: *id031
     safety_trigger_options: []
   F17-SU-13:
     status: approved

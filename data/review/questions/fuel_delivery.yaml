@@ -1021,7 +1021,15 @@ faults:
     confirmation_test: Current draw and short test.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options: []
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F10-FD-08:
     status: approved
     name: Weak Fuel Pump / Low Fuel Pressure
@@ -1116,9 +1124,13 @@ faults:
     danger_phrases:
     - petrol smell
     - petrol dripping
+    - petrol badbu
     safety_trigger_options:
     - question: fuel_delivery-q01
       option: Petrol is dripping, or there is a strong smell
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F10-FD-19:
     status: approved
     name: Water or Dirt in Petrol (Contaminated Fuel)
@@ -1208,9 +1220,13 @@ faults:
     danger_phrases:
     - petrol smell
     - leak
+    - petrol badbu
     safety_trigger_options:
     - question: fuel_delivery-q01
       option: Petrol is dripping, or there is a strong smell
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
 safety_rules:
 - id: fuel_delivery-s-F10-FD-01
   status: approved

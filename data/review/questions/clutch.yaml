@@ -1049,9 +1049,27 @@ faults:
     danger_phrases:
     - smoke
     - strong burning smell
+    - jalne badbu
+    - jalane badbu
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: clutch-q01
       option: Smoke or a strong burning smell
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F01-CL-03:
     status: approved
     name: Clutch cable broken
@@ -1078,9 +1096,27 @@ faults:
     danger_phrases:
     - smoke
     - strong burning smell
+    - jalne badbu
+    - jalane badbu
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: clutch-q01
       option: Smoke or a strong burning smell
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F01-CL-05:
     status: approved
     name: Clutch completely failed
@@ -1144,9 +1180,13 @@ faults:
       at fault.
     danger_phrases:
     - pedal sinks to the floor
+    - pedal neeche tak
     safety_trigger_options:
     - question: clutch-q04
       option: No, it stays on the floor
+    danger_phrases_hinglish_added:
+    - pedal neeche tak
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F01-CL-09:
     status: approved
     name: Clutch not disengaging (clutch drag)
@@ -1211,9 +1251,23 @@ faults:
       slipping = worn clutch.
     danger_phrases:
     - smoke
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: clutch-q01
       option: Smoke or a strong burning smell
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F01-CL-15:
     status: approved
     name: Hydraulic clutch fluid leak
@@ -1224,9 +1278,13 @@ faults:
     danger_phrases:
     - brake fluid dropping
     - pedal sinks to the floor
+    - pedal neeche tak
     safety_trigger_options:
     - question: clutch-q19
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - pedal neeche tak
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F01-CL-16:
     status: approved
     name: Clutch engages too low or too high

@@ -700,6 +700,41 @@ questions:
   - label: Not sure
     not_sure: true
     effects: []
+- id: ignition_key-sep-01
+  status: approved
+  stage: 3
+  text: What does the dashboard or the key remote show?
+  source_faults:
+  - F13-IG-03
+  - F13-IG-11
+  separates:
+  - F13-IG-03
+  - F13-IG-11
+  reviewed_by: claude_code (auto, pending mechanic sign-off)
+  basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: IG-11: key battery low message,
+    short remote range; IG-03: key not detected message'
+  options:
+  - label: A 'key battery low' message, or the remote works only very close
+    effects:
+    - fault: F13-IG-11
+      effect: supports
+      strength: strong
+    - fault: F13-IG-03
+      effect: supports
+      strength: weak
+    safety_trigger: false
+  - label: A 'key not detected' message even with a good key battery
+    effects:
+    - fault: F13-IG-03
+      effect: supports
+      strength: strong
+    - fault: F13-IG-11
+      effect: rules_out
+      strength: moderate
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
 faults:
   F13-IG-01:
     status: approved
@@ -771,9 +806,17 @@ faults:
     danger_phrases:
     - burnt smell
     - engine cuts out
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: ignition_key-q01
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F13-IG-09:
     status: approved
     name: Steering Lock Preventing Key Turning
@@ -827,7 +870,15 @@ faults:
     confirmation_test: Fuse and relay test.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options: []
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F13-IG-15:
     status: approved
     name: Ignition Problem After Water Damage or Wiring Fault

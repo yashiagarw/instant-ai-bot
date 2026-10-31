@@ -52,6 +52,8 @@ embeddings off, 5479 cases. Compare a change against it with
 | `*_eval_v1.1-keyword` | 1.1.0 | keyword | 49.1% / 56.7% | 33.3% / 33.3% | 42.5% / 50.2% | 88.6% |
 | `*_eval_v1.1-hybrid` | 1.1.0 | hybrid | 49.8% / 57.5% | 33.3% / 33.3% | 43.5% / 52.2% | 88.6% |
 | `20261024-121453Z_eval_current` | 1.1.0 | hybrid, Devanagari-aware | 49.9% / 57.7% | 45.8% / 45.8% | 43.5% / 52.2% | 88.8% |
+| `*_eval_phase-3-2-test` (test split) | 2.3.0 | hybrid | 52.9% / 64.0% | 41.7% / 45.8% | 45.0% / 58.6% | 90.8% |
+| `*_eval_accuracy-test-after` (test split; accuracy round: separating questions, capped + Hinglish danger phrases, spelling and Hindi phrases, tuned on dev only) | 2.3.0 | hybrid | 54.0% / 64.8% | 58.3% / 62.5% | 46.4% / 60.0% | 99.0% |
 
 The Hindi gain comes from reading Devanagari as Hinglish (engine 1.1, `engine/hindi.py`) and, for Devanagari
 queries, from scoring a strong vector match on its own similarity (the indexed text has no Devanagari, so the

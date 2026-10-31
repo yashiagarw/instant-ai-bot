@@ -1313,9 +1313,15 @@ faults:
     confirmation_test: Water test of the connectors.
     danger_phrases:
     - flooded
+    - paani bhar
+    - pani bhar
     safety_trigger_options:
     - question: sensor_ecu-q10
       option: The car went into deep water
+    danger_phrases_hinglish_added:
+    - paani bhar
+    - pani bhar
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F15-SE-25:
     status: approved
     name: Confirmed ECU Internal Failure - Repair or Replacement

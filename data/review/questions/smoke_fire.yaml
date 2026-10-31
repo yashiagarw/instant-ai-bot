@@ -105,10 +105,23 @@ faults:
     - visible smoke
     - smoke from engine
     - smoke from wiring
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: smoke_fire-q02
       option: 'No: there is smoke from the engine or the wiring'
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
   F16-SM-04:
     status: approved
     name: Burst Pipe with Smoke / Steam / Fire Risk
@@ -119,8 +132,13 @@ faults:
     - burst pipe
     - hissing
     - steam
+    - bhaap
+    - bhap
     safety_trigger_options: []
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
   F16-SM-05:
     status: approved
     name: Burning Rubber Smell
@@ -198,10 +216,15 @@ faults:
     - petrol smell
     - diesel smell
     - fuel dripping
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: smoke_fire-q01
       option: Petrol or diesel (fuel)
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
   F16-SM-13:
     status: approved
     name: Smoke from AC Vents / Dashboard
@@ -234,8 +257,21 @@ faults:
     - fire
     - heavy smoke
     - glow under bonnet
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options: []
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
   F16-SM-16:
     status: approved
     name: New Car / After-Service Burning Smell (Normal Bedding / Spill)  [NEW - India]

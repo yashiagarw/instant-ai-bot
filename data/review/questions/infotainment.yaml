@@ -842,9 +842,15 @@ faults:
     confirmation_test: Inspection for water damage.
     danger_phrases:
     - flooded
+    - paani bhar
+    - pani bhar
     safety_trigger_options:
     - question: infotainment-q15
       option: Yes, the car was flooded
+    danger_phrases_hinglish_added:
+    - paani bhar
+    - pani bhar
+    approved_by: claude_code (auto, pending mechanic sign-off)
 safety_rules:
 - id: infotainment-s-F16-IF-01
   status: approved

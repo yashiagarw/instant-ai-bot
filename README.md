@@ -48,6 +48,7 @@ uv run python -m app.knowledge.importer --all        # the 18 datasets (first ru
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
 uv run python -m app.knowledge.merges apply          # approved duplicate-fault merges (data/review/merges.yaml)
 uv run python -m app.knowledge.requirements apply    # what faults need (start-stop, diesel, AMT …): data/review/fault_requirements.yaml
+uv run python -m app.knowledge.phrases load          # reviewed extra customer phrases (spellings, Hindi): data/review/phrases
 uv run python -m app.knowledge.embeddings sync       # search index: embeds only new or changed texts
 uv run python -m app.parts build                     # parts catalogue (after merges): prices, fits, fault links, labour
 cd ..

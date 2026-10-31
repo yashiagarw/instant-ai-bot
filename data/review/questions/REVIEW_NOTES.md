@@ -201,3 +201,121 @@ trigger words) stops the flow. Check that this split is right for each high-risk
 - BT-41 and BT-42 roadside actions rewritten as customer actions.
 - Status typo `dapproved` corrected to `approved` on safety rules BT-05 and BT-09 (the loader skips anything that is not exactly `approved`).
 - Fault entries BT-02 and BT-03 are still `draft` and were not loaded.
+
+## 8. Accuracy round (31 Oct 2026): separating questions, danger phrases, extra customer phrases
+
+Everything below is by `claude_code (auto, pending mechanic sign-off)`, tuned on the evaluation's **dev split only** (results are reported on the test split, never tuned on). Nothing here has been checked by a mechanic.
+
+### Separating questions (16)
+
+Added for the fault pairs the dev split confused most. Each question entry has `separates`, `reviewed_by` and a `basis` naming the dataset symptoms it rests on. Check that each option really tells the two faults apart, and the strengths.
+
+| Question | Separates | Text |
+|---|---|---|
+| airbag_srs-sep-01 | F16-AB-10 / F16-AB-15 | When did the airbag light first come on? |
+| brakes-sep-01 | F11-BR-15 / F11-BR-16 | With your foot on the brake pedal, start the engine. What happens? |
+| brakes-sep-02 | F11-BR-05 / F11-BR-12 | How are the brake pads wearing? |
+| cng-sep-01 | F17-CG-11 / F17-CG-17 | Which is closer to your car? |
+| electrical-sep-01 | F12-EL-08 / F12-EL-21 | Do you see any of these? |
+| exhaust-sep-01 | F16-EX-11 / F16-EX-17 | Was a sports or aftermarket silencer fitted? |
+| hose_leak-sep-01 | F16-HP-02 / F16-HP-06 | Where is the coolant dripping from? |
+| ignition_key-sep-01 | F13-IG-03 / F13-IG-11 | What does the dashboard or the key remote show? |
+| lights_horn-sep-01 | F12-LT-09 / F12-LT-28 | What is wrong with the headlights? |
+| not_starting-sep-01 | F09-NS-01 / F09-NS-25 | How much fuel was in the car? |
+| pickup_throttle-sep-01 | F09-AP-28 / F09-AP-32 | When does the car feel weak? |
+| self_start-sep-01 | F07-SS-29 / F07-SS-30 | What do you hear when you start the car? |
+| self_start-sep-02 | F07-SS-05 / F07-SS-07 | When you turn the key, how does the click sound? |
+| suspension-sep-01 | F14-SU-03 / F14-SU-05 | What do you notice most? |
+| underbody-sep-01 | F13-UB-05 / F13-UB-16 | Is a heavy metal engine guard fitted under the car? |
+| window_wiper-sep-01 | F14-WW-04 / F14-WW-14 | What is the sunroof doing? |
+
+Pairs left alone because the dataset gives nothing that separates them: F10-FD-03 / FD-04 (fuel gauge vs sender), F07-SS-08 / SS-14 (starter spins vs Bendix), and the file 7 faults that share one customer phrase word for word ("Self nahi le rahi", "Dashboard par warning aa rahi hai"): those phrases cannot pick one fault.
+
+### Danger phrases kept within what the app can show
+
+The app shows at most 3 phrase-fired fault rules for one message. A phrase on more rules than that ("smoke" and "burning smell" were on all 38 self_start faults; "steam" and "needle in red" on 15 cooling faults) meant most of those rules could never fire from it. Each such phrase now stays on the 3 most serious rules of its category (rules counted, not faults; a phrase also counts when its words are all in another phrase). Every customer who types it still gets those alerts: replaying the 481 committed phrase cases on the new data, 100% get the rule's own advice or an alert at least as serious. The rule of a fault whose phrase moved still shows when that fault is likely. Fault entries carry `danger_phrases_moved` and a note. **Check that the 3 kept rules per phrase are the right ones.**
+
+| Category | Fault | Phrases moved |
+|---|---|---|
+| ac | F05-AC-02 | burning smell |
+| ac | F05-AC-11 | battery light |
+| ac | F05-AC-14 | burning smell |
+| ac | F05-AC-15 | burning smell |
+| ac | F05-AC-18 | burning smell |
+| ac | F05-AC-24 | battery light |
+| brakes | F11-BR-18 | very soft pedal |
+| brakes | F11-BR-23 | soft pedal |
+| cooling | F02-OH-01 | needle in red, steam |
+| cooling | F02-OH-03 | steam, heavy leak |
+| cooling | F02-OH-06 | needle in red |
+| cooling | F02-OH-07 | needle in red, steam |
+| cooling | F02-OH-08 | needle in red, steam |
+| cooling | F02-OH-09 | steam |
+| cooling | F02-OH-10 | needle in red |
+| cooling | F02-OH-11 | needle in red, steam |
+| cooling | F02-OH-12 | needle in red, steam |
+| cooling | F02-OH-13 | steam |
+| cooling | F02-OH-14 | needle in red, steam |
+| cooling | F02-OH-15 | needle in red, steam |
+| cooling | F02-OH-16 | white smoke |
+| cooling | F02-OH-17 | needle in red, steam |
+| cooling | F02-OH-18 | needle in red, steam |
+| cooling | F02-OH-20 | needle in red |
+| electrical | F12-EL-25 | smoke |
+| hose_leak | F16-HP-11 | overheating |
+| not_starting | F09-NS-05 | smoke |
+| not_starting | F09-NS-09 | fuel smell |
+| not_starting | F09-NS-16 | jalne smell |
+| self_start | F07-SS-01 | smoke, burning smell |
+| self_start | F07-SS-02 | smoke, burning smell |
+| self_start | F07-SS-03 | smoke, burning smell |
+| self_start | F07-SS-04 | smoke, burning smell |
+| self_start | F07-SS-05 | smoke, burning smell |
+| self_start | F07-SS-06 | smoke, burning smell |
+| self_start | F07-SS-07 | smoke, burning smell |
+| self_start | F07-SS-08 | smoke, burning smell |
+| self_start | F07-SS-09 | smoke, burning smell |
+| self_start | F07-SS-10 | smoke, burning smell |
+| self_start | F07-SS-11 | smoke, burning smell |
+| self_start | F07-SS-12 | smoke, burning smell |
+| self_start | F07-SS-13 | smoke, burning smell |
+| self_start | F07-SS-14 | smoke, burning smell |
+| self_start | F07-SS-15 | smoke, burning smell |
+| self_start | F07-SS-16 | smoke, burning smell |
+| self_start | F07-SS-17 | smoke, burning smell |
+| self_start | F07-SS-18 | smoke, burning smell |
+| self_start | F07-SS-19 | smoke, burning smell |
+| self_start | F07-SS-20 | smoke, burning smell |
+| self_start | F07-SS-21 | smoke, burning smell |
+| self_start | F07-SS-22 | smoke, burning smell |
+| self_start | F07-SS-23 | smoke, burning smell |
+| self_start | F07-SS-24 | smoke, burning smell |
+| self_start | F07-SS-25 | smoke, burning smell |
+| self_start | F07-SS-26 | smoke, burning smell |
+| self_start | F07-SS-27 | smoke, burning smell |
+| self_start | F07-SS-28 | smoke, burning smell |
+| self_start | F07-SS-29 | smoke, burning smell |
+| self_start | F07-SS-30 | smoke, burning smell |
+| self_start | F07-SS-33 | smoke, burning smell |
+| self_start | F07-SS-34 | smoke, burning smell |
+| self_start | F07-SS-36 | smoke, burning smell |
+| self_start | F07-SS-37 | smoke, burning smell |
+| self_start | F07-SS-38 | smoke, burning smell |
+| suspension | F17-SU-04 | wheel tilted |
+
+### Hinglish danger phrases (296 added)
+
+Hindi danger words become Hinglish in the app ("धुआं" -> "dhuan", "भाप" -> "bhaap", "जलने की बदबू" -> "jalane badbu"), and none of them matched the English danger phrases, so Hindi and Hinglish descriptions of smoke, steam or a burning smell fired no phrase rule. Added on faults that already have the English phrase (`danger_phrases_hinglish_added`):
+
+- smoke -> bonnet dhuan, bonnet dhuaan, wire dhuan, taar dhuan, wiring dhuan, dashboard dhuan (never bare "dhuan": black or white exhaust smoke, "kala dhuan", is not an emergency; a first version with bare "dhuan" stopped those conversations with a fire alert and was removed)
+- white smoke -> safed dhuan; burning / burnt smell -> jalne badbu, jalane badbu, jalne smell; fuel smell -> petrol badbu, diesel badbu; gas smell -> gas badbu
+- steam -> bhaap, bhap; needle in red -> sui lal; flood(ed) -> paani bhar, pani bhar; loud bang -> dhamaka; pedal sinking -> pedal neeche tak
+
+"Engine dhuan" was left out on purpose (it also matches "diesel engine kala dhuan"). A Hindi speaker should check these words and suggest others.
+
+### Still to check
+
+- battery.yaml and tyre.yaml were reviewed by a person and were not changed. battery: "battery hot" is on 5 faults, so 2 of those rules cannot fire from it; please move it to the 3 most serious.
+- File 12 sheet rules (engine, electrical) often have the roadside action "No - None.". Alerts with identical advice are merged into the most serious one, so a medium rule such as EL-27 shows inside a high-risk alert. Real roadside actions for these rules would fix it.
+- English "smoke" (a global rule) still fires on "black smoke from the exhaust". Consider giving the global smoke rule location words too.
+- Extra customer phrases: `data/review/phrases/` (REVIEW_NOTES.md there).

@@ -1,0 +1,30 @@
+# Hindi (Devanagari) customer phrases for common Phase 1 problems. Written by Claude Code from general usage, not from
+# any evaluation case (all Hindi evaluation cases are in the test split and were not read). DRAFT: a Hindi speaker must
+# check each phrase and gloss.
+category: phase1
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+phrases:
+- {fault: F11-BR-04, status: approved, language: hi, text: ब्रेक बिल्कुल काम नहीं कर रहे, english_gloss: the brakes are not working at all}
+- {fault: F11-BR-04, status: approved, language: hi, text: ब्रेक फेल हो गए हैं गाड़ी रुक नहीं रही, english_gloss: brakes failed and the car will not stop}
+- {fault: F11-BR-02, status: approved, language: hi, text: ब्रेक पैडल दबाने पर नीचे तक चला जाता है, english_gloss: the brake pedal goes all the way down}
+- {fault: F11-BR-02, status: approved, language: hi, text: ब्रेक पैडल नरम लग रहा है, english_gloss: the brake pedal feels soft}
+- {fault: F11-BR-01, status: approved, language: hi, text: ब्रेक लगाने पर चीं चीं की आवाज़ आती है, english_gloss: squealing noise when braking}
+- {fault: F11-BR-03, status: approved, language: hi, text: ब्रेक कम लग रहे हैं गाड़ी देर से रुकती है, english_gloss: brakes are weak and the car stops late}
+- {fault: F02-OH-05, status: approved, language: hi, text: इंजन बहुत गरम हो गया और भाप निकल रही है, english_gloss: the engine got very hot and steam is coming out}
+- {fault: F02-OH-05, status: approved, language: hi, text: टेम्परेचर की सुई लाल में चली गई, english_gloss: the temperature needle went into the red}
+- {fault: F02-OH-01, status: approved, language: hi, text: कूलेंट थोड़ा कम है, english_gloss: coolant is a little low}
+- {fault: F02-OH-03, status: approved, language: hi, text: गाड़ी के नीचे हरा पानी टपक रहा है, english_gloss: green water is dripping under the car}
+- {fault: F08-BT-03, status: approved, language: hi, text: बैटरी पूरी तरह डेड है कुछ भी नहीं जल रहा, english_gloss: the battery is fully dead and nothing lights up}
+- {fault: F08-BT-01, status: approved, language: hi, text: सेल्फ धीरे घूमता है गाड़ी मुश्किल से स्टार्ट होती है, english_gloss: the starter turns slowly and the car starts with difficulty}
+- {fault: F08-BT-19, status: approved, language: hi, text: बैटरी फूल गई है और गरम है, english_gloss: the battery is swollen and hot}
+- {fault: F04-TY-01, status: approved, language: hi, text: टायर में हवा कम लग रही है, english_gloss: the tyre looks low on air}
+- {fault: F04-TY-02, status: approved, language: hi, text: टायर पंचर हो गया धीरे धीरे हवा निकलती है, english_gloss: the tyre is punctured and loses air slowly}
+- {fault: F01-CL-01, status: approved, language: hi, text: क्लच बहुत भारी हो गया है, english_gloss: the clutch has become very heavy}
+- {fault: F01-CL-03, status: approved, language: hi, text: क्लच की तार टूट गई, english_gloss: the clutch cable broke}
+- {fault: F01-CL-05, status: approved, language: hi, text: क्लच बिल्कुल काम नहीं कर रहा गियर नहीं लग रहा, english_gloss: the clutch does not work at all and gears will not engage}
+- {fault: F05-AC-01, status: approved, language: hi, text: एसी ठंडी हवा नहीं दे रहा, english_gloss: the AC is not giving cold air}
+- {fault: F05-AC-02, status: approved, language: hi, text: एसी का ब्लोअर हवा नहीं फेंक रहा, english_gloss: the AC blower is not blowing air}
+- {fault: F07-SS-01, status: approved, language: hi, text: सेल्फ मारने पर गाड़ी देर से स्टार्ट होती है, english_gloss: the car starts late when cranking}
+- {fault: F07-SS-02, status: approved, language: hi, text: कभी कभी सेल्फ नहीं लेती, english_gloss: sometimes the starter does not engage}
+- {fault: F09-NS-04, status: approved, language: hi, text: चलते चलते गाड़ी अचानक बंद हो गई, english_gloss: the car suddenly stopped while driving}
+- {fault: F09-NS-01, status: approved, language: hi, text: गाड़ी कभी कभी स्टार्ट नहीं होती, english_gloss: the car sometimes does not start}

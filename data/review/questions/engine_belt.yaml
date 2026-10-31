@@ -1018,6 +1018,15 @@ faults:
     danger_phrases:
     - burning smell
     - smoke
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: engine_belt-q01
       option: 'Yes'
@@ -1025,6 +1034,17 @@ faults:
       option: 'Yes'
     - question: engine_belt-q03
       option: Belt pieces are wrapped around the pulleys
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F11-EB-05:
     status: approved
     name: Belt Slipping During Acceleration
@@ -1076,9 +1096,17 @@ faults:
     confirmation_test: Belt-off spin test of the idler pulley.
     danger_phrases:
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: engine_belt-q02
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F11-EB-11:
     status: approved
     name: Alternator Pulley / Overrunning Pulley Fault
@@ -1128,9 +1156,29 @@ faults:
     danger_phrases:
     - burning smell
     - smoke
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: engine_belt-q02
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F11-EB-16:
     status: approved
     name: AC Compressor Pulley / Bearing Seizure
@@ -1182,9 +1230,15 @@ faults:
     danger_phrases:
     - temperature high
     - steam
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: engine_belt-q01
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F11-EB-21:
     status: approved
     name: Belt Failure with Loss of Hydraulic Power Steering

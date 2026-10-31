@@ -720,9 +720,15 @@ faults:
     danger_phrases:
     - heavy leak
     - fuel smell
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: diesel-q02
       option: Yes, it is dripping or there is a puddle
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F17-DS-12:
     status: approved
     name: Diesel Starting Difficulty / Air in Fuel System

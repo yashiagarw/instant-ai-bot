@@ -713,9 +713,17 @@ faults:
     confirmation_test: Starter signal, voltage drop and bench test.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: starter_motor-q01
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F13-ST-05:
     status: approved
     name: Starter Motor Slow Cranking

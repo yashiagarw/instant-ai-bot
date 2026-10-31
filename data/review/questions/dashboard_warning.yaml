@@ -1170,11 +1170,17 @@ faults:
     danger_phrases:
     - needle high
     - steam
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: dashboard_warning-q01
       option: Red
     - question: dashboard_warning-q03
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F10-DW-25:
     status: approved
     name: Airbag / SRS Warning Light

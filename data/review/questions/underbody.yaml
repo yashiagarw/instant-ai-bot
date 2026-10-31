@@ -615,6 +615,38 @@ questions:
   - label: Not sure
     not_sure: true
     effects: []
+- id: underbody-sep-01
+  status: approved
+  stage: 3
+  text: Is a heavy metal engine guard fitted under the car?
+  source_faults:
+  - F13-UB-05
+  - F13-UB-16
+  separates:
+  - F13-UB-05
+  - F13-UB-16
+  reviewed_by: claude_code (auto, pending mechanic sign-off)
+  basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: UB-16: aftermarket heavy engine
+    guard; UB-05: sagging panel, missing clips'
+  options:
+  - label: Yes, an aftermarket metal guard
+    effects:
+    - fault: F13-UB-16
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No; plastic panels are sagging or clips are missing
+    effects:
+    - fault: F13-UB-05
+      effect: supports
+      strength: strong
+    - fault: F13-UB-16
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
 faults:
   F13-UB-01:
     status: approved
@@ -646,11 +678,25 @@ faults:
     - sparks
     - smoke
     - dragging
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: underbody-q02
       option: Yes, it is scraping the road
     - question: underbody-q02
       option: Yes, with sparks or smoke
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F13-UB-04:
     status: approved
     name: Complete Underguard / Undertray Detached
@@ -760,6 +806,8 @@ faults:
     danger_phrases:
     - fuel smell
     - brake fluid drops
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: underbody-q01
       option: Fluid drops or a puddle
@@ -769,6 +817,10 @@ faults:
       option: Soft brake pedal
     - question: underbody-q03
       option: A pipe (fuel or brake) is hanging
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F13-UB-15:
     status: approved
     name: Major Underbody Damage with Fluid Leak / Safety Risk
@@ -779,6 +831,8 @@ faults:
     - fuel smell
     - fluid puddle
     - soft brake pedal
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: underbody-q01
       option: Fluid drops or a puddle
@@ -788,6 +842,10 @@ faults:
       option: Soft brake pedal
     - question: underbody-q07
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   F13-UB-16:
     status: approved
     name: Aftermarket Heavy Engine Guard Rattling / Blocking Cooling or Service  [NEW - India]

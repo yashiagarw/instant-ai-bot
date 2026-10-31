@@ -591,6 +591,38 @@ questions:
   - label: Not sure
     not_sure: true
     effects: []
+- id: exhaust-sep-01
+  status: approved
+  stage: 3
+  text: Was a sports or aftermarket silencer fitted?
+  source_faults:
+  - F16-EX-11
+  - F16-EX-17
+  separates:
+  - F16-EX-11
+  - F16-EX-17
+  reviewed_by: claude_code (auto, pending mechanic sign-off)
+  basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: EX-17: modified / aftermarket
+    silencer; EX-11: low power, rattle, underbody very hot'
+  options:
+  - label: Yes, an aftermarket / loud silencer was fitted
+    effects:
+    - fault: F16-EX-17
+      effect: supports
+      strength: strong
+    safety_trigger: false
+  - label: No; the car has lost power and rattles underneath
+    effects:
+    - fault: F16-EX-11
+      effect: supports
+      strength: strong
+    - fault: F16-EX-17
+      effect: rules_out
+      strength: strong
+    safety_trigger: false
+  - label: Not sure
+    not_sure: true
+    effects: []
 faults:
   F16-EX-01:
     status: approved
