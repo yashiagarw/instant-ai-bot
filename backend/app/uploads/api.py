@@ -5,6 +5,7 @@ upload or session does not exist (404). Photos are never public: GET answers a s
 2. the browser posts the file straight to the storage
 3. POST /api/uploads/{id}/complete   -> the API checks the real type, size and pixels, re-encodes, keeps the clean JPEG
 4. GET  /api/uploads/{id}            -> a short-lived signed link, for the owner only
+5. POST /api/uploads/{id}/analyze    -> what the photo may show (app.vision), never blocking the diagnosis
 """
 
 import logging
@@ -20,11 +21,15 @@ from sqlalchemy.orm import Session
 from app.accounts import service as accounts
 from app.accounts.service import ANON_COOKIE, SESSION_COOKIE
 from app.db import get_session
+from app.diagnosis import service as diagnosis_service
 from app.diagnosis.models import DiagnosisSession
+from app.diagnosis.schemas import SafetyAlertOut
 from app.ratelimit import RateLimiter, client_ip
 from app.uploads.imaging import MESSAGES, ImageRejected, process
 from app.uploads.models import Upload, UploadStatus
 from app.uploads.storage import Storage, StorageError, make_storage
+from app.vision import analysis
+from app.vision.models import AnalysisMode, FindingStatus, ImageFinding
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/uploads", tags=["uploads"])
@@ -84,6 +89,28 @@ class UploadFormOut(BaseModel):
     expires_in: int
 
 
+class AnalyzeIn(BaseModel):
+    mode: AnalysisMode = Field(description="warning_light: a dashboard light. damage: visible damage, wear or a leak.")
+
+
+class FindingLabelOut(BaseModel):
+    code: str
+    name: str
+    meaning: str
+    severity: str | None = Field(default=None, description="Warning lights: red, amber or info.")
+    confidence: float
+    reviewed: bool = Field(description="False until a mechanic has reviewed this label.")
+
+
+class FindingOut(BaseModel):
+    upload_id: uuid.UUID
+    mode: AnalysisMode
+    status: FindingStatus = Field(description="found, unclear (retake), unavailable or failed (a mechanic looks).")
+    message: str
+    labels: list[FindingLabelOut] = Field(description='Shown as "Possible: ..."; never a verified fact.')
+    safety: list[SafetyAlertOut] = Field(description="Safety rules for a red light or dangerous damage.")
+
+
 class PhotoOut(BaseModel):
     id: uuid.UUID
     status: UploadStatus
@@ -91,6 +118,7 @@ class PhotoOut(BaseModel):
     height: int | None = None
     url: str | None = Field(default=None, description="Signed link, valid `expires_in` seconds, owner only.")
     expires_in: int | None = None
+    findings: list[FindingOut] = Field(default_factory=list)
 
 
 def _owned_upload(session: Session, caller: Caller, upload_id: uuid.UUID) -> Upload:
@@ -100,11 +128,33 @@ def _owned_upload(session: Session, caller: Caller, upload_id: uuid.UUID) -> Upl
     return row
 
 
-def _photo_out(request: Request, storage: Storage, row: Upload) -> PhotoOut:
+def _finding_out(session: Session, finding: ImageFinding) -> FindingOut:
+    views = analysis.label_views(session, finding)
+    return FindingOut(
+        upload_id=finding.upload_id,
+        mode=finding.mode,
+        status=finding.status,
+        message=analysis.MESSAGES[finding.status],
+        labels=[FindingLabelOut(**{k: getattr(v, k) for k in FindingLabelOut.model_fields}) for v in views],
+        safety=[SafetyAlertOut(**a) for a in analysis.safety_alerts(session, finding, views)],
+    )
+
+
+def _photo_out(request: Request, storage: Storage, row: Upload, session: Session | None = None) -> PhotoOut:
     ttl = request.app.state.settings.upload_view_ttl_seconds
     url = storage.presign_view(row.object_key, ttl) if row.status == UploadStatus.ready else None
+    findings = []
+    if session is not None:
+        rows = session.scalars(select(ImageFinding).where(ImageFinding.upload_id == row.id).order_by(ImageFinding.id))
+        findings = [_finding_out(session, f) for f in rows]
     return PhotoOut(
-        id=row.id, status=row.status, width=row.width, height=row.height, url=url, expires_in=ttl if url else None
+        id=row.id,
+        status=row.status,
+        width=row.width,
+        height=row.height,
+        url=url,
+        expires_in=ttl if url else None,
+        findings=findings,
     )
 
 
@@ -207,7 +257,7 @@ def get_upload(
 ):
     """The photo's details and a signed link to it (a few minutes). Owner only."""
     response.headers["Cache-Control"] = "no-store"
-    return _photo_out(request, storage, _owned_upload(session, caller, upload_id))
+    return _photo_out(request, storage, _owned_upload(session, caller, upload_id), session)
 
 
 @router.get("", response_model=list[PhotoOut], responses={404: {}})
@@ -229,7 +279,50 @@ def list_uploads(
         .where(Upload.session_id == ds.id, Upload.status == UploadStatus.ready)
         .order_by(Upload.created_at)
     ).all()
-    return [_photo_out(request, storage, r) for r in rows if caller.owns(r)]
+    return [_photo_out(request, storage, r, session) for r in rows if caller.owns(r)]
+
+
+@router.post(
+    "/{upload_id}/analyze",
+    response_model=FindingOut,
+    dependencies=[Depends(limit_uploads)],
+    responses={404: {}, 409: {"description": "The photo is not checked yet"}, 503: {}},
+)
+def analyze_upload(
+    upload_id: uuid.UUID,
+    body: AnalyzeIn,
+    request: Request,
+    response: Response,
+    session: DbSession,
+    caller: CallerDep,
+    storage: StorageDep,
+):
+    """What the photo may show, from a fixed list only: a warning light (name, meaning, severity) or visible damage,
+    or "unclear". Without a vision provider: status unavailable (no call, no cost); the photo is kept for the
+    mechanic either way. A finding already made for this photo and mode is returned as it is (no second call)."""
+    settings = request.app.state.settings
+    response.headers["Cache-Control"] = "no-store"
+    row = _owned_upload(session, caller, upload_id)
+    if row.status != UploadStatus.ready:
+        raise HTTPException(status.HTTP_409_CONFLICT, "This photo has not been checked yet")
+    done = session.scalar(
+        select(ImageFinding).where(
+            ImageFinding.upload_id == row.id,
+            ImageFinding.mode == body.mode,
+            ImageFinding.status.in_([FindingStatus.found, FindingStatus.unclear]),
+        )
+    )
+    if done is None:
+        llm = diagnosis_service.get_llm(request.app.state)
+        image = None
+        if llm is not None:
+            try:
+                image = storage.get(row.object_key)
+            except StorageError as e:
+                raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, STORAGE_DOWN) from e
+        done = analysis.analyze(session, row, body.mode, image, llm, settings.vision_min_confidence)
+        session.commit()
+    return _finding_out(session, done)
 
 
 @router.delete("/{upload_id}", status_code=status.HTTP_204_NO_CONTENT, responses={404: {}, 503: {}})

@@ -1,6 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { FakePhotos } from "../src/__tests__/fake-photos";
+import { FakePhotos, RED_OIL_LIGHT } from "../src/__tests__/fake-photos";
 import { expectNoSideScroll, expectTouchTargets } from "./checks";
 import { mockApi } from "./mock-api";
 
@@ -54,6 +54,8 @@ test("photo step: camera or gallery, preview, upload progress, then the photo; q
   await expect(step.getByTestId("photo-status")).toContainText("Photo added");
   await expect(step.getByRole("img", { name: "Your photo 1" })).toBeVisible();
   expect(photos.photos).toHaveLength(1);
+  // No vision provider (the default): the photo is kept and a mechanic looks at it.
+  await expect(step.getByText("A mechanic will look at your photo.")).toBeVisible();
 
   // A wrong file is explained and does not stop anything.
   await step.getByTestId("gallery-input").setInputFiles({ name: "notes.pdf", mimeType: "application/pdf", buffer: PNG });
@@ -72,4 +74,36 @@ test("the photo step can be skipped and the diagnosis finishes without a photo",
   await page.getByRole("button", { name: "The tyre goes soft again after I fill it with air" }).click();
   await page.getByRole("button", { name: "Not sure" }).click();
   await expect(page).toHaveURL(/\/result$/);
+});
+
+test("a red warning light in a photo: Possible ..., a note to verify, and the safety banner", async ({ page }) => {
+  const photos = await chat(page);
+  photos.analysis = RED_OIL_LIGHT;
+  const step = page.getByTestId("photo-step");
+  await step.getByTestId("gallery-input").setInputFiles({ name: "dash.png", mimeType: "image/png", buffer: PNG });
+  await step.getByRole("radio", { name: "A warning light on the dashboard" }).check();
+  await step.getByRole("button", { name: "Use this photo" }).click();
+  await expect(step.getByText("Possible: Engine oil pressure light")).toBeVisible();
+  await expect(step.getByText(/Photos can be misleading/)).toBeVisible();
+  await expect(step.getByTestId("safety-banner")).toContainText("Stop now and switch off the engine");
+  expect(photos.analyzed).toEqual(["warning_light"]);
+  await expectNoSideScroll(page);
+  await expectTouchTargets(page);
+});
+
+test("the results page shows the customer's photos", async ({ page }) => {
+  const photos = await chat(page);
+  photos.analysis = RED_OIL_LIGHT;
+  const step = page.getByTestId("photo-step");
+  await step.getByTestId("gallery-input").setInputFiles({ name: "dash.png", mimeType: "image/png", buffer: PNG });
+  await step.getByRole("button", { name: "Use this photo" }).click();
+  await expect(step.getByTestId("photo-status")).toContainText("Photo added");
+  await page.getByRole("button", { name: "The tyre goes soft again after I fill it with air" }).click();
+  await page.getByRole("button", { name: "Not sure" }).click();
+  await expect(page).toHaveURL(/\/result$/);
+  const gallery = page.getByTestId("photo-gallery").locator("visible=true");
+  await expect(gallery.getByRole("img", { name: "Your photo 1" })).toBeVisible();
+  await expect(gallery.getByText("Possible: Engine oil pressure light")).toBeVisible();
+  await expect(page.locator("#result-safety")).toContainText("Stop now and switch off the engine");
+  await expectNoSideScroll(page);
 });

@@ -6,6 +6,7 @@ FakeProvider answers from a function, for tests; it never touches the network.
 
 from __future__ import annotations
 
+import base64
 import json
 import time
 from collections.abc import Callable
@@ -32,6 +33,8 @@ class LLMRequest:
     tool: ToolSpec
     max_tokens: int
     effort: str = "low"
+    # (media type, bytes) images sent before the text, e.g. a customer photo (already re-encoded, no metadata).
+    images: list[tuple[str, bytes]] = field(default_factory=list)
 
 
 @dataclass
@@ -78,7 +81,7 @@ class ClaudeProvider:
                 ],
                 # Forced tool_choice is rejected on several current models: auto + the prompt's instruction.
                 tool_choice={"type": "auto"},
-                messages=[{"role": "user", "content": request.user}],
+                messages=[{"role": "user", "content": _content(request)}],
             )
         except self._anthropic.APIError as e:
             raise LLMError(f"{type(e).__name__}: {getattr(e, 'status_code', '')}".strip(": ")) from e
@@ -98,6 +101,16 @@ class ClaudeProvider:
             cache_read_tokens=getattr(u, "cache_read_input_tokens", 0) or 0,
             cache_write_tokens=getattr(u, "cache_creation_input_tokens", 0) or 0,
         )
+
+
+def _content(request: LLMRequest) -> str | list[dict]:
+    if not request.images:
+        return request.user
+    blocks: list[dict] = [
+        {"type": "image", "source": {"type": "base64", "media_type": t, "data": base64.b64encode(b).decode()}}
+        for t, b in request.images
+    ]
+    return [*blocks, {"type": "text", "text": request.user}]
 
 
 @dataclass

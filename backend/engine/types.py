@@ -177,6 +177,9 @@ class Request:
     # Symptom ids (TextEntry.id) the LLM extraction step found in the customer's words. Added to the free-text
     # matches; the text itself is still matched and still runs every safety rule.
     symptoms: list[int] = field(default_factory=list)
+    # Symptom ids a photo analysis found (app.vision). Weaker evidence than any answer (PHOTO_SYMPTOM_SCORE), added
+    # on top of the text match; never runs or skips a safety rule.
+    photo_symptoms: list[int] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------- result

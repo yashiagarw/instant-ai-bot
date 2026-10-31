@@ -124,7 +124,7 @@ class SafetyAlertOut(BaseModel):
     rule_id: int
     risk: Literal["low", "medium", "high"]
     reason: str = Field(description="What fired it: an answer, matched words, or the likely cause.")
-    source: Literal["answer", "text", "likely"]
+    source: Literal["answer", "text", "likely", "photo"]
     roadside_action: str = Field(description="What the customer should do now.")
     stop_driving_trigger: str
     towing: str

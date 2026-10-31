@@ -149,8 +149,10 @@ class LLMClient:
         extraction_model: str,
         phrasing_model: str,
         explanation_model: str = "",
+        vision_model: str = "",
         effort: str = "low",
         timeout: float = 4.0,
+        vision_timeout: float | None = None,
         daily_cap_usd: float = 2.0,
         workers: int = 8,
     ):
@@ -159,8 +161,10 @@ class LLMClient:
             "extraction": extraction_model,
             "phrasing": phrasing_model,
             "explanation": explanation_model or phrasing_model,
+            "vision": vision_model or explanation_model or phrasing_model,
         }
         self.effort, self.timeout, self.daily_cap_usd = effort, timeout, daily_cap_usd
+        self.timeouts = {"vision": vision_timeout or timeout}
         self._pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="llm")
 
     def _record(self, rec: CallRecord) -> None:
@@ -187,8 +191,10 @@ class LLMClient:
         validate: Validator,
         session_id: uuid.UUID | None = None,
         detail: str = "",
+        images: list[tuple[str, bytes]] | None = None,
     ) -> Outcome:
         model = self.models[purpose]
+        timeout = self.timeouts.get(purpose, self.timeout)
         base = CallRecord(purpose, self.provider.name, model, prompt_version, "", session_id=session_id, detail=detail)
 
         def done(outcome: str, value: Any = None, **fields) -> Outcome:
@@ -202,14 +208,14 @@ class LLMClient:
         if self._over_cap():
             return done(LLMOutcome.spend_cap, detail=f"daily cap ${self.daily_cap_usd}")
 
-        request = LLMRequest(model, system, user, tool, max_tokens, self.effort)
+        request = LLMRequest(model, system, user, tool, max_tokens, self.effort, images=list(images or []))
         started = time.monotonic()
         future = self._pool.submit(self.provider.call, request)
         try:
-            response: LLMResponse = future.result(timeout=self.timeout)
+            response: LLMResponse = future.result(timeout=timeout)
         except FutureTimeout:
             # The answer is no longer used. Log the row once the call ends, with the tokens it was billed.
-            future.add_done_callback(lambda f: self._late(f, base, started))
+            future.add_done_callback(lambda f: self._late(f, base, started, timeout))
             return Outcome(None, False, LLMOutcome.timeout)
         except LLMError as e:
             return done(LLMOutcome.error, latency_ms=_ms(started), detail=str(e)[:200])
@@ -229,12 +235,12 @@ class LLMClient:
             return done(LLMOutcome.dropped, value, detail=f"dropped {dropped}", **usage)
         return done(LLMOutcome.ok, value, **usage)
 
-    def _late(self, future: Future, base: CallRecord, started: float) -> None:
+    def _late(self, future: Future, base: CallRecord, started: float, timeout: float) -> None:
         fields: dict = {"latency_ms": _ms(started)}
         exc = future.exception()
         if exc is None:
             fields |= _usage(future.result(), base.model)
-        info = "; ".join(x for x in (base.detail, f"over {self.timeout}s", type(exc).__name__ if exc else "") if x)
+        info = "; ".join(x for x in (base.detail, f"over {timeout}s", type(exc).__name__ if exc else "") if x)
         self._record(CallRecord(**{**base.__dict__, **fields, "outcome": LLMOutcome.timeout, "detail": info}))
 
 
@@ -262,11 +268,15 @@ def make_llm_client(settings, recorder: Recorder) -> LLMClient | None:
     from app.llm.providers import ClaudeProvider
 
     return LLMClient(
-        ClaudeProvider(settings.anthropic_api_key, settings.llm_timeout_seconds),
+        ClaudeProvider(
+            settings.anthropic_api_key, max(settings.llm_timeout_seconds, settings.llm_vision_timeout_seconds)
+        ),
         recorder,
         extraction_model=settings.llm_extraction_model,
         phrasing_model=settings.llm_phrasing_model,
         explanation_model=settings.llm_explanation_model,
+        vision_model=settings.llm_vision_model,
+        vision_timeout=settings.llm_vision_timeout_seconds,
         effort=settings.llm_effort,
         timeout=settings.llm_timeout_seconds,
         daily_cap_usd=settings.llm_daily_spend_cap_usd,

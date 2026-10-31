@@ -237,7 +237,9 @@ export function QuestionChat() {
       )}
 
       {/* Optional and separate from the questions: it never blocks answering. */}
-      {q && <PhotoStep sessionId={sessionId} />}
+      {q && (
+        <PhotoStep sessionId={sessionId} defaultMode={q.category === "dashboard_warning" ? "warning_light" : "damage"} />
+      )}
     </div>
   );
 }

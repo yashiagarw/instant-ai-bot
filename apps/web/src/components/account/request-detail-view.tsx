@@ -5,9 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Check, Circle, CircleDot, X } from "lucide-react";
 
+import { PhotoGallery, photoAlerts, usePhotos } from "@/components/diagnose/photo-findings";
 import { ErrorMessage } from "@/components/error-message";
+import { SafetyBanner } from "@/components/safety-banner";
 import { Skeleton } from "@/components/skeleton";
-import { accountApi, type TimelineStep } from "@/lib/api";
+import { accountApi, type RequestDetail as RequestDetailType, type TimelineStep } from "@/lib/api";
 import { shortDate } from "@/lib/format";
 import { useLoad } from "@/lib/use-load";
 import { cn } from "@/lib/utils";
@@ -64,7 +66,11 @@ export function RequestDetailView() {
 
   if (status === "loading" || unauthorised) return <Skeleton className="h-96 rounded-3xl" />;
   if (req.state.status === "error") return <ErrorMessage message={req.state.message} onRetry={req.retry} />;
-  const r = req.state.data;
+  return <RequestDetail r={req.state.data} />;
+}
+
+function RequestDetail({ r }: { r: RequestDetailType }) {
+  const photos = usePhotos(r.session_id);
   return (
     <article aria-labelledby="req-h" className="flex flex-col gap-5 rounded-3xl border border-border bg-white p-5 sm:p-7">
       <div>
@@ -77,6 +83,7 @@ export function RequestDetailView() {
           {r.urgent && " · urgent"}
         </p>
       </div>
+      <SafetyBanner alerts={photoAlerts(photos)} />
       <section aria-labelledby="status-h">
         <h2 id="status-h" className="mb-3 text-xl font-black text-ink">
           Status: {r.status_label}
@@ -101,6 +108,7 @@ export function RequestDetailView() {
           </div>
         )}
       </dl>
+      <PhotoGallery photos={photos} className="border-0 p-0" />
       <div className="flex flex-wrap gap-x-5">
         {r.session_id && (
           <Link

@@ -30,12 +30,15 @@ from engine.core import (
     Engine,
     cost_for,
     coverage_level,
+    match_evidence,
+    photo_evidence,
 )
 from engine.safety import evaluate
 from engine.text import STOPWORDS, tokens
 from engine.types import ROUTE_QUESTION, Evidence, Question, QuestionOut, RankedFault, Request, Result
 
-ENGINE_VERSION_V2 = "2.3.0"  # 2.1: Request.symptoms. 2.2: car features / fault requirements, evidence items.
+ENGINE_VERSION_V2 = "2.4.0"  # 2.1: Request.symptoms. 2.2: car features / fault requirements, evidence items.
+# 2.4: Request.photo_symptoms.
 # 2.3: part_fit_verified from part_compatibility records
 DEFAULTS = {"question_budget": MAX_QUESTIONS, "stop_probability": 0.75, "stop_margin": 0.5, "min_questions": 1}
 FAST_TRACK_ONLY = {"question_budget": FAST_TRACK_MAX, "min_questions": 0}
@@ -134,9 +137,14 @@ class EngineV2(Engine):
         evidence: dict[int, list[str]] = {fid: [] for fid in candidates}
         items: dict[int, list[Evidence]] = {fid: [] for fid in candidates}
         for fid, m in matches.items():
+            if fid in evidence and (ev := match_evidence(m)):
+                evidence[fid].append(ev[0])
+                items[fid].append(ev[1])
+        for fid, line in sc.photo.items():
             if fid in evidence:
-                evidence[fid].append(f"Matched {'your words' if m.kind == 'phrase' else 'symptom'}: {m.text}")
-                items[fid].append(Evidence("said" if m.kind == "phrase" else "symptom", m.text))
+                ev = photo_evidence(line)
+                evidence[fid].append(ev[0])
+                items[fid].append(ev[1])
         answered_q: set[int] = set()
         answered_opts: set[int] = set()
         answers: list[tuple[dict, int]] = []

@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 import engine as eng
 from app.vehicles.features import requirement_label
 
-SUPPORTS = ("main", "answer", "said", "symptom")
+SUPPORTS = ("main", "answer", "said", "symptom", "photo")
 INSPECTION_LINE = (
     "Still not fixed? Ask for a full inspection, and tell the mechanic what has already been checked or replaced."
 )
@@ -45,6 +45,8 @@ def evidence_sentence(e: eng.types.Evidence) -> str:
         return f"Your description sounds like {_q(e.text)}."
     if e.kind == "symptom":
         return f"It matches a known sign: {_q(e.text)}."
+    if e.kind == "photo":
+        return f"Your photo may show {_q(e.text)} (photos can mislead; a mechanic will check)."
     if e.kind == "lacks":
         return f"Less likely, because it needs {need_label(e.need)}, which your car doesn't have."
     return e.text

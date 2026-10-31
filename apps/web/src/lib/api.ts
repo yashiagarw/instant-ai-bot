@@ -219,7 +219,7 @@ export interface SafetyAlert {
   rule_id: number;
   risk: "low" | "medium" | "high";
   reason: string;
-  source: "answer" | "text" | "likely";
+  source: "answer" | "text" | "likely" | "photo";
   roadside_action: string;
   stop_driving_trigger: string;
   towing: string;
@@ -695,6 +695,27 @@ export interface UploadForm {
   expires_in: number;
 }
 
+export type PhotoMode = "warning_light" | "damage";
+
+export interface FindingLabel {
+  code: string;
+  name: string;
+  meaning: string;
+  severity: "red" | "amber" | "info" | null;
+  confidence: number;
+  reviewed: boolean;
+}
+
+/** What a photo may show (backend/app/vision). Labels are possibilities, never verified facts. */
+export interface Finding {
+  upload_id: string;
+  mode: PhotoMode;
+  status: "found" | "unclear" | "unavailable" | "failed";
+  message: string;
+  labels: FindingLabel[];
+  safety: SafetyAlert[];
+}
+
 export interface Photo {
   id: string;
   status: "pending" | "ready" | "rejected";
@@ -702,6 +723,7 @@ export interface Photo {
   height: number | null;
   url: string | null;
   expires_in: number | null;
+  findings?: Finding[];
 }
 
 /** The type to declare for a file: browsers often leave HEIC photos untyped, so the extension decides then. */
@@ -739,4 +761,5 @@ export const photosApi = {
   list: (sessionId: string, signal?: AbortSignal) =>
     get<Photo[]>(`/uploads?session_id=${encodeURIComponent(sessionId)}`, signal),
   remove: (id: string) => del<void>(`/uploads/${id}`),
+  analyze: (id: string, mode: PhotoMode) => post<Finding>(`/uploads/${id}/analyze`, { mode }),
 };

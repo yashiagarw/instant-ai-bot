@@ -40,6 +40,13 @@ The engine is stateless: send the whole session (vehicle, tile, text, all answer
 8. **Merged duplicates** (`data/review/merges.yaml` -> `merged_into` links): same-category aliases are folded into the canonical fault by the loader; cross-category aliases stay in their category and are ranked once (`Knowledge.alias_of`).
 9. **Result**: ranked faults with evidence, segment cost (approx label + check date) and repair time, roadside verdict, safety alerts and tips, actions (`request_mechanic` / `book_inspection`), inspection checklist.
 
+## Photo evidence
+
+`Request.photo_symptoms` takes symptom ids found in the customer's photos (`app/vision`, from the fixed label list).
+Each adds `PHOTO_SYMPTOM_SCORE` (0.3) to its fault's text match, once per fault; with the text weight of 3 that is
+0.9, below the weakest answer weight (1), so a photo never outweighs an answer. The evidence item has kind `photo`.
+Safety rules are not changed by photos. Empty = no change.
+
 ## Free-text matching
 
 `Request.symptoms` takes symptom ids (`TextEntry.id`, the fault item ids) found by the app's LLM extraction step

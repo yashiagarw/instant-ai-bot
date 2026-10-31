@@ -3,10 +3,14 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { Camera, CircleCheck, ImagePlus, LoaderCircle, RotateCcw, Trash2, X } from "lucide-react";
 
+import { PhotoFindings, photoAlerts } from "@/components/diagnose/photo-findings";
+import { SafetyBanner } from "@/components/safety-banner";
 import { Button } from "@/components/ui/button";
 import {
   errorMessage,
+  type Finding,
   PHOTO_MAX_BYTES,
+  type PhotoMode,
   photosApi,
   photoType,
   sendToStorage,
@@ -20,7 +24,7 @@ const ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.hei
 type Step =
   | { kind: "idle" }
   | { kind: "preview"; file: File; url: string | null }
-  | { kind: "uploading"; file: File; url: string | null; progress: number; checking: boolean }
+  | { kind: "uploading"; file: File; url: string | null; progress: number; phase: "sending" | "checking" | "reading" }
   | { kind: "error"; file: File | null; url: string | null; message: string };
 
 /** Phones get "Take a photo" (camera) and "Choose from gallery"; desktops one "Choose a photo". */
@@ -44,9 +48,15 @@ export function checkPhoto(file: File): string | null {
   return null;
 }
 
+const MODES: { value: PhotoMode; label: string }[] = [
+  { value: "warning_light", label: "A warning light on the dashboard" },
+  { value: "damage", label: "Damage, wear or a leak" },
+];
+
 /** An optional photo of the problem, beside the questions. It never blocks them: skip it, or carry on while it
- * uploads; an error here only affects the photo. */
-export function PhotoStep({ sessionId }: { sessionId: string }) {
+ * uploads; an error here only affects the photo. After upload the photo is read for a warning light or damage;
+ * when that is not possible a mechanic looks at it. */
+export function PhotoStep({ sessionId, defaultMode = "damage" }: { sessionId: string; defaultMode?: PhotoMode }) {
   const id = useId();
   const touch = useTouch();
   const camera = useRef<HTMLInputElement>(null);
@@ -56,6 +66,7 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [skipped, setSkipped] = useState(false);
   const [status, setStatus] = useState("");
+  const [mode, setMode] = useState<PhotoMode>(defaultMode);
 
   // Photos already added to this diagnosis (after a reload). Failure here just shows none.
   useEffect(() => {
@@ -83,7 +94,7 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
   async function upload(file: File, url: string | null) {
     const type = photoType(file)!;
     abort.current = new AbortController();
-    setStep({ kind: "uploading", file, url, progress: 0, checking: false });
+    setStep({ kind: "uploading", file, url, progress: 0, phase: "sending" });
     try {
       const form = await photosApi.start(sessionId, type, file.size);
       await sendToStorage(
@@ -92,9 +103,12 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
         (p) => setStep((s) => (s.kind === "uploading" ? { ...s, progress: p } : s)),
         abort.current.signal,
       );
-      setStep((s) => (s.kind === "uploading" ? { ...s, progress: 1, checking: true } : s));
+      setStep((s) => (s.kind === "uploading" ? { ...s, progress: 1, phase: "checking" } : s));
       const photo = await photosApi.complete(form.upload_id);
-      setPhotos((ps) => [...ps, photo]);
+      setStep((s) => (s.kind === "uploading" ? { ...s, phase: "reading" } : s));
+      // Reading the photo is extra: if it fails, the photo is still saved and a mechanic looks at it.
+      const finding: Finding | null = await photosApi.analyze(photo.id, mode).catch(() => null);
+      setPhotos((ps) => [...ps, { ...photo, findings: finding ? [finding] : [] }]);
       setStep({ kind: "idle" });
       setStatus("Photo added. The mechanic will see it with your diagnosis.");
     } catch (e) {
@@ -180,6 +194,7 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
   return (
     <section aria-labelledby={`${id}-h`} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5" data-testid="photo-step">
       {inputs}
+      <SafetyBanner alerts={photoAlerts(photos)} />
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 id={`${id}-h`} className="text-lg font-black text-ink">
@@ -201,14 +216,15 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
       </div>
 
       {photos.length > 0 && (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3" data-testid="photos">
+        <ul className="flex flex-col gap-3" data-testid="photos">
           {photos.map((p, i) => (
-            <li key={p.id} className="relative overflow-hidden rounded-2xl bg-warm-white">
+            <li key={p.id} className="flex gap-3">
+              <div className="relative size-28 shrink-0 overflow-hidden rounded-2xl bg-warm-white">
               {p.url ? (
                 // eslint-disable-next-line @next/next/no-img-element -- a short-lived signed link from the API
-                <img src={p.url} alt={`Your photo ${i + 1}`} className="aspect-square w-full object-cover" />
+                <img src={p.url} alt={`Your photo ${i + 1}`} className="size-full object-cover" />
               ) : (
-                <div className="flex aspect-square items-center justify-center text-sm text-ink/70">Photo {i + 1}</div>
+                <div className="flex size-full items-center justify-center text-sm text-ink/70">Photo {i + 1}</div>
               )}
               <button
                 type="button"
@@ -218,6 +234,10 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
               >
                 <Trash2 aria-hidden="true" className="size-5" />
               </button>
+              </div>
+              <div className="min-w-0 flex-1">
+                <PhotoFindings findings={p.findings ?? []} />
+              </div>
             </li>
           ))}
         </ul>
@@ -235,6 +255,32 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
               </p>
             )}
           </div>
+          {step.kind === "preview" && (
+            <fieldset className="flex flex-col gap-2">
+              <legend className="mb-1 font-bold text-ink">What does the photo show?</legend>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                {MODES.map((m) => (
+                  <label
+                    key={m.value}
+                    className={cn(
+                      "flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-2 px-4 py-2 font-semibold text-ink has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring",
+                      mode === m.value ? "border-cta bg-warm-white" : "border-border bg-white",
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name={`${id}-mode`}
+                      value={m.value}
+                      checked={mode === m.value}
+                      onChange={() => setMode(m.value)}
+                      className="size-5 accent-cta"
+                    />
+                    {m.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )}
           {step.kind === "preview" ? (
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button type="button" className="h-12 rounded-full bg-cta px-6 text-lg font-bold text-white hover:bg-cta/90" onClick={() => void upload(step.file, step.url)}>
@@ -249,7 +295,13 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
           ) : (
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between text-sm font-semibold text-ink">
-                <span>{step.checking ? "Checking and removing location data…" : "Uploading…"}</span>
+                <span>
+                  {step.phase === "sending"
+                    ? "Uploading…"
+                    : step.phase === "checking"
+                      ? "Checking and removing location data…"
+                      : "Looking at your photo…"}
+                </span>
                 <span className="tabular-nums">{Math.round(step.progress * 100)}%</span>
               </div>
               <div
@@ -261,11 +313,14 @@ export function PhotoStep({ sessionId }: { sessionId: string }) {
                 className="h-2.5 overflow-hidden rounded-full bg-ink/10"
               >
                 <div
-                  className={cn("h-full rounded-full bg-cta transition-[width] motion-reduce:transition-none", step.checking && "animate-pulse")}
+                  className={cn(
+                    "h-full rounded-full bg-cta transition-[width] motion-reduce:transition-none",
+                    step.phase !== "sending" && "animate-pulse motion-reduce:animate-none",
+                  )}
                   style={{ width: `${Math.round(step.progress * 100)}%` }}
                 />
               </div>
-              {!step.checking && (
+              {step.phase === "sending" && (
                 <Button type="button" variant="ghost" className="h-11 self-start rounded-full px-3 text-base font-semibold" onClick={() => abort.current?.abort()}>
                   <LoaderCircle aria-hidden="true" className="size-5 animate-spin motion-reduce:animate-none" />
                   Cancel upload

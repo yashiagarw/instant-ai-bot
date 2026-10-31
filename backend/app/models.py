@@ -8,3 +8,4 @@ from app.parts import models as parts  # noqa: F401
 from app.requests import models as requests  # noqa: F401
 from app.uploads import models as uploads  # noqa: F401
 from app.vehicles import models as vehicles  # noqa: F401
+from app.vision import models as vision  # noqa: F401

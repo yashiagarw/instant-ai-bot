@@ -101,6 +101,11 @@ class Settings(BaseSettings):
     llm_explanation_model: str = "claude-haiku-5-5"
     llm_effort: str = "low"  # output_config.effort for live calls
     llm_timeout_seconds: float = 4.0  # wall clock per call; slower calls fall back
+    # Photo analysis (app.vision): reads a customer photo as labels from image_labels. Images take longer.
+    llm_vision_model: str = "claude-opus-5-5"
+    llm_vision_timeout_seconds: float = 20.0
+    # Photo findings at or above this confidence (0-1) are shown and used as evidence; below: "unclear".
+    vision_min_confidence: float = 0.6
     # Estimated USD per day (India time) across all live calls; once reached, every step falls back.
     llm_daily_spend_cap_usd: float = 2.0
     questions_model: str = "claude-opus-5-5"

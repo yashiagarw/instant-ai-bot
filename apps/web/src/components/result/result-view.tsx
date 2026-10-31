@@ -7,6 +7,7 @@ import { ChevronDown, CircleHelp, RotateCcw, ShieldAlert, Truck, Wrench } from "
 
 import { CarSummary } from "@/components/diagnose/car-summary";
 import { ErrorMessage } from "@/components/error-message";
+import { PhotoGallery, photoAlerts, usePhotos } from "@/components/diagnose/photo-findings";
 import { PartsSection } from "@/components/parts/parts-section";
 import { AreaPicker, METRO_LABEL } from "@/components/result/area-picker";
 import { EstimateCard, type EstimateState } from "@/components/result/estimate-card";
@@ -203,6 +204,7 @@ function Result({ r }: { r: ResultOut }) {
   const zoneLabel = estimates.data?.zone.label ?? null;
   const verifying = estimates.data?.estimates.some((e) => e.flags?.needs_check) ?? false;
   const explanations = useExplanations(r.session_id);
+  const photos = usePhotos(r.session_id);
   const streaming = explanations.status === "loading";
   const verdict = r.roadside.verdict;
   const roadText = roadsideText(r.roadside.text);
@@ -211,7 +213,7 @@ function Result({ r }: { r: ResultOut }) {
   const fastTrack = r.mode === "fast_track" || r.mode === "inspect";
   return (
     <div className="flex flex-col gap-6 pb-24 md:pb-0">
-      <SafetyBanner alerts={r.safety_alerts} id="result-safety" />
+      <SafetyBanner alerts={[...r.safety_alerts, ...photoAlerts(photos, r.safety_alerts)]} id="result-safety" />
       <Stepper current="Result" />
 
       {r.status === "in_progress" && (
@@ -228,6 +230,8 @@ function Result({ r }: { r: ResultOut }) {
         <CarSummary vehicle={r.vehicle} topic={r.topic} />
         <CoverageBadge level={r.coverage_level} />
       </header>
+
+      <PhotoGallery photos={photos} />
 
       {fastTrack && (
         <section aria-labelledby="tips-heading" className="flex flex-col gap-4 rounded-3xl border-2 border-cta bg-white p-5">

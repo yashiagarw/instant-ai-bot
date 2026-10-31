@@ -38,6 +38,18 @@ A git ref is extracted with `git archive` and run in its own process, so two eng
 knowledge loader and the database are always today's. Each report records the engine version string and a hash
 of the engine code (the version string was not bumped between some behaviour changes).
 
+## Photo analysis
+
+Labelled photos live in `images/` (`images/manifest.yaml`; format and an example in `images/manifest.example.yaml`).
+`run_image_eval.py` runs each photo through the upload checks and the same model call as the API, then reports
+correct / wrong / unclear rates per mode and red-light recall, with tokens and estimated cost (`--out report.json`
+for JSON). It calls Claude only with `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY`; with no photos or no
+provider it says so and exits 0. Use only photos you may use (never customer photos without consent).
+
+```bash
+uv run python ../data/eval/run_image_eval.py
+```
+
 ## Baseline
 
 `reports/20261024-052401Z_eval_v1-baseline.{md,json}`: engine 1.0.0 (code `d54bfab665`), dataset version 36,

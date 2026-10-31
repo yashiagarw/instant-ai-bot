@@ -1,0 +1,16 @@
+# An example of the format (these files do not exist; copy entries into manifest.yaml with real photos).
+photos:
+  - file: photos/oil-light-01.jpg
+    mode: warning_light
+    expect: [oil_pressure]
+    note: Red oil can lit, engine running
+  - file: photos/dash-several-lights.jpg
+    mode: warning_light
+    expect: [battery_charging, check_engine]
+  - file: photos/belt-cracks.jpg
+    mode: damage
+    expect: [belt_cracked]
+  - file: photos/blurred-engine-bay.jpg
+    mode: damage
+    expect: []
+    note: Too blurred to tell; the right answer is unclear

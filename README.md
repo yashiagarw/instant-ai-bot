@@ -42,7 +42,7 @@ docker compose up -d db storage
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0013)
+uv run alembic upgrade head                          # all migrations (0001 … 0014)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -51,6 +51,7 @@ uv run python -m app.knowledge.requirements apply    # what faults need (start-s
 uv run python -m app.knowledge.phrases load          # reviewed extra customer phrases (spellings, Hindi): data/review/phrases
 uv run python -m app.knowledge.safety_triggers apply # reviewed phrases for global emergency rules: data/review/safety_global_triggers.yaml
 uv run python -m app.uploads.storage setup           # private photo bucket (needs S3_ACCESS_KEY / S3_SECRET_KEY in backend/.env)
+uv run python -m app.vision.catalogue seed           # photo labels (warning lights, damage): data/review/image_labels.yaml
 uv run python -m app.knowledge.embeddings sync       # search index: embeds only new or changed texts
 uv run python -m app.parts build                     # parts catalogue (after merges): prices, fits, fault links, labour
 cd ..
@@ -165,6 +166,7 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `ANTHROPIC_API_KEY` | Claude API key: empty in `.env.example`; set it only to switch the LLM layer on |
 | | `LLM_EXTRACTION_MODEL`, `LLM_PHRASING_MODEL`, `LLM_EXPLANATION_MODEL`, `LLM_EFFORT` | Live LLM models (`claude-haiku-5-5`) and effort (`low`) |
 | | `LLM_TIMEOUT_SECONDS`, `LLM_DAILY_SPEND_CAP_USD` | Per-call wall-clock timeout (4 s) and daily estimated spend cap (USD, India-time day); past either, the fallback is used |
+| | `LLM_VISION_MODEL`, `LLM_VISION_TIMEOUT_SECONDS`, `VISION_MIN_CONFIDENCE` | Photo analysis: model (`claude-opus-5-5`), timeout (20 s), and the confidence below which a finding counts as unclear (0.6). Same switch and spend cap as above |
 | | `QUESTIONS_MODEL`, `QUESTIONS_EFFORT`, `OPENAI_API_KEY`, `OPENAI_MODEL`, … | Offline question drafting (`python -m app.knowledge.questions`, `--provider anthropic\|openai`) |
 | `apps/web/.env.local` | `NEXT_PUBLIC_API_URL` | Backend base URL for the browser |
 
@@ -324,7 +326,7 @@ Type it, tick the consent box and press **Log in**. Diagnoses you made in that b
    set `TRUST_FORWARDED_FOR=true` only behind your own proxy so the per-IP limits see real client addresses.
 6. Send a test code to a team phone and check MSG91's delivery report.
 
-## Phase 4.1: photo uploads
+## Phase 3.5: photo uploads
 
 An optional **Add a photo** box sits under the questions in the chat. It never blocks the diagnosis: skip it, or
 answer questions while it uploads; an error only affects the photo. Phones show **Take a photo** (back camera) and
@@ -366,6 +368,39 @@ Try it: start a diagnosis at http://localhost:3000, and under the first question
 
 In production, also set the bucket's CORS to allow `POST` from the web app's origin, and `S3_PUBLIC_ENDPOINT_URL` to
 the address browsers use for the storage.
+
+## Phase 3.6: photo analysis
+
+After a photo is uploaded, the customer says whether it shows **a warning light on the dashboard** or **damage, wear
+or a leak** (the default follows the problem), and `POST /api/uploads/{id}/analyze {"mode": "warning_light" | "damage"}`
+reads it with a Claude vision model through the LLM layer (`backend/app/vision`).
+
+- **Fixed list only.** The model may answer only codes from `image_labels` (18 warning lights with name, meaning,
+  severity red / amber / info; 12 kinds of damage such as `belt_cracked`, `oil_leak`, `coolant_leak`, `tyre_worn`,
+  `corrosion`), each with a confidence, or "unclear". Unknown codes are dropped; below `VISION_MIN_CONFIDENCE` it is
+  "unclear, please retake from another angle". The list is seeded from the datasets
+  (`data/review/image_labels.yaml` → `uv run python -m app.vision.catalogue seed`; re-run after a dataset import)
+  and is `reviewed: false` until a mechanic checks it (`REVIEW_NOTES.md`).
+- **Off by default, no cost.** With `LLM_PROVIDER=none` (or no `ANTHROPIC_API_KEY`) nothing is called: the answer is
+  `unavailable` and the page says "A mechanic will look at your photo". A timeout, error, refusal or the daily spend
+  cap gives `failed` with the same message. The photo is always kept for the mechanic, and nothing blocks the
+  questions. The model sees only the re-encoded JPEG (no EXIF / GPS). A photo is read once per mode.
+- **Results** are saved in `image_findings`. Customers see "Possible: …" with the meaning and "Photos can be
+  misleading. A mechanic will check this before any repair."
+- **Engine evidence.** Each label links to symptom lines of dataset faults; found labels add them to the engine
+  request (`Request.photo_symptoms`) at a text score of 0.3, i.e. 0.9 after weighting, below the weakest answer
+  weight (1). Safety rules are unchanged and still run on every call.
+- **Safety.** A red warning light shows the red safety banner with the live safety rules of its faults (e.g. the
+  red oil light: "Stop now and switch off the engine"); damage shows the banner for high-risk rules only (fuel or
+  brake fluid leak, melted wiring).
+- The customer's photos and findings also show on the results page and on `/requests/[id]`.
+
+Try it without a key: upload a photo in the chat; it says "A mechanic will look at your photo". With a key
+(`LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY=...` in `backend/.env`), photograph a dashboard light.
+
+Evaluate on labelled photos (`data/eval/images/manifest.yaml`, format in `manifest.example.yaml`; empty for now):
+`cd backend && uv run python ../data/eval/run_image_eval.py` reports correct / wrong / unclear rates per mode and
+red-light recall (it calls Claude only with a key, and says so otherwise).
 
 ## LLM layer (off by default)
 

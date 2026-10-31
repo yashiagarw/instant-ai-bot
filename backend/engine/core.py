@@ -8,7 +8,7 @@ changes nothing.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import combinations
 
 from engine.hindi import expand as expand_hindi
@@ -36,7 +36,8 @@ from engine.types import (
     Vehicle,
 )
 
-ENGINE_VERSION = "1.4.0"  # 1.1: hybrid search, Hindi as Hinglish. 1.2: Request.symptoms. 1.3: car requirements.
+ENGINE_VERSION = "1.5.0"  # 1.1: hybrid search, Hindi as Hinglish. 1.2: Request.symptoms. 1.3: car requirements.
+# 1.5: Request.photo_symptoms.
 # 1.4: part_fit_verified from part_compatibility records (Fault.fit_variant_ids), no longer from fit text
 DISCLAIMER = (
     "This is an estimate based on your answers and our data. It is not a replacement for a professional "
@@ -58,6 +59,9 @@ HIGH_RISK_SCORE = 3.0  # a high-risk fault's rules fire once its score reaches o
 # Text-match score of a symptom the LLM extraction step found (Request.symptoms). Not tuned yet: choose it on the
 # dev split once real extraction runs (data/eval/run_eval.py run --extraction llm).
 EXTRACTED_SYMPTOM_SCORE = 0.8
+# Text-match score a photo finding adds (Request.photo_symptoms). TEXT_WEIGHT / TEXT_STRENGTH x 0.3 = 0.9, below the
+# weakest answer weight (1): a photo can tip a close call but never outweighs anything the customer answered.
+PHOTO_SYMPTOM_SCORE = 0.3
 # A fault the car is known not to be able to have (it needs a feature, fuel or gearbox the car lacks) is down-ranked,
 # never hidden: v2 keeps this share of its prior per unmet need (small enough that even a perfect text match,
 # about 20x in v2's likelihood, leaves it below a plausible alternative), v1 subtracts one strong answer per need.
@@ -158,6 +162,19 @@ class Scope:
     candidates: set[int]
     text: str  # the free text, with the Hinglish form of any Devanagari
     matches: dict[int, Match]
+    photo: dict[int, str] = field(default_factory=dict)  # fault id -> the symptom line a photo showed
+
+
+def match_evidence(m: Match) -> tuple[str, Evidence] | None:
+    """The evidence line and item for a text match (None for a photo-only match: listed from Scope.photo)."""
+    if m.kind == "photo":
+        return None
+    said = m.kind == "phrase"
+    return f"Matched {'your words' if said else 'symptom'}: {m.text}", Evidence("said" if said else "symptom", m.text)
+
+
+def photo_evidence(text: str) -> tuple[str, Evidence]:
+    return f"Possibly seen in a photo: {text}", Evidence("photo", text)
 
 
 class Engine:
@@ -250,8 +267,20 @@ class Engine:
             if e is not None and e.fault_id in candidates:
                 if e.fault_id not in matches or matches[e.fault_id].score < EXTRACTED_SYMPTOM_SCORE:
                     matches[e.fault_id] = Match(EXTRACTED_SYMPTOM_SCORE, e.text, "symptom")
+        photo: dict[int, str] = {}
+        for sid in req.photo_symptoms:  # once per fault, on top of its text match
+            e = self.symptom_entries.get(sid)
+            if e is None or e.fault_id not in candidates or e.fault_id in photo:
+                continue
+            photo[e.fault_id] = e.text
+            m = matches.get(e.fault_id)
+            matches[e.fault_id] = (
+                Match(min(1.0, m.score + PHOTO_SYMPTOM_SCORE), m.text, m.kind)
+                if m
+                else Match(PHOTO_SYMPTOM_SCORE, e.text, "photo")
+            )
 
-        return Scope(vehicle, group, mode, cats, hint, route_answer, candidates, text, matches)
+        return Scope(vehicle, group, mode, cats, hint, route_answer, candidates, text, matches, photo)
 
     def diagnose(self, req: Request) -> Result:
         k = self.k
@@ -280,9 +309,14 @@ class Engine:
         evidence: dict[int, list[str]] = {fid: [] for fid in candidates}
         items: dict[int, list[Evidence]] = {fid: [] for fid in candidates}
         for fid, m in matches.items():
+            if fid in evidence and (ev := match_evidence(m)):
+                evidence[fid].append(ev[0])
+                items[fid].append(ev[1])
+        for fid, line in sc.photo.items():
             if fid in evidence:
-                evidence[fid].append(f"Matched {'your words' if m.kind == 'phrase' else 'symptom'}: {m.text}")
-                items[fid].append(Evidence("said" if m.kind == "phrase" else "symptom", m.text))
+                ev = photo_evidence(line)
+                evidence[fid].append(ev[0])
+                items[fid].append(ev[1])
         answered_q: set[int] = set()
         answered_opts: set[int] = set()
         asked = 0

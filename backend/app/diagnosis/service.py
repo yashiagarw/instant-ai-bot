@@ -50,6 +50,7 @@ from app.llm.models import GeneratedQuestion
 from app.llm.phrasing import detect_language, phrase
 from app.llm.prompts import load as load_prompt
 from app.vehicles.models import UnlistedVehicle, Variant
+from app.vision import analysis as vision
 from engine.core import FAST_TRACK_MAX, MAX_QUESTIONS, MAX_TIPS, unmet_needs
 from engine.text import tokens
 
@@ -167,6 +168,7 @@ def _request(session: Session, ds: DiagnosisSession) -> eng.Request:
     answers = [eng.Answer(e.payload["question_id"], e.payload["option_id"]) for e in _live(session, ds)[1]]
     texts = _free_text(session, ds)
     symptoms = list(dict.fromkeys(i for t in texts for i in t.get("symptom_ids", [])))
+    photo = vision.photo_symptoms(session, ds.id)  # findings from the customer's photos (weaker than answers)
     return eng.Request(
         vehicle=_vehicle(ds.vehicle_snapshot),
         group=start.get("topic_id"),
@@ -174,6 +176,7 @@ def _request(session: Session, ds: DiagnosisSession) -> eng.Request:
         text=" ".join(t["text"] for t in texts),
         answers=answers,
         **({"symptoms": symptoms} if symptoms else {}),
+        **({"photo_symptoms": photo} if photo else {}),
     )
 
 

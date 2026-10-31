@@ -1,0 +1,215 @@
+# What a customer photo may be read as. The vision model may answer ONLY these codes (or "unclear").
+#
+#   faults:   fault keys from the datasets this label points to (meaning and safety rules come from them)
+#   symptoms: a pattern (case-insensitive regular expression) picking the symptom lines of those faults that the
+#             photo shows; their ids become engine evidence (weaker than any answer)
+#   meaning:  empty = taken from the first fault's description at seed time
+#   severity: warning lights only. red = the safety banner shows the linked faults' safety rules
+#   look:     what the light / damage looks like, for the model only (never shown to customers)
+#
+# reviewed: false until a mechanic has checked the label (REVIEW_NOTES.md). Seed with:
+#   cd backend && uv run python -m app.vision.catalogue seed
+
+warning_light:
+  - code: oil_pressure
+    name: Engine oil pressure light
+    severity: red
+    look: Red oil can (dripping oil can) symbol.
+    faults: [F10-DW-23, F12-EN-13]
+    symptoms: "oil light|oil pressure"
+    reviewed: false
+  - code: brake_warning
+    name: Brake warning light
+    severity: red
+    look: Red circle with "!" or "BRAKE" inside brackets ( ! ).
+    faults: [F10-DW-12]
+    symptoms: "brake light"
+    reviewed: false
+  - code: engine_temperature
+    name: Engine temperature light
+    severity: red
+    look: Red thermometer in waves, or the temperature needle in the red zone.
+    faults: [F10-DW-24, F12-EN-11]
+    symptoms: "temp|overheat|needle|gauge"
+    reviewed: false
+  - code: battery_charging
+    name: Battery / charging light
+    severity: red
+    look: Red battery symbol with + and -.
+    faults: [F10-DW-22, F11-EB-18]
+    symptoms: "battery light|charging"
+    reviewed: false
+  - code: airbag
+    name: Airbag (SRS) light
+    severity: red
+    look: Red seated person with a round airbag in front, or "SRS" / "AIRBAG".
+    faults: [F10-DW-25, F16-AB-01]
+    symptoms: "airbag|srs"
+    reviewed: false
+  - code: check_engine_flashing
+    name: Check engine light flashing
+    severity: red
+    look: Amber engine outline that is flashing (often only visible as a video or described as blinking).
+    faults: [F12-EN-05, F15-JM-25]
+    symptoms: "flash|blink"
+    reviewed: false
+  - code: ev_high_voltage
+    name: Electric / hybrid system warning
+    severity: red
+    look: Red or amber car with "!" or a high-voltage battery symbol on an electric or hybrid car.
+    faults: [F06-EV-43]
+    symptoms: "warning|high.?voltage"
+    reviewed: false
+  - code: check_engine
+    name: Check engine light
+    severity: amber
+    look: Amber engine outline (steady, not flashing), sometimes "CHECK".
+    faults: [F10-DW-21, F12-EN-01, F15-SE-05]
+    symptoms: "engine light|check engine"
+    reviewed: false
+  - code: abs
+    name: ABS light
+    severity: amber
+    look: Amber "ABS" in a circle.
+    faults: [F10-DW-02]
+    symptoms: "abs"
+    reviewed: false
+  - code: power_steering
+    name: Power steering (EPS) light
+    severity: amber
+    look: Amber or red steering wheel with "!".
+    faults: [F10-DW-03, F03-ST-11]
+    symptoms: "eps|steering"
+    reviewed: false
+  - code: stability_control
+    name: ESP / traction control light
+    severity: amber
+    look: Amber car with wavy skid lines, sometimes "OFF".
+    faults: [F10-DW-06, F10-DW-07]
+    symptoms: "esp|esc|traction|tcs|tc off|skid|spin"
+    reviewed: false
+  - code: epc
+    name: EPC light
+    severity: amber
+    look: Amber "EPC" letters (Volkswagen, Skoda, Audi).
+    faults: [F10-DW-05]
+    symptoms: "epc"
+    reviewed: false
+  - code: tyre_pressure
+    name: Tyre pressure (TPMS) light
+    severity: amber
+    look: Amber horseshoe-shaped tyre section with "!".
+    faults: [F10-DW-29]
+    symptoms: "tpms|tyre|pressure"
+    reviewed: false
+  - code: water_in_fuel
+    name: Water in diesel light
+    severity: amber
+    look: Amber fuel filter with water drops (diesel cars).
+    faults: [F17-DS-07]
+    symptoms: "wif|water"
+    reviewed: false
+  - code: dpf
+    name: Diesel particulate filter (DPF) light
+    severity: amber
+    look: Amber box with dots inside (filter), diesel cars.
+    faults: [F17-DS-16, F16-EX-14]
+    symptoms: "dpf|warning|light"
+    reviewed: false
+  - code: immobilizer
+    name: Key / immobiliser light
+    severity: amber
+    look: Key symbol, or a car with a key or padlock, steady or flashing.
+    faults: [F13-IG-10]
+    symptoms: "key|immobili"
+    reviewed: false
+  - code: brake_pad_wear
+    name: Brake pad wear light
+    severity: amber
+    look: Amber circle with dashed lines either side ( ( ) ).
+    faults: [F11-BR-01]
+    symptoms: "light|warning|wear"
+    reviewed: false
+  - code: reminder
+    name: Reminder light (seat belt, door open, handbrake, service due)
+    severity: info
+    look: Seat belt person, open car door, "P" in a circle, or a spanner / "SERVICE".
+    faults: [F10-DW-30]
+    symptoms: "reminder|seat|door|handbrake|service|info"
+    reviewed: false
+
+damage:
+  - code: belt_cracked
+    name: Cracked or worn engine belt
+    look: Rubber drive belt with cracks across the ribs, fraying edges or a shiny glazed surface.
+    faults: [F11-EB-02, F11-EB-26]
+    symptoms: "crack|fray|torn|shiny"
+    reviewed: false
+  - code: oil_leak
+    name: Engine oil leak
+    look: Dark brown or black oily wet patch on the engine, under the car or oil drops on the ground.
+    faults: [F12-EN-12]
+    symptoms: "leak|spots|oily|drop"
+    reviewed: false
+  - code: coolant_leak
+    name: Coolant leak
+    look: Green, pink or orange liquid, or crusty dried marks around hoses, clamps, radiator or water pump.
+    faults: [F02-OH-03, F02-OH-07, F16-HP-05, F16-HP-06]
+    symptoms: "leak|crust|wet|drip|puddle"
+    reviewed: false
+  - code: brake_fluid_leak
+    name: Brake fluid leak
+    look: Clear-yellow oily liquid near a wheel, brake hose or under the brake fluid tank.
+    faults: [F11-BR-13, F16-HP-13]
+    symptoms: "leak|wet|fluid"
+    reviewed: false
+  - code: tyre_sidewall_damage
+    name: Tyre bulge, cut or sidewall damage
+    look: Bubble or bulge on the side of the tyre, a cut or crack in the sidewall.
+    meaning: "Sidewall damage means a cut, a bulge (bubble) or a crack on the side of the tyre. It can burst."
+    faults: [F04-TY-05, F04-TY-06]
+    symptoms: "bulge|bubble|cut|crack|sidewall"
+    reviewed: false
+  - code: tyre_flat
+    name: Flat or punctured tyre
+    look: Tyre visibly squashed at the bottom, or a nail / screw in the tread.
+    faults: [F04-TY-03, F04-TY-02]
+    symptoms: "flat|nail|screw|thorn|soft|low"
+    reviewed: false
+  - code: tyre_worn
+    name: Worn or unevenly worn tyre
+    look: Little or no tread left, or one edge of the tyre worn much more than the other.
+    meaning: One side of the tyre wears faster than the other, usually from wheel alignment or steering parts.
+    faults: [F03-ST-06, F03-ST-09]
+    symptoms: "tyre wear"
+    reviewed: false
+  - code: corrosion
+    name: Battery terminal corrosion
+    look: White, blue or green powder on the battery terminals or clamps.
+    faults: [F08-BT-04, F07-SS-19]
+    symptoms: "powder|corrosion"
+    reviewed: false
+  - code: brake_disc_rust
+    name: Rusty or scored brake disc
+    look: Orange rust or a rust lip on the brake disc, or deep grooves / cracks on its face.
+    faults: [F11-BR-28, F11-BR-09]
+    symptoms: "rust|crack|groove|score"
+    reviewed: false
+  - code: exhaust_rust
+    name: Rusted or holed silencer
+    look: Silencer or exhaust pipe with heavy rust, holes or a broken hanger.
+    faults: [F16-EX-08, F16-EX-06]
+    symptoms: "rust|hole|hang|noise|rattle"
+    reviewed: false
+  - code: melted_wiring
+    name: Melted or burnt wiring
+    look: Wires with melted, blackened or burnt insulation, often near extra horns or lights.
+    faults: [F16-SM-18]
+    symptoms: "melt|burn|smell|smoke"
+    reviewed: false
+  - code: fuel_leak
+    name: Fuel leak
+    look: Wet patch with a petrol or diesel smell under the car or along a fuel line.
+    faults: [F10-FD-18, F17-DS-11]
+    symptoms: "leak|smell|wet|drip"
+    reviewed: false

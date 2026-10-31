@@ -17,6 +17,7 @@ class LLMPurpose(StrEnum):
     extraction = "extraction"
     phrasing = "phrasing"
     explanation = "explanation"
+    vision = "vision"
 
 
 class LLMOutcome(StrEnum):

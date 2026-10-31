@@ -358,6 +358,16 @@ and `session_results.cost_snapshot` are built from it. Rules: README "Phase 3.2"
 stored_bytes, width, height, reject_reason. Objects: `incoming/<id>` (raw, deleted after the check) and
 `photos/<id>.jpg` (re-encoded, no metadata) in a private bucket.
 
+`image_labels` (migration 0014): mode (`warning_light` / `damage`), code (unique per mode), name, meaning,
+severity (`red` / `amber` / `info`, lights only), look (for the model only), fault_keys, symptom_ids (fault_items of
+those faults; rebuilt by `app.vision.catalogue seed` per dataset version), reviewed. Source:
+`data/review/image_labels.yaml`.
+
+`image_findings` (migration 0014): upload (cascade), session (cascade), mode, status (`found` / `unclear` /
+`unavailable` / `failed`), labels (`[{code, confidence}]` from image_labels only), symptom_ids (the engine evidence),
+llm_outcome, model, prompt_version. Deleting a photo or an account deletes its findings. `llm_calls.purpose` gains
+`vision`.
+
 `diagnosis_sessions` and `service_requests` gain `user_id` (the owner) and `anon_key_hash` (SHA-256 of the browser's
 anonymous cookie until login attaches the row). Code: `backend/app/accounts`; rules: README "Phase 4.0".
 

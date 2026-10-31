@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
+import { PhotoGallery, photoAlerts } from "@/components/diagnose/photo-findings";
 import { checkPhoto, PhotoStep } from "@/components/diagnose/photo-step";
+import type { Photo } from "@/lib/api";
 import { mockApi } from "./api-mock";
-import { FakePhotos, STORAGE_URL } from "./fake-photos";
+import { FakePhotos, finding, OIL_ALERT, RED_OIL_LIGHT, STORAGE_URL } from "./fake-photos";
 
 let photos: FakePhotos;
 let coarse = false;
@@ -160,4 +162,61 @@ test("the photo step can be skipped and reopened", async () => {
   expect(screen.getByText("No photo added.")).toBeDefined();
   fireEvent.click(screen.getByRole("button", { name: "Add a photo" }));
   expect(screen.getByTestId("photo-step")).toBeDefined();
+});
+
+test("the photo is read as the chosen kind; a red light shows Possible, the meaning and the safety banner", async () => {
+  photos.analysis = RED_OIL_LIGHT;
+  render(<PhotoStep sessionId="s1" defaultMode="damage" />);
+  choose(file("dash.jpg", "image/jpeg"));
+  expect(screen.getByRole("radio", { name: "Damage, wear or a leak" })).toHaveProperty("checked", true);
+  fireEvent.click(screen.getByRole("radio", { name: "A warning light on the dashboard" }));
+  fireEvent.click(screen.getByRole("button", { name: "Use this photo" }));
+  const found = await screen.findByTestId("photo-findings");
+  expect(photos.analyzed).toEqual(["warning_light"]);
+  expect(within(found).getByText(/Possible: Engine oil pressure light/)).toBeDefined();
+  expect(within(found).getByText("Red oil light means oil pressure is too low.")).toBeDefined();
+  expect(within(found).getByText(/Photos can be misleading/)).toBeDefined();
+  const banner = screen.getByTestId("safety-banner");
+  expect(banner.textContent).toMatch(/Stop now and switch off the engine/);
+});
+
+test("without a vision provider, or if reading fails, the photo is kept and a mechanic looks at it", async () => {
+  render(<PhotoStep sessionId="s1" />);
+  choose(file("leak.jpg", "image/jpeg"));
+  fireEvent.click(screen.getByRole("button", { name: "Use this photo" }));
+  await waitFor(() => expect(screen.getByTestId("photo-status").textContent).toMatch(/Photo added/));
+  expect(within(screen.getByTestId("photos")).getByText("A mechanic will look at your photo.")).toBeDefined();
+  expect(screen.queryByTestId("safety-banner")).toBeNull();
+
+  photos.analysis = () => "error";
+  choose(file("leak2.jpg", "image/jpeg"));
+  fireEvent.click(screen.getByRole("button", { name: "Use this photo" }));
+  await waitFor(() => expect(photos.photos).toHaveLength(2));
+  await waitFor(() => expect(within(screen.getByTestId("photos")).getAllByText("A mechanic will look at your photo.")).toHaveLength(2));
+  expect(screen.queryByRole("alert")).toBeNull(); // no error: the photo is saved
+});
+
+test("an unclear photo asks for a retake from another angle", async () => {
+  photos.analysis = (id, mode) =>
+    finding(id, mode, { status: "unclear", message: "We couldn't tell from this photo. Please retake it from another angle." });
+  render(<PhotoStep sessionId="s1" />);
+  choose(file("blur.jpg", "image/jpeg"));
+  fireEvent.click(screen.getByRole("button", { name: "Use this photo" }));
+  expect(await screen.findByText(/retake it from another angle/)).toBeDefined();
+});
+
+test("results and request pages: the gallery shows photos with findings and photo alerts", () => {
+  const ready: Photo = { id: "p1", status: "ready", width: 4, height: 3, url: "https://storage.test/p1.jpg?sig=x", expires_in: 300 };
+  render(
+    <>
+      <PhotoGallery photos={[{ ...ready, findings: [RED_OIL_LIGHT("p1", "warning_light")] }, { ...ready, id: "p2" }]} />
+    </>,
+  );
+  const gallery = screen.getByTestId("photo-gallery");
+  expect(within(gallery).getAllByRole("img")).toHaveLength(2);
+  expect(within(gallery).getByText(/Possible: Engine oil pressure light/)).toBeDefined();
+  expect(within(gallery).getByText("A mechanic will look at your photo.")).toBeDefined(); // not analysed
+  expect(photoAlerts([{ ...ready, findings: [RED_OIL_LIGHT("p1", "warning_light"), RED_OIL_LIGHT("p1", "damage")] }])).toEqual([OIL_ALERT]);
+  cleanup();
+  expect(render(<PhotoGallery photos={[]} />).container.innerHTML).toBe("");
 });

@@ -7,6 +7,7 @@ import { LoginView, safeNext } from "@/components/account/login-view";
 import { RequestDetailView } from "@/components/account/request-detail-view";
 import { mockApi } from "./api-mock";
 import { CODE, FakeSite, REQUEST } from "./fake-account";
+import { RED_OIL_LIGHT } from "./fake-photos";
 
 const push = vi.fn();
 const replace = vi.fn();
@@ -154,6 +155,21 @@ test("request page: the status timeline, and someone else's request is not found
   params = { id: "00000000-0000-4000-8000-000000000099" };
   render(<RequestDetailView />);
   expect(await screen.findByText(/couldn't find that/i)).toBeDefined();
+});
+
+test("request page shows the customer's photos with what they may show, and red-light safety", async () => {
+  site.loggedIn = true;
+  params = { id: REQUEST.id };
+  const photo = { id: "p1", status: "ready", width: 4, height: 3, url: "https://storage.test/p1.jpg?sig=x", expires_in: 300 };
+  mockApi(
+    { "/api/uploads": (u: URL) => (u.searchParams.get("session_id") === REQUEST.session_id ? [{ ...photo, findings: [RED_OIL_LIGHT("p1", "warning_light")] }] : "missing") },
+    site,
+  );
+  render(<RequestDetailView />);
+  const gallery = await screen.findByTestId("photo-gallery");
+  expect(within(gallery).getByRole("img", { name: "Your photo 1" })).toBeDefined();
+  expect(within(gallery).getByText(/Possible: Engine oil pressure light/)).toBeDefined();
+  expect(screen.getByTestId("safety-banner").textContent).toMatch(/Stop now/);
 });
 
 test("request page sends logged-out visitors to log in and back", async () => {

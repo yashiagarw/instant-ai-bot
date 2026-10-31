@@ -1,0 +1,16 @@
+# Labelled test photos for photo analysis (backend/app/vision). Put the photo files in photos/ (any of JPEG, PNG,
+# WebP, HEIC; they go through the same checks and re-encoding as customer uploads) and add one entry per photo.
+#
+#   - file: photos/oil-light-01.jpg     # path relative to this folder
+#     mode: warning_light               # warning_light | damage
+#     expect: [oil_pressure]            # codes from data/review/image_labels.yaml that are truly in the photo;
+#                                       # [] = nothing on the list is visible (the right answer is "unclear")
+#     note: Swift dashboard, night      # optional, free text
+#
+# Scoring per photo (data/eval/run_image_eval.py):
+#   correct  the most confident answer is one of `expect` (or, with expect: [], the answer is unclear)
+#   wrong    a code was answered that is not in `expect`
+#   unclear  unclear, or the call failed / no provider (counted separately: retake or mechanic)
+# Never add customer photos here without their consent; use your own or licensed photos.
+
+photos: []

@@ -322,3 +322,13 @@ def test_generator_runs_on_the_openai_provider_with_the_same_schemas():
     ]
     assert len(doc["safety_rules"]) == 3
     assert provider.usage.calls == 4  # 3 faults + 1 merge, every answer schema-checked
+
+
+def test_images_go_before_the_text_as_base64_blocks():
+    from app.llm.providers import LLMRequest, ToolSpec, _content
+
+    tool = ToolSpec("t", "d", {"type": "object"})
+    assert _content(LLMRequest("m", "s", "hello", tool, 10)) == "hello"
+    blocks = _content(LLMRequest("m", "s", "what light?", tool, 10, images=[("image/jpeg", b"\xff\xd8\xff")]))
+    assert blocks[0] == {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": "/9j/"}}
+    assert blocks[-1] == {"type": "text", "text": "what light?"}
