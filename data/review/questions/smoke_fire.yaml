@@ -102,7 +102,11 @@ faults:
     - Smoke coming
     confirmation_test: Inspection.
     danger_phrases:
-    - visible smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from dashboard
+    - smoke in cabin
     - smoke from engine
     - smoke from wiring
     - bonnet dhuan
@@ -122,6 +126,10 @@ faults:
     - taar dhuan
     - wiring dhuan
     - dashboard dhuan
+    danger_phrases_moved:
+    - visible smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F16-SM-04:
     status: approved
     name: Burst Pipe with Smoke / Steam / Fire Risk
@@ -255,7 +263,12 @@ faults:
     danger_phrases:
     - flames
     - fire
-    - heavy smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - glow under bonnet
     - bonnet dhuan
     - bonnet dhuaan
@@ -272,6 +285,10 @@ faults:
     - taar dhuan
     - wiring dhuan
     - dashboard dhuan
+    danger_phrases_moved:
+    - heavy smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F16-SM-16:
     status: approved
     name: New Car / After-Service Burning Smell (Normal Bedding / Spill)  [NEW - India]

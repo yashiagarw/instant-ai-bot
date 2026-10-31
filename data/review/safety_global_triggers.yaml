@@ -1,0 +1,30 @@
+# Trigger phrases for the global emergency rules (the "EMERGENCY - ..." lines of the SAFETY_AND_TOWING_RULES sheets).
+# Without an entry here, the app takes a global rule's phrases from its heading ("smoke, sparks or a burning plastic
+# smell" -> smoke, sparks, burning plastic smell). The heading word "smoke" alone also matched exhaust smoke
+# ("black smoke from the exhaust"), a running problem, not a fire, so these rules list where the smoke is instead.
+# Applied with:  cd backend && uv run python -m app.knowledge.safety_triggers apply   (re-run after every import)
+# Rules are found by their sheet row (source_ref). A phrase fires when all its words are in the message.
+reviewed_by: claude_code (auto, pending mechanic sign-off)
+
+smoke_locations: &smoke
+  - smoke from bonnet
+  - smoke from engine bay
+  - smoke under bonnet
+  - smoke from wires
+  - smoke from wiring
+  - wire smoke
+  - smoke from dashboard
+  - smoke from vents
+  - smoke in cabin
+  - smoke inside car
+  - bonnet dhuan
+  - wire dhuan
+  - taar dhuan
+  - wiring dhuan
+  - dashboard dhuan
+
+rules:
+  "F12 SAFETY_AND_TOWING_RULES r87":  # If there is smoke, sparks or a burning plastic smell: stop safely ...
+    phrases: [sparks, burning plastic smell, burning smell, jalne badbu, jalane badbu, chingari, *smoke]
+  "F18 SAFETY_AND_TOWING_RULES r68":  # Anyone injured, trapped, fire, smoke or fuel leak: call 112 first ...
+    phrases: [anyone injured, trapped, fire, flames, aag, fuel leak, petrol leak, *smoke]

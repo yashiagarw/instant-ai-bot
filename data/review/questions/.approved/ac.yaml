@@ -1,5 +1,5 @@
 category: ac
-loaded_at: '2026-10-23T19:15:13+00:00'
+loaded_at: '2026-10-31T12:09:47+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question ac-main:
@@ -1365,11 +1365,15 @@ approved:
     stage2_choices:
     - Weak air or no air from the vents
     confirmation_test: Fuse, relay, blower plug power test and blower motor test.
-    danger_phrases:
-    - burning smell
+    danger_phrases: []
     safety_trigger_options:
     - question: ac-q01
       option: Smoke or a burning smell
+    danger_phrases_moved:
+    - burning smell
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-03:
     status: approved
     name: AC Belt / Compressor Noise Issue
@@ -1378,12 +1382,41 @@ approved:
     confirmation_test: Stethoscope check, belt and tensioner check, AC on/off test.
     danger_phrases:
     - grinding
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
     - battery light
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: ac-q15
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F05-AC-04:
     status: approved
     name: AC and Lights / Electrical Combined Failure
@@ -1394,11 +1427,19 @@ approved:
     - headlights failing
     - battery light
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: ac-q01
       option: The headlights or dashboard lights are failing
     - question: ac-q15
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-05:
     status: approved
     name: AC cools initially but becomes warm after some time
@@ -1459,11 +1500,15 @@ approved:
     - Noise when the AC is on
     confirmation_test: Belt inspection, belt tension and pulley checks.
     danger_phrases:
-    - battery light
     - temperature light
     safety_trigger_options:
     - question: ac-q15
       option: 'Yes'
+    danger_phrases_moved:
+    - battery light
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-12:
     status: approved
     name: Suspected refrigerant leakage
@@ -1489,13 +1534,17 @@ approved:
     stage2_choices:
     - Weak air or no air from the vents
     confirmation_test: Blower resistor, plug and motor current test.
-    danger_phrases:
-    - burning smell
+    danger_phrases: []
     safety_trigger_options:
     - question: ac-q01
       option: Smoke or a burning smell
     - question: ac-q26
       option: Burning
+    danger_phrases_moved:
+    - burning smell
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-15:
     status: approved
     name: Blower motor makes noise or works intermittently
@@ -1503,9 +1552,13 @@ approved:
     - Noise when the AC is on
     - Weak air or no air from the vents
     confirmation_test: Remove and inspect the blower.
-    danger_phrases:
-    - burning smell
+    danger_phrases: []
     safety_trigger_options: []
+    danger_phrases_moved:
+    - burning smell
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-16:
     status: approved
     name: AC air filter or cabin filter blocked
@@ -1529,9 +1582,13 @@ approved:
     stage2_choices:
     - Bad smell or water leak
     confirmation_test: Filter and drain check, cleaning.
-    danger_phrases:
-    - burning smell
+    danger_phrases: []
     safety_trigger_options: []
+    danger_phrases_moved:
+    - burning smell
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-19:
     status: approved
     name: AC evaporator or expansion valve problem suspected
@@ -1549,11 +1606,17 @@ approved:
     danger_phrases:
     - temperature high
     - steam
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: ac-q01
       option: The engine temperature is rising
     - question: ac-q23
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-21:
     status: approved
     name: AC trips or switches off repeatedly
@@ -1579,11 +1642,19 @@ approved:
     danger_phrases:
     - burning smell
     - melted plug
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: ac-q01
       option: Smoke or a burning smell
     - question: ac-q26
       option: Burning
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-24:
     status: approved
     name: AC and headlights, dashboard lights or other electrical systems fail together
@@ -1592,12 +1663,16 @@ approved:
     confirmation_test: Battery and charging test.
     danger_phrases:
     - headlights failing
-    - battery light
     safety_trigger_options:
     - question: ac-q01
       option: The headlights or dashboard lights are failing
     - question: ac-q15
       option: 'Yes'
+    danger_phrases_moved:
+    - battery light
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F05-AC-25:
     status: approved
     name: Water dripping inside the cabin or suspected blocked AC drain

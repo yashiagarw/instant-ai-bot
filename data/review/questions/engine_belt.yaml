@@ -1017,7 +1017,12 @@ faults:
     confirmation_test: Full pulley spin test and timing cover check.
     danger_phrases:
     - burning smell
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - jalne badbu
     - jalane badbu
     - jalne smell
@@ -1045,6 +1050,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F11-EB-05:
     status: approved
     name: Belt Slipping During Acceleration
@@ -1155,7 +1164,12 @@ faults:
     confirmation_test: Belt-off spin and alternator bench test.
     danger_phrases:
     - burning smell
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - jalne badbu
     - jalane badbu
     - jalne smell
@@ -1179,6 +1193,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F11-EB-16:
     status: approved
     name: AC Compressor Pulley / Bearing Seizure

@@ -1,5 +1,5 @@
 category: airbag_srs
-loaded_at: '2026-10-23T19:29:55+00:00'
+loaded_at: '2026-10-31T12:09:45+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question airbag_srs-main:
@@ -645,6 +645,42 @@ approved:
     - label: Not sure
       not_sure: true
       effects: []
+  question airbag_srs-sep-01:
+    id: airbag_srs-sep-01
+    status: approved
+    stage: 3
+    text: When did the airbag light first come on?
+    source_faults:
+    - F16-AB-10
+    - F16-AB-15
+    separates:
+    - F16-AB-10
+    - F16-AB-15
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: AB-10: light came right after
+      body repair, water inside door; AB-15: crash history'
+    options:
+    - label: After an accident or crash
+      effects:
+      - fault: F16-AB-15
+        effect: supports
+        strength: strong
+      - fault: F16-AB-10
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: After body or bumper repair, or water got into a door
+      effects:
+      - fault: F16-AB-10
+        effect: supports
+        strength: strong
+      - fault: F16-AB-15
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
   fault F16-AB-01:
     status: approved
     name: Airbag Warning Light
@@ -746,9 +782,15 @@ approved:
     confirmation_test: Inspection and scan.
     danger_phrases:
     - flooded
+    - paani bhar
+    - pani bhar
     safety_trigger_options:
     - question: airbag_srs-q05
       option: Yes, the car was flooded (water above the floor)
+    danger_phrases_hinglish_added:
+    - paani bhar
+    - pani bhar
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F16-AB-13:
     status: approved
     name: Seat Belt Buckle / SRS Signal Fault

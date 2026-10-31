@@ -7,7 +7,9 @@ import { ChevronDown, CircleHelp, RotateCcw, ShieldAlert, Truck, Wrench } from "
 
 import { CarSummary } from "@/components/diagnose/car-summary";
 import { ErrorMessage } from "@/components/error-message";
-import { CostCard } from "@/components/result/cost-card";
+import { PartsSection } from "@/components/parts/parts-section";
+import { AreaPicker, METRO_LABEL } from "@/components/result/area-picker";
+import { EstimateCard, type EstimateState } from "@/components/result/estimate-card";
 import { CoverageBadge } from "@/components/result/coverage-badge";
 import { CauseExplanation, ConfidenceMeter, EvidenceList, useExplanations } from "@/components/result/explanations";
 import { FeedbackForm } from "@/components/result/feedback-form";
@@ -16,7 +18,16 @@ import { DISCLAIMER } from "@/components/site-footer";
 import { Skeleton } from "@/components/skeleton";
 import { Stepper } from "@/components/stepper";
 import { Button } from "@/components/ui/button";
-import { api, mediaUrl, type RankedFault, type ResultOut, type RoadsideVerdict } from "@/lib/api";
+import {
+  api,
+  mediaUrl,
+  partsApi,
+  type Area,
+  type Estimates,
+  type RankedFault,
+  type ResultOut,
+  type RoadsideVerdict,
+} from "@/lib/api";
 import { repeats, roadsideText, towingText } from "@/lib/format";
 import { useLoad } from "@/lib/use-load";
 import { cn } from "@/lib/utils";
@@ -164,8 +175,33 @@ function RequestButton({ sessionId, sticky = false }: { sessionId: string; stick
   );
 }
 
+/** Estimates for the result's causes in the chosen area (GET /api/estimates); re-fetched when the area changes. */
+function useEstimates(sessionId: string, area: Area) {
+  const loaded = useLoad(`estimates:${sessionId}:${JSON.stringify(area)}`, (signal) =>
+    partsApi.estimates(sessionId, area, signal),
+  );
+  const data: Estimates | null = loaded.state.status === "ready" ? loaded.state.data : null;
+  const stateFor = (faultKey: string): EstimateState =>
+    loaded.state.status === "ready"
+      ? { status: "ready", estimate: loaded.state.data.estimates.find((e) => e.fault_key === faultKey) }
+      : loaded.state.status === "loading"
+        ? { status: "loading" }
+        : { status: "error" };
+  return { data, stateFor };
+}
+
+function areaNote(data: Estimates | null): string {
+  if (!data) return METRO_LABEL;
+  if (data.zone.label) return `Labour priced for ${data.zone.label}`;
+  return data.zone.source === "pincode" ? data.zone.note : METRO_LABEL;
+}
+
 function Result({ r }: { r: ResultOut }) {
   const [top, ...others] = r.ranked;
+  const [area, setArea] = useState<Area>(null);
+  const estimates = useEstimates(r.session_id, area);
+  const zoneLabel = estimates.data?.zone.label ?? null;
+  const verifying = estimates.data?.estimates.some((e) => e.flags?.needs_check) ?? false;
   const explanations = useExplanations(r.session_id);
   const streaming = explanations.status === "loading";
   const verdict = r.roadside.verdict;
@@ -239,9 +275,35 @@ function Result({ r }: { r: ResultOut }) {
             </section>
           )}
 
-          <CostCard cost={top.cost} repairTime={top.repair_time} />
+          {r.vehicle.price_segment && (
+            <div className="flex flex-col gap-2">
+              <AreaPicker area={area} onChange={setArea} note={areaNote(estimates.data)} />
+              {verifying && (
+                <p className="px-1 text-sm text-ink/75" data-testid="verifying-note">
+                  Prices are being verified with our mechanics.
+                </p>
+              )}
+            </div>
+          )}
+          <EstimateCard
+            state={estimates.stateFor(top.fault_key)}
+            fallback={top.cost}
+            repairTime={top.repair_time}
+            sessionId={r.session_id}
+            zoneLabel={zoneLabel}
+            segmentKnown={!!r.vehicle.price_segment}
+          />
           <FaultDetails fault={top} verdict={verdict} />
         </article>
+      )}
+
+      {top && !fastTrack && (
+        <PartsSection
+          faultKey={top.fault_key}
+          faultName={top.name}
+          variantId={r.vehicle.variant_id}
+          segment={r.vehicle.price_segment}
+        />
       )}
 
       {r.uncertainty?.length > 0 && (
@@ -283,7 +345,14 @@ function Result({ r }: { r: ResultOut }) {
                   <CauseExplanation explanation={explanations.items[f.fault_key]} loading={streaming} />
                 </div>
                 <EvidenceList fault={f} />
-                <CostCard cost={f.cost} repairTime={f.repair_time} />
+                <EstimateCard
+                  state={estimates.stateFor(f.fault_key)}
+                  fallback={f.cost}
+                  repairTime={f.repair_time}
+                  sessionId={r.session_id}
+                  zoneLabel={zoneLabel}
+                  segmentKnown={!!r.vehicle.price_segment}
+                />
                 <FaultDetails fault={f} verdict="unknown" headingLevel={3} />
               </div>
             </details>

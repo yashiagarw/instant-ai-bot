@@ -1,5 +1,5 @@
 category: electrical
-loaded_at: '2026-10-23T19:34:25+00:00'
+loaded_at: '2026-10-31T12:09:47+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question electrical-main:
@@ -965,6 +965,39 @@ approved:
     - label: Not sure
       not_sure: true
       effects: []
+  question electrical-sep-01:
+    id: electrical-sep-01
+    status: approved
+    stage: 3
+    text: Do you see any of these?
+    source_faults:
+    - F12-EL-08
+    - F12-EL-21
+    separates:
+    - F12-EL-08
+    - F12-EL-21
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: EL-08: green/white powder,
+      works after plug is pushed; EL-21: comes and goes, no fault at garage'
+    options:
+    - label: Green or white powder on a plug, or it works after pushing the plug in
+      effects:
+      - fault: F12-EL-08
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It comes and goes with bumps, heat or rain, and the garage found nothing
+      effects:
+      - fault: F12-EL-21
+        effect: supports
+        strength: strong
+      - fault: F12-EL-08
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
   fault F12-EL-01:
     status: approved
     name: Blown Fuse - Single Circuit
@@ -998,10 +1031,39 @@ approved:
     confirmation_test: Isolation test.
     danger_phrases:
     - burning smell
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: electrical-q01
       option: A burning plastic smell only
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F12-EL-05:
     status: approved
     name: Major Wiring Harness Damage / Fire Risk
@@ -1010,8 +1072,22 @@ approved:
     - Electrical burning smell
     confirmation_test: Inspection and circuit tests.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: electrical-q01
       option: A burning plastic smell only
@@ -1019,6 +1095,21 @@ approved:
       option: Smoke, sparks or fire
     - question: electrical-q02
       option: Burnt or cut wiring under the bonnet
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F12-EL-06:
     status: approved
     name: Repeated Fuse Blowing
@@ -1052,9 +1143,15 @@ approved:
     confirmation_test: Inspection.
     danger_phrases:
     - fuel smell
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: electrical-q09
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F12-EL-10:
     status: approved
     name: Water-Damaged Electrical Wiring
@@ -1146,7 +1243,18 @@ approved:
     confirmation_test: Inspection and load test.
     danger_phrases:
     - melted fuse box
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: electrical-q01
       option: A burning plastic smell only
@@ -1154,6 +1262,18 @@ approved:
       option: Smoke, sparks or fire
     - question: electrical-q02
       option: Melted fuse box or plug
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F12-EL-20:
     status: approved
     name: Aftermarket Accessory Wiring Fault
@@ -1205,7 +1325,6 @@ approved:
     - Electrical burning smell
     confirmation_test: Inspection once it is safe.
     danger_phrases:
-    - smoke
     - sparks
     - fire
     safety_trigger_options:
@@ -1213,6 +1332,11 @@ approved:
       option: A burning plastic smell only
     - question: electrical-q01
       option: Smoke, sparks or fire
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F12-EL-26:
     status: approved
     name: Electrical Faults After Retrofit CNG Kit Fitting  [NEW - India]
@@ -1222,9 +1346,13 @@ approved:
     confirmation_test: Inspection of the CNG kit wiring.
     danger_phrases:
     - gas smell
+    - gas badbu
     safety_trigger_options:
     - question: electrical-q09
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - gas badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F12-EL-27:
     status: approved
     name: Damage After Wrong Jump-Start (Reverse Polarity / Sparks)  [NEW - India]
@@ -1234,6 +1362,14 @@ approved:
     confirmation_test: Main fuse and module tests.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: electrical-q01
       option: A burning plastic smell only
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)

@@ -1366,7 +1366,12 @@ faults:
     confirmation_test: Stethoscope check, belt and tensioner check, AC on/off test.
     danger_phrases:
     - grinding
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
     - battery light
     - jalne badbu
@@ -1392,6 +1397,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F05-AC-04:
     status: approved
     name: AC and Lights / Electrical Combined Failure

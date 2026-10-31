@@ -223,6 +223,8 @@ export interface VehicleSummary {
   fuel: Fuel | null;
   transmission: Transmission | null;
   price_segment: PriceSegment | null;
+  /** Catalogue variant (null for an unlisted car): decides which parts fit. */
+  variant_id?: number | null;
 }
 
 export interface AnswerOut {
@@ -410,3 +412,155 @@ export interface ServiceRequestOut {
   helpline_number: string;
   next_steps: string[];
 }
+
+// ---------------------------------------------------------------- Parts and estimates (backend/app/parts, app/estimates)
+
+export type FitStatus = "listed" | "confirm_fit" | "not_verified";
+export type BrandKind = "oem" | "oes" | "aftermarket" | "unspecified";
+export type Verification = "checked" | "listed_recheck" | "approx";
+
+export interface PartPrice {
+  segment: PriceSegment;
+  price_inr: number;
+  price_max_inr: number | null;
+  approx_label: string;
+  verification: Verification;
+  checked_on: string | null;
+  model_verified: boolean;
+  price_basis: string | null;
+  gst_text: string | null;
+  gst_included: boolean | null;
+  fitting_included: boolean | null;
+  supplier: string | null;
+  source_url: string | null;
+  note: string | null;
+}
+
+export interface Part {
+  id: number;
+  name: string;
+  part_type: string;
+  brand: { name: string; kind: BrandKind } | null;
+  part_number: string | null;
+  quantity: number;
+  generic: boolean;
+  fit: { status: FitStatus; label: string };
+  listed_for: string[];
+  in_total: boolean | null;
+  prices: PartPrice[];
+  images: { file: string; caption: string | null; image_type: string }[];
+}
+
+export interface PartDetail extends Part {
+  compatibility: {
+    make: string;
+    model: string;
+    year_from: number | null;
+    year_to: number | null;
+    fuel: Fuel | null;
+    transmission: Transmission | null;
+    status: "listed" | "confirm_fit";
+  }[];
+  faults: { fault_key: string; name: string; segment: PriceSegment }[];
+}
+
+export interface PartsVehicle {
+  variant_id: number;
+  name: string;
+  fuel: Fuel;
+  transmission: Transmission;
+  price_segment: PriceSegment;
+}
+
+export interface FaultParts {
+  fault_key: string;
+  requested_key: string;
+  fault_name: string;
+  vehicle: PartsVehicle | null;
+  segment: PriceSegment | null;
+  coverage_level: CoverageLevel;
+  parts: Part[];
+  disclaimer: string;
+}
+
+export interface PartCompare {
+  vehicle: PartsVehicle | null;
+  parts: PartDetail[];
+  disclaimer: string;
+}
+
+export interface Range {
+  low: number;
+  high: number;
+}
+
+export interface EstimateInput {
+  kind: "part" | "consumable" | "labour" | "service";
+  name: string;
+  low: number;
+  high: number;
+  source: string;
+  checked_on: string | null;
+  verified: boolean;
+  stale: boolean;
+  note: string;
+}
+
+export interface FaultEstimate {
+  rank: number;
+  fault_key: string;
+  fault_name: string;
+  status: "ok" | "not_enough_data";
+  reasons: string[];
+  parts: Range | null;
+  consumables: Range | null;
+  labour: Range | null;
+  total: Range | null;
+  parts_basis: "itemised" | "sheet_parts_total" | "sheet_total_minus_labour" | "none" | "";
+  labour_basis: "zone_rate" | "metro_estimate" | "none" | "";
+  inputs: EstimateInput[];
+  flags: { needs_check: boolean; stale_inputs: string[]; unverified_inputs: string[] } | null;
+  last_updated: string | null;
+  oldest_input: string | null;
+}
+
+export type ZoneCode = "delhi" | "noida" | "gurugram" | "ghaziabad" | "faridabad";
+
+export interface Estimates {
+  session_id: string;
+  segment: PriceSegment | null;
+  zone: {
+    code: ZoneCode | null;
+    label: string | null;
+    source: "zone" | "pincode" | "service_request" | "none";
+    note: string;
+    choices: { code: ZoneCode; label: string }[];
+  };
+  estimates: FaultEstimate[];
+  source_of_truth: string;
+  disclaimer: string;
+}
+
+/** Where the customer is: a zone, a pincode, or nothing chosen (Delhi NCR metro estimate). */
+export type Area = { zone: ZoneCode } | { pincode: string } | null;
+
+function query(params: Record<string, string | number | null | undefined>): string {
+  const q = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) if (v !== null && v !== undefined && v !== "") q.set(k, String(v));
+  const s = q.toString();
+  return s ? `?${s}` : "";
+}
+
+export const partsApi = {
+  estimates: (sessionId: string, area: Area, signal?: AbortSignal) =>
+    get<Estimates>(`/estimates${query({ session_id: sessionId, ...(area ?? {}) })}`, signal),
+  faultParts: (key: string, car: { variant_id?: number | null; segment?: PriceSegment | null }, signal?: AbortSignal) =>
+    get<FaultParts>(
+      `/faults/${encodeURIComponent(key)}/parts${query(car.variant_id ? { variant_id: car.variant_id } : { segment: car.segment })}`,
+      signal,
+    ),
+  part: (id: number, variantId: number | null, signal?: AbortSignal) =>
+    get<PartDetail>(`/parts/${id}${query({ variant_id: variantId })}`, signal),
+  compare: (ids: number[], variantId: number | null, signal?: AbortSignal) =>
+    get<PartCompare>(`/parts/compare${query({ ids: ids.join(","), variant_id: variantId })}`, signal),
+};

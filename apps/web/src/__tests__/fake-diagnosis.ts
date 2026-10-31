@@ -477,6 +477,7 @@ function vehicleOf(v: Record<string, unknown>): VehicleSummary {
       fuel: variant.fuel,
       transmission: variant.transmission,
       price_segment: variant.price_segment,
+      variant_id: variant.id,
     };
   }
   const u = v.unlisted as Record<string, string | number | null>;

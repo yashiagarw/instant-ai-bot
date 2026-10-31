@@ -1,5 +1,5 @@
 category: lights_horn
-loaded_at: '2026-10-23T19:43:49+00:00'
+loaded_at: '2026-10-31T12:09:45+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question lights_horn-main:
@@ -952,6 +952,42 @@ approved:
     - label: Not sure
       not_sure: true
       effects: []
+  question lights_horn-sep-01:
+    id: lights_horn-sep-01
+    status: approved
+    stage: 3
+    text: What is wrong with the headlights?
+    source_faults:
+    - F12-LT-09
+    - F12-LT-28
+    separates:
+    - F12-LT-09
+    - F12-LT-28
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: LT-09: no high beam; LT-28:
+      dazzle complaints, uneven beams'
+    options:
+    - label: The high beam does not come on at all
+      effects:
+      - fault: F12-LT-09
+        effect: supports
+        strength: strong
+      - fault: F12-LT-28
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: 'They work but point wrong: other drivers flash at me, or the beams are uneven'
+      effects:
+      - fault: F12-LT-28
+        effect: supports
+        strength: strong
+      - fault: F12-LT-09
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
   fault F12-LT-01:
     status: approved
     name: Single Bulb Fused / Not Working
@@ -1201,9 +1237,17 @@ approved:
     confirmation_test: Inspection of the extra horn wiring.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: lights_horn-q02
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F12-LT-28:
     status: approved
     name: Headlight Beam Pointing Wrong (After Accident / Loaded Car / Bulb Change)  [NEW - India]

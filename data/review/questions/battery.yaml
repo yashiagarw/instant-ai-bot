@@ -2452,9 +2452,15 @@ faults:
     - Car not starting
     confirmation_test: Fuse and alternator test.
     danger_phrases:
-    - smoke
+    - smoke from battery
+    - smoke from cables
+    - smoke from wires
+    - smoke from bonnet
     - burnt smell
     - burnt cable
+    # 31 Oct 2026, claude_code (auto, pending sign-off by the reviewer of this file): bare "smoke" replaced by where
+    # the smoke is, because it also matched "black smoke from the exhaust" (not an emergency). The answer "Smoke"
+    # below still fires this rule.
     safety_trigger_options:
     - question: battery-q28
       option: Hot or burnt wire, or a burning smell

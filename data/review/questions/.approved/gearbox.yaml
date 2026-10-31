@@ -1,5 +1,5 @@
 category: gearbox
-loaded_at: '2026-10-23T19:39:45+00:00'
+loaded_at: '2026-10-31T12:09:45+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question gearbox-main:
@@ -893,9 +893,17 @@ approved:
     confirmation_test: Transmission scan.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: gearbox-q01
       option: Burning smell or loud grinding
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F17-GB-16:
     status: approved
     name: Severe Transmission Failure / Vehicle Not Moving
@@ -905,11 +913,19 @@ approved:
     danger_phrases:
     - car not moving
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: gearbox-q01
       option: Burning smell or loud grinding
     - question: gearbox-q01
       option: The engine revs but the car does not move
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F17-GB-17:
     status: approved
     name: Clutch / Gearbox Wear From Stop-Go City Traffic (Riding the Clutch)  [NEW - India]

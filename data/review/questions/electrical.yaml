@@ -1029,7 +1029,12 @@ faults:
     confirmation_test: Isolation test.
     danger_phrases:
     - burning smell
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - jalne badbu
     - jalane badbu
     - jalne smell
@@ -1053,6 +1058,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F12-EL-05:
     status: approved
     name: Major Wiring Harness Damage / Fire Risk
@@ -1061,7 +1070,12 @@ faults:
     - Electrical burning smell
     confirmation_test: Inspection and circuit tests.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
     - jalne badbu
     - jalane badbu
@@ -1090,6 +1104,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F12-EL-06:
     status: approved
     name: Repeated Fuse Blowing
@@ -1223,7 +1241,12 @@ faults:
     confirmation_test: Inspection and load test.
     danger_phrases:
     - melted fuse box
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - bonnet dhuan
     - bonnet dhuaan
     - wire dhuan
@@ -1245,6 +1268,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F12-EL-20:
     status: approved
     name: Aftermarket Accessory Wiring Fault

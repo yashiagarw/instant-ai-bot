@@ -2,8 +2,14 @@
 
 const RUPEES = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 
+/** Indian digit grouping: 123456 → "₹1,23,456". Show with `tabular-nums` so columns of prices line up. */
 export function rupees(amount: number): string {
   return RUPEES.format(amount);
+}
+
+/** "₹2,700" or "₹9,800 – ₹12,750". */
+export function rupeeRange(low: number, high?: number | null): string {
+  return high === undefined || high === null || high === low ? rupees(low) : `${rupees(low)} – ${rupees(high)}`;
 }
 
 /** "2026-10-12" → "12 Oct 2026". */

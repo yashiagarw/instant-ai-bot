@@ -1,5 +1,5 @@
 category: brakes
-loaded_at: '2026-10-23T19:19:42+00:00'
+loaded_at: '2026-10-31T12:09:46+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question brakes-main:
@@ -1330,6 +1330,72 @@ approved:
     - label: Not sure
       not_sure: true
       effects: []
+  question brakes-sep-01:
+    id: brakes-sep-01
+    status: approved
+    stage: 3
+    text: With your foot on the brake pedal, start the engine. What happens?
+    source_faults:
+    - F11-BR-15
+    - F11-BR-16
+    separates:
+    - F11-BR-15
+    - F11-BR-16
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: BR-15: pedal rises up when
+      engine starts (should go down), hiss, rough idle; BR-16: brake works only with heavy force'
+    options:
+    - label: The pedal does not go down, or I hear a hiss / the idle goes rough when braking
+      effects:
+      - fault: F11-BR-15
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: The pedal goes down a little as normal, but braking needs a lot of force
+      effects:
+      - fault: F11-BR-16
+        effect: supports
+        strength: strong
+      - fault: F11-BR-15
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question brakes-sep-02:
+    id: brakes-sep-02
+    status: approved
+    stage: 3
+    text: How are the brake pads wearing?
+    source_faults:
+    - F11-BR-05
+    - F11-BR-12
+    separates:
+    - F11-BR-05
+    - F11-BR-12
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: BR-12: uneven / taper wear,
+      drag, one wheel hotter; BR-05: thin pads, wear tab squeal'
+    options:
+    - label: One pad is thinner or worn at an angle, or one wheel is hotter / drags
+      effects:
+      - fault: F11-BR-12
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Evenly thin, with a squeal from the wear indicator
+      effects:
+      - fault: F11-BR-05
+        effect: supports
+        strength: strong
+      - fault: F11-BR-12
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
   fault F11-BR-01:
     status: approved
     name: Brake Pad Wear Warning
@@ -1349,11 +1415,15 @@ approved:
     danger_phrases:
     - soft pedal
     - pedal sinking
+    - pedal neeche tak
     safety_trigger_options:
     - question: brakes-q02
       option: Soft or spongy
     - question: brakes-q08
       option: Red BRAKE light
+    danger_phrases_hinglish_added:
+    - pedal neeche tak
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-BR-03:
     status: approved
     name: Reduced Braking Performance
@@ -1379,6 +1449,7 @@ approved:
     - pedal to floor
     - no braking
     - large fluid leak
+    - pedal neeche tak
     safety_trigger_options:
     - question: brakes-q01
       option: No, the car is still moving and the brakes are not working
@@ -1386,6 +1457,9 @@ approved:
       option: It goes down to the floor
     - question: brakes-q08
       option: Red BRAKE light
+    danger_phrases_hinglish_added:
+    - pedal neeche tak
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-BR-05:
     status: approved
     name: Brake Pads Worn Thin
@@ -1452,9 +1526,17 @@ approved:
     confirmation_test: Wheel spin test and caliper piston test.
     danger_phrases:
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: brakes-q16
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-BR-12:
     status: approved
     name: Brake Caliper Slider Pin Stuck
@@ -1489,9 +1571,13 @@ approved:
     confirmation_test: Pedal hold test and isolation test.
     danger_phrases:
     - pedal sinking
+    - pedal neeche tak
     safety_trigger_options:
     - question: brakes-q03
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - pedal neeche tak
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-BR-15:
     status: approved
     name: Brake Booster / Vacuum Assist Fault
@@ -1535,11 +1621,15 @@ approved:
     stage2_choices:
     - Brake pedal feels soft
     confirmation_test: 'Bleed and recheck: pedal firm after bleeding and no leak.'
-    danger_phrases:
-    - very soft pedal
+    danger_phrases: []
     safety_trigger_options:
     - question: brakes-q02
       option: Soft or spongy
+    danger_phrases_moved:
+    - very soft pedal
+    danger_phrases_note: Danger phrases kept on the rules the app can show (at most 3 phrase-fired rules); this
+      fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-BR-19:
     status: approved
     name: Old / Moisture-Contaminated Brake Fluid
@@ -1596,10 +1686,14 @@ approved:
     confirmation_test: Drum-off check.
     danger_phrases:
     - fluid low
-    - soft pedal
     safety_trigger_options:
     - question: brakes-q02
       option: Soft or spongy
+    danger_phrases_moved:
+    - soft pedal
+    danger_phrases_note: Danger phrases kept on the rules the app can show (at most 3 phrase-fired rules); this
+      fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-BR-24:
     status: approved
     name: Brake Overheating / Brake Fade
@@ -1667,9 +1761,17 @@ approved:
     confirmation_test: Wheel spin test.
     danger_phrases:
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: brakes-q16
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-BR-30:
     status: approved
     name: Poor-Quality / Duplicate Brake Pads (Noise, Dust, Weak Braking)  [NEW - India]

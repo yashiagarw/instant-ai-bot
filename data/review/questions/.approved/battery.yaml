@@ -1,5 +1,5 @@
 category: battery
-loaded_at: '2026-10-23T18:15:44+00:00'
+loaded_at: '2026-10-31T12:10:50+00:00'
 reviewed_by: Aarav
 approved:
   question battery-main:
@@ -2463,7 +2463,10 @@ approved:
     - Car not starting
     confirmation_test: Fuse and alternator test.
     danger_phrases:
-    - smoke
+    - smoke from battery
+    - smoke from cables
+    - smoke from wires
+    - smoke from bonnet
     - burnt smell
     - burnt cable
     safety_trigger_options:

@@ -1,5 +1,5 @@
 category: ev_hybrid
-loaded_at: '2026-10-23T19:54:06+00:00'
+loaded_at: '2026-10-31T12:09:45+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question ev_hybrid-main:
@@ -2133,6 +2133,9 @@ approved:
     danger_phrases:
     - melted plastic
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: ev_hybrid-q01
       option: Burning smell or melted plastic
@@ -2142,6 +2145,11 @@ approved:
       option: The plug, socket or cable is very hot
     - question: ev_hybrid-q19
       option: Bent pins or burn marks
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F06-EV-19:
     status: approved
     name: Charging Port Locking Actuator Fault
@@ -2183,9 +2191,15 @@ approved:
     confirmation_test: Let it dry, inspect, then insulation checks by a trained technician.
     danger_phrases:
     - flooded
+    - paani bhar
+    - pani bhar
     safety_trigger_options:
     - question: ev_hybrid-q20
       option: The car was flooded
+    danger_phrases_hinglish_added:
+    - paani bhar
+    - pani bhar
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F06-EV-24:
     status: approved
     name: Charging Station Cannot Communicate With Vehicle
@@ -2277,6 +2291,9 @@ approved:
     danger_phrases:
     - melted plastic
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: ev_hybrid-q01
       option: Burning smell or melted plastic
@@ -2284,6 +2301,11 @@ approved:
       option: Smoke or flame
     - question: ev_hybrid-q01
       option: The plug, socket or cable is very hot
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F06-EV-34:
     status: approved
     name: Onboard Charger (OBC) Suspected Fault
@@ -2577,13 +2599,42 @@ approved:
     confirmation_test: Visual check (power off) by a trained technician.
     danger_phrases:
     - burning smell
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - melted plastic
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: ev_hybrid-q01
       option: Burning smell or melted plastic
     - question: ev_hybrid-q01
       option: Smoke or flame
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F06-EV-65:
     status: approved
     name: Vehicle Has Multiple Charging or Electrical Warnings

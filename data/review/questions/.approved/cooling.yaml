@@ -1,5 +1,5 @@
 category: cooling
-loaded_at: '2026-10-23T19:12:27+00:00'
+loaded_at: '2026-10-31T12:09:47+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question cooling-main:
@@ -1005,10 +1005,14 @@ approved:
     - Coolant is a little low
     confirmation_test: Cold coolant level check, visual leak check, and a pressure test if the level has fallen
       before.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - needle in red
     - steam
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-02:
     status: approved
     name: TEMPERATURE GAUGE RISING / APPROACHING RED
@@ -1021,9 +1025,17 @@ approved:
     - steam
     - heavy leak
     - knocking
+    - sui lal
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: cooling-q01
       option: The needle is in the red zone
+    danger_phrases_hinglish_added:
+    - sui lal
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-03:
     status: approved
     name: MINOR COOLANT LEAKAGE
@@ -1031,10 +1043,14 @@ approved:
     - I see a leak
     - Coolant is a little low
     confirmation_test: Cooling-system pressure test and visual inspection (UV dye if needed).
-    danger_phrases:
-    - heavy leak
-    - steam
+    danger_phrases: []
     safety_trigger_options: []
+    danger_phrases_moved:
+    - steam
+    - heavy leak
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-04:
     status: approved
     name: COOLING FAN / THERMOSTAT FAILURE
@@ -1045,7 +1061,15 @@ approved:
     danger_phrases:
     - needle in red
     - steam
+    - sui lal
+    - bhaap
+    - bhap
     safety_trigger_options: []
+    danger_phrases_hinglish_added:
+    - sui lal
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-05:
     status: approved
     name: SEVERE OVERHEATING / HEAD GASKET RISK
@@ -1058,6 +1082,10 @@ approved:
     - knocking
     - white smoke
     - milky oil
+    - sui lal
+    - bhaap
+    - bhap
+    - safed dhuan
     safety_trigger_options:
     - question: cooling-q01
       option: A lot of liquid is coming out
@@ -1071,6 +1099,12 @@ approved:
       option: 'Yes'
     - question: cooling-q22
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - sui lal
+    - bhaap
+    - bhap
+    - safed dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-06:
     status: approved
     name: COOLANT LEVEL KEEPS DROPPING WITHOUT VISIBLE LEAK
@@ -1078,12 +1112,19 @@ approved:
     - Coolant is a little low
     confirmation_test: Pressure test, cap test and combustion-gas test.
     danger_phrases:
-    - needle in red
     - white smoke
     - knocking
+    - safed dhuan
     safety_trigger_options:
     - question: cooling-q10
       option: 'Yes'
+    danger_phrases_moved:
+    - needle in red
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_hinglish_added:
+    - safed dhuan
   fault F02-OH-07:
     status: approved
     name: RADIATOR OR COOLANT HOSE LEAKAGE
@@ -1093,23 +1134,31 @@ approved:
     confirmation_test: Visual check and pressure test.
     danger_phrases:
     - heavy leak
-    - steam
-    - needle in red
     safety_trigger_options:
     - question: cooling-q01
       option: A lot of liquid is coming out
     - question: cooling-q01
       option: Steam
+    danger_phrases_moved:
+    - needle in red
+    - steam
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-08:
     status: approved
     name: RADIATOR BLOCKAGE / DAMAGE / POOR COOLING
     stage2_choices:
     - Needle is going up
     confirmation_test: Temperature scan, flow test and pressure test.
-    danger_phrases:
-    - steam
-    - needle in red
+    danger_phrases: []
     safety_trigger_options: []
+    danger_phrases_moved:
+    - needle in red
+    - steam
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-09:
     status: approved
     name: RADIATOR CAP / RESERVOIR CAP FAILURE
@@ -1118,11 +1167,15 @@ approved:
     - Needle is going up
     confirmation_test: Radiator / reservoir cap test.
     danger_phrases:
-    - steam
     - boil-over
     safety_trigger_options:
     - question: cooling-q01
       option: Steam
+    danger_phrases_moved:
+    - steam
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-10:
     status: approved
     name: WATER PUMP LEAKAGE OR FAILURE
@@ -1133,8 +1186,12 @@ approved:
     danger_phrases:
     - belt broken
     - heavy leak
-    - needle in red
     safety_trigger_options: []
+    danger_phrases_moved:
+    - needle in red
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-11:
     status: approved
     name: COOLING FAN NOT RUNNING
@@ -1142,49 +1199,69 @@ approved:
     - Fan not working
     - Needle is going up
     confirmation_test: Fuse, relay, wiring, sensor and fan motor tests.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - needle in red
     - steam
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-12:
     status: approved
     name: THERMOSTAT STUCK CLOSED / NOT OPENING CORRECTLY
     stage2_choices:
     - Needle is going up
     confirmation_test: Thermostat opening test.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - needle in red
     - steam
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-13:
     status: approved
     name: COOLANT TEMPERATURE SENSOR / ELECTRICAL FAULT
     stage2_choices:
     - Other
     confirmation_test: Compare with a reference thermometer and read scan data.
-    danger_phrases:
-    - steam
+    danger_phrases: []
     safety_trigger_options: []
+    danger_phrases_moved:
+    - steam
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-14:
     status: approved
     name: AIR TRAPPED IN COOLING SYSTEM AFTER SERVICE
     stage2_choices:
     - Needle is going up
     confirmation_test: Bleed the air out and retest.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - needle in red
     - steam
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-15:
     status: approved
     name: CABIN HEATER BLOWS COLD AIR WHILE ENGINE OVERHEATS
     stage2_choices:
     - Needle is going up
     confirmation_test: Coolant level check, bleeding and water pump check.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - needle in red
     - steam
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-16:
     status: approved
     name: COOLANT MIXING WITH ENGINE OIL / INTERNAL LEAK SUSPECTED
@@ -1194,30 +1271,42 @@ approved:
     confirmation_test: Combustion-gas test, pressure test and oil analysis.
     danger_phrases:
     - milky oil
-    - white smoke
     safety_trigger_options:
     - question: cooling-q10
       option: 'Yes'
+    danger_phrases_moved:
+    - white smoke
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-17:
     status: approved
     name: REPEATED OVERHEATING IN TRAFFIC / WITH AC
     stage2_choices:
     - Needle is going up
     confirmation_test: Fan test and radiator cleaning.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - needle in red
     - steam
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-18:
     status: approved
     name: ENGINE OVERHEATS SOON AFTER START / SHORT DRIVE
     stage2_choices:
     - Needle is going up
     confirmation_test: Coolant level, thermostat and pressure tests.
-    danger_phrases:
+    danger_phrases: []
+    safety_trigger_options: []
+    danger_phrases_moved:
     - needle in red
     - steam
-    safety_trigger_options: []
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-19:
     status: approved
     name: POSSIBLE HEAD GASKET FAILURE AFTER OVERHEATING (TEST-CONFIRMED)
@@ -1227,11 +1316,15 @@ approved:
     danger_phrases:
     - white smoke
     - milky oil
+    - safed dhuan
     safety_trigger_options:
     - question: cooling-q10
       option: 'Yes'
     - question: cooling-q11
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - safed dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F02-OH-20:
     status: approved
     name: MULTIPLE COOLING FAULTS / UNCERTAIN OVERHEATING CAUSE
@@ -1239,9 +1332,13 @@ approved:
     - Needle is going up
     - Car overheated badly
     confirmation_test: Staged tests, one fault at a time.
-    danger_phrases:
-    - needle in red
+    danger_phrases: []
     safety_trigger_options: []
+    danger_phrases_moved:
+    - needle in red
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   safety_rule cooling-s-F02-OH-01:
     id: cooling-s-F02-OH-01
     status: approved

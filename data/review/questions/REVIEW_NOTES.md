@@ -319,3 +319,18 @@ Hindi danger words become Hinglish in the app ("धुआं" -> "dhuan", "भ�
 - File 12 sheet rules (engine, electrical) often have the roadside action "No - None.". Alerts with identical advice are merged into the most serious one, so a medium rule such as EL-27 shows inside a high-risk alert. Real roadside actions for these rules would fix it.
 - English "smoke" (a global rule) still fires on "black smoke from the exhaust". Consider giving the global smoke rule location words too.
 - Extra customer phrases: `data/review/phrases/` (REVIEW_NOTES.md there).
+
+### Smoke from the exhaust is not a fire (31 Oct 2026, web-app round)
+
+- The global rules "If there is smoke, sparks or a burning plastic smell" (F12 r87) and "Anyone injured, trapped,
+  fire, smoke or fuel leak" (F18 r68) took the word "smoke" from their heading, so "black smoke from the exhaust" gave
+  the fire alert. They now have reviewed phrases in `data/review/safety_global_triggers.yaml` (smoke from the bonnet /
+  engine bay / wires / wiring / dashboard / vents / cabin, the Hinglish equivalents, plus their other heading words),
+  applied with `python -m app.knowledge.safety_triggers apply`. **Check the list.**
+- Fault danger phrases "smoke", "heavy smoke" and "visible smoke" (22 faults) were replaced the same way
+  (`danger_phrases_smoke_note`). In **battery.yaml (reviewed by a person)** one entry was changed with a comment: BT-42
+  "smoke" -> smoke from battery / cables / wires / bonnet; the answer "Smoke" still fires that rule. Please confirm.
+- White smoke from the exhaust still fires the cooling head-gasket rules (OH-05, OH-19, high risk) because the data
+  rates it so; check that this is wanted.
+- Evaluation after this change (test split): safety recall 99.2% (was 99.0%), Phase 1 100%, top-3 75.0% (unchanged),
+  human-written safety texts 5 of 8 (was 4 of 8), no false alarms.

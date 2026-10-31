@@ -1,5 +1,5 @@
 category: pickup_throttle
-loaded_at: '2026-10-23T19:50:08+00:00'
+loaded_at: '2026-10-31T12:09:46+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question pickup_throttle-main:
@@ -1309,6 +1309,42 @@ approved:
     - label: Not sure
       not_sure: true
       effects: []
+  question pickup_throttle-sep-01:
+    id: pickup_throttle-sep-01
+    status: approved
+    stage: 3
+    text: When does the car feel weak?
+    source_faults:
+    - F09-AP-28
+    - F09-AP-32
+    separates:
+    - F09-AP-28
+    - F09-AP-32
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: AP-32: slower with AC, normal
+      without AC; AP-28: weak uphill, full load'
+    options:
+    - label: Only with the AC on; fine with the AC off
+      effects:
+      - fault: F09-AP-32
+        effect: supports
+        strength: strong
+      - fault: F09-AP-28
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: On hills or with a full load, even with the AC off
+      effects:
+      - fault: F09-AP-28
+        effect: supports
+        strength: strong
+      - fault: F09-AP-32
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
   fault F09-AP-01:
     status: approved
     name: Slight Pickup Lag (Car Slow to Gain Speed)
@@ -1461,9 +1497,15 @@ approved:
     confirmation_test: Road test and clutch / gearbox check.
     danger_phrases:
     - strong burning smell
+    - jalne badbu
+    - jalane badbu
     safety_trigger_options:
     - question: pickup_throttle-q01
       option: Yes, sudden power loss with smoke, burning smell or a warning
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-AP-16:
     status: approved
     name: Sudden Loss of Engine Power While Driving
@@ -1473,10 +1515,33 @@ approved:
     confirmation_test: Scan and targeted tests.
     danger_phrases:
     - temperature high
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: pickup_throttle-q01
       option: Yes, sudden power loss with smoke, burning smell or a warning
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F09-AP-17:
     status: approved
     name: Limp Mode / Reduced Power Mode
@@ -1550,9 +1615,13 @@ approved:
     confirmation_test: CNG pressure test and kit scan.
     danger_phrases:
     - gas smell
+    - gas badbu
     safety_trigger_options:
     - question: pickup_throttle-q21
       option: Gas smell
+    danger_phrases_hinglish_added:
+    - gas badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-AP-25:
     status: approved
     name: Diesel DPF Blocked (Soot Filter) - Power Loss

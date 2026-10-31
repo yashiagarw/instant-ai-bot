@@ -291,6 +291,10 @@ class VehicleOut(BaseModel):
     fuel: str | None
     transmission: str | None
     price_segment: PriceSegment | None
+    variant_id: int | None = Field(
+        default=None,
+        description="Catalogue variant, null for an unlisted car (parts fit: GET /api/faults/{key}/parts).",
+    )
 
 
 class ResultOut(BaseModel):

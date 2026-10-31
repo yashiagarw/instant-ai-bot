@@ -32,7 +32,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test("listed car: top cause with evidence, roadside verdict, segment cost with labour, approx and date", async () => {
+test("listed car: top cause with evidence, roadside verdict; without /api/estimates the result's own cost is shown", async () => {
   finished({ vehicle: { variant_id: 16 }, topic_id: "tyres" }, [85, 91]);
   render(<ResultView />);
   const top = await screen.findByRole("article", { name: "Slow/pinhole puncture" });
@@ -47,6 +47,7 @@ test("listed car: top cause with evidence, roadside verdict, segment cost with l
   expect(roadside.textContent).not.toMatch(/^Limited|Limited\./); // answer word stripped
   expect(roadside.textContent).toContain("When to tow: Usually not needed.");
 
+  await within(top).findByTestId("cost-total"); // the estimate request failed: the result's own cost card
   const cost = within(top).getByRole("region", { name: "Estimated cost" });
   expect(cost.textContent).toContain("₹230");
   expect(cost.textContent).toContain("Labour₹150");
@@ -74,7 +75,7 @@ test("sections without content are hidden; DIY and mechanic advice are separate;
   expect([...details].every((d) => !d.open)).toBe(true);
   expect(details[0].textContent).toContain("How it's checked"); // Valve issue has steps
   expect(details[1].textContent).not.toContain("What you can do"); // Flat tyre has none
-  expect(details[1].textContent).toContain("Price after inspection");
+  await waitFor(() => expect(details[1].textContent).toContain("Price after inspection"));
 });
 
 test("disclaimer, feedback and a Request a Mechanic button that sticks on mobile", async () => {
@@ -99,7 +100,7 @@ test("unlisted car without a price range: General guidance and no cost", async (
   const top = await screen.findByRole("article");
   expect(screen.getByTestId("coverage").textContent).toContain("General guidance");
   expect(screen.getByTestId("car-summary").textContent).toContain("Hindustan Ambassador 2010");
-  expect(within(top).getByText(/can't estimate the cost without your car's price range/)).toBeDefined();
+  expect(await within(top).findByText(/can't estimate the cost without your car's price range/)).toBeDefined();
   expect(within(top).queryByTestId("cost-total")).toBeNull();
 });
 

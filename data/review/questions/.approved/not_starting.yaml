@@ -1,5 +1,5 @@
 category: not_starting
-loaded_at: '2026-10-23T19:09:03+00:00'
+loaded_at: '2026-10-31T12:09:46+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question not_starting-main:
@@ -1785,6 +1785,39 @@ approved:
     - label: Not sure
       not_sure: true
       effects: []
+  question not_starting-sep-01:
+    id: not_starting-sep-01
+    status: approved
+    stage: 3
+    text: How much fuel was in the car?
+    source_faults:
+    - F09-NS-01
+    - F09-NS-25
+    separates:
+    - F09-NS-01
+    - F09-NS-25
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: NS-25: stopped with low fuel,
+      starts after adding fuel; NS-01: starts on next try'
+    options:
+    - label: Fuel was low, or it starts after adding fuel
+      effects:
+      - fault: F09-NS-25
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: Plenty of fuel; it usually starts on the next try
+      effects:
+      - fault: F09-NS-01
+        effect: supports
+        strength: strong
+      - fault: F09-NS-25
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
   fault F09-NS-01:
     status: approved
     name: Car Sometimes Does Not Start - Simple Reason
@@ -1802,9 +1835,15 @@ approved:
     confirmation_test: Fuel pressure, spark, RPM (crank) signal and immobiliser tests.
     danger_phrases:
     - fuel smell
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: not_starting-q11
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-NS-03:
     status: approved
     name: Starter / Ignition Switch Problem (No Crank)
@@ -1820,10 +1859,24 @@ approved:
     - Gaadi chalti chalti band ho gayi
     confirmation_test: Safety check, scan and crank test.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
     - loud noise
     - in traffic
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: not_starting-q19
       option: Temperature warning, or the needle went high
@@ -1833,6 +1886,21 @@ approved:
       option: Smoke
     - question: not_starting-q23
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F09-NS-05:
     status: approved
     name: Complete Breakdown - Cause Not Known (Roadside)
@@ -1841,10 +1909,14 @@ approved:
     - Other issue
     confirmation_test: Roadside checklist.
     danger_phrases:
-    - smoke
     - smell
     - in traffic
     safety_trigger_options: []
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-NS-06:
     status: approved
     name: Fuel Pump Failed / No Fuel Reaching Engine
@@ -1854,7 +1926,13 @@ approved:
     confirmation_test: Voltage test at the fuel pump and fuel pressure test.
     danger_phrases:
     - fuel smell
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options: []
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-NS-07:
     status: approved
     name: Fuel Pump Relay or Fuse Failed
@@ -1879,10 +1957,19 @@ approved:
     - Gaadi jerk maar rahi hai
     confirmation_test: Injector test.
     danger_phrases:
-    - fuel smell
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: not_starting-q11
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - fuel smell
+    danger_phrases_note: Danger phrases kept on the rules the app can show (at most 3 phrase-fired rules); this
+      fault's rule still shows when the fault is likely.
   fault F09-NS-10:
     status: approved
     name: Ignition Coil Failed
@@ -1948,9 +2035,20 @@ approved:
     confirmation_test: Wiring continuity test.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
     safety_trigger_options:
     - question: not_starting-q21
       option: A burning smell
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - jalne smell
+    danger_phrases_note: Danger phrases kept on the rules the app can show (at most 3 phrase-fired rules); this
+      fault's rule still shows when the fault is likely.
   fault F09-NS-17:
     status: approved
     name: Engine Stops at Idle / Low Speed
@@ -1976,9 +2074,17 @@ approved:
     danger_phrases:
     - battery light
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: not_starting-q21
       option: A burning smell
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-NS-20:
     status: approved
     name: Engine Overheated and Stopped / Will Not Restart
@@ -1989,11 +2095,17 @@ approved:
     - steam
     - temperature high
     - knock
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: not_starting-q19
       option: Temperature warning, or the needle went high
     - question: not_starting-q20
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-NS-21:
     status: approved
     name: Timing Belt / Chain Broken or Jumped (Suspected)
@@ -2015,11 +2127,17 @@ approved:
     danger_phrases:
     - stopped in water
     - flood
+    - paani bhar
+    - pani bhar
     safety_trigger_options:
     - question: not_starting-q25
       option: 'Yes'
     - question: not_starting-q26
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - paani bhar
+    - pani bhar
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-NS-23:
     status: approved
     name: Diesel Air in Fuel Line (Airlock)
@@ -2037,9 +2155,20 @@ approved:
     confirmation_test: Try to turn the engine by hand.
     danger_phrases:
     - heavy knock
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - oil light
     - engine locked
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: not_starting-q19
       option: Red oil warning light
@@ -2049,6 +2178,18 @@ approved:
       option: A heavy knock or loud mechanical noise
     - question: not_starting-q21
       option: Smoke
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F09-NS-25:
     status: approved
     name: Fuel Finished / Fuel Gauge Showing Wrong  [NEW - India]
@@ -2089,9 +2230,13 @@ approved:
     danger_phrases:
     - gas smell
     - hissing
+    - gas badbu
     safety_trigger_options:
     - question: not_starting-q49
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - gas badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F09-NS-29:
     status: approved
     name: Rat-Bitten Engine Wiring - No Start or Stalling  [NEW - India]
@@ -2133,8 +2278,19 @@ approved:
     confirmation_test: Check the dipstick and oil pressure gauge.
     danger_phrases:
     - red oil light
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - noise
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: not_starting-q19
       option: Red oil warning light
@@ -2142,6 +2298,18 @@ approved:
       option: A heavy knock or loud mechanical noise
     - question: not_starting-q21
       option: Smoke
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F09-NS-33:
     status: approved
     name: Diesel Thickens in Extreme Cold (Hills / Winter)  [NEW - India]

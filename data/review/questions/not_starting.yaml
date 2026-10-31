@@ -1826,7 +1826,12 @@ faults:
     - Gaadi chalti chalti band ho gayi
     confirmation_test: Safety check, scan and crank test.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
     - loud noise
     - in traffic
@@ -1859,6 +1864,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F09-NS-05:
     status: approved
     name: Complete Breakdown - Cause Not Known (Roadside)
@@ -2113,7 +2122,12 @@ faults:
     confirmation_test: Try to turn the engine by hand.
     danger_phrases:
     - heavy knock
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - oil light
     - engine locked
     - bonnet dhuan
@@ -2139,6 +2153,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F09-NS-25:
     status: approved
     name: Fuel Finished / Fuel Gauge Showing Wrong  [NEW - India]
@@ -2227,7 +2245,12 @@ faults:
     confirmation_test: Check the dipstick and oil pressure gauge.
     danger_phrases:
     - red oil light
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - noise
     - bonnet dhuan
     - bonnet dhuaan
@@ -2250,6 +2273,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F09-NS-33:
     status: approved
     name: Diesel Thickens in Extreme Cold (Hills / Winter)  [NEW - India]

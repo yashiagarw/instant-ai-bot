@@ -1,5 +1,5 @@
 category: cng
-loaded_at: '2026-10-23T19:30:39+00:00'
+loaded_at: '2026-10-31T12:09:47+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question cng-main:
@@ -651,6 +651,39 @@ approved:
     - label: Not sure
       not_sure: true
       effects: []
+  question cng-sep-01:
+    id: cng-sep-01
+    status: approved
+    stage: 3
+    text: Which is closer to your car?
+    source_faults:
+    - F17-CG-11
+    - F17-CG-17
+    separates:
+    - F17-CG-11
+    - F17-CG-17
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: CG-11: service overdue; CG-17:
+      old kit, low mileage'
+    options:
+    - label: The CNG filter or kit service is overdue
+      effects:
+      - fault: F17-CG-11
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It is an older fitted (retrofit) CNG kit and mileage has dropped
+      effects:
+      - fault: F17-CG-17
+        effect: supports
+        strength: strong
+      - fault: F17-CG-11
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
   fault F17-CG-01:
     status: approved
     name: CNG Filling Cap Missing / Damaged
@@ -659,7 +692,11 @@ approved:
     confirmation_test: Visual check and leak check.
     danger_phrases:
     - gas smell
+    - gas badbu
     safety_trigger_options: []
+    danger_phrases_hinglish_added:
+    - gas badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F17-CG-02:
     status: approved
     name: CNG Button / Selector Switch Issue
@@ -685,11 +722,15 @@ approved:
     danger_phrases:
     - gas smell
     - hissing
+    - gas badbu
     safety_trigger_options:
     - question: cng-q01
       option: 'Yes'
     - question: cng-q02
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - gas badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F17-CG-05:
     status: approved
     name: CNG Level Indicator Not Working

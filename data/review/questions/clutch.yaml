@@ -1047,7 +1047,12 @@ faults:
     confirmation_test: Standing test (car does not stall) and lining thickness check with the gearbox out; recheck
       after adjusting free play or bleeding.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - strong burning smell
     - jalne badbu
     - jalane badbu
@@ -1070,6 +1075,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F01-CL-03:
     status: approved
     name: Clutch cable broken
@@ -1094,7 +1103,12 @@ faults:
     - Burning smell from the clutch
     confirmation_test: Lining thinner than the minimum, or shiny or oily, when checked with the gearbox out.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - strong burning smell
     - jalne badbu
     - jalane badbu
@@ -1117,6 +1131,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F01-CL-05:
     status: approved
     name: Clutch completely failed
@@ -1250,7 +1268,12 @@ faults:
     confirmation_test: Smell only after heavy use with no slipping afterwards = driving habit; repeated smell with
       slipping = worn clutch.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - bonnet dhuan
     - bonnet dhuaan
     - wire dhuan
@@ -1268,6 +1291,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F01-CL-15:
     status: approved
     name: Hydraulic clutch fluid leak

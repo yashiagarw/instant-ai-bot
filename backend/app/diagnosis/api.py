@@ -116,6 +116,7 @@ def _vehicle_out(snap: dict) -> s.VehicleOut:
         fuel=snap.get("fuel"),
         transmission=snap.get("transmission"),
         price_segment=snap.get("segment"),
+        variant_id=snap.get("variant_id"),
     )
 
 

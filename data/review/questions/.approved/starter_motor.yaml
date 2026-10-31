@@ -1,5 +1,5 @@
 category: starter_motor
-loaded_at: '2026-10-23T19:46:12+00:00'
+loaded_at: '2026-10-31T12:09:45+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question starter_motor-main:
@@ -709,9 +709,17 @@ approved:
     confirmation_test: Starter signal, voltage drop and bench test.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: starter_motor-q01
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F13-ST-05:
     status: approved
     name: Starter Motor Slow Cranking

@@ -676,7 +676,12 @@ faults:
     confirmation_test: Inspection.
     danger_phrases:
     - sparks
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - dragging
     - bonnet dhuan
     - bonnet dhuaan
@@ -697,6 +702,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F13-UB-04:
     status: approved
     name: Complete Underguard / Undertray Detached

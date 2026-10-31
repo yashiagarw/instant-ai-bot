@@ -1,5 +1,5 @@
 category: hose_leak
-loaded_at: '2026-10-23T19:40:35+00:00'
+loaded_at: '2026-10-31T12:09:47+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question hose_leak-main:
@@ -687,6 +687,42 @@ approved:
     - label: Not sure
       not_sure: true
       effects: []
+  question hose_leak-sep-01:
+    id: hose_leak-sep-01
+    status: approved
+    stage: 3
+    text: Where is the coolant dripping from?
+    source_faults:
+    - F16-HP-02
+    - F16-HP-06
+    separates:
+    - F16-HP-02
+    - F16-HP-06
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: HP-06: drip under front, wet
+      lower hose; HP-02: puddle under engine, wet hose'
+    options:
+    - label: At the very front, from the lower hose under the radiator
+      effects:
+      - fault: F16-HP-06
+        effect: supports
+        strength: strong
+      - fault: F16-HP-02
+        effect: supports
+        strength: weak
+      safety_trigger: false
+    - label: From a hose higher up or under the engine
+      effects:
+      - fault: F16-HP-02
+        effect: supports
+        strength: strong
+      - fault: F16-HP-06
+        effect: rules_out
+        strength: moderate
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
   fault F16-HP-01:
     status: approved
     name: Minor Pipe Seepage
@@ -716,6 +752,8 @@ approved:
     danger_phrases:
     - fuel smell
     - brake fluid
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: hose_leak-q01
       option: 'Yes'
@@ -723,6 +761,10 @@ approved:
       option: 'Yes'
     - question: hose_leak-q04
       option: Clear liquid near a wheel
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F16-HP-04:
     status: approved
     name: Major Pipe Crack / Split
@@ -734,11 +776,17 @@ approved:
     danger_phrases:
     - steam
     - high temperature
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: hose_leak-q03
       option: Heavy steam, or the needle is in the red
     - question: hose_leak-q06
       option: Very fast, it is spraying out
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F16-HP-05:
     status: approved
     name: Upper Radiator Hose Leak
@@ -800,9 +848,13 @@ approved:
     stage2_choices:
     - Water or coolant leaking
     confirmation_test: Cooling system pressure test.
-    danger_phrases:
-    - overheating
+    danger_phrases: []
     safety_trigger_options: []
+    danger_phrases_moved:
+    - overheating
+    danger_phrases_note: Shared danger phrases kept on the 3 most serious rules of this category (the app shows
+      at most 3 phrase-fired rules); this fault's rule still shows when the fault is likely.
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F16-HP-12:
     status: approved
     name: Fuel Hose / Fuel Line Leak
@@ -811,11 +863,17 @@ approved:
     confirmation_test: Workshop inspection of the fuel line.
     danger_phrases:
     - fuel smell
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: hose_leak-q01
       option: 'Yes'
     - question: hose_leak-q04
       option: Smells of petrol or diesel
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F16-HP-13:
     status: approved
     name: Brake Fluid Pipe / Flexible Brake Hose Leak

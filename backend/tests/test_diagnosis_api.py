@@ -414,6 +414,7 @@ def test_result_has_mode_vehicle_topic_and_towing(client, knowledge, variant):
     assert result["mode"] == "diagnose" and result["topic"] == "Battery, lights & warning lights"
     assert result["vehicle"]["listed"] and result["vehicle"]["price_segment"] == "mid"
     assert variant.name in result["vehicle"]["label"]
+    assert result["vehicle"]["variant_id"] == variant.id  # for parts fit (GET /api/faults/{key}/parts)
     assert "towing" in result["roadside"]
 
     u = start(
@@ -428,6 +429,7 @@ def test_result_has_mode_vehicle_topic_and_towing(client, knowledge, variant):
         "fuel": None,
         "transmission": None,
         "price_segment": None,
+        "variant_id": None,
     }
 
 

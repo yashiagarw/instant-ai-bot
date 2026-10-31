@@ -1,5 +1,5 @@
 category: engine
-loaded_at: '2026-10-23T19:35:24+00:00'
+loaded_at: '2026-10-31T12:09:46+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question engine-main:
@@ -1198,7 +1198,18 @@ approved:
     confirmation_test: Compression, leak-down and strip inspection.
     danger_phrases:
     - loud knocking
-    - heavy smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: engine-q01
       option: Both
@@ -1212,6 +1223,18 @@ approved:
       option: A deep knock that rises with engine speed
     - question: engine-q14
       option: Heavy smoke with knocking
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - heavy smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F12-EN-04:
     status: approved
     name: Engine Seizure / Complete Failure
@@ -1291,9 +1314,15 @@ approved:
     danger_phrases:
     - steam
     - gauge stays high
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: engine-q02
       option: Yes, with steam
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F12-EN-12:
     status: approved
     name: Low Engine Oil Level / Oil Leak
@@ -1404,9 +1433,13 @@ approved:
     danger_phrases:
     - white smoke
     - milky oil
+    - safed dhuan
     safety_trigger_options:
     - question: engine-q02
       option: Yes, with steam
+    danger_phrases_hinglish_added:
+    - safed dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F12-EN-22:
     status: approved
     name: Excessive Exhaust Smoke
@@ -1433,8 +1466,31 @@ approved:
     - Other problem
     confirmation_test: Boost data and hose check.
     danger_phrases:
-    - heavy smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options: []
+    danger_phrases_hinglish_added:
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - heavy smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F12-EN-25:
     status: approved
     name: Engine ECU / Control-System Fault
@@ -1453,9 +1509,13 @@ approved:
     confirmation_test: Plug and coil check and CNG system test.
     danger_phrases:
     - gas smell
+    - gas badbu
     safety_trigger_options:
     - question: engine-q22
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - gas badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F12-EN-27:
     status: approved
     name: Engine Problem After Wrong / Bad Fuel Filled  [NEW - India]

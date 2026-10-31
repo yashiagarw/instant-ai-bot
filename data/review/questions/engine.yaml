@@ -1192,7 +1192,12 @@ faults:
     confirmation_test: Compression, leak-down and strip inspection.
     danger_phrases:
     - loud knocking
-    - heavy smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - bonnet dhuan
     - bonnet dhuaan
     - wire dhuan
@@ -1220,6 +1225,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - heavy smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F12-EN-04:
     status: approved
     name: Engine Seizure / Complete Failure
@@ -1451,7 +1460,12 @@ faults:
     - Other problem
     confirmation_test: Boost data and hose check.
     danger_phrases:
-    - heavy smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - bonnet dhuan
     - bonnet dhuaan
     - wire dhuan
@@ -1467,6 +1481,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - heavy smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F12-EN-25:
     status: approved
     name: Engine ECU / Control-System Fault

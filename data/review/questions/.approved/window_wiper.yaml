@@ -1,5 +1,5 @@
 category: window_wiper
-loaded_at: '2026-10-23T19:48:22+00:00'
+loaded_at: '2026-10-31T12:09:47+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question window_wiper-main:
@@ -553,6 +553,39 @@ approved:
       - fault: F14-WW-17
         effect: rules_out
         strength: strong
+      safety_trigger: false
+    - label: Not sure
+      not_sure: true
+      effects: []
+  question window_wiper-sep-01:
+    id: window_wiper-sep-01
+    status: approved
+    stage: 3
+    text: What is the sunroof doing?
+    source_faults:
+    - F14-WW-04
+    - F14-WW-14
+    separates:
+    - F14-WW-04
+    - F14-WW-14
+    reviewed_by: claude_code (auto, pending mechanic sign-off)
+    basis: 'Separates two faults the evaluation (dev split) often confused. Dataset: WW-04: stuck open, water entry;
+      WW-14: jerky, uneven, tilt only'
+    options:
+    - label: It is stuck open (water can get in)
+      effects:
+      - fault: F14-WW-04
+        effect: supports
+        strength: strong
+      safety_trigger: false
+    - label: It moves, but jerky or uneven, or it only tilts
+      effects:
+      - fault: F14-WW-14
+        effect: supports
+        strength: strong
+      - fault: F14-WW-04
+        effect: rules_out
+        strength: moderate
       safety_trigger: false
     - label: Not sure
       not_sure: true

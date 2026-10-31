@@ -1,5 +1,5 @@
 category: engine_belt
-loaded_at: '2026-10-23T19:36:50+00:00'
+loaded_at: '2026-10-31T12:09:46+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question engine_belt-main:
@@ -1017,7 +1017,21 @@ approved:
     confirmation_test: Full pulley spin test and timing cover check.
     danger_phrases:
     - burning smell
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: engine_belt-q01
       option: 'Yes'
@@ -1025,6 +1039,21 @@ approved:
       option: 'Yes'
     - question: engine_belt-q03
       option: Belt pieces are wrapped around the pulleys
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F11-EB-05:
     status: approved
     name: Belt Slipping During Acceleration
@@ -1076,9 +1105,17 @@ approved:
     confirmation_test: Belt-off spin test of the idler pulley.
     danger_phrases:
     - burning smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options:
     - question: engine_belt-q02
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-EB-11:
     status: approved
     name: Alternator Pulley / Overrunning Pulley Fault
@@ -1127,10 +1164,39 @@ approved:
     confirmation_test: Belt-off spin and alternator bench test.
     danger_phrases:
     - burning smell
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
     safety_trigger_options:
     - question: engine_belt-q02
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    - bonnet dhuan
+    - bonnet dhuaan
+    - wire dhuan
+    - taar dhuan
+    - wiring dhuan
+    - dashboard dhuan
+    approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   fault F11-EB-16:
     status: approved
     name: AC Compressor Pulley / Bearing Seizure
@@ -1182,9 +1248,15 @@ approved:
     danger_phrases:
     - temperature high
     - steam
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: engine_belt-q01
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F11-EB-21:
     status: approved
     name: Belt Failure with Loss of Hydraulic Power Steering

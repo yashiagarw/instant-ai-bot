@@ -1,5 +1,5 @@
 category: fuel_delivery
-loaded_at: '2026-10-23T19:38:42+00:00'
+loaded_at: '2026-10-31T12:09:46+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question fuel_delivery-main:
@@ -1024,7 +1024,15 @@ approved:
     confirmation_test: Current draw and short test.
     danger_phrases:
     - burnt smell
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
     safety_trigger_options: []
+    danger_phrases_hinglish_added:
+    - jalne badbu
+    - jalane badbu
+    - jalne smell
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F10-FD-08:
     status: approved
     name: Weak Fuel Pump / Low Fuel Pressure
@@ -1119,9 +1127,13 @@ approved:
     danger_phrases:
     - petrol smell
     - petrol dripping
+    - petrol badbu
     safety_trigger_options:
     - question: fuel_delivery-q01
       option: Petrol is dripping, or there is a strong smell
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F10-FD-19:
     status: approved
     name: Water or Dirt in Petrol (Contaminated Fuel)
@@ -1211,9 +1223,13 @@ approved:
     danger_phrases:
     - petrol smell
     - leak
+    - petrol badbu
     safety_trigger_options:
     - question: fuel_delivery-q01
       option: Petrol is dripping, or there is a strong smell
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   safety_rule fuel_delivery-s-F10-FD-01:
     id: fuel_delivery-s-F10-FD-01
     status: approved

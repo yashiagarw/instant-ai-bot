@@ -1,5 +1,5 @@
 category: dashboard_warning
-loaded_at: '2026-10-23T19:31:59+00:00'
+loaded_at: '2026-10-31T12:09:47+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question dashboard_warning-main:
@@ -1173,11 +1173,17 @@ approved:
     danger_phrases:
     - needle high
     - steam
+    - bhaap
+    - bhap
     safety_trigger_options:
     - question: dashboard_warning-q01
       option: Red
     - question: dashboard_warning-q03
       option: 'Yes'
+    danger_phrases_hinglish_added:
+    - bhaap
+    - bhap
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F10-DW-25:
     status: approved
     name: Airbag / SRS Warning Light

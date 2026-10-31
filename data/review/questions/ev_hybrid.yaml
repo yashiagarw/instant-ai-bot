@@ -2585,7 +2585,12 @@ faults:
     confirmation_test: Visual check (power off) by a trained technician.
     danger_phrases:
     - burning smell
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - melted plastic
     - jalne badbu
     - jalane badbu
@@ -2612,6 +2617,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F06-EV-65:
     status: approved
     name: Vehicle Has Multiple Charging or Electrical Warnings

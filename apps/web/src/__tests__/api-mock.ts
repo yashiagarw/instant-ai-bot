@@ -7,7 +7,7 @@ export { CATEGORIES, MAKES, MODELS, SEARCH, VARIANTS };
 
 export type Routes = Record<string, unknown | ((url: URL) => unknown)>;
 
-/** Replace fetch: the first route whose path prefix matches answers with JSON; "fail" answers 500,
+/** Replace fetch: the first route whose path prefix matches answers with JSON; "fail" answers 500, "missing" 404,
  * "offline" rejects like a network error. */
 export function mockApi(overrides: Routes = {}, diagnosis = new FakeDiagnosis()) {
   const routes: Routes = {
@@ -36,6 +36,7 @@ export function mockApi(overrides: Routes = {}, diagnosis = new FakeDiagnosis())
     const body = typeof value === "function" ? (value as (u: URL) => unknown)(url) : value;
     if (body === "offline") throw new TypeError("Failed to fetch");
     if (body === "fail") return new Response("error", { status: 500 });
+    if (body === "missing") return new Response("not found", { status: 404 });
     return new Response(JSON.stringify(body), { status: 200, headers: { "Content-Type": "application/json" } });
   });
   vi.stubGlobal("fetch", fetchMock);

@@ -1354,7 +1354,12 @@ faults:
     confirmation_test: Mechanic component test of the starter assembly, control circuit, engagement and ring gear.
       Do not replace parts until a test confirms the fault.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
     - starter hot
     - jalne badbu
@@ -1382,6 +1387,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F07-SS-32:
     status: approved
     name: Engine Seized / Engine Cannot Rotate
@@ -1390,7 +1399,12 @@ faults:
     confirmation_test: Mechanic component test of the wiring damage, moisture, mechanical rotation and safety. Do
       not replace parts until a test confirms the fault.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
     - engine jammed
     - engine cannot rotate
@@ -1417,6 +1431,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F07-SS-33:
     status: approved
     name: ECU / BCM Starting Authorization Fault
@@ -1457,7 +1475,12 @@ faults:
     confirmation_test: Mechanic component test of the wiring damage, moisture, mechanical rotation and safety. Do
       not replace parts until a test confirms the fault.
     danger_phrases:
-    - smoke
+    - smoke from bonnet
+    - smoke from engine bay
+    - smoke from wires
+    - smoke from wiring
+    - smoke from dashboard
+    - smoke in cabin
     - burning smell
     - flood
     - water in the car
@@ -1488,6 +1511,10 @@ faults:
     - wiring dhuan
     - dashboard dhuan
     approved_by: claude_code (auto, pending mechanic sign-off)
+    danger_phrases_moved:
+    - smoke
+    danger_phrases_smoke_note: 'Bare ''smoke'' also matched exhaust smoke (not an emergency): replaced by where
+      the smoke is (bonnet, engine bay, wires, dashboard, cabin).'
   F07-SS-36:
     status: approved
     name: Automatic Start-Stop Battery Sensor Fault

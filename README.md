@@ -49,6 +49,7 @@ uv run python -m app.knowledge.questions load --all  # approved question flows +
 uv run python -m app.knowledge.merges apply          # approved duplicate-fault merges (data/review/merges.yaml)
 uv run python -m app.knowledge.requirements apply    # what faults need (start-stop, diesel, AMT …): data/review/fault_requirements.yaml
 uv run python -m app.knowledge.phrases load          # reviewed extra customer phrases (spellings, Hindi): data/review/phrases
+uv run python -m app.knowledge.safety_triggers apply # reviewed phrases for global emergency rules: data/review/safety_global_triggers.yaml
 uv run python -m app.knowledge.embeddings sync       # search index: embeds only new or changed texts
 uv run python -m app.parts build                     # parts catalogue (after merges): prices, fits, fault links, labour
 cd ..
@@ -236,6 +237,27 @@ usable part prices gets `status: "not_enough_data"` and the reasons, never a num
   must check: `data/review/parts/REVIEW_NOTES.md`; lines never used as prices: `data/review/parts/excluded.csv`.
 - `part_fit_verified` on the diagnosis result now comes from `part_compatibility` records for the car's variant
   (engine 1.4.0 / 2.3.0), not from words in the fit text.
+
+## Phase 3.3: parts and estimates in the web app
+
+- **Result page** (`/diagnose/{session}/result`): under the most likely cause, **Your area** (Delhi, Noida, Gurugram,
+  Ghaziabad, Faridabad or a pincode) re-fetches `GET /api/estimates`; without a choice the label reads "Delhi NCR metro
+  estimate". **Estimated cost** shows the total range, parts / labour / consumables, "Where these prices come from"
+  (each input with its source and check date) and "The final price depends on the mechanic's inspection". A cause
+  without enough data shows **Price on inspection** with Request a Mechanic. Because almost every estimate has
+  `needs_check`, one calm line says "Prices are being verified with our mechanics". If `/api/estimates` cannot be
+  reached, the result's own cost card is shown (the same numbers).
+- **Parts you may need**: part cards (picture, name, brand type, price for the car's segment, "Fits your car" or
+  "Fit not verified for your car"); tick 2 or 3 to compare. **`/parts/[id]`** shows one part (prices with dates, the
+  models it is listed for, what it fixes); **`/parts/compare?ids=1,2,3`** compares up to 3 side by side. `variant_id`
+  in the query decides the fit badge; without it no part is shown as fitting.
+- Prices use Indian digit grouping (₹12,34,567) with tabular numbers. The result's `vehicle` now includes `variant_id`.
+- Safety: the global smoke / fire rules no longer fire on the bare word "smoke" (black or white exhaust smoke is not a
+  fire); smoke from the bonnet, wires, dashboard or cabin, in English, Hinglish or Hindi, still gives the high alert.
+
+Try it: run the API and `pnpm dev` (see "Run"), finish a diagnosis for a listed car, then on the result pick an area,
+open a part and compare two. Tests: `cd apps/web && pnpm test` and `pnpm test:e2e` (if Playwright times out with
+parallel workers on a busy machine, use `pnpm exec playwright test --workers=1`).
 
 ## LLM layer (off by default)
 

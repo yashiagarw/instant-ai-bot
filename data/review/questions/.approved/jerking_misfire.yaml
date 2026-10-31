@@ -1,5 +1,5 @@
 category: jerking_misfire
-loaded_at: '2026-10-23T19:43:01+00:00'
+loaded_at: '2026-10-31T12:09:47+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question jerking_misfire-main:
@@ -1121,9 +1121,15 @@ approved:
     confirmation_test: Injector tests.
     danger_phrases:
     - fuel smell
+    - petrol badbu
+    - diesel badbu
     safety_trigger_options:
     - question: jerking_misfire-q02
       option: Fuel smell
+    danger_phrases_hinglish_added:
+    - petrol badbu
+    - diesel badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F15-JM-15:
     status: approved
     name: Low Fuel Pressure / Fuel Pump Fault
@@ -1220,9 +1226,13 @@ approved:
     confirmation_test: Spark plug / coil and CNG system checks.
     danger_phrases:
     - gas smell
+    - gas badbu
     safety_trigger_options:
     - question: jerking_misfire-q02
       option: Gas (CNG) smell
+    danger_phrases_hinglish_added:
+    - gas badbu
+    approved_by: claude_code (auto, pending mechanic sign-off)
   fault F15-JM-25:
     status: approved
     name: Severe Misfire / Flashing Check Engine Light
