@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import secrets
 import time
 
 import pyotp
@@ -47,6 +48,14 @@ def check_password_policy(password: str, email: str) -> None:
     local = email.split("@")[0].lower()
     if len(local) >= 4 and local in password.lower():
         raise WeakPassword("Don't use your email name in the password")
+
+
+def temporary_password() -> str:
+    """For an invitation: 16 random URL-safe characters, shown once; the person changes it after signing in."""
+    while True:
+        pw = secrets.token_urlsafe(12)
+        if len(set(pw)) >= 8:
+            return pw
 
 
 def fernet(settings: Settings) -> Fernet:

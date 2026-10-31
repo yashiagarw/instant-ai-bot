@@ -1,0 +1,8 @@
+# One pnpm workspace: the customer site, the staff admin app and the shared UI package.
+packages:
+  - apps/*
+  - packages/*
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver

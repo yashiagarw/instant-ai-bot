@@ -15,7 +15,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import DBAPIError
 
-from app.accounts.models import AuthSession
+from app.accounts.models import AuthSession, User
 from app.admin import cli, service
 from app.admin.audit import mask
 from app.admin.deps import ATTR, STAFF_COOKIE, admin_routes, check_admin_routes, enforce, requires
@@ -48,8 +48,12 @@ def code(secret: str, ahead: int = 0) -> str:
     return pyotp.TOTP(secret).at(time.time() + 30 * ahead)
 
 
-def make_staff(db_session, settings, email, roles, password=PASSWORD):
-    user, secret = service.create_staff(db_session, settings, service.CLI, email, email.split("@")[0], password, roles)
+def make_staff(db_session, settings, email, roles, password=PASSWORD, two_factor=True):
+    """A staff account with a known password and (by default) two-factor already set up: (account, secret)."""
+    secret = pyotp.random_base32() if two_factor else None
+    user, _ = service.create_staff(
+        db_session, settings, service.CLI, email, email.split("@")[0], roles, password=password, secret=secret
+    )
     db_session.commit()
     return user, secret
 
@@ -57,7 +61,7 @@ def make_staff(db_session, settings, email, roles, password=PASSWORD):
 def sign_in(app, email, secret, password=PASSWORD, ahead=0) -> TestClient:
     c = browser(app)
     r = c.post("/api/admin/auth/login", json={"email": email, "password": password, "code": code(secret, ahead)})
-    assert r.status_code == 200, r.text
+    assert r.status_code == 200 and r.json()["next"] == "done", r.text
     return c
 
 
@@ -86,21 +90,22 @@ def targets(db_session, test_settings):
         consent_text_version="request-v1", consent_at=datetime.now(UTC),
     )  # fmt: skip
     q = GeneratedQuestion(text="Is the belt squealing?", options=["Yes", "No"], model="m", prompt_version="v")
-    db_session.add_all([req, q])
+    cust = User(phone="+919811112222", name="Ravi", consent_text_version="account-v1", consent_at=datetime.now(UTC))
+    db_session.add_all([req, q, cust])
     db_session.commit()
-    return {"staff_id": target.id, "request_id": req.id, "question_id": q.id}
+    return {"staff_id": target.id, "request_id": req.id, "question_id": q.id, "customer_id": cust.id}
 
 
 def calls(t: dict, who: str, secret: str) -> list[tuple[str, str, dict | None]]:
     """One call per admin endpoint with a valid body; logout last."""
     return [
         ("POST", "/api/admin/auth/login", {"email": "nobody@im.test", "password": "x", "code": "000000"}),
+        ("POST", "/api/admin/auth/two-factor/confirm", {"code": "000000"}),
         ("GET", "/api/admin/auth/me", None),
         ("POST", "/api/admin/auth/password",
          {"current_password": PASSWORD, "code": code(secret, 1), "new_password": "a brand new passphrase 77"}),
         ("GET", "/api/admin/staff", None),
-        ("POST", "/api/admin/staff",
-         {"email": f"new-{who}@im.test", "name": "New", "password": "a long enough pass 1", "roles": ["mechanic"]}),
+        ("POST", "/api/admin/staff", {"email": f"new-{who}@im.test", "name": "New", "roles": ["mechanic"]}),
         ("PUT", f"/api/admin/staff/{t['staff_id']}/roles", {"roles": ["mechanic", "support_agent"]}),
         ("POST", f"/api/admin/staff/{t['staff_id']}/deactivate", None),
         ("POST", f"/api/admin/staff/{t['staff_id']}/activate", None),
@@ -113,6 +118,8 @@ def calls(t: dict, who: str, secret: str) -> list[tuple[str, str, dict | None]]:
         ("GET", "/api/admin/content/generated-questions", None),
         ("POST", f"/api/admin/content/generated-questions/{t['question_id']}/review", {"decision": "approved"}),
         ("GET", "/api/admin/content/image-labels", None),
+        ("GET", "/api/admin/customers", None),
+        ("POST", f"/api/admin/customers/{t['customer_id']}/reveal-phone", None),
         ("POST", "/api/admin/auth/logout", None),
     ]  # fmt: skip
 
@@ -156,8 +163,8 @@ def test_every_admin_endpoint_with_every_role(app, db_session, test_settings, ta
         perm = permission_of(app, method, path)
         before = audit_count(db_session)
         r = client.request(method, path, json=body)
-        if perm == PUBLIC:
-            assert r.status_code == 401 and r.json()["detail"] == service.LOGIN_FAILED, (who, path, r.text)
+        if perm == PUBLIC:  # the login (wrong password) and setup confirm (no setup started): refused, for everyone
+            assert r.status_code == 401, (who, path, r.text)
             continue
         if who in ("anonymous", "customer"):
             assert r.status_code == 401, (who, method, path, r.status_code)
@@ -228,11 +235,11 @@ def test_login_cookie_is_separate_strict_and_short(app, db_session, test_setting
     _, secret = make_staff(db_session, test_settings, "boss@im.test", ["super_admin"])
     c = browser(app)
     r = c.post("/api/admin/auth/login", json={"email": "Boss@IM.test ", "password": PASSWORD, "code": code(secret)})
-    assert r.status_code == 200 and r.json()["roles"] == ["super_admin"]
+    assert r.status_code == 200 and r.json()["me"]["roles"] == ["super_admin"]
     cookie = r.headers["set-cookie"]
     assert cookie.startswith(f"{STAFF_COOKIE}=") and "HttpOnly" in cookie and "Secure" in cookie
     assert "SameSite=strict" in cookie and "Path=/api/admin" in cookie and "Max-Age=28800" in cookie
-    expires = datetime.fromisoformat(r.json()["session_expires_at"])
+    expires = datetime.fromisoformat(r.json()["me"]["session_expires_at"])
     assert timedelta(hours=7) < expires - datetime.now(UTC) <= timedelta(hours=8)  # customers: 30 days
     # The staff cookie is not a customer login, and a customer login is not a staff one.
     assert c.get("/api/me").status_code == 401
@@ -312,7 +319,7 @@ def test_there_is_always_one_active_super_admin(app, db_session, test_settings):
     assert c.put(f"/api/admin/staff/{me.id}/roles", json={"roles": ["mechanic"]}).status_code == 422
     assert c.post(f"/api/admin/staff/{me.id}/deactivate").status_code == 422
     assert c.put(f"/api/admin/staff/{me.id}/roles", json={"roles": ["customer"]}).status_code == 422
-    r = c.post("/api/admin/staff", json={"email": "x@im.test", "name": "X", "password": "short", "roles": ["mechanic"]})
+    r = c.post("/api/admin/staff", json={"email": "not an email", "name": "X", "roles": ["mechanic"]})
     assert r.status_code == 422
 
 
@@ -330,24 +337,20 @@ def test_mechanics_see_masked_phone_numbers_support_sees_them_in_full(app, db_se
 def test_audit_rows_never_hold_secrets_or_full_phone_numbers(app, db_session, test_settings, targets):
     _, boss = make_staff(db_session, test_settings, "boss@im.test", ["super_admin"])
     c = sign_in(app, "boss@im.test", boss)
-    new = {"email": "new@im.test", "name": "New", "password": "a long enough pass 1", "roles": ["mechanic"]}
-    created = c.post("/api/admin/staff", json=new).json()
-    secret = created["two_factor"]["secret"]
+    created = c.post("/api/admin/staff", json={"email": "new@im.test", "name": "New", "roles": ["mechanic"]}).json()
+    temporary = created["temporary_password"]
+    setup = browser(app).post("/api/admin/auth/login", json={"email": "new@im.test", "password": temporary}).json()
+    secret = setup["setup"]["secret"]
     c.post(f"/api/admin/staff/{created['staff']['id']}/reset-two-factor")
     c.patch(f"/api/admin/requests/{targets['request_id']}", json={"status": "contacted"})
+    c.post(f"/api/admin/customers/{targets['customer_id']}/reveal-phone")
     c.post("/api/admin/auth/password", json={"current_password": PASSWORD, "code": code(boss, 1),
                                              "new_password": "an even better passphrase 2"})  # fmt: skip
     rows = db_session.execute(text("select before::text, after::text, actor_label from audit_log")).all()
     dump = " ".join(" ".join(x or "" for x in r) for r in rows)
-    for leaked in (
-        secret,
-        boss,
-        "a long enough pass 1",
-        "an even better passphrase 2",
-        PASSWORD,
-        "9800001234",
-        "argon2",
-    ):
+    assert "customer.reveal_phone" in {a for (a,) in db_session.execute(text("select action from audit_log"))}
+    for leaked in (secret, boss, temporary, "an even better passphrase 2", PASSWORD, "9800001234", "9811112222",
+                   "argon2", "gAAAA"):  # fmt: skip
         assert leaked not in dump, leaked
     one = db_session.scalar(select(AuditLog).where(AuditLog.action == "request.set_status"))
     assert one.before == {"status": "submitted"} and one.after == {"status": "contacted"}
@@ -427,3 +430,141 @@ def test_staff_tokens_and_customer_tokens_are_different_tables(app, db_session, 
     assert db_session.scalar(select(func.count()).select_from(StaffSession)) == 1
     assert db_session.scalar(select(func.count()).select_from(AuthSession)) == 1
     assert uuid.UUID(str(service.find(db_session, "mech@im.test").id))
+
+
+# ---------------------------------------------------------------- two-factor setup, invitations, resets
+
+
+def test_password_first_then_the_code(app, db_session, test_settings):
+    _, secret = make_staff(db_session, test_settings, "agent@im.test", ["support_agent"])
+    c = browser(app)
+    r = c.post("/api/admin/auth/login", json={"email": "agent@im.test", "password": PASSWORD})
+    assert r.json() == {"next": "code", "me": None, "setup": None} and STAFF_COOKIE not in c.cookies
+    assert c.get("/api/admin/auth/me").status_code == 401
+    r = c.post("/api/admin/auth/login", json={"email": "agent@im.test", "password": PASSWORD, "code": code(secret)})
+    assert r.json()["next"] == "done" and c.get("/api/admin/auth/me").status_code == 200
+
+
+def test_an_invited_person_sets_up_two_factor_then_chooses_a_password(app, db_session, test_settings):
+    _, boss = make_staff(db_session, test_settings, "boss@im.test", ["super_admin"])
+    admin = sign_in(app, "boss@im.test", boss)
+    r = admin.post("/api/admin/staff", json={"email": "Mechanic@IM.test", "name": "Raju", "roles": ["mechanic"]})
+    assert r.status_code == 201 and r.headers["cache-control"] == "no-store"
+    temporary, staff = r.json()["temporary_password"], r.json()["staff"]
+    assert len(temporary) >= 12 and staff["two_factor"] is False and staff["must_change_password"] is True
+
+    c = browser(app)
+    r = c.post("/api/admin/auth/login", json={"email": "mechanic@im.test", "password": temporary})
+    body = r.json()
+    assert body["next"] == "setup" and body["me"] is None and STAFF_COOKIE not in c.cookies
+    setup = body["setup"]
+    assert setup["otpauth_uri"].startswith("otpauth://totp/Instant%20Mechanic:mechanic%40im.test")
+    assert setup["qr_svg"].startswith("<svg") or "<svg" in setup["qr_svg"][:200]
+    cookie = r.headers["set-cookie"]
+    assert "im_staff_setup=" in cookie and "HttpOnly" in cookie and "SameSite=strict" in cookie
+    assert "Path=/api/admin/auth/two-factor" in cookie and "Max-Age=600" in cookie
+
+    # A wrong code keeps the setup open; the right one signs in and saves the secret.
+    bad = c.post("/api/admin/auth/two-factor/confirm", json={"code": "000000"})
+    assert bad.status_code == 401 and "doesn't match" in bad.json()["detail"]
+    ok = c.post("/api/admin/auth/two-factor/confirm", json={"code": code(setup["secret"])})
+    assert ok.status_code == 200 and ok.json()["two_factor"] is True and ok.json()["must_change_password"] is True
+    assert c.get("/api/admin/auth/me").status_code == 200
+    # The setup cannot be used again, and the secret now works for sign-in.
+    assert c.post("/api/admin/auth/two-factor/confirm", json={"code": code(setup["secret"], 1)}).status_code == 401
+
+    # Temporary password: only the self endpoints until a new one is chosen.
+    r = c.get("/api/admin/requests")
+    assert r.status_code == 403 and r.json()["detail"] == "Choose your own password first"
+    r = c.post("/api/admin/auth/password", json={"current_password": temporary, "code": code(setup["secret"], 1),
+                                                 "new_password": "my own long passphrase 5"})  # fmt: skip
+    assert r.status_code == 204
+    assert c.get("/api/admin/requests").status_code == 200
+    actions = set(db_session.scalars(select(AuditLog.action)))
+    assert {"staff.two_factor_setup_started", "staff.two_factor_enrolled", "staff.change_password"} <= actions
+
+
+def test_the_setup_step_needs_its_cookie_expires_and_ends_after_wrong_codes(app, db_session, test_settings):
+    from app.admin.models import StaffSetupTicket
+
+    make_staff(db_session, test_settings, "new@im.test", ["mechanic"], two_factor=False)
+    c = browser(app)
+    secret = c.post("/api/admin/auth/login", json={"email": "new@im.test", "password": PASSWORD}).json()["setup"]
+    other = browser(app)  # another browser without the setup cookie
+    assert other.post("/api/admin/auth/two-factor/confirm", json={"code": code(secret["secret"])}).status_code == 401
+    for _ in range(service.SETUP_TRIES - 1):
+        c.post("/api/admin/auth/two-factor/confirm", json={"code": "000000"})
+    last = c.post("/api/admin/auth/two-factor/confirm", json={"code": "000000"})
+    assert "sign in again" in last.json()["detail"]
+    assert c.post("/api/admin/auth/two-factor/confirm", json={"code": code(secret["secret"])}).status_code == 401
+
+    c = browser(app)
+    secret = c.post("/api/admin/auth/login", json={"email": "new@im.test", "password": PASSWORD}).json()["setup"]
+    ticket = db_session.scalar(select(StaffSetupTicket))
+    ticket.expires_at = datetime.now(UTC) - timedelta(seconds=1)
+    db_session.commit()
+    r = c.post("/api/admin/auth/two-factor/confirm", json={"code": code(secret["secret"])})
+    assert r.status_code == 401 and "expired" in r.json()["detail"]
+    # A wrong password never reaches the setup step.
+    r = browser(app).post("/api/admin/auth/login", json={"email": "new@im.test", "password": "wrong password!"})
+    assert r.status_code == 401 and r.json()["detail"] == service.LOGIN_FAILED
+
+
+def test_a_reset_removes_two_factor_and_the_next_sign_in_sets_it_up(app, db_session, test_settings):
+    _, boss = make_staff(db_session, test_settings, "boss@im.test", ["super_admin"])
+    user, old = make_staff(db_session, test_settings, "agent@im.test", ["support_agent"])
+    agent = sign_in(app, "agent@im.test", old)
+    r = sign_in(app, "boss@im.test", boss).post(f"/api/admin/staff/{user.id}/reset-two-factor")
+    assert r.status_code == 200 and r.json()["two_factor"] is False and "secret" not in r.text
+    assert agent.get("/api/admin/auth/me").status_code == 401  # signed out
+    r = browser(app).post("/api/admin/auth/login", json={"email": "agent@im.test", "password": PASSWORD,
+                                                         "code": code(old, 1)})  # fmt: skip
+    assert r.json()["next"] == "setup" and r.json()["setup"]["secret"] != old  # old codes are useless now
+
+    printed: list[str] = []
+    assert cli.reset_two_factor(db_session, "agent@im.test", printed.append) == 0
+    assert "shows a new QR code" in printed[-1]
+    db_session.refresh(user)
+    assert user.totp_secret_enc is None
+
+
+def test_customers_are_listed_with_masked_phones_and_a_reveal_is_audited(app, db_session, test_settings, targets):
+    _, s = make_staff(db_session, test_settings, "agent@im.test", ["support_agent"])
+    c = sign_in(app, "agent@im.test", s)
+    rows = c.get("/api/admin/customers").json()
+    assert [r["phone_masked"] for r in rows] == ["******2222"] and "9811112222" not in c.get(
+        "/api/admin/customers"
+    ).text
+    assert [r["name"] for r in c.get("/api/admin/customers?q=rav").json()] == ["Ravi"]
+    assert [r["name"] for r in c.get("/api/admin/customers?q=2222").json()] == ["Ravi"]
+    assert c.get("/api/admin/customers?q=nobody").json() == []
+    r = c.post(f"/api/admin/customers/{targets['customer_id']}/reveal-phone")
+    assert r.json() == {"phone": "+919811112222"} and r.headers["cache-control"] == "no-store"
+    row = db_session.scalar(select(AuditLog).where(AuditLog.action == "customer.reveal_phone"))
+    assert row.actor_label == "agent@im.test" and row.after == {"phone": "******2222"}
+
+
+def test_audit_filters(app, db_session, test_settings, targets):
+    _, boss = make_staff(db_session, test_settings, "boss@im.test", ["super_admin"])
+    c = sign_in(app, "boss@im.test", boss)
+    c.patch(f"/api/admin/requests/{targets['request_id']}", json={"status": "contacted"})
+    get = lambda q: c.get(f"/api/admin/audit?{q}").json()  # noqa: E731
+    assert {r["action"] for r in get("action=request.set_status")} == {"request.set_status"}
+    assert {r["entity_type"] for r in get("entity_type=service_request")} == {"service_request"}
+    assert {r["actor_label"] for r in get("actor=BOSS")} == {"boss@im.test"}
+    assert get(f"entity_id={targets['request_id']}")[0]["after"] == {"status": "contacted"}
+    future = (datetime.now(UTC) + timedelta(days=1)).isoformat().replace("+00:00", "Z")
+    assert get(f"since={future}") == [] and len(get(f"until={future}&limit=2")) == 2
+
+
+def test_cors_allows_the_admin_app_and_the_website_only(app):
+    c = TestClient(app)
+    for origin, allowed in (
+        ("http://localhost:3001", True),
+        ("http://localhost:3000", True),
+        ("https://evil.test", False),
+    ):
+        r = c.options("/api/admin/auth/login", headers={"Origin": origin, "Access-Control-Request-Method": "POST"})
+        assert (r.headers.get("access-control-allow-origin") == origin) is allowed, origin
+        if allowed:
+            assert r.headers.get("access-control-allow-credentials") == "true"

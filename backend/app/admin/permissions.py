@@ -17,6 +17,8 @@ class Perm(StrEnum):
     requests_read = "requests.read"  # mechanic requests, phone numbers masked
     requests_contact = "requests.contact"  # ... with the customer's full phone number
     requests_update = "requests.update"  # status changes
+    customers_read = "customers.read"  # customer accounts, phone numbers masked
+    customers_contact = "customers.contact"  # show one customer's full phone number (each time audited)
     content_read = "content.read"  # generated questions, photo labels
     content_review = "content.review"  # approve / reject generated questions
 
@@ -27,7 +29,14 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
     RoleCode.super_admin: frozenset(Perm),
     RoleCode.content_admin: frozenset({Perm.self_service, Perm.content_read, Perm.content_review}),
     RoleCode.support_agent: frozenset(
-        {Perm.self_service, Perm.requests_read, Perm.requests_contact, Perm.requests_update}
+        {
+            Perm.self_service,
+            Perm.requests_read,
+            Perm.requests_contact,
+            Perm.requests_update,
+            Perm.customers_read,
+            Perm.customers_contact,
+        }
     ),
     RoleCode.mechanic: frozenset({Perm.self_service, Perm.requests_read}),
     RoleCode.customer: frozenset(),  # customers never get into /api/admin

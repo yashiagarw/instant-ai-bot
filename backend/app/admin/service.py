@@ -9,12 +9,12 @@ import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
 from app.accounts.service import token_hash
 from app.admin import audit, security
-from app.admin.models import STAFF_ROLES, RoleCode, StaffSession, StaffUser, UserRole
+from app.admin.models import STAFF_ROLES, RoleCode, StaffSession, StaffSetupTicket, StaffUser, UserRole
 from app.config import Settings
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -62,6 +62,8 @@ def snapshot(u: StaffUser) -> dict:
         "roles": u.role_codes,
         "failed_logins": u.failed_logins,
         "locked_until": u.locked_until.isoformat() if u.locked_until else None,
+        "two_factor": u.totp_secret_enc is not None,
+        "must_change_password": u.must_change_password,
     }
 
 
@@ -113,32 +115,36 @@ def create_staff(
     actor: Actor,
     email: str,
     name: str,
-    password: str,
     roles: list[str],
+    *,
+    password: str | None = None,
     secret: str | None = None,
-) -> tuple[StaffUser, str]:
-    """A new staff account and its TOTP secret (returned once, to show as a QR code; stored encrypted). `secret`:
-    one already shown and confirmed (the CLI)."""
+) -> tuple[StaffUser, str | None]:
+    """A new staff account. Without `password` (an invitation) a temporary password is made, returned once, and
+    must be changed after the first sign-in. Without `secret` (normal) two-factor is set up at the first sign-in in
+    the admin app; the CLI passes one it has already shown and confirmed. Returns (account, temporary password)."""
     email = normalize_email(email)
     if not name.strip():
         raise StaffError("Enter a name")
     roles = _roles(roles)
+    temporary = password is None
+    password = security.temporary_password() if temporary else password
     security.check_password_policy(password, email)
     if find(session, email):
         raise StaffError("A staff account with this email already exists")
-    secret = secret or security.new_totp_secret()
     user = StaffUser(
         email=email,
         name=name.strip(),
         password_hash=security.hash_password(password),
-        totp_secret_enc=security.encrypt_secret(settings, secret),
+        totp_secret_enc=security.encrypt_secret(settings, secret) if secret else None,
         password_changed_at=now(),
+        must_change_password=temporary,
     )
     user.roles = [UserRole(role_code=r, granted_by=actor.id) for r in roles]
     session.add(user)
     session.flush()
     _write(session, actor, "staff.create", user, after=snapshot(user))
-    return user, secret
+    return user, password if temporary else None
 
 
 def set_roles(session: Session, actor: Actor, user: StaffUser, roles: list[str]) -> StaffUser:
@@ -180,41 +186,93 @@ def unlock(session: Session, actor: Actor, user: StaffUser) -> StaffUser:
     return user
 
 
-def reset_two_factor(session: Session, settings: Settings, actor: Actor, user: StaffUser) -> str:
-    """A new TOTP secret (returned once). Old codes stop working and the account's sessions end."""
-    secret = security.new_totp_secret()
-    user.totp_secret_enc = security.encrypt_secret(settings, secret)
-    user.totp_last_step = None
+def reset_two_factor(session: Session, actor: Actor, user: StaffUser) -> None:
+    """Remove two-factor (lost phone): the next sign-in shows the setup step with a new QR code. Old codes stop
+    working and the account's sessions end."""
+    before = snapshot(user)
+    user.totp_secret_enc, user.totp_last_step = None, None
     revoke_sessions(session, user)
+    session.execute(delete(StaffSetupTicket).where(StaffSetupTicket.staff_user_id == user.id))
     session.flush()
-    _write(session, actor, "staff.reset_two_factor", user, after={"two_factor": "reset"})
-    return secret
+    _write(session, actor, "staff.reset_two_factor", user, before, snapshot(user))
 
 
 def change_password(
     session: Session, settings: Settings, actor: Actor, user: StaffUser, current: str, code: str, new: str
 ) -> None:
     """Own password: needs the current password and a fresh TOTP code. Other sessions of the account end."""
-    secret = security.decrypt_secret(settings, user.totp_secret_enc)
+    secret = security.decrypt_secret(settings, user.totp_secret_enc) if user.totp_secret_enc else None
     step = security.totp_step(secret, code, user.totp_last_step) if secret else None
     if not security.verify_password(user.password_hash, current) or step is None:
         raise StaffError("Current password or code is wrong")
     security.check_password_policy(new, user.email)
     if security.verify_password(user.password_hash, new):
         raise StaffError("Choose a password you haven't used here")
+    before = snapshot(user)
     user.password_hash = security.hash_password(new)
-    user.password_changed_at, user.totp_last_step = now(), step
+    user.password_changed_at, user.totp_last_step, user.must_change_password = now(), step, False
     session.flush()
-    _write(session, actor, "staff.change_password", user, after={"password": "changed"})
+    _write(session, actor, "staff.change_password", user, before, snapshot(user))
 
 
 # ---------------------------------------------------------------- login and sessions
 
+SETUP_MINUTES = 10  # the two-factor setup step must be finished within this
+SETUP_TRIES = 5  # wrong codes during setup before it has to start again
+SETUP_FAILED = "That code doesn't match. Make sure the phone's time is set automatically and type the newest code."
 
-def login(session: Session, settings: Settings, email: str, password: str, code: str, ip: str | None):
-    """(staff, cookie token). Raises LoginFailed with one message for any wrong part; after
-    STAFF_MAX_FAILED_LOGINS failures in a row the account is locked for STAFF_LOCKOUT_MINUTES. The caller commits
-    (failures are counted and audited even though the login is refused)."""
+
+@dataclass
+class LoginResult:
+    """next: "done" (signed in: `token` is the session cookie), "code" (password right, ask for the authenticator
+    code) or "setup" (password right, no two-factor yet: `token` is the setup ticket, `secret` to show once)."""
+
+    next: str
+    user: StaffUser
+    token: str | None = None
+    secret: str | None = None
+
+
+def _fail(session: Session, settings: Settings, who: Actor, user: StaffUser, at: datetime, reason: str):
+    before = snapshot(user)
+    user.failed_logins += 1
+    locked = user.failed_logins >= settings.staff_max_failed_logins
+    if locked:
+        user.locked_until, user.failed_logins = at + timedelta(minutes=settings.staff_lockout_minutes), 0
+    session.flush()
+    after = {**snapshot(user), "reason": reason}
+    _write(session, who, "staff.locked" if locked else "staff.login_failed", user, before, after)
+    if locked:
+        raise LoginFailed(
+            f"Too many failed attempts. Try again in {settings.staff_lockout_minutes} minutes.",
+            settings.staff_lockout_minutes * 60,
+        )
+
+
+def _start_session(session: Session, settings: Settings, who: Actor, user: StaffUser, step: int, at: datetime):
+    before = snapshot(user)
+    user.failed_logins, user.locked_until, user.totp_last_step, user.last_login_at = 0, None, step, at
+    token = secrets.token_urlsafe(32)
+    session.add(
+        StaffSession(
+            staff_user_id=user.id,
+            token_hash=token_hash(token),
+            expires_at=at + timedelta(hours=settings.staff_session_hours),
+            last_seen_at=at,
+        )
+    )
+    session.flush()
+    _write(session, who, "staff.login", user, before, snapshot(user))
+    return token
+
+
+def login(
+    session: Session, settings: Settings, email: str, password: str, code: str | None, ip: str | None
+) -> LoginResult:
+    """Email + password, then the authenticator code (sent together, or the code in a second call). Any wrong part
+    gets the same LoginFailed message; after STAFF_MAX_FAILED_LOGINS failures in a row the account is locked for
+    STAFF_LOCKOUT_MINUTES. An account without two-factor gets a setup ticket instead of a session. The caller
+    commits (failures are counted and audited even though the login is refused)."""
     at = now()
     clean = (email or "").strip().lower()
     user = find(session, clean) if clean else None
@@ -228,40 +286,66 @@ def login(session: Session, settings: Settings, email: str, password: str, code:
         wait = (user.locked_until - at).total_seconds()
         raise LoginFailed(f"Too many failed attempts. Try again in {max(1, round(wait / 60))} minutes.", wait)
 
-    ok = security.verify_password(user.password_hash, password or "")
-    secret = security.decrypt_secret(settings, user.totp_secret_enc)
-    step = security.totp_step(secret, code, user.totp_last_step) if (ok and secret) else None
-    if step is None:
-        before = snapshot(user)
-        user.failed_logins += 1
-        locked = user.failed_logins >= settings.staff_max_failed_logins
-        if locked:
-            user.locked_until, user.failed_logins = at + timedelta(minutes=settings.staff_lockout_minutes), 0
-        session.flush()
-        _write(session, who, "staff.locked" if locked else "staff.login_failed", user, before, snapshot(user))
-        if locked:
-            raise LoginFailed(
-                f"Too many failed attempts. Try again in {settings.staff_lockout_minutes} minutes.",
-                settings.staff_lockout_minutes * 60,
-            )
+    if not security.verify_password(user.password_hash, password or ""):
+        _fail(session, settings, who, user, at, "password")
         raise LoginFailed()
-
-    before = snapshot(user)
-    user.failed_logins, user.locked_until, user.totp_last_step, user.last_login_at = 0, None, step, at
     if security.needs_rehash(user.password_hash):
         user.password_hash = security.hash_password(password)
-    token = secrets.token_urlsafe(32)
-    session.add(
-        StaffSession(
-            staff_user_id=user.id,
-            token_hash=token_hash(token),
-            expires_at=at + timedelta(hours=settings.staff_session_hours),
-            last_seen_at=at,
+
+    if user.totp_secret_enc is None:  # no two-factor yet: set it up before any session
+        session.execute(delete(StaffSetupTicket).where(StaffSetupTicket.staff_user_id == user.id))
+        secret, ticket = security.new_totp_secret(), secrets.token_urlsafe(32)
+        session.add(
+            StaffSetupTicket(
+                staff_user_id=user.id,
+                token_hash=token_hash(ticket),
+                secret_enc=security.encrypt_secret(settings, secret),
+                expires_at=at + timedelta(minutes=SETUP_MINUTES),
+            )
         )
-    )
+        session.flush()
+        _write(session, who, "staff.two_factor_setup_started", user, after={"email": user.email})
+        return LoginResult("setup", user, ticket, secret)
+
+    if not (code or "").strip():
+        return LoginResult("code", user)
+    secret = security.decrypt_secret(settings, user.totp_secret_enc)
+    step = security.totp_step(secret, code, user.totp_last_step) if secret else None
+    if step is None:
+        _fail(session, settings, who, user, at, "code")
+        raise LoginFailed()
+    return LoginResult("done", user, _start_session(session, settings, who, user, step, at))
+
+
+def confirm_two_factor(
+    session: Session, settings: Settings, ticket: str | None, code: str, ip: str | None
+) -> tuple[StaffUser, str]:
+    """Finish the setup step: the code must come from the secret shown with this ticket. Saves the secret and
+    signs in. Raises LoginFailed (expired ticket, wrong code; SETUP_TRIES wrong codes end the ticket)."""
+    at = now()
+    row = session.scalar(select(StaffSetupTicket).where(StaffSetupTicket.token_hash == token_hash(ticket or "")))
+    if row is None or row.expires_at <= at:
+        raise LoginFailed("This setup has expired. Please sign in again.")
+    user = session.get(StaffUser, row.staff_user_id)
+    who = Actor(user.id, user.email, ip)
+    if not user.active or (user.locked_until and user.locked_until > at) or user.totp_secret_enc is not None:
+        session.delete(row)
+        raise LoginFailed("This setup has expired. Please sign in again.")
+    secret = security.decrypt_secret(settings, row.secret_enc)
+    step = security.totp_step(secret, code, None) if secret else None
+    if step is None:
+        row.attempts += 1
+        _write(session, who, "staff.login_failed", user, after={"reason": "two-factor setup code"})
+        if row.attempts >= SETUP_TRIES:
+            session.delete(row)
+            raise LoginFailed("Too many wrong codes. Please sign in again to get a new QR code.")
+        raise LoginFailed(SETUP_FAILED)
+    before = snapshot(user)
+    user.totp_secret_enc = row.secret_enc
+    session.execute(delete(StaffSetupTicket).where(StaffSetupTicket.staff_user_id == user.id))
     session.flush()
-    _write(session, who, "staff.login", user, before, snapshot(user))
-    return user, token
+    _write(session, who, "staff.two_factor_enrolled", user, before, snapshot(user))
+    return user, _start_session(session, settings, who, user, step, at)
 
 
 def logout(session: Session, actor: Actor, row: StaffSession) -> None:

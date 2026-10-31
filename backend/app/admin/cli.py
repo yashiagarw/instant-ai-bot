@@ -1,7 +1,7 @@
 """Staff accounts from the command line (run from backend/). Every change is written to the audit log as "cli".
 
     uv run python -m app.admin.cli create-super-admin --email you@example.com --name "Your Name"
-    uv run python -m app.admin.cli reset-two-factor --email you@example.com    # lost phone
+    uv run python -m app.admin.cli reset-two-factor --email you@example.com    # lost phone: set up again on sign-in
     uv run python -m app.admin.cli unlock --email you@example.com              # after too many wrong tries
 
 create-super-admin asks for a password (twice, not shown), prints a QR code and the secret for the authenticator
@@ -91,7 +91,7 @@ def create_super_admin(
         out("Not saved. Run the command again to start over.")
         return 1
     user, _ = staff.create_staff(
-        session, settings, staff.CLI, email, name, password, [RoleCode.super_admin], secret=secret
+        session, settings, staff.CLI, email, name, [RoleCode.super_admin], password=password, secret=secret
     )
     user.totp_last_step = step  # the code just typed cannot be used again to sign in
     session.commit()
@@ -99,20 +99,18 @@ def create_super_admin(
     return 0
 
 
-def reset_two_factor(session: Session, settings: Settings, email: str, ask: Ask, out: Out) -> int:
+def reset_two_factor(session: Session, email: str, out: Out) -> int:
+    """Remove two-factor (lost phone). The next sign-in in the admin app shows a new QR code and asks for a code."""
     user = staff.find(session, email)
     if user is None:
         out(f"No staff account for {email}.")
         return 1
-    secret = security.new_totp_secret()
-    show_two_factor(settings, secret, user.email, out)
-    if confirm_code(secret, ask, out) is None:
-        out("Not changed.")
-        return 1
-    staff.reset_two_factor(session, settings, staff.CLI, user)
-    user.totp_secret_enc = security.encrypt_secret(settings, secret)  # the one just confirmed
+    staff.reset_two_factor(session, staff.CLI, user)
     session.commit()
-    out("Two-factor reset. The account's sessions were signed out.")
+    out(
+        f"Two-factor removed for {user.email} and its sessions signed out. Sign in at the admin app "
+        "(http://localhost:3001/login locally): it shows a new QR code once, then asks for a code."
+    )
     return 0
 
 
@@ -147,7 +145,7 @@ def main(argv: list[str] | None = None, ask: Ask = input, ask_secret: Ask = getp
             if args.command == "create-super-admin":
                 return create_super_admin(session, settings, args.email, args.name, ask, ask_secret, out, args.another)
             if args.command == "reset-two-factor":
-                return reset_two_factor(session, settings, args.email, ask, out)
+                return reset_two_factor(session, args.email, out)
             return unlock(session, args.email, out)
         except staff.StaffError as e:
             out(str(e))

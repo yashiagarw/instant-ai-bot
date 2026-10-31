@@ -30,6 +30,8 @@ table against it and calls every admin endpoint with every role.
 | `requests.read` | yes | no | yes | yes | no |
 | `requests.contact` | yes | no | yes | no | no |
 | `requests.update` | yes | no | yes | no | no |
+| `customers.read` | yes | no | yes | no | no |
+| `customers.contact` | yes | no | yes | no | no |
 | `content.read` | yes | yes | no | no | no |
 | `content.review` | yes | yes | no | no | no |
 
@@ -37,21 +39,43 @@ What each permission covers:
 
 | Permission | Endpoints |
 | --- | --- |
-| public | `POST /api/admin/auth/login` |
+| public | `POST /api/admin/auth/login`, `POST /api/admin/auth/two-factor/confirm` (needs the setup cookie from the login) |
 | `self` | `GET /api/admin/auth/me`, `POST /api/admin/auth/logout`, `POST /api/admin/auth/password` (own password: current password + a fresh code) |
 | `staff.read` | `GET /api/admin/staff` |
-| `staff.manage` | `POST /api/admin/staff` (two-factor setup returned once), `PUT /api/admin/staff/{id}/roles`, `POST /api/admin/staff/{id}/deactivate`, `.../activate`, `.../unlock`, `.../reset-two-factor` |
-| `audit.read` | `GET /api/admin/audit` (filters: `action`, `entity_type`, `limit`) |
+| `staff.manage` | `POST /api/admin/staff` (invite: a temporary password returned once), `PUT /api/admin/staff/{id}/roles`, `POST /api/admin/staff/{id}/deactivate`, `.../activate`, `.../unlock`, `.../reset-two-factor` (removes two-factor: set up again at the next sign-in) |
+| `audit.read` | `GET /api/admin/audit` (filters: `action`, `entity_type`, `entity_id`, `actor`, `since`, `until`, `limit`) |
 | `requests.read` | `GET /api/admin/requests`, `GET /api/admin/requests/{id}`: phone numbers show only the last 4 digits |
 | `requests.contact` | the same, with the customer's full phone number (to call them) |
 | `requests.update` | `PATCH /api/admin/requests/{id}` (status) |
 | `content.read` | `GET /api/admin/content/generated-questions`, `GET /api/admin/content/image-labels` |
 | `content.review` | `POST /api/admin/content/generated-questions/{id}/review` (approve / reject) |
+| `customers.read` | `GET /api/admin/customers` (search by name or the last digits of the phone): phone numbers always masked |
+| `customers.contact` | `POST /api/admin/customers/{id}/reveal-phone`: one customer's full number, each time written to the audit log |
+
+## Admin app menu (apps/admin)
+
+Menu items are hidden without their permission, and their pages say "no access" when opened directly. Hiding is
+only for convenience: the API checks every call.
+
+| Menu item | Shown with |
+| --- | --- |
+| Overview | `self` (every staff member) |
+| Requests, Mechanics | `requests.read` (Mechanics also with `staff.read`) |
+| Knowledge, Vehicles, Parts & Prices, Datasets, Quality | `content.read` |
+| Users | `staff.read` (Staff tab) or `customers.read` (Customers tab) |
+| Audit log | `audit.read` |
 
 ## Staff sign-in
 
-- Email + password (argon2id, at least 12 characters, not the email name) + a 6-digit TOTP code (RFC 6238, 30 s,
-  one step of clock drift). A code that was used once is refused after that.
+- Email + password (argon2id, at least 12 characters, not the email name), then a 6-digit TOTP code (RFC 6238,
+  30 s, one step of clock drift). A code that was used once is refused after that.
+- **No two-factor yet** (invited staff, or after a reset): a correct password leads to the setup step instead of a
+  session. The response shows the QR code and setup key once and sets a 10-minute HttpOnly setup cookie; a code
+  from the new secret (`POST /api/admin/auth/two-factor/confirm`) saves it and signs in. 5 wrong codes, or 10
+  minutes, end the setup: sign in again for a new QR code.
+- **Invited staff** get a temporary password (shown once to the inviter). After signing in and setting up
+  two-factor they can only change their password (every other admin call answers 403 "Choose your own password
+  first") until they choose their own.
 - One answer for any wrong part ("Email, password or code is wrong."). After `STAFF_MAX_FAILED_LOGINS` (5) failures
   in a row the account is locked for `STAFF_LOCKOUT_MINUTES` (15); a super admin can unlock it earlier. Sign-ins are
   also rate-limited per IP.
@@ -68,7 +92,8 @@ The table is append-only (a trigger refuses UPDATE and DELETE).
 
 | Action | When |
 | --- | --- |
-| `staff.login`, `staff.login_failed`, `staff.locked`, `staff.login_locked`, `staff.logout` | sign-in events |
+| `staff.login`, `staff.login_failed`, `staff.locked`, `staff.login_locked`, `staff.logout`, `staff.two_factor_setup_started`, `staff.two_factor_enrolled` | sign-in events |
+| `customer.reveal_phone` | a customer's full phone number was shown |
 | `staff.create`, `staff.set_roles`, `staff.activate`, `staff.deactivate`, `staff.unlock`, `staff.reset_two_factor`, `staff.change_password` | staff accounts (API or CLI) |
 | `request.set_status` | a mechanic request's status changed |
 | `content.review_question` | a generated question approved or rejected |

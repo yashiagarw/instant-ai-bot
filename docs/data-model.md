@@ -358,9 +358,11 @@ and `session_results.cost_snapshot` are built from it. Rules: README "Phase 3.2"
 stored_bytes, width, height, reject_reason. Objects: `incoming/<id>` (raw, deleted after the check) and
 `photos/<id>.jpg` (re-encoded, no metadata) in a private bucket.
 
-Staff (migration 0015, rules in `docs/permissions.md`): `staff_users` (id, email lower-case and unique, name,
-password_hash argon2id, totp_secret_enc encrypted with STAFF_TOTP_KEY, totp_last_step so a code works once, active,
-failed_logins, locked_until, last_login_at, password_changed_at), `roles` (code, name, description: the 5 roles,
+Staff (migrations 0015, 0016; rules in `docs/permissions.md`): `staff_users` (id, email lower-case and unique,
+name, password_hash argon2id, totp_secret_enc encrypted with STAFF_TOTP_KEY or empty until two-factor is set up,
+totp_last_step so a code works once, active, failed_logins, locked_until, last_login_at, password_changed_at,
+must_change_password for invited staff), `staff_setup_tickets` (the pending two-factor secret between a correct
+password and the first code: token SHA-256, encrypted secret, 10-minute expiry, attempts), `roles` (code, name, description: the 5 roles,
 seeded), `user_roles` (staff_user_id, role_code, granted_by; `customer` refused by a check), `staff_sessions` (token
 SHA-256, expires_at, last_seen_at, revoked_at). `audit_log` (at, actor_id, actor_label, action, entity_type,
 entity_id, before / after JSONB masked, ip): append-only by trigger, no foreign keys so it outlives accounts.

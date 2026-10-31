@@ -30,12 +30,15 @@ from app.ratelimit import client_ip
 
 log = logging.getLogger(__name__)
 STAFF_COOKIE = "im_staff"
+SETUP_COOKIE = "im_staff_setup"  # the two-factor setup ticket, between password and first code
+SETUP_PATH = "/api/admin/auth/two-factor"
 ADMIN_PREFIX = "/api/admin"
 COOKIE_PATH = "/api/admin"
 ATTR = "__admin_permission__"
 SEEN_EVERY = timedelta(seconds=60)  # last_seen_at is written at most this often
 NOT_SIGNED_IN = "Please sign in as staff"
 NOT_ALLOWED = "You don't have access to this"
+CHANGE_PASSWORD_FIRST = "Choose your own password first"
 
 
 def requires(perm: Perm) -> Callable:
@@ -103,6 +106,8 @@ def enforce(request: Request, session: Annotated[Session, Depends(get_session)])
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, NOT_SIGNED_IN)
     if perm not in staff.perms:
         raise HTTPException(status.HTTP_403_FORBIDDEN, NOT_ALLOWED)
+    if staff.user.must_change_password and perm != Perm.self_service:  # invited: temporary password still in use
+        raise HTTPException(status.HTTP_403_FORBIDDEN, CHANGE_PASSWORD_FIRST)
     request.state.staff = staff
 
 

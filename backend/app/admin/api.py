@@ -8,18 +8,31 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Literal
 
+import qrcode
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from qrcode.image.svg import SvgPathImage
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.accounts.models import User
 from app.admin import audit
 from app.admin import service as staff_service
-from app.admin.deps import COOKIE_PATH, STAFF_COOKIE, CurrentStaff, enforce, public, requires
+from app.admin.deps import (
+    COOKIE_PATH,
+    SETUP_COOKIE,
+    SETUP_PATH,
+    STAFF_COOKIE,
+    CurrentStaff,
+    enforce,
+    public,
+    requires,
+)
 from app.admin.models import AuditLog, StaffUser
 from app.admin.permissions import Perm
 from app.admin.security import WeakPassword, provisioning_uri
 from app.db import get_session
+from app.diagnosis.models import DiagnosisSession
 from app.llm.models import GeneratedQuestion, GeneratedStatus
 from app.ratelimit import RateLimiter, client_ip
 from app.requests.models import RequestStatus, ServiceRequest
@@ -50,7 +63,9 @@ def _staff_or_404(session: Session, staff_id: uuid.UUID) -> StaffUser:
 class LoginIn(BaseModel):
     email: str
     password: str = Field(repr=False)
-    code: str = Field(description="The 6-digit code from the authenticator app.", repr=False)
+    code: str | None = Field(
+        default=None, repr=False, description="The 6-digit authenticator code; omit it to be asked (next: code)."
+    )
 
 
 class StaffOut(BaseModel):
@@ -60,6 +75,9 @@ class StaffOut(BaseModel):
     roles: list[str]
     active: bool
     locked: bool
+    two_factor: bool = Field(description="False until the person sets up two-factor at their next sign-in.")
+    must_change_password: bool
+    created_at: datetime
     last_login_at: datetime | None
 
 
@@ -69,22 +87,52 @@ class MeOut(StaffOut):
 
 
 class TwoFactorSetupOut(BaseModel):
-    """Shown once: scan `otpauth_uri` as a QR code or type `secret` into the authenticator app."""
+    """Shown once: scan the QR code (`qr_svg`, or `otpauth_uri` in any QR generator) or type `secret` into the
+    authenticator app."""
 
     otpauth_uri: str
     secret: str
+    qr_svg: str
+
+
+class LoginOut(BaseModel):
+    next: Literal["done", "code", "setup"] = Field(
+        description="done: signed in (me). code: ask for the authenticator code and send everything again. "
+        "setup: show `setup` once, then POST /api/admin/auth/two-factor/confirm with a code."
+    )
+    me: MeOut | None = None
+    setup: TwoFactorSetupOut | None = None
+
+
+class CodeIn(BaseModel):
+    code: str = Field(repr=False)
 
 
 class StaffCreateIn(BaseModel):
     email: str
     name: str
-    password: str = Field(repr=False, description="At least 12 characters; the person changes it after signing in.")
     roles: list[str]
 
 
 class StaffCreatedOut(BaseModel):
     staff: StaffOut
-    two_factor: TwoFactorSetupOut
+    temporary_password: str = Field(
+        description="Shown once: give it to the person. They sign in with it, set up two-factor, then choose their own."
+    )
+
+
+class CustomerOut(BaseModel):
+    id: uuid.UUID
+    name: str | None
+    phone_masked: str = Field(description="Always masked; POST .../reveal-phone (customers.contact) for the number.")
+    created_at: datetime
+    last_login_at: datetime | None
+    diagnoses: int
+    requests: int
+
+
+class PhoneOut(BaseModel):
+    phone: str
 
 
 class RolesIn(BaseModel):
@@ -162,12 +210,35 @@ def _staff_out(u: StaffUser) -> StaffOut:
         roles=u.role_codes,
         active=u.active,
         locked=bool(u.locked_until and u.locked_until > staff_service.now()),
+        two_factor=u.totp_secret_enc is not None,
+        must_change_password=u.must_change_password,
+        created_at=u.created_at,
         last_login_at=u.last_login_at,
     )
 
 
 def _two_factor(request: Request, secret: str, email: str) -> TwoFactorSetupOut:
-    return TwoFactorSetupOut(otpauth_uri=provisioning_uri(request.app.state.settings, secret, email), secret=secret)
+    uri = provisioning_uri(request.app.state.settings, secret, email)
+    svg = qrcode.make(uri, image_factory=SvgPathImage, border=2).to_string(encoding="unicode")
+    return TwoFactorSetupOut(otpauth_uri=uri, secret=secret, qr_svg=svg)
+
+
+def _set_session_cookie(response: Response, settings, token: str) -> None:
+    response.set_cookie(
+        STAFF_COOKIE,
+        token,
+        max_age=settings.staff_session_hours * 3600,
+        path=COOKIE_PATH,
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite="strict",
+    )
+
+
+def _login_failed(session: Session, e: staff_service.LoginFailed) -> HTTPException:
+    session.commit()  # the failure count and its audit row stay
+    headers = {"Retry-After": str(max(1, round(e.retry_after)))} if e.retry_after else None
+    return HTTPException(status.HTTP_401_UNAUTHORIZED, str(e), headers=headers)
 
 
 # ---------------------------------------------------------------- sign in
@@ -188,33 +259,64 @@ def _limit_login(request: Request) -> None:
 
 @router.post(
     "/auth/login",
-    response_model=MeOut,
+    response_model=LoginOut,
     dependencies=[Depends(_limit_login)],
     responses={401: {"description": "Wrong email, password or code"}, 429: {}},
 )
 @public
 def login(body: LoginIn, request: Request, response: Response, session: DbSession):
-    """Staff sign-in: email, password and the authenticator code, all at once. Sets the im_staff cookie
+    """Staff sign-in: email and password, then the authenticator code (same call with `code`, or again after
+    next=code). An account without two-factor gets next=setup: the QR code and key (shown only in this response)
+    and a 10-minute setup cookie; finish with POST /auth/two-factor/confirm. Signed in: the im_staff cookie
     (HttpOnly, Secure, SameSite=Strict, path /api/admin; STAFF_SESSION_HOURS, ends after STAFF_IDLE_MINUTES idle)."""
     settings = request.app.state.settings
     response.headers["Cache-Control"] = "no-store"
     ip = client_ip(request, settings.trust_forwarded_for)
     try:
-        user, token = staff_service.login(session, settings, body.email, body.password, body.code, ip)
+        result = staff_service.login(session, settings, body.email, body.password, body.code, ip)
     except staff_service.LoginFailed as e:
-        session.commit()  # the failure count and its audit row stay
-        headers = {"Retry-After": str(max(1, round(e.retry_after)))} if e.retry_after else None
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, str(e), headers=headers) from e
+        raise _login_failed(session, e) from e
     session.commit()
-    response.set_cookie(
-        STAFF_COOKIE,
-        token,
-        max_age=settings.staff_session_hours * 3600,
-        path=COOKIE_PATH,
-        httponly=True,
-        secure=settings.cookie_secure,
-        samesite="strict",
+    if result.next == "code":
+        return LoginOut(next="code")
+    if result.next == "setup":
+        response.set_cookie(
+            SETUP_COOKIE,
+            result.token,
+            max_age=staff_service.SETUP_MINUTES * 60,
+            path=SETUP_PATH,
+            httponly=True,
+            secure=settings.cookie_secure,
+            samesite="strict",
+        )
+        return LoginOut(next="setup", setup=_two_factor(request, result.secret, result.user.email))
+    _set_session_cookie(response, settings, result.token)
+    return LoginOut(next="done", me=_me(result.user, session, settings, result.token))
+
+
+@router.post(
+    "/auth/two-factor/confirm",
+    response_model=MeOut,
+    dependencies=[Depends(_limit_login)],
+    responses={401: {"description": "Wrong code, or the setup expired"}, 429: {}},
+)
+@public
+def confirm_two_factor(body: CodeIn, request: Request, response: Response, session: DbSession):
+    """Finish two-factor setup with a code from the app (needs the setup cookie from /auth/login). Signs in."""
+    settings = request.app.state.settings
+    response.headers["Cache-Control"] = "no-store"
+    ip = client_ip(request, settings.trust_forwarded_for)
+    try:
+        user, token = staff_service.confirm_two_factor(
+            session, settings, request.cookies.get(SETUP_COOKIE), body.code, ip
+        )
+    except staff_service.LoginFailed as e:
+        raise _login_failed(session, e) from e
+    session.commit()
+    response.delete_cookie(
+        SETUP_COOKIE, path=SETUP_PATH, httponly=True, secure=settings.cookie_secure, samesite="strict"
     )
+    _set_session_cookie(response, settings, token)
     return _me(user, session, settings, token)
 
 
@@ -283,16 +385,17 @@ def list_staff(session: DbSession):
 @router.post("/staff", response_model=StaffCreatedOut, status_code=status.HTTP_201_CREATED, responses={422: {}})
 @requires(Perm.staff_manage)
 def create_staff(body: StaffCreateIn, staff: CurrentStaff, session: DbSession, request: Request, response: Response):
-    """A staff account. The two-factor setup is in this response only: give it to the person once."""
+    """Invite a staff member: the response holds a temporary password, once. They sign in with it, set up
+    two-factor (QR code in the admin app), then must choose their own password."""
     response.headers["Cache-Control"] = "no-store"
     try:
-        user, secret = staff_service.create_staff(
-            session, request.app.state.settings, _actor(staff), body.email, body.name, body.password, body.roles
+        user, temporary = staff_service.create_staff(
+            session, request.app.state.settings, _actor(staff), body.email, body.name, body.roles
         )
     except (staff_service.StaffError, WeakPassword) as e:
         raise _bad(e) from e
     session.commit()
-    return StaffCreatedOut(staff=_staff_out(user), two_factor=_two_factor(request, secret, user.email))
+    return StaffCreatedOut(staff=_staff_out(user), temporary_password=temporary)
 
 
 @router.put("/staff/{staff_id}/roles", response_model=StaffOut, responses={404: {}, 422: {}})
@@ -337,17 +440,14 @@ def unlock(staff_id: uuid.UUID, staff: CurrentStaff, session: DbSession):
     return _staff_out(user)
 
 
-@router.post("/staff/{staff_id}/reset-two-factor", response_model=TwoFactorSetupOut, responses={404: {}})
+@router.post("/staff/{staff_id}/reset-two-factor", response_model=StaffOut, responses={404: {}})
 @requires(Perm.staff_manage)
-def reset_two_factor(
-    staff_id: uuid.UUID, staff: CurrentStaff, session: DbSession, request: Request, response: Response
-):
-    """A new authenticator secret for someone who lost their phone (shown once). Their sessions end."""
-    response.headers["Cache-Control"] = "no-store"
+def reset_two_factor(staff_id: uuid.UUID, staff: CurrentStaff, session: DbSession):
+    """Remove someone's two-factor (lost phone): their sessions end and their next sign-in shows a new QR code."""
     user = _staff_or_404(session, staff_id)
-    secret = staff_service.reset_two_factor(session, request.app.state.settings, _actor(staff), user)
+    staff_service.reset_two_factor(session, _actor(staff), user)
     session.commit()
-    return _two_factor(request, secret, user.email)
+    return _staff_out(user)
 
 
 # ---------------------------------------------------------------- audit log
@@ -359,17 +459,91 @@ def audit_log(
     session: DbSession,
     action: str | None = None,
     entity_type: str | None = None,
-    limit: Annotated[int, Query(ge=1, le=500)] = 100,
+    entity_id: str | None = None,
+    actor: Annotated[str | None, Query(description="Part of the actor's email (or cli).")] = None,
+    since: datetime | None = None,
+    until: datetime | None = None,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 200,
 ):
+    """Newest first. All filters are optional and combine."""
     q = select(AuditLog).order_by(AuditLog.id.desc()).limit(limit)
     if action:
         q = q.where(AuditLog.action == action)
     if entity_type:
         q = q.where(AuditLog.entity_type == entity_type)
+    if entity_id:
+        q = q.where(AuditLog.entity_id == entity_id)
+    if actor:
+        q = q.where(AuditLog.actor_label.ilike(f"%{actor.strip()}%"))
+    if since:
+        q = q.where(AuditLog.at >= since)
+    if until:
+        q = q.where(AuditLog.at <= until)
     return [
         AuditOut(**{k: getattr(r, k) for k in AuditOut.model_fields if k != "ip"}, ip=str(r.ip) if r.ip else None)
         for r in session.scalars(q)
     ]
+
+
+# ---------------------------------------------------------------- customers
+
+
+@router.get("/customers", response_model=list[CustomerOut])
+@requires(Perm.customers_read)
+def list_customers(
+    session: DbSession,
+    q: Annotated[str | None, Query(description="Name, or the last digits of the phone number.")] = None,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 500,
+):
+    """Customer accounts (phone + OTP logins), newest first. Phone numbers are always masked here."""
+    diagnoses = (
+        select(func.count()).select_from(DiagnosisSession).where(DiagnosisSession.user_id == User.id)
+    ).scalar_subquery()
+    requests_n = (
+        select(func.count()).select_from(ServiceRequest).where(ServiceRequest.user_id == User.id)
+    ).scalar_subquery()
+    stmt = select(User, diagnoses, requests_n).order_by(User.created_at.desc()).limit(limit)
+    term = (q or "").strip()
+    if term:
+        digits = "".join(ch for ch in term if ch.isdigit())
+        if digits and len(digits) == len(term.replace(" ", "")):
+            stmt = stmt.where(User.phone.endswith(digits[-10:]))
+        else:
+            stmt = stmt.where(User.name.ilike(f"%{term}%"))
+    return [
+        CustomerOut(
+            id=u.id,
+            name=u.name,
+            phone_masked=audit.mask_phone(u.phone),
+            created_at=u.created_at,
+            last_login_at=u.last_login_at,
+            diagnoses=d,
+            requests=r,
+        )  # fmt: skip
+        for u, d, r in session.execute(stmt)
+    ]
+
+
+@router.post("/customers/{customer_id}/reveal-phone", response_model=PhoneOut, responses={404: {}})
+@requires(Perm.customers_contact)
+def reveal_phone(customer_id: uuid.UUID, staff: CurrentStaff, session: DbSession, response: Response):
+    """One customer's full phone number, to call them. Every reveal is written to the audit log."""
+    response.headers["Cache-Control"] = "no-store"
+    user = session.get(User, customer_id)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Customer not found")
+    audit.record(
+        session,
+        actor_id=staff.user.id,
+        actor_label=staff.label,
+        action="customer.reveal_phone",
+        entity_type="customer",
+        entity_id=user.id,
+        after={"phone": user.phone},  # masked by the audit helper
+        ip=staff.ip,
+    )
+    session.commit()
+    return PhoneOut(phone=user.phone)
 
 
 # ---------------------------------------------------------------- mechanic requests

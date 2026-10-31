@@ -6,7 +6,9 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 
 | Path | What |
 |---|---|
-| `apps/web` | Customer site: Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
+| `apps/web` | Customer site (port 3000): Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
+| `apps/admin` | Staff admin app (port 3001): sign-in with two-factor, role-based menu, Users, Audit log |
+| `packages/ui` | `@im/ui`, shared by both apps: brand theme, Button, Dialog, the data table (TanStack Table) |
 | `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `uploads` (customer photos), `notify` (email and SMS), `llm` (optional LLM layer, off by default), `parts` (parts catalogue) |
 | `backend/engine` | Diagnosis engine, plain Python with no web imports |
 | `backend/alembic` | Database migrations |
@@ -42,7 +44,7 @@ docker compose up -d db storage
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0015)
+uv run alembic upgrade head                          # all migrations (0001 … 0016)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -56,18 +58,16 @@ uv run python -m app.knowledge.embeddings sync       # search index: embeds only
 uv run python -m app.parts build                     # parts catalogue (after merges): prices, fits, fault links, labour
 cd ..
 
-# Web
-cd apps/web
-pnpm install
-pnpm exec playwright install chromium                # once, for the end-to-end tests
-cd ../..
+# Web apps (one pnpm workspace at the repo root: apps/web, apps/admin, packages/ui)
+pnpm install                                          # from the repo root
+pnpm --filter web exec playwright install chromium    # once, for the end-to-end tests
 ```
 
 After pulling new code, run `uv run alembic upgrade head` again, and restart `pnpm dev` after any `pnpm install`.
 
 ### 2. Run
 
-Two terminals:
+Two terminals: the API, then both web apps together.
 
 ```bash
 cd backend && uv run uvicorn app.main:app --reload --port 8000
@@ -76,9 +76,14 @@ cd backend && uv run uvicorn app.main:app --reload --port 8000
 ```
 
 ```bash
-cd apps/web && pnpm dev
-# http://localhost:3000   (use port 3000: the API's CORS allows only WEB_ORIGIN)
+pnpm dev            # from the repo root: the website and the admin app side by side
+# http://localhost:3000   customer website  (WEB_ORIGIN)
+# http://localhost:3001   staff admin app   (ADMIN_ORIGIN)
 ```
+
+The API's CORS allows exactly these two addresses, so keep the ports. One app only: `pnpm dev:web` or
+`pnpm dev:admin` (or `cd apps/web && pnpm dev` as before). Both read `NEXT_PUBLIC_API_URL` (default
+`http://localhost:8000`) from their own `.env.local`.
 
 ### 3. Try the flow
 
@@ -107,13 +112,15 @@ cd backend && uv run pytest -q               # API, engine, importer, migrations
 cd backend && uv run ruff check . && uv run ruff format --check .
 cd backend && uv run python ../data/eval/run_eval.py --simulate   # diagnosis quality on golden + simulated cases
 cd backend && uv run python ../data/eval/run_eval.py run --split test --extraction llm   # through the LLM extraction step (fallback when LLM_PROVIDER=none)
-cd apps/web && pnpm test                     # Vitest component tests
+pnpm test                                    # Vitest in packages/ui, apps/web and apps/admin (from the repo root)
 cd apps/web && pnpm test:e2e                 # Playwright, phone + desktop (builds and serves the app on :3100;
                                              # the API is mocked, no backend needed)
+cd apps/admin && pnpm test:e2e               # admin: login, two-factor setup, menus by role, Users, Audit (:3101)
+# If Playwright times out on a busy machine: add --workers=1 (pnpm exec playwright test --workers=1)
 # Optional: the same flows against the real API and database, LLM off (own ports, so `pnpm dev` keeps working):
 cd backend && LLM_PROVIDER=none WEB_ORIGIN=http://localhost:3110 uv run uvicorn app.main:app --port 8010
 cd apps/web && E2E_LIVE_API=1 E2E_PORT=3110 NEXT_PUBLIC_API_URL=http://localhost:8010 pnpm exec playwright test e2e/live.spec.ts
-cd apps/web && pnpm lint && pnpm build
+pnpm lint && pnpm build                      # both apps (and a type check of packages/ui)
 ```
 
 Data scripts (dataset profiler, schema file checks):
@@ -140,7 +147,7 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | `.env` | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `POSTGRES_TEST_DB`, `POSTGRES_PORT` | Database container |
 | `backend/.env` | `DATABASE_URL` | SQLAlchemy URL (psycopg 3) |
 | | `TEST_DATABASE_URL` | pytest database (must end in `_test`) |
-| | `WEB_ORIGIN` | The only origin CORS allows |
+| | `WEB_ORIGIN`, `ADMIN_ORIGIN` | The two origins CORS allows: the website (`http://localhost:3000`) and the admin app (`http://localhost:3001`) |
 | | `DB_CONNECT_TIMEOUT` | Seconds before the health check reports the database down |
 | | `ENVIRONMENT` | `development` / `test` / `production` |
 | | `SESSION_RATE_LIMIT`, `SESSION_RATE_WINDOW_SECONDS` | New diagnosis sessions per IP per window |
@@ -406,19 +413,18 @@ red-light recall (it calls Claude only with a key, and says so otherwise).
 
 ## Phase 4.1: staff access control
 
-Staff sign in at `/api/admin` with **email + password + an authenticator code** (Google Authenticator or any TOTP
-app). Their login is completely separate from customers' phone OTP login (own table, sessions and `im_staff`
-cookie). Roles: `super_admin`, `content_admin`, `support_agent`, `mechanic` (and `customer`, every phone login, with
-no admin access). Who may do what, and every rule, is in [docs/permissions.md](docs/permissions.md). Every admin
-write is recorded in the append-only `audit_log`, with passwords, secrets, codes and phone numbers masked. There is
-no admin UI yet: use the API (http://localhost:8000/docs, section "admin") or curl.
+Staff sign in with **email + password + an authenticator code** (Google Authenticator or any TOTP app). Their login
+is completely separate from customers' phone OTP login (own table, sessions and `im_staff` cookie). Roles:
+`super_admin`, `content_admin`, `support_agent`, `mechanic` (and `customer`, every phone login, with no admin
+access). Who may do what, and every rule, is in [docs/permissions.md](docs/permissions.md). Every admin write is
+recorded in the append-only `audit_log`, with passwords, secrets, codes and phone numbers masked.
 
 ### Create your super admin (local)
 
 1. Install Google Authenticator (or Microsoft Authenticator, 1Password, ...) on your phone. Make sure the phone's
    time is set automatically: codes depend on the clock.
 2. Have the database and backend ready: `docker compose up -d db`, then
-   `cd backend && uv sync && uv run alembic upgrade head` (adds the staff tables, migration 0015).
+   `cd backend && uv sync && uv run alembic upgrade head` (staff tables: migrations 0015 and 0016).
 3. `backend/.env` already has a local `STAFF_TOTP_KEY` (generated for you). On another machine, add one:
    `uv run python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` and paste it
    as `STAFF_TOTP_KEY=...`. Keep it: changing it means setting up two-factor again.
@@ -426,28 +432,46 @@ no admin UI yet: use the API (http://localhost:8000/docs, section "admin") or cu
    ```bash
    uv run python -m app.admin.cli create-super-admin --email you@example.com --name "Your Name"
    ```
-5. Type a password twice (at least 12 characters, not shown on screen).
+5. Type a password twice (at least 12 characters, not your email name; not shown on screen).
 6. A QR code appears in the terminal, **only this once**. In Google Authenticator tap **+ > Scan a QR code** and scan
-   it. If scanning fails, tap **+ > Enter a setup key**, type the account (your email) and the key shown under the
-   QR code, and keep "Time based". Make the terminal window big enough to show the whole QR code.
-7. Type the 6-digit code the app shows. Only then is the account saved (a wrong code three times: nothing is
-   saved; run the command again).
-8. Sign in (wait for the **next** code; the one you just typed cannot be used twice):
-   ```bash
-   curl -i -c staff.txt -H 'Content-Type: application/json' http://localhost:8000/api/admin/auth/login \
-     -d '{"email": "you@example.com", "password": "your password", "code": "123456"}'
-   curl -b staff.txt http://localhost:8000/api/admin/auth/me
-   ```
-   Locally over plain http, set `COOKIE_SECURE=false` in `backend/.env` for curl to send the cookie back (never in
-   production). Delete `staff.txt` afterwards.
+   it, or tap **+ > Enter a setup key** and type the key shown under it. Then type the 6-digit code the app shows:
+   only then is the account saved.
+7. Sign in at the admin app, http://localhost:3001 (see "Phase 4.2"), with the **next** code (a code works once).
 
-Then add other staff with `POST /api/admin/staff` (the response holds their QR / setup key once, to hand over).
-Lost your phone: `uv run python -m app.admin.cli reset-two-factor --email you@example.com`. Locked out after 5 wrong
-tries: wait 15 minutes, or `uv run python -m app.admin.cli unlock --email you@example.com`. The CLI refuses to create
-a second "first" super admin (`--another` overrides it).
+Lost your phone, or want to set two-factor up again in the browser:
+`uv run python -m app.admin.cli reset-two-factor --email you@example.com`. That removes two-factor; your next
+sign-in at the admin app shows a new QR code and setup key once, then asks for a code. Locked out after 5 wrong
+tries: wait 15 minutes, or `uv run python -m app.admin.cli unlock --email you@example.com`. The CLI refuses to
+create a second "first" super admin (`--another` overrides it).
 
-Tests: `uv run pytest tests/test_admin.py` (every admin endpoint with every role, login, lockout, sessions, cookies,
-audit masking, the CLI).
+Tests: `uv run pytest tests/test_admin.py` (every admin endpoint with every role, login, two-factor setup, lockout,
+sessions, cookies, audit masking and filters, customers, CORS, the CLI).
+
+## Phase 4.2: admin app
+
+`apps/admin`, a second Next.js app on **port 3001** next to the website on 3000, sharing `packages/ui` (`@im/ui`:
+brand theme, Button, Dialog, data table). Start both with `pnpm dev` from the repo root (and the API on 8000).
+
+- **Sign in** (`/login`): email and password, then the authenticator code. An account **without two-factor**
+  (invited staff, or after a reset) gets the setup screen instead: the QR code and setup key, shown once, then a
+  code from the app finishes it and signs in. Invited staff then must choose their own password before anything
+  else. Sessions: 8 hours, 30 minutes idle.
+- **Menu**: Overview, Requests, Mechanics, Knowledge, Vehicles, Parts & Prices, Datasets, Quality, Users, Audit log.
+  Items are hidden by role (table in `docs/permissions.md`) and their pages say "No access" when opened directly;
+  the API checks every call regardless. Requests, Mechanics, Knowledge, Vehicles, Parts & Prices, Datasets and
+  Quality are placeholders for now.
+- **Users**: the Staff tab (super admin) lists staff with search, role and status filters and CSV export, and lets
+  you invite staff (a temporary password shown once), change roles, disable / enable, unlock and reset two-factor.
+  The Customers tab (super admin, support agent) lists customer accounts with **masked phone numbers**; "Show"
+  reveals one number for roles allowed to call customers, and every reveal is written to the audit log. The CSV
+  never contains revealed numbers.
+- **Audit log**: filters by action, entity, who and dates (India time), search, before/after JSON, CSV export.
+- **Data table** (`@im/ui/data-table`, TanStack Table v8): search over all columns, select filters (array values
+  such as roles match by "contains"), sorting, pagination, CSV export of every matching row (spreadsheet formulas
+  neutralised). Later admin pages reuse it.
+
+Tests: `cd apps/admin && pnpm test` (helpers) and `pnpm test:e2e` (Playwright, desktop + phone, API mocked: login
+with two-factor, the setup screen, menus for each role, Users, Audit log); `cd packages/ui && pnpm test` (the table).
 
 ## LLM layer (off by default)
 

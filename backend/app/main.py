@@ -32,10 +32,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[settings.web_origin],
+        allow_origins=[o for o in (settings.web_origin, settings.admin_origin) if o],
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["Content-Type", "Authorization"],
-        allow_credentials=True,  # login cookies (HttpOnly, SameSite=Lax); only WEB_ORIGIN may send them
+        allow_credentials=True,  # login cookies; only WEB_ORIGIN and ADMIN_ORIGIN may send them
     )
 
     app.include_router(health.router, prefix="/api")
