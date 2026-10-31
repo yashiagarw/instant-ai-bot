@@ -66,3 +66,6 @@ class ServiceRequest(CreatedAtMixin, Base):
     # Email alert to the support address: when it went out, or why it failed (the request is kept either way).
     alert_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     alert_error: Mapped[str | None] = mapped_column(Text)
+    # Owner, as for diagnosis sessions: a logged-in customer or the hash of the browser's anonymous cookie.
+    user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), index=True)
+    anon_key_hash: Mapped[str | None] = mapped_column(Text, index=True)

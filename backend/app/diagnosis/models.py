@@ -68,6 +68,10 @@ class DiagnosisSession(CreatedAtMixin, Base):
     engine_version: Mapped[str] = mapped_column(Text)
     dataset_version_id: Mapped[int | None] = mapped_column(ForeignKey("dataset_versions.id", ondelete="SET NULL"))
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Owner: a logged-in customer, or the SHA-256 of the browser's anonymous cookie (attached to the account on
+    # login). Both null for sessions made before accounts existed.
+    user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), index=True)
+    anon_key_hash: Mapped[str | None] = mapped_column(Text, index=True)
 
     events: Mapped[list["SessionEvent"]] = relationship(
         back_populates="session", order_by="SessionEvent.id", cascade="all, delete-orphan"

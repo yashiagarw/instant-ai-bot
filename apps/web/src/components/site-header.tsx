@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { AccountLink } from "@/components/account/account-link";
+
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-warm-white/90 backdrop-blur">
@@ -10,7 +12,10 @@ export function SiteHeader() {
         >
           Instant&nbsp;<span className="text-orange-text">Mechanic</span>
         </Link>
-        <span className="hidden text-sm font-semibold text-ink/70 sm:inline">AI car diagnosis · Delhi NCR</span>
+        <div className="flex items-center gap-4">
+          <span className="hidden text-sm font-semibold text-ink/70 md:inline">AI car diagnosis · Delhi NCR</span>
+          <AccountLink />
+        </div>
       </div>
     </header>
   );

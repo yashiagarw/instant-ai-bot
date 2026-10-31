@@ -47,6 +47,30 @@ class Settings(BaseSettings):
     # Per-IP limit on new service requests: at most N per window.
     request_rate_limit: int = 5
     request_rate_window_seconds: int = 600
+    # Customer accounts (app.accounts). AUTH_SECRET keys the OTP hashes: set a long random value in production
+    # (python -c "import secrets; print(secrets.token_urlsafe(48))"); the API refuses to start there without one.
+    auth_secret: str = "dev-only-auth-secret-change-me"
+    # SMS for login codes: console (prints the code, development and tests only) or msg91 (needs the MSG91 keys).
+    sms_provider: Literal["console", "msg91"] = "console"
+    msg91_auth_key: str = ""
+    msg91_template_id: str = ""  # DLT-approved OTP template registered in MSG91
+    msg91_sender_id: str = ""  # 6-letter DLT sender ID (header)
+    otp_ttl_seconds: int = 300
+    otp_max_attempts: int = 5
+    # Codes sent to one phone: at most N per window (counted in the database, so it holds across workers).
+    otp_phone_limit: int = 3
+    otp_phone_window_seconds: int = 900
+    # Per-IP limits on asking for a code and on checking one.
+    otp_ip_limit: int = 10
+    otp_ip_window_seconds: int = 3600
+    otp_verify_ip_limit: int = 20
+    otp_verify_ip_window_seconds: int = 900
+    auth_session_days: int = 30
+    # Login cookies are HttpOnly, SameSite=Lax and Secure. Browsers accept Secure cookies on http://localhost;
+    # set false only if yours does not (never in production).
+    cookie_secure: bool = True
+    # Files customers upload (none yet): deleted with the account, one folder per user id.
+    uploads_dir: Path = Path(__file__).resolve().parents[2] / "data" / "uploads"
     # Fault pictures (drawn guides) served at /media; result `media[].file` paths are relative to it.
     media_dir: Path = Path(__file__).resolve().parents[2] / "data" / "media"
     # LLM provider. none (default): every live LLM step uses its non-LLM fallback (engine + hybrid search for

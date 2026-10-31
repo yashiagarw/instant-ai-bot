@@ -106,7 +106,10 @@ test("emergency: helpline at the top, optional fields skipped, pincode optional,
 test("a refused request shows the reason and keeps the form", async () => {
   class Busy extends FakeDiagnosis {
     handle(method: string, path: string, body?: unknown) {
-      if (path === "/api/service-requests" && method === "POST") return { status: 429, json: { detail: "busy" } };
+      if (path === "/api/service-requests" && method === "POST") return {
+          status: 429,
+          json: { detail: "Too many requests from this address. Please call the helpline or try again shortly." },
+        };
       return super.handle(method, path, body);
     }
   }
@@ -118,6 +121,6 @@ test("a refused request shows the reason and keeps the form", async () => {
   fireEvent.click(screen.getByRole("radio", { name: /At my location/ }));
   fireEvent.click(screen.getByRole("checkbox"));
   fireEvent.click(screen.getByRole("button", { name: "Request a Mechanic" }));
-  expect((await screen.findByRole("alert")).textContent).toMatch(/Too many requests/);
+  expect((await screen.findByRole("alert")).textContent).toMatch(/Too many requests from this address\. Please call the helpline/);
   expect(screen.getByLabelText("Your name")).toHaveProperty("value", "Asha");
 });

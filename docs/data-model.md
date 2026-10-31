@@ -343,6 +343,19 @@ catalogue (approved fault links, prices, compatibility, service charges), `data/
 `data/schema/zones.yaml`. The estimate is the single source of the price a customer sees: the result page's `cost`
 and `session_results.cost_snapshot` are built from it. Rules: README "Phase 3.2".
 
+## Customer accounts (migration 0012)
+
+| Table | Columns (main) | Notes |
+|---|---|---|
+| users | id (UUID), phone (+91XXXXXXXXXX, unique, CHECK), name, consent_text_version, consent_at, last_login_at | CHECK: no consent record, no account |
+| user_vehicles | user, variant, label, snapshot | "My garage"; unique per user and variant |
+| otp_requests | phone_hash, code_hash (HMAC with AUTH_SECRET), expires_at, attempts, consumed_at | no phone or code in clear |
+| auth_sessions | user, token_hash (SHA-256 of the cookie token), expires_at, revoked_at | |
+| account_deletions | counts | receipt of a deletion, no personal data |
+
+`diagnosis_sessions` and `service_requests` gain `user_id` (the owner) and `anon_key_hash` (SHA-256 of the browser's
+anonymous cookie until login attaches the row). Code: `backend/app/accounts`; rules: README "Phase 4.0".
+
 ## Catalogue, sessions and requests
 
 Implemented with the knowledge tables in migration `0002` (task 1.3). Code: `backend/app/vehicles`, `backend/app/diagnosis`, `backend/app/requests`.

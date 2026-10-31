@@ -2,9 +2,10 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
+from app.accounts.api import claim_for_owner
 from app.db import get_session
 from app.diagnosis.api import EngineDep
 from app.notify.email import EmailSender, make_sender
@@ -70,6 +71,7 @@ def get_config(request: Request):
 def create_request(
     body: ServiceRequestIn,
     request: Request,
+    response: Response,
     session: DbSession,
     engine: EngineDep,
     sender: Annotated[EmailSender, Depends(get_sender)],
@@ -80,6 +82,7 @@ def create_request(
         req = service.create(session, engine, body)
     except service.RequestInputError as e:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e)) from e
+    claim_for_owner(request, response, session, req)
     session.commit()  # the request is safe before any email is attempted
     settings = request.app.state.settings
     service.send_alert(session, req, sender, settings)

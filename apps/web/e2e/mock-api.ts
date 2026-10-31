@@ -14,8 +14,8 @@ const ROUTES: [string, (url: URL) => unknown][] = [
 const PICTURE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 30"><rect width="40" height="30" fill="#ffe6d3"/></svg>`;
 
 /** Answer the browser's API calls (http://localhost:8000) without a backend. Returns the fake diagnosis store. */
-export async function mockApi(page: Page): Promise<FakeDiagnosis> {
-  const fake = new FakeDiagnosis();
+export async function mockApi<T extends FakeDiagnosis = FakeDiagnosis>(page: Page, fake?: T): Promise<T> {
+  fake ??= new FakeDiagnosis() as T;
   await page.route("http://localhost:8000/**", async (route) => {
     const req = route.request();
     const url = new URL(req.url());

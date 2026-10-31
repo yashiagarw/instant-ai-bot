@@ -5,12 +5,13 @@ import uuid
 from dataclasses import asdict
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 import engine as eng
+from app.accounts.api import claim_for_owner
 from app.db import get_session
 from app.diagnosis import explain, present, service
 from app.diagnosis import schemas as s
@@ -192,13 +193,16 @@ def list_categories(
     responses={422: ERRORS[422], 429: {"description": "Too many new sessions from this address"}},
     dependencies=[Depends(limit_session_creation)],
 )
-def create_session(body: s.SessionCreate, session: DbSession, engine: EngineDep, llm: LLMDep):
+def create_session(
+    body: s.SessionCreate, request: Request, response: Response, session: DbSession, engine: EngineDep, llm: LLMDep
+):
     """Start a session for a catalogue variant or an unlisted car (saved for review), from a topic, categories
     and / or free text. Returns the session id, coverage level, safety alerts and the first question."""
     try:
         ds, result = service.create_session(session, engine, body, llm)
     except service.SessionInputError as e:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e)) from e
+    claim_for_owner(request, response, session, ds)  # the logged-in customer, or this browser until login
     session.commit()
     return s.SessionOut(
         session_id=ds.id,

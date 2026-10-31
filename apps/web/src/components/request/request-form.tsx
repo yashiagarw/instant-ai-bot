@@ -62,7 +62,7 @@ function Helpline({ number, urgent }: { number: string; urgent: boolean }) {
       {urgent && (
         <a
           href={`tel:${number.replace(/[^\d+]/g, "")}`}
-          className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-6 text-lg font-bold text-ink outline-none focus-visible:ring-3 focus-visible:ring-white/70"
+          className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-full bg-white px-6 text-lg font-bold whitespace-nowrap text-ink outline-none focus-visible:ring-3 focus-visible:ring-white/70"
         >
           Call now
         </a>

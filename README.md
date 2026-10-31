@@ -7,7 +7,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | Path | What |
 |---|---|
 | `apps/web` | Customer site: Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
-| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `notify` (email alerts), `llm` (optional LLM layer, off by default), `parts` (parts catalogue) |
+| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `notify` (email and SMS), `llm` (optional LLM layer, off by default), `parts` (parts catalogue) |
 | `backend/engine` | Diagnosis engine, plain Python with no web imports |
 | `backend/alembic` | Database migrations |
 | `data/raw` | The 18 original Excel datasets. Never edit |
@@ -42,7 +42,7 @@ docker compose up -d db
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0011)
+uv run alembic upgrade head                          # all migrations (0001 … 0012)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -151,6 +151,12 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `EMAIL_PROVIDER` | `console` (default, prints the email), `smtp` or `resend` |
 | | `EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_STARTTLS`, `RESEND_API_KEY` | Email provider settings |
 | | `REQUEST_RATE_LIMIT`, `REQUEST_RATE_WINDOW_SECONDS` | New service requests per IP per window |
+| | `AUTH_SECRET` | Keys the OTP hashes; a long random value in production (required there) |
+| | `SMS_PROVIDER` | `console` (default, prints login codes; development only) or `msg91` |
+| | `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, `MSG91_SENDER_ID` | MSG91 OTP sending (placeholders; see "Going live with MSG91") |
+| | `OTP_TTL_SECONDS`, `OTP_MAX_ATTEMPTS`, `OTP_PHONE_LIMIT`, `OTP_PHONE_WINDOW_SECONDS`, `OTP_IP_LIMIT`, `OTP_IP_WINDOW_SECONDS`, `OTP_VERIFY_IP_LIMIT`, `OTP_VERIFY_IP_WINDOW_SECONDS` | Code lifetime, tries and rate limits |
+| | `AUTH_SESSION_DAYS`, `COOKIE_SECURE` | Login length; Secure flag on cookies (keep true) |
+| | `UPLOADS_DIR` | Customer uploads, one folder per user, deleted with the account |
 | | `LLM_PROVIDER` | `none` (default: no LLM calls, every step uses its fallback), `anthropic` (live LLM layer, only with `ANTHROPIC_API_KEY`) or `openai` (offline question drafting only). See [LLM layer](#llm-layer-off-by-default) |
 | | `ANTHROPIC_API_KEY` | Claude API key: empty in `.env.example`; set it only to switch the LLM layer on |
 | | `LLM_EXTRACTION_MODEL`, `LLM_PHRASING_MODEL`, `LLM_EXPLANATION_MODEL`, `LLM_EFFORT` | Live LLM models (`claude-haiku-5-5`) and effort (`low`) |
@@ -258,6 +264,61 @@ usable part prices gets `status: "not_enough_data"` and the reasons, never a num
 Try it: run the API and `pnpm dev` (see "Run"), finish a diagnosis for a listed car, then on the result pick an area,
 open a part and compare two. Tests: `cd apps/web && pnpm test` and `pnpm test:e2e` (if Playwright times out with
 parallel workers on a busy machine, use `pnpm exec playwright test --workers=1`).
+
+## Phase 4.0: customer accounts
+
+Anonymous diagnosis and requests work exactly as before; an account is optional.
+
+- **Login by phone + OTP** (`/login`): Indian mobiles only (+91, 10 digits). `POST /api/auth/otp/request` sends a
+  6-digit code (valid 5 minutes, 5 tries, one use; a new code replaces older ones); `POST /api/auth/otp/verify` needs
+  the code and the ticked consent box (`GET /api/auth/config`; the consent version and time are stored on the user).
+  Codes are stored as an HMAC with `AUTH_SECRET`, never in clear; phones in OTP rows only as an HMAC too. Limits: 3
+  codes per phone per 15 minutes (in the database), 10 code requests and 20 checks per IP per window.
+- **Cookies**: `im_session` (login, 30 days) is HttpOnly, Secure, SameSite=Lax and holds a random token whose SHA-256
+  is in `auth_sessions`; logout revokes it. Anonymous visitors get an HttpOnly `im_anon` cookie when they start a
+  diagnosis or send a request; logging in attaches the rows made with that cookie (only those: a session id alone
+  never claims anything). CORS allows credentials for `WEB_ORIGIN` only.
+- **`/account`**: My garage (catalogue cars you diagnosed, saved automatically), Diagnosis history, My requests,
+  log out, and **Delete my account** (type DELETE): removes the phone, saved cars, logins, codes, diagnosis sessions
+  with their answers and typed messages, typed-in unlisted cars, requests with their contact details and consent
+  records, and `UPLOADS_DIR/<user id>` (no uploads exist yet). A count-only receipt stays in `account_deletions`.
+- **`/requests/[id]`**: the status timeline (received → picked up → called → mechanic assigned → completed), read-only.
+  Another customer's request answers 404.
+- API: `GET /api/me`, `/api/me/vehicles` (`DELETE /api/me/vehicles/{id}`), `/api/me/sessions`, `/api/me/requests`,
+  `GET /api/requests/{id}`, `POST /api/auth/logout`, `DELETE /api/me` (body `{"confirm": "DELETE"}`).
+- Logs never contain a full phone number or a code (`+91******3210`), except the console SMS provider's own line.
+
+### Try login locally (console SMS)
+
+`SMS_PROVIDER=console` is the default. Start the API and the web app (see "Run"), open http://localhost:3000/login,
+enter any valid mobile (e.g. 9876543210), press **Send code**, and read the code in the **API terminal**:
+
+```
+[console SMS] to +919876543210: Your Instant Mechanic login code is 482913. It expires in 5 minutes.
+```
+
+Type it, tick the consent box and press **Log in**. Diagnoses you made in that browser before logging in appear in
+**My account**. Chrome and Firefox keep Secure cookies on http://localhost; if your browser does not, set
+`COOKIE_SECURE=false` in `backend/.env` for local use only. The console provider is refused when
+`ENVIRONMENT=production`, and the API refuses to start there without a real `AUTH_SECRET`.
+
+### Going live with MSG91
+
+`SMS_PROVIDER=msg91` is built (`backend/app/notify/sms.py`, MSG91 OTP API) but only starts when all three keys are set;
+`.env.example` has empty placeholders. Before going live:
+
+1. **MSG91 account** with KYC done and SMS credit; create an **auth key** (`MSG91_AUTH_KEY`), ideally restricted to
+   the server's IP.
+2. **DLT registration** (TRAI rules for commercial SMS in India), on a DLT portal (Jio, Vodafone Idea, Airtel, BSNL…):
+   register the business as a **principal entity** (company documents, GST / PAN), then link the entity ID in MSG91.
+3. **Sender ID (header)**: register a 6-letter header such as `IMECHN` on the DLT portal (`MSG91_SENDER_ID`).
+4. **OTP template**: register a transactional/service-implicit template on DLT, e.g. "Your Instant Mechanic login code
+   is {#var#}. It expires in 5 minutes. Do not share it.", then add it in MSG91 with the DLT template ID and use the
+   MSG91 template ID as `MSG91_TEMPLATE_ID` (its variable is filled with the code).
+5. Set `SMS_PROVIDER=msg91`, the three keys, `ENVIRONMENT=production`, a long random `AUTH_SECRET`, `COOKIE_SECURE=true`,
+   serve the web app and API on one site (e.g. instantmechanic.online and api.instantmechanic.online) over HTTPS, and
+   set `TRUST_FORWARDED_FOR=true` only behind your own proxy so the per-IP limits see real client addresses.
+6. Send a test code to a team phone and check MSG91's delivery report.
 
 ## LLM layer (off by default)
 

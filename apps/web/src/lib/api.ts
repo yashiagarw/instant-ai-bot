@@ -96,18 +96,39 @@ async function post<T>(path: string, body?: unknown): Promise<T> {
   });
 }
 
+async function del<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "DELETE",
+    headers: body === undefined ? {} : { "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
 async function request<T>(path: string, init: RequestInit): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}/api${path}`, { ...init, headers: { Accept: "application/json", ...init.headers } });
+    // credentials: the login and anonymous cookies (HttpOnly, SameSite=Lax) go to the API, which allows only WEB_ORIGIN.
+    res = await fetch(`${API_URL}/api${path}`, {
+      ...init,
+      credentials: "include",
+      headers: { Accept: "application/json", ...init.headers },
+    });
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") throw e;
     throw new ApiError("We couldn't reach our server. Check your internet connection and try again.");
   }
-  if (res.status === 429) throw new ApiError("Too many requests. Please wait a moment and try again.", 429);
+  if (res.status === 429) {
+    const detail = await res
+      .json()
+      .then((b: { detail?: unknown }) => b.detail)
+      .catch(() => null);
+    throw new ApiError(typeof detail === "string" ? detail : "Too many requests. Please wait a moment and try again.", 429);
+  }
+  if (res.status === 401) throw new ApiError("Please log in to see this.", 401);
+  if (res.status === 204) return undefined as T;
   if (res.status === 404) throw new ApiError("We couldn't find that. Please go back and pick again.", 404);
   if (res.status === 409) throw new ApiError("This step has already moved on. Please refresh the page.", 409);
-  if (res.status === 422) {
+  if (res.status === 422 || res.status === 400) {
     // Plain-sentence reasons from the API (for example "enter a 6-digit pincode") are shown as they are.
     const detail = await res
       .json()
@@ -117,7 +138,7 @@ async function request<T>(path: string, init: RequestInit): Promise<T> {
       typeof detail === "string"
         ? detail.charAt(0).toUpperCase() + detail.slice(1)
         : "Something in your answer didn't look right. Please check and try again.";
-    throw new ApiError(message, 422);
+    throw new ApiError(message, res.status);
   }
   if (!res.ok) throw new ApiError("Something went wrong on our side. Please try again.", res.status);
   return (await res.json()) as T;
@@ -351,6 +372,7 @@ export async function streamExplanations(
 ): Promise<void> {
   const res = await fetch(`${API_URL}/api/diagnosis/sessions/${id}/explanations`, {
     headers: { Accept: "text/event-stream" },
+    credentials: "include",
     signal,
   });
   if (!res.ok || !res.body) throw new ApiError("We couldn't load the explanations.", res.status);
@@ -563,4 +585,91 @@ export const partsApi = {
     get<PartDetail>(`/parts/${id}${query({ variant_id: variantId })}`, signal),
   compare: (ids: number[], variantId: number | null, signal?: AbortSignal) =>
     get<PartCompare>(`/parts/compare${query({ ids: ids.join(","), variant_id: variantId })}`, signal),
+};
+
+// ---------------------------------------------------------------- Accounts (backend/app/accounts)
+
+export interface User {
+  id: string;
+  phone_masked: string;
+  name: string | null;
+  created_at: string;
+}
+
+export interface Me {
+  user: User;
+  vehicles: number;
+  sessions: number;
+  requests: number;
+}
+
+export interface SavedCar {
+  id: number;
+  label: string;
+  variant_id: number | null;
+  created_at: string;
+}
+
+export interface SessionSummary {
+  session_id: string;
+  created_at: string;
+  status: "in_progress" | "completed" | "abandoned";
+  vehicle: string;
+  topic: string | null;
+  top_cause: string | null;
+}
+
+export interface RequestSummary {
+  id: string;
+  reference: string;
+  created_at: string;
+  status: string;
+  status_label: string;
+  urgent: boolean;
+  vehicle: string;
+  problem_summary: string;
+}
+
+export interface TimelineStep {
+  key: string;
+  label: string;
+  state: "done" | "current" | "upcoming" | "cancelled";
+  at: string | null;
+}
+
+export interface RequestDetail extends RequestSummary {
+  service_type: ServiceType;
+  area: string;
+  preferred_time: string;
+  session_id: string | null;
+  timeline: TimelineStep[];
+}
+
+export interface AuthConfig {
+  consent_version: string;
+  consent_text: string;
+  code_length: number;
+  expires_in: number;
+}
+
+export const accountApi = {
+  config: (signal?: AbortSignal) => get<AuthConfig>("/auth/config", signal),
+  requestCode: (phone: string) =>
+    post<{ sent: boolean; phone_masked: string; expires_in: number }>("/auth/otp/request", { phone }),
+  verifyCode: (phone: string, code: string, consentVersion: string) =>
+    post<{ user: User; attached: { sessions: number; requests: number } }>("/auth/otp/verify", {
+      phone,
+      code,
+      consent: true,
+      consent_text_version: consentVersion,
+    }),
+  logout: () => post<void>("/auth/logout"),
+  me: (signal?: AbortSignal) => get<Me>("/me", signal),
+  cars: (signal?: AbortSignal) => get<SavedCar[]>("/me/vehicles", signal),
+  removeCar: (id: number) => del<void>(`/me/vehicles/${id}`),
+  sessions: (signal?: AbortSignal) => get<SessionSummary[]>("/me/sessions", signal),
+  requests: (signal?: AbortSignal) => get<RequestSummary[]>("/me/requests", signal),
+  request: (id: string, signal?: AbortSignal) => get<RequestDetail>(`/requests/${encodeURIComponent(id)}`, signal),
+  deleteAccount: () =>
+    del<{ deleted: boolean; sessions: number; requests: number; vehicles: number }>("/me", { confirm: "DELETE" }),
 };
