@@ -42,7 +42,7 @@ docker compose up -d db storage
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0014)
+uv run alembic upgrade head                          # all migrations (0001 … 0015)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -158,6 +158,8 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, `MSG91_SENDER_ID` | MSG91 OTP sending (placeholders; see "Going live with MSG91") |
 | | `OTP_TTL_SECONDS`, `OTP_MAX_ATTEMPTS`, `OTP_PHONE_LIMIT`, `OTP_PHONE_WINDOW_SECONDS`, `OTP_IP_LIMIT`, `OTP_IP_WINDOW_SECONDS`, `OTP_VERIFY_IP_LIMIT`, `OTP_VERIFY_IP_WINDOW_SECONDS` | Code lifetime, tries and rate limits |
 | | `AUTH_SESSION_DAYS`, `COOKIE_SECURE` | Login length; Secure flag on cookies (keep true) |
+| | `STAFF_TOTP_KEY` | Encrypts staff two-factor secrets (a Fernet key; placeholder in `.env.example`, required in production; changing it means everyone sets up two-factor again) |
+| | `STAFF_SESSION_HOURS`, `STAFF_IDLE_MINUTES`, `STAFF_MAX_FAILED_LOGINS`, `STAFF_LOCKOUT_MINUTES`, `STAFF_LOGIN_IP_LIMIT`, `STAFF_LOGIN_IP_WINDOW_SECONDS` | Staff sessions (8 h, 30 min idle), lockout (5 failures, 15 min) and sign-in rate limit per IP |
 | | `UPLOADS_DIR` | Customer files outside the bucket (none yet), one folder per user, deleted with the account |
 | | `S3_ACCESS_KEY`, `S3_SECRET_KEY` | Photo storage key pair (placeholders in `.env.example`; the local `storage` container reads the same pair) |
 | | `S3_ENDPOINT_URL`, `S3_PUBLIC_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET` | Where the API reaches the storage, the address in links given to browsers, region, private bucket |
@@ -401,6 +403,51 @@ Try it without a key: upload a photo in the chat; it says "A mechanic will look 
 Evaluate on labelled photos (`data/eval/images/manifest.yaml`, format in `manifest.example.yaml`; empty for now):
 `cd backend && uv run python ../data/eval/run_image_eval.py` reports correct / wrong / unclear rates per mode and
 red-light recall (it calls Claude only with a key, and says so otherwise).
+
+## Phase 4.1: staff access control
+
+Staff sign in at `/api/admin` with **email + password + an authenticator code** (Google Authenticator or any TOTP
+app). Their login is completely separate from customers' phone OTP login (own table, sessions and `im_staff`
+cookie). Roles: `super_admin`, `content_admin`, `support_agent`, `mechanic` (and `customer`, every phone login, with
+no admin access). Who may do what, and every rule, is in [docs/permissions.md](docs/permissions.md). Every admin
+write is recorded in the append-only `audit_log`, with passwords, secrets, codes and phone numbers masked. There is
+no admin UI yet: use the API (http://localhost:8000/docs, section "admin") or curl.
+
+### Create your super admin (local)
+
+1. Install Google Authenticator (or Microsoft Authenticator, 1Password, ...) on your phone. Make sure the phone's
+   time is set automatically: codes depend on the clock.
+2. Have the database and backend ready: `docker compose up -d db`, then
+   `cd backend && uv sync && uv run alembic upgrade head` (adds the staff tables, migration 0015).
+3. `backend/.env` already has a local `STAFF_TOTP_KEY` (generated for you). On another machine, add one:
+   `uv run python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` and paste it
+   as `STAFF_TOTP_KEY=...`. Keep it: changing it means setting up two-factor again.
+4. Run, with your own email and name:
+   ```bash
+   uv run python -m app.admin.cli create-super-admin --email you@example.com --name "Your Name"
+   ```
+5. Type a password twice (at least 12 characters, not shown on screen).
+6. A QR code appears in the terminal, **only this once**. In Google Authenticator tap **+ > Scan a QR code** and scan
+   it. If scanning fails, tap **+ > Enter a setup key**, type the account (your email) and the key shown under the
+   QR code, and keep "Time based". Make the terminal window big enough to show the whole QR code.
+7. Type the 6-digit code the app shows. Only then is the account saved (a wrong code three times: nothing is
+   saved; run the command again).
+8. Sign in (wait for the **next** code; the one you just typed cannot be used twice):
+   ```bash
+   curl -i -c staff.txt -H 'Content-Type: application/json' http://localhost:8000/api/admin/auth/login \
+     -d '{"email": "you@example.com", "password": "your password", "code": "123456"}'
+   curl -b staff.txt http://localhost:8000/api/admin/auth/me
+   ```
+   Locally over plain http, set `COOKIE_SECURE=false` in `backend/.env` for curl to send the cookie back (never in
+   production). Delete `staff.txt` afterwards.
+
+Then add other staff with `POST /api/admin/staff` (the response holds their QR / setup key once, to hand over).
+Lost your phone: `uv run python -m app.admin.cli reset-two-factor --email you@example.com`. Locked out after 5 wrong
+tries: wait 15 minutes, or `uv run python -m app.admin.cli unlock --email you@example.com`. The CLI refuses to create
+a second "first" super admin (`--another` overrides it).
+
+Tests: `uv run pytest tests/test_admin.py` (every admin endpoint with every role, login, lockout, sessions, cookies,
+audit masking, the CLI).
 
 ## LLM layer (off by default)
 

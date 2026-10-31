@@ -7,7 +7,7 @@ from sqlalchemy import text
 import app.models  # noqa: F401
 from app.db import Base
 
-HEAD = "0014"
+HEAD = "0015"
 
 
 def test_single_head(alembic_config):

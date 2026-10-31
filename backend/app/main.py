@@ -5,6 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.accounts import api as accounts_api
+from app.admin import api as admin_api
+from app.admin.deps import check_admin_routes
+from app.admin.security import fernet
 from app.api import health
 from app.config import Settings, get_settings
 from app.db import make_engine, make_session_factory
@@ -20,6 +23,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     if settings.environment == "production" and settings.auth_secret.startswith("dev-only"):
         raise RuntimeError("Set AUTH_SECRET to a long random value in production")
+    fernet(settings)  # STAFF_TOTP_KEY must be valid (and set, in production) before staff can sign in
     app = FastAPI(title="Instant Mechanic API", version="0.1.0")
 
     app.state.settings = settings
@@ -29,7 +33,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[settings.web_origin],
-        allow_methods=["GET", "POST", "PATCH", "DELETE"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["Content-Type", "Authorization"],
         allow_credentials=True,  # login cookies (HttpOnly, SameSite=Lax); only WEB_ORIGIN may send them
     )
@@ -45,6 +49,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(accounts_api.me_router, prefix="/api")
     app.include_router(accounts_api.requests_router, prefix="/api")
     app.include_router(uploads_api.router, prefix="/api")
+    app.include_router(admin_api.router, prefix="/api")
+    check_admin_routes(app, admin_api.router)  # every /api/admin route runs the access check with a permission
     if settings.media_dir.is_dir():
         app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
     return app

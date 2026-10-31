@@ -69,6 +69,16 @@ class Settings(BaseSettings):
     # Login cookies are HttpOnly, SameSite=Lax and Secure. Browsers accept Secure cookies on http://localhost;
     # set false only if yours does not (never in production).
     cookie_secure: bool = True
+    # Staff login (/api/admin): email + password + TOTP, its own cookie and shorter sessions than customers.
+    # STAFF_TOTP_KEY encrypts TOTP secrets (a Fernet key); empty = derived from AUTH_SECRET (development only).
+    staff_totp_key: str = ""
+    staff_totp_issuer: str = "Instant Mechanic"
+    staff_session_hours: int = 8  # absolute
+    staff_idle_minutes: int = 30  # without a request
+    staff_max_failed_logins: int = 5  # then locked for staff_lockout_minutes
+    staff_lockout_minutes: int = 15
+    staff_login_ip_limit: int = 20
+    staff_login_ip_window_seconds: int = 900
     # Customer photos: an S3-compatible private bucket (the docker-compose `storage` service locally). The endpoint is
     # where the API reaches the storage; the public endpoint is the address in presigned links given to browsers.
     s3_endpoint_url: str = "http://localhost:8333"

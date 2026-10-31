@@ -358,6 +358,13 @@ and `session_results.cost_snapshot` are built from it. Rules: README "Phase 3.2"
 stored_bytes, width, height, reject_reason. Objects: `incoming/<id>` (raw, deleted after the check) and
 `photos/<id>.jpg` (re-encoded, no metadata) in a private bucket.
 
+Staff (migration 0015, rules in `docs/permissions.md`): `staff_users` (id, email lower-case and unique, name,
+password_hash argon2id, totp_secret_enc encrypted with STAFF_TOTP_KEY, totp_last_step so a code works once, active,
+failed_logins, locked_until, last_login_at, password_changed_at), `roles` (code, name, description: the 5 roles,
+seeded), `user_roles` (staff_user_id, role_code, granted_by; `customer` refused by a check), `staff_sessions` (token
+SHA-256, expires_at, last_seen_at, revoked_at). `audit_log` (at, actor_id, actor_label, action, entity_type,
+entity_id, before / after JSONB masked, ip): append-only by trigger, no foreign keys so it outlives accounts.
+
 `image_labels` (migration 0014): mode (`warning_light` / `damage`), code (unique per mode), name, meaning,
 severity (`red` / `amber` / `info`, lights only), look (for the model only), fault_keys, symptom_ids (fault_items of
 those faults; rebuilt by `app.vision.catalogue seed` per dataset version), reviewed. Source:
