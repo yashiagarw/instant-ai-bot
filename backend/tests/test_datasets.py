@@ -120,7 +120,10 @@ def world(tmp_path, db_session):
                 {"label": "Not sure", "not_sure": True},
             ],
         }],
-        "faults": {}, "safety_rules": [],
+        # BT-03's sheet safety rule fires on the answer "Battery looks swollen" (as in the real AC files).
+        "faults": {"F08-BT-03": {"status": "approved", "danger_phrases": ["battery phool gayi"], "safety_trigger_options": [
+            {"question": "battery-main", "option": "Battery looks swollen"}]}},
+        "safety_rules": [],
     })  # fmt: skip
     write(review / "merges.yaml", {"decided_by": "mechanic", "merge": [
         {"canonical": "F07-SS-01", "aliases": ["F07-SS-02"], "reason": "same fault"}]})  # fmt: skip
@@ -275,7 +278,7 @@ def test_full_lifecycle_upload_diff_eval_blocked_override_publish(db_session, wo
     # Blocked: top-3 down 5 points.
     set_eval(db_session, vid, 0.55, 0.9)
     r = content.post(f"/api/admin/datasets/versions/{vid}/publish", json={})
-    assert r.status_code == 409 and "Top-3 accuracy drops 5.0 points" in r.json()["detail"]
+    assert r.status_code == 409 and "Top-3 accuracy drops 5.00 points" in r.json()["detail"]
     r = content.post(f"/api/admin/datasets/versions/{vid}/publish", json={"override_reason": "content admins cannot"})
     assert r.status_code == 403
     r = boss.post(f"/api/admin/datasets/versions/{vid}/publish", json={"override_reason": "too short"})
@@ -361,7 +364,11 @@ def test_a_draft_that_would_lose_a_safety_rule_is_not_validated(db_session, worl
     vid = upload(content, path).json()["version"]["id"]
     d = content.get(f"/api/admin/datasets/versions/{vid}").json()
     assert d["status"] == "draft" and d["validated"] is False
-    assert {(x["area"], x["fault_key"]) for x in d["validation"]["losses"]} == {("safety rules", "F08-BT-03")}
+    assert {(x["area"], x["fault_key"]) for x in d["validation"]["losses"]} == {
+        ("safety rules", "F08-BT-03"),
+        ("safety trigger phrases", "F08-BT-03"),
+        ("safety trigger answers (answers that fire a safety rule)", "F08-BT-03"),
+    }
     assert content.post(f"/api/admin/datasets/versions/{vid}/eval", json={}).status_code == 409
 
 

@@ -6,6 +6,7 @@
 import type { Page, Route } from "@playwright/test";
 
 import { FakeDatasets } from "./fake-datasets";
+import { FakeKnowledge } from "./fake-knowledge";
 
 export const API = "http://localhost:8000/api/admin";
 export const PASSWORD = "a long staff passphrase 1";
@@ -14,8 +15,8 @@ export const SETUP_KEY = "JBSWY3DPEHPK3PXPJBSWY3DP";
 const PERMS: Record<string, string[]> = {
   super_admin: ["self", "staff.read", "staff.manage", "audit.read", "requests.read", "requests.contact",
     "requests.update", "customers.read", "customers.contact", "content.read", "content.review", "datasets.manage",
-    "datasets.override"],
-  content_admin: ["self", "content.read", "content.review", "datasets.manage"],
+    "datasets.override", "knowledge.edit", "vehicles.manage"],
+  content_admin: ["self", "content.read", "content.review", "datasets.manage", "knowledge.edit", "vehicles.manage"],
   support_agent: ["self", "requests.read", "requests.contact", "requests.update", "customers.read", "customers.contact"],
   mechanic: ["self", "requests.read"],
 }; // prettier-ignore
@@ -76,6 +77,7 @@ export class FakeAdmin {
   pending: Account | null = null; // between password and setup confirm
   auditQueries: string[] = [];
   datasets = new FakeDatasets();
+  knowledge = new FakeKnowledge();
   revealed: string[] = [];
 
   /** Signed in already (skips the login screen). */
@@ -183,7 +185,10 @@ export class FakeAdmin {
       const action = url.searchParams.get("action");
       return { status: 200, json: this.audit.filter((r) => !action || r.action === action) };
     }
-    return this.datasets.handle(method, path, url, body, perms, a.email) ?? { status: 404, json: { detail: "Not Found" } };
+    return (
+      this.datasets.handle(method, path, url, body, perms, a.email) ??
+      this.knowledge.handle(method, path, body, perms) ?? { status: 404, json: { detail: "Not Found" } }
+    );
   }
 
   async install(page: Page): Promise<this> {

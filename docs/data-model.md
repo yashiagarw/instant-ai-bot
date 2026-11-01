@@ -84,6 +84,22 @@ A version is a complete copy of the knowledge: an upload copies the other catego
 base's files with one replaced (app/datasets/pipeline.py). The CLI importer only reuses or deletes its own
 (`import`) versions, and the app never serves an unpublished upload.
 
+### knowledge_edits (0018)
+
+Admin editor changes, kept as overrides on top of the imported data (app/knowledge/edits): id, dataset_version_id (the
+draft it was made in), entity (`category`, `group`, `vehicle_filter`, `fault`, `fault_items`, `phrase`, `question`,
+`safety_rule`, `fault_images`, `image_label`), key (stable across imports: `F08-BT-01`, `F08-BT-01/symptom`,
+`F08-BT-01|<phrase>`, `battery/<question id>`, `F08-BT-03/sheet/general`, `global/<sheet row>`, category or tile
+code), data (the item's full new state; null = deleted), base (its state before; null = new), status `draft` /
+`published` / `replaced`, safety, signoff, reason, created_by(_id), updated_at, published_at. One pending edit per item
+and draft (partial unique index). Every build and publish re-applies the published edits and the draft's own after
+the reviewed files ("editor edits apply" step): a later import never undoes them; a field the import changed too is
+reported as a conflict, an item that is gone as not applied. 0018 also adds `dataset_versions.taxonomy` (the
+version's taxonomy: taxonomy.yaml + taxonomy edits; the live categories / problem_groups tables are synced from the
+published one), `questions.ref` (the entry id in data/review/questions), and `reviewed_by` / `reviewed_at` on
+customer_phrases and image_labels (sign-off). A tile removed in the editor that old sessions still point at is kept
+with position -1 (never shown).
+
 ### dataset_jobs (0017)
 
 Background jobs of the dataset pipeline (arq worker): id, kind `build` / `eval` / `publish` / `rollback`,

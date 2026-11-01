@@ -80,6 +80,37 @@ def part_fit_variants(session: Session, fault_ids: list[int]) -> dict[int, set[i
     return out
 
 
+def _draft_taxonomy(tax: dict, live: dict) -> tuple[dict, dict]:
+    from app.knowledge.edits.taxonomy import category_filters, groups_of
+
+    categories = {
+        c["code"]: _known(
+            et.Category,
+            code=c["code"],
+            name=c["name"],
+            kind=c["kind"],
+            filters=category_filters(tax, c.get("filters", [])),
+            wave=float(c["wave"]),
+            source_files=tuple(sorted({s["file"] for s in c.get("sources", [])}))
+            or (live[c["code"]].source_files if c["code"] in live else ()),
+            config=dict(c.get("config") or {}),
+        )
+        for c in tax["categories"]
+    }
+    groups = {
+        g["code"]: et.Group(
+            code=g["code"],
+            group_type=group_type,
+            label=g["label_en"],
+            categories=list(g.get("categories", [])),
+            mode=mode,
+            variants=list(g.get("variants", [])),
+        )
+        for g, group_type, mode in groups_of(tax)
+    }
+    return categories, groups
+
+
 def load_knowledge(session: Session, version: DatasetVersion | None = None) -> et.Knowledge:
     """The engine's knowledge for `version` (default: the version the app serves)."""
     version = version or target_version(session)
@@ -106,8 +137,13 @@ def load_knowledge(session: Session, version: DatasetVersion | None = None) -> e
             mode=str(g.mode) if g.mode else None,
             variants=list(g.variants or []),
         )
-        for g in session.scalars(select(ProblemGroup).options(selectinload(ProblemGroup.categories)))
+        for g in session.scalars(
+            select(ProblemGroup).where(ProblemGroup.position >= 0).options(selectinload(ProblemGroup.categories))
+        )
     }
+    if version.taxonomy and version.status != "published":
+        # A draft with editor taxonomy changes: its own categories and tiles (the live tables change at publish).
+        categories, groups = _draft_taxonomy(version.taxonomy, categories)
 
     rows = session.scalars(select(Fault).where(Fault.dataset_version_id == version.id).order_by(Fault.id)).all()
     faults = {

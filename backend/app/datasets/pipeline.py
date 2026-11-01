@@ -23,8 +23,12 @@ from sqlalchemy.orm import Session
 from app.admin import audit
 from app.datasets import checks, evaluation
 from app.datasets.steps import StepInputs, copy_priors, run_steps
+from app.knowledge.edits import service as edits_service
+from app.knowledge.edits.apply import apply_global
+from app.knowledge.embeddings import sync as embeddings_sync
 from app.knowledge.importer.config import REPO_ROOT, FileEntry, ImportConfig, load_config
 from app.knowledge.importer.embed import Embedder
+from app.knowledge.importer.loader import sync_taxonomy
 from app.knowledge.importer.run import run_import
 from app.knowledge.models import DatasetOrigin, DatasetStatus, DatasetVersion, Fault
 from app.vision import catalogue
@@ -128,7 +132,7 @@ def build(session: Session, pipe: Pipeline, version: DatasetVersion, progress: P
     base = session.get(DatasetVersion, version.base_version_id) if version.base_version_id else None
     swap = swap_for(session, version)
     files = set(swap)
-    categories = categories_of(pipe.config, files)
+    categories = categories_of(pipe.config, files) | edits_service.scope(session, version)["categories"]
     entries = _entries(pipe, base, swap)
 
     progress("importing files", 0.02)
@@ -163,8 +167,10 @@ def build(session: Session, pipe: Pipeline, version: DatasetVersion, progress: P
     check_list = [
         {
             "id": "category_rows",
-            "label": "The file has rows for " + ", ".join(sorted(categories)),
-            "ok": bool(categories) and all(rows.values()),
+            "label": "The file has rows for " + ", ".join(sorted(categories_of(pipe.config, files)))
+            if files
+            else "No file replaced (editor changes only)",
+            "ok": not files or (bool(categories) and all(rows.values())),
             "detail": ", ".join(f"{c}: {n} rows" for c, n in rows.items()),
             "blocking": True,
         },
@@ -236,9 +242,21 @@ def _losses(
     lost = checks.losses(
         checks.artefacts(session, base), checks.artefacts(session, version), categories, files, keys_new & keys_old
     )
+    intended = edits_service.scope(session, version)
+    lost = [x for x in lost if not _edited(x, intended)]  # changes made in the editors are not losses
     spec = pipe.inputs.label_spec()
     label_lost = checks.photo_label_losses(session, catalogue.resolve(session, spec, version))
     return lost, label_lost, missing
+
+
+def _edited(loss: checks.Loss, intended: dict[str, set[str]]) -> bool:
+    if loss.area in checks.SAFETY_AREAS:  # only a safety edit may change safety, never a side effect
+        if loss.fault_key:
+            return loss.fault_key in intended["safety_fault_keys"]
+        return any(ref in loss.detail for ref in intended["global_rules"])
+    if loss.fault_key:
+        return loss.fault_key in intended["fault_keys"]
+    return loss.category in intended["categories"] or any(ref in loss.detail for ref in intended["global_rules"])
 
 
 # ---------------------------------------------------------------- eval
@@ -249,7 +267,11 @@ def evaluate(session: Session, pipe: Pipeline, version: DatasetVersion, full: bo
     if version.status not in (DatasetStatus.validated, DatasetStatus.draft):
         raise PipelineError("Only a draft can be evaluated.")
     live = live_version(session)
-    scope = evaluation.scope_for((version.validation or {}).get("categories"), full)
+    if pipe.embedder is not None:  # editor edits since the build may have added texts
+        progress("syncing embeddings", 0.01)
+        embeddings_sync(session, version.id, pipe.embedder)
+    edited = edits_service.scope(session, version)["categories"]
+    scope = evaluation.scope_for(sorted(set((version.validation or {}).get("categories") or []) | edited), full)
     search = pipe.search_factory()
     two = live is not None and live.id != version.id
 
@@ -330,7 +352,9 @@ def publish(
         raise PipelineError("Publishing is blocked: " + " ".join(reasons))
     live = live_version(session)
     base = live if live is not None and live.id != version.id else None
-    categories = set((version.validation or {}).get("categories") or [])
+    categories = (
+        set((version.validation or {}).get("categories") or []) | edits_service.scope(session, version)["categories"]
+    )
     files = set((version.validation or {}).get("files") or [])
 
     steps = run_steps(session, version, pipe.inputs, pipe.embedder, lambda s, f: progress(s, 0.05 + 0.75 * f))
@@ -347,10 +371,11 @@ def publish(
     now = datetime.now(UTC)
     old = _switch(session, version, actor, now)
     version.override_reason = ((override_reason or "").strip() or None) if reasons else None
-    spec = pipe.inputs.label_spec()
-    catalogue.seed(session, spec, version)
+    catalogue.seed(session, pipe.inputs.label_spec(), version)
+    edits_published = _go_live(session, pipe, version)
     version.validation = {**(version.validation or {}), "publish_steps": steps.as_dict()}
-    after = {"status": "published", "categories": sorted(categories), "files": sorted(files)}
+    after = {"status": "published", "categories": sorted(categories), "files": sorted(files),
+             "editor_edits": edits_published}  # fmt: skip
     audit.record(
         session,
         actor_id=actor.id,
@@ -375,6 +400,14 @@ def publish(
     session.flush()
     progress("done", 1.0)
     return {"version_id": version.id, "archived": old.id if old else None}
+
+
+def _go_live(session: Session, pipe: Pipeline, version: DatasetVersion) -> int:
+    """In the publish transaction: photo-label sign-offs onto the live list, the live taxonomy tables from this
+    version's taxonomy, and this version's editor edits become part of the live knowledge."""
+    apply_global(session, version)
+    sync_taxonomy(session, pipe.config, version.taxonomy or None)
+    return edits_service.publish(session, version)
 
 
 # ---------------------------------------------------------------- rollback
@@ -439,8 +472,8 @@ def _publish_rollback(
     progress("switching the published version", 0.9)
     now = datetime.now(UTC)
     old = _switch(session, new, actor, now)
-    spec = pipe.inputs.label_spec()
-    catalogue.seed(session, spec, new)
+    catalogue.seed(session, pipe.inputs.label_spec(), new)
+    _go_live(session, pipe, new)
     audit.record(
         session,
         actor_id=actor.id,

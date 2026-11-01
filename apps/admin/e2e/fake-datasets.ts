@@ -65,7 +65,7 @@ const EVAL = {
   draft: { version_id: 0, cases: 101, overall: { n: 101, top1: 0.6, top3: 0.75, safety_n: 20, safety_recall: 1 }, by_category: {}, skipped: [] },
   current: { version_id: 41, cases: 101, overall: { n: 101, top1: 0.62, top3: 0.8, safety_n: 20, safety_recall: 1 }, by_category: {}, skipped: [] },
   gate: { ok: false, top3_change: -5, safety_change: 0,
-    reasons: ["Top-3 accuracy drops 5.0 points (80.0% to 75.0%); the limit is 3 points."] },
+    reasons: ["Top-3 accuracy drops 5.00 points (80.00% to 75.00%); the limit is 3 points."] },
 }; // prettier-ignore
 
 export class FakeDatasets {

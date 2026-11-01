@@ -36,6 +36,8 @@ table against it and calls every admin endpoint with every role.
 | `content.review` | yes | yes | no | no | no |
 | `datasets.manage` | yes | yes | no | no | no |
 | `datasets.override` | yes | no | no | no | no |
+| `knowledge.edit` | yes | yes | no | no | no |
+| `vehicles.manage` | yes | yes | no | no | no |
 
 What each permission covers:
 
@@ -53,6 +55,9 @@ What each permission covers:
 | `content.review` | `POST /api/admin/content/generated-questions/{id}/review` (approve / reject) |
 | `content.read` (datasets) | `GET /api/admin/datasets` (versions, categories, active job), `GET /api/admin/datasets/versions/{id}` (validation report, diff, eval), `GET /api/admin/datasets/jobs/{id}` (progress) |
 | `datasets.manage` | `POST /api/admin/datasets/uploads` (a category file: a draft built in the background), `POST .../versions/{id}/rebuild`, `.../eval`, `.../publish`, `.../rollback`, `DELETE .../versions/{id}` (discard a draft), `POST .../jobs/{id}/cancel` (a job not started yet) |
+| `content.read` (knowledge) | `GET /api/admin/knowledge/drafts`, `.../versions/{id}/taxonomy`, `.../faults`, `.../faults/{key}`, `.../questions`, `.../safety`, `.../signoff`, `.../edits`, `GET /api/admin/knowledge/images`, `GET /api/admin/vehicles/unlisted`, `GET /api/admin/vehicles/makes` |
+| `knowledge.edit` | `POST /api/admin/knowledge/drafts` (start an edit draft), `POST .../versions/{id}/edits` (save an item: always into a draft, published through the pipeline), `DELETE .../versions/{id}/edits/{edit}` (revert), `POST .../versions/{id}/signoff` (mark reviewed under your own name), `POST /api/admin/knowledge/generated-questions/{id}/approve` |
+| `vehicles.manage` | `POST /api/admin/vehicles/unlisted/{id}/add` (to the car catalogue, live), `POST .../unlisted/{id}/dismiss` |
 | `datasets.override` | publish although the eval gate blocks it (top-3 down more than 3 points, or safety recall down): `override_reason` of at least 15 characters, written to the audit log |
 | `customers.read` | `GET /api/admin/customers` (search by name or the last digits of the phone): phone numbers always masked |
 | `customers.contact` | `POST /api/admin/customers/{id}/reveal-phone`: one customer's full number, each time written to the audit log |
@@ -66,7 +71,7 @@ only for convenience: the API checks every call.
 | --- | --- |
 | Overview | `self` (every staff member) |
 | Requests, Mechanics | `requests.read` (Mechanics also with `staff.read`) |
-| Knowledge, Vehicles, Parts & Prices, Datasets, Quality | `content.read` |
+| Knowledge, Vehicles, Parts & Prices, Datasets, Quality | `content.read` (editing: `knowledge.edit`; the unlisted-vehicles queue: `vehicles.manage`) |
 | Users | `staff.read` (Staff tab) or `customers.read` (Customers tab) |
 | Audit log | `audit.read` |
 
@@ -104,4 +109,8 @@ The table is append-only (a trigger refuses UPDATE and DELETE).
 | `content.review_question` | a generated question approved or rejected |
 | `dataset.upload`, `dataset.rebuild`, `dataset.eval`, `dataset.publish_requested`, `dataset.rollback_requested`, `dataset.discard`, `dataset.job_cancel` | Datasets page actions (the job id in `after`) |
 | `dataset.publish`, `dataset.rollback` | the worker switched the published version (`before`: the version archived) |
+| `knowledge.edit`, `knowledge.signoff`, `knowledge.edit_revert` | an editor save, sign-off or revert (`before` / `after`: the changed fields) |
+| `knowledge.safety_edit`, `knowledge.safety_edit_revert` | a safety rule or trigger change, with its old and new values |
+| `dataset.edit_draft` | an edit draft started |
+| `vehicle.add_from_unlisted`, `vehicle.dismiss_unlisted` | the unlisted-vehicles queue |
 | `dataset.publish_override` | published although the eval gate blocked it: the gate's reasons in `before`, the written reason in `after` |

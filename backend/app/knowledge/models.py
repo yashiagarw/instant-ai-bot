@@ -195,6 +195,7 @@ class DatasetOrigin(StrEnum):
     import_ = "import"  # the importer CLI (all files from data/raw)
     upload = "upload"  # a file uploaded for one category on the admin Datasets page
     rollback = "rollback"  # a category restored to an archived version's file
+    edit = "edit"  # changed in the admin editors only (app/knowledge/edits), on the files of the live version
 
 
 class DatasetVersion(CreatedAtMixin, Base):
@@ -230,6 +231,51 @@ class DatasetVersion(CreatedAtMixin, Base):
     published_by: Mapped[str | None] = mapped_column(Text)
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     override_reason: Mapped[str | None] = mapped_column(Text)
+    # The taxonomy this version serves (taxonomy.yaml + editor edits). Empty = taxonomy.yaml as imported. The live
+    # categories / problem_groups tables are synced from the published version's (app/knowledge/edits/taxonomy.py).
+    taxonomy: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+
+
+class EditStatus(StrEnum):
+    draft = "draft"  # in an unpublished version (dataset_version_id), applied to it only
+    published = "published"  # part of the live knowledge: applied to every version built from now on
+    replaced = "replaced"  # a later published edit of the same item took its place
+
+
+class KnowledgeEdit(CreatedAtMixin, Base):
+    """An editor change, kept as an override on top of the imported data: the item's full new state (`data`, null =
+    deleted) and its state before (`base`, null = new). Applied to its draft when saved, and again as a pipeline step
+    on every build and publish, so it survives a later Excel import (a changed import value is reported as a
+    conflict). See app/knowledge/edits."""
+
+    __tablename__ = "knowledge_edits"
+    __table_args__ = (
+        Index(
+            "uq_knowledge_edits_one_draft_per_item",
+            "dataset_version_id",
+            "entity",
+            "key",
+            unique=True,
+            postgresql_where="status = 'draft'",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    dataset_version_id: Mapped[int] = mapped_column(ForeignKey("dataset_versions.id", ondelete="CASCADE"), index=True)
+    entity: Mapped[str] = mapped_column(Text)  # fault, fault_items, phrase, question, safety_rule, category, ...
+    key: Mapped[str] = mapped_column(Text)  # F08-BT-01, F08-BT-01/symptom, battery/battery-main, ...
+    data: Mapped[dict | None] = mapped_column(JSONB)
+    base: Mapped[dict | None] = mapped_column(JSONB)
+    status: Mapped[EditStatus] = mapped_column(
+        str_enum(EditStatus, "status"), default=EditStatus.draft, server_default="draft"
+    )
+    safety: Mapped[bool] = mapped_column(default=False, server_default="false")
+    signoff: Mapped[bool] = mapped_column(default=False, server_default="false")
+    reason: Mapped[str] = mapped_column(Text, default="", server_default="")
+    created_by_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("staff_users.id", ondelete="SET NULL"))
+    created_by: Mapped[str] = mapped_column(Text, default="", server_default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class JobKind(StrEnum):
@@ -441,6 +487,9 @@ class CustomerPhrase(Base):
     source: Mapped[PhraseSource] = mapped_column(str_enum(PhraseSource, "source"))
     status: Mapped[ReviewStatus] = mapped_column(str_enum(ReviewStatus, "status"))
     held_out: Mapped[bool] = mapped_column(default=False, server_default="false")
+    # Who checked a reviewed phrase (from its file's reviewed_by, or a sign-off in the editor).
+    reviewed_by: Mapped[str | None] = mapped_column(Text)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     fault: Mapped[Fault] = relationship(back_populates="phrases")
 
@@ -656,6 +705,7 @@ class Question(CreatedAtMixin, Base):
     reviewed_by: Mapped[str | None] = mapped_column(Text)
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     version: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
+    ref: Mapped[str | None] = mapped_column(Text)  # the entry's id in data/review/questions/<category>.yaml
 
     options: Mapped[list["QuestionOption"]] = relationship(
         back_populates="question", order_by="QuestionOption.position", cascade="all, delete-orphan"

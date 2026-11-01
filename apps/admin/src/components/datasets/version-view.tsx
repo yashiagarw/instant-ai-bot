@@ -12,9 +12,10 @@ import { Dialog } from "@im/ui/dialog";
 import { StateBadge } from "@/components/datasets/datasets-view";
 import { JobProgress, useJob } from "@/components/datasets/job-progress";
 import { ErrorBox } from "@/components/error-box";
+import { EditorSummaryView } from "@/components/knowledge/editor-summary";
 import { useMe } from "@/components/staff-shell";
-import { adminApi, type DatasetJob, type DiffRow, errorMessage, type EvalStats, type VersionDetail } from "@/lib/api";
-import { isActive, pct, points, versionTitle } from "@/lib/datasets";
+import { adminApi, type DatasetJob, type DiffRow, errorMessage, type CommonStats, type Comparison, type VersionDetail } from "@/lib/api";
+import { isActive, missed, pct, points, versionTitle } from "@/lib/datasets";
 import { dateTime } from "@/lib/format";
 
 const MIN_REASON = 15;
@@ -99,6 +100,11 @@ export function VersionView({ id }: { id: number }) {
       )}
 
       <Validation v={ver} canManage={canManage} busy={busy} onStarted={started} />
+      {(Object.keys(ver.editor.tables).length > 0 || (ver.editor.conflicts ?? []).length > 0 || (ver.editor.orphans ?? []).length > 0) && (
+        <Card title="Editor changes in this version" id="editor-heading">
+          <EditorSummaryView summary={ver.editor} />
+        </Card>
+      )}
       {ver.diff.categories && <Changes v={ver} />}
       {draft && ver.status === "validated" && <Evaluation v={ver} canManage={canManage} busy={busy} onStarted={started} />}
       {ver.status === "published" || ver.status === "archived" ? (
@@ -366,14 +372,28 @@ function EvalTable({ v }: { v: VersionDetail }) {
   const ev = v.eval;
   if (!ev.draft) return null;
   const live = ev.current;
-  const metric = (label: string, key: keyof EvalStats) => (
+  const cmp = ev.comparison;
+  // Compared on the cases both versions have (older evals: each version's totals).
+  const L: Partial<CommonStats> | undefined = cmp ? cmp.live : live?.overall;
+  const D: Partial<CommonStats> = cmp ? cmp.draft : ev.draft.overall;
+  const metric = (label: string, key: "top1" | "top3") => (
     <tr className="border-b border-border">
       <th scope="row" className="p-2 text-left font-semibold">
         {label}
       </th>
-      <td className="p-2">{live ? pct(live.overall[key] as number | null) : "–"}</td>
-      <td className="p-2">{pct(ev.draft!.overall[key] as number | null)}</td>
-      <td className="p-2 font-bold">{live ? points(ev.draft!.overall[key] as number | null, live.overall[key] as number | null) : "–"}</td>
+      <td className="p-2">{L ? pct(L[key]) : "–"}</td>
+      <td className="p-2">{pct(D[key])}</td>
+      <td className="p-2 font-bold">{L ? points(D[key], L[key]) : "–"}</td>
+    </tr>
+  );
+  const safetyRow = (
+    <tr className="border-b border-border" data-testid="safety-row">
+      <th scope="row" className="p-2 text-left font-semibold">
+        Safety recall
+      </th>
+      <td className="p-2">{L ? (cmp ? missed(cmp.live) : pct(L.safety_recall)) : "–"}</td>
+      <td className="p-2">{cmp ? missed(cmp.draft) : pct(D.safety_recall)}</td>
+      <td className="p-2 font-bold">{L ? points(D.safety_recall, L.safety_recall) : "–"}</td>
     </tr>
   );
   const gate = ev.gate;
@@ -397,14 +417,14 @@ function EvalTable({ v }: { v: VersionDetail }) {
           <tbody>
             {metric("Top-1 accuracy", "top1")}
             {metric("Top-3 accuracy", "top3")}
-            {metric("Safety recall", "safety_recall")}
+            {safetyRow}
             <tr className="border-b border-border">
               <th scope="row" className="p-2 text-left font-semibold">
-                Cases
+                Cases run
               </th>
               <td className="p-2">{live?.cases ?? "–"}</td>
               <td className="p-2">{ev.draft.cases}</td>
-              <td className="p-2" />
+              <td className="p-2">{cmp ? `${cmp.common} in both` : ""}</td>
             </tr>
           </tbody>
         </table>
@@ -426,6 +446,7 @@ function EvalTable({ v }: { v: VersionDetail }) {
           <p className="text-sm">Rule: top-3 may drop at most 3 points; safety recall may not drop at all.</p>
         </div>
       )}
+      {cmp && <CaseDifferences cmp={cmp} live={live?.version_id} draft={v.id} />}
       {ev.draft.skipped.length > 0 && (
         <details>
           <summary className="min-h-11 cursor-pointer py-2 font-semibold text-orange-text">
@@ -437,6 +458,66 @@ function EvalTable({ v }: { v: VersionDetail }) {
             ))}
           </ul>
         </details>
+      )}
+    </div>
+  );
+}
+
+const OUTCOME = { fired: "alert fired", missed: "missed", absent: "case not there" } as const;
+
+function CaseDifferences({ cmp, live, draft }: { cmp: Comparison; live?: number; draft: number }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm text-ink/80">
+        Accuracy and safety recall above are measured on the {cmp.common} cases both versions have, so the numbers compare like for like.
+      </p>
+      {cmp.safety_changed.length > 0 && (
+        <div className="flex flex-col gap-2 rounded-2xl border-2 border-danger p-3" data-testid="safety-changed">
+          <h3 className="font-bold text-danger">Safety cases that changed ({cmp.safety_changed.length})</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-md text-left text-sm">
+              <caption className="sr-only">Safety cases whose outcome differs between the live version and the draft</caption>
+              <thead>
+                <tr className="border-b border-border">
+                  <th scope="col" className="p-2">Case</th>
+                  <th scope="col" className="p-2">Category</th>
+                  <th scope="col" className="p-2">Live v{live}</th>
+                  <th scope="col" className="p-2">Draft v{draft}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cmp.safety_changed.map((c) => (
+                  <tr key={c.key} className="border-b border-border">
+                    <td className="p-2">{c.label}</td>
+                    <td className="p-2">{c.category}</td>
+                    <td className="p-2">{OUTCOME[c.live]}</td>
+                    <td className="p-2 font-bold">{OUTCOME[c.draft]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      {(
+        [
+          [cmp.only_live, `Cases only the live version has (${cmp.only_live.length})`],
+          [cmp.only_draft, `Cases only this draft has (${cmp.only_draft.length})`],
+        ] as const
+      ).map(
+        ([rows, title]) =>
+          rows.length > 0 && (
+            <details key={title} data-testid="only-cases">
+              <summary className="min-h-11 cursor-pointer py-2 font-semibold text-orange-text">{title}</summary>
+              <ul className="list-disc pl-5 text-sm">
+                {rows.map((c) => (
+                  <li key={c.key}>
+                    {c.type} · {c.category} · {c.label}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ),
       )}
     </div>
   );

@@ -49,6 +49,7 @@ ARTEFACTS: dict[str, tuple[str, bool]] = {
     "effects": ("question answer effects", False),
     "safety": ("safety rules", False),
     "triggers": ("safety trigger phrases", False),
+    "trigger_answers": ("safety trigger answers (answers that fire a safety rule)", False),
     "drafted_phrases": ("reviewed customer phrases", False),
     "merges": ("duplicate merges", False),
     "requirements": ("fault requirements", False),
@@ -61,6 +62,9 @@ ARTEFACTS: dict[str, tuple[str, bool]] = {
     "images": ("fault pictures", True),
     "checklist": ("inspection checklist items", True),
 }
+
+
+SAFETY_AREAS = {ARTEFACTS[k][0] for k in ("safety", "triggers", "trigger_answers", "global_safety")}
 
 
 def _faults(session: Session, version_id: int) -> dict[int, tuple[str, str]]:
@@ -96,6 +100,13 @@ def artefacts(session: Session, version: DatasetVersion) -> dict[str, Counter]:
     ):
         if fid in faults:
             out["effects"][slot(fid, str(effect))] += 1
+    answers = set(
+        session.scalars(
+            select(QuestionOption.id)
+            .join(Question, Question.id == QuestionOption.question_id)
+            .where(Question.dataset_version_id == version.id, Question.status == ReviewStatus.approved)
+        )
+    )
     for fid, scope, source, kind, ref, triggers in session.execute(
         select(
             SafetyRule.fault_id,
@@ -107,8 +118,12 @@ def artefacts(session: Session, version: DatasetVersion) -> dict[str, Counter]:
         ).where(SafetyRule.dataset_version_id == version.id, SafetyRule.status.in_(list(LIVE_SAFETY_STATUSES)))
     ):
         has_triggers = bool((triggers or {}).get("phrases") or (triggers or {}).get("option_ids"))
+        # Only answers that exist in this version count: a trigger on a deleted answer never fires.
+        live_answers = len(set((triggers or {}).get("option_ids") or []) & answers)
         if fid is not None and fid in faults:
             out["safety"][slot(fid, str(scope), str(source), str(kind))] += 1
+            if live_answers:
+                out["trigger_answers"][slot(fid, str(source))] += live_answers
             if has_triggers:
                 out["triggers"][slot(fid, str(source))] += 1
         elif str(scope) == "global":

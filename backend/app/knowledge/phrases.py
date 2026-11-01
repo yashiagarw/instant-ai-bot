@@ -161,6 +161,7 @@ def load(session: Session, docs: list[tuple[Path, dict]], version: DatasetVersio
                     source=PhraseSource.drafted,
                     status=ReviewStatus.approved,
                     held_out=False,
+                    reviewed_by=(doc.get("reviewed_by") or "").strip() or None,
                 )
             )
             report.loaded += 1

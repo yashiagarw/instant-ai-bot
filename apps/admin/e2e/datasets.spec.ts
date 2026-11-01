@@ -36,9 +36,9 @@ test("datasets: upload, job progress, validation and diff, eval, a blocked publi
 
   await page.getByRole("button", { name: "Run the evaluation" }).click();
   await expect(page.getByTestId("gate")).toContainText("Publishing is blocked by the eval gate", { timeout: 10_000 });
-  await expect(page.getByTestId("gate")).toContainText("Top-3 accuracy drops 5.0 points");
+  await expect(page.getByTestId("gate")).toContainText("Top-3 accuracy drops 5.00 points");
   const results = page.getByTestId("eval-results").first();
-  await expect(results.getByRole("row", { name: /Top-3 accuracy/ })).toContainText("80.0%75.0%-5.0");
+  await expect(results.getByRole("row", { name: /Top-3 accuracy/ })).toContainText("80.00%75.00%-5.00");
   await expect(page.getByTestId("override-needed")).toContainText("Only a super admin");
   await expect(page.getByRole("button", { name: /^Publish v42/ })).toHaveCount(0);
 

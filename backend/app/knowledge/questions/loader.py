@@ -92,6 +92,7 @@ def load_document(session: Session, doc: dict, version: DatasetVersion | None = 
             reviewed_by=q.get("approved_by") or reviewer,
             reviewed_at=now,
             version=(doc.get("generated") or {}).get("prompt_version", 1),
+            ref=q["id"],
         )
         for pos, o in enumerate(q["options"]):
             option = QuestionOption(position=pos, label_en=o["label"].strip(), is_not_sure=bool(o.get("not_sure")))

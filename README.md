@@ -45,7 +45,7 @@ docker compose up -d db storage redis
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0017)
+uv run alembic upgrade head                          # all migrations (0001 … 0018)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -469,8 +469,8 @@ brand theme, Button, Dialog, data table). Start both with `pnpm dev` from the re
   else. Sessions: 8 hours, 30 minutes idle.
 - **Menu**: Overview, Requests, Mechanics, Knowledge, Vehicles, Parts & Prices, Datasets, Quality, Users, Audit log.
   Items are hidden by role (table in `docs/permissions.md`) and their pages say "No access" when opened directly;
-  the API checks every call regardless. Requests, Mechanics, Knowledge, Vehicles, Parts & Prices and Quality are
-  placeholders for now (Datasets: Phase 4.3).
+  the API checks every call regardless. Requests, Mechanics, Parts & Prices and Quality are placeholders for now
+  (Datasets: Phase 4.3; Knowledge and the Vehicles unlisted-cars queue: Phase 4.4).
 - **Users**: the Staff tab (super admin) lists staff with search, role and status filters and CSV export, and lets
   you invite staff (a temporary password shown once), change roles, disable / enable, unlock and reset two-factor.
   The Customers tab (super admin, support agent) lists customer accounts with **masked phone numbers**; "Show"
@@ -506,7 +506,10 @@ manual steps after an import. Background jobs run in a worker (arq on Redis) and
 - **Diff** against the live version: added, changed (with the fields, before and after) and removed fault rows.
 - **Eval** in the background: by default the test split of the categories the upload changes (a few minutes), or
   the full run (optional, slow). The live version runs on the same cases and the page compares them.
-- **Publish** is blocked when top-3 accuracy drops by more than 3 points or safety recall drops at all. A super
+- **Publish** is blocked when top-3 accuracy drops by more than 3 points or safety recall drops at all, measured on
+  the cases both versions have (matched by fault keys and question / answer text, not database ids), or when a danger
+  case of the live version is missing from the draft. Safety recall is shown as "N of M danger cases missed (98.86%)",
+  with the safety cases whose outcome changed and the cases only one version has. A super
   admin can override with a written reason (at least 15 characters), saved on the version and in the audit log
   (`dataset.publish_override`). Publishing runs the steps once more, checks nothing is lost, then switches.
 - **Discard** a draft; **Rebuild** a draft that was built before another category was published.
@@ -529,6 +532,48 @@ a job left running by a stopped worker is marked failed when the worker starts a
 Tests: `cd backend && uv run pytest tests/test_datasets.py` (the whole lifecycle with fixture files: blocked publish,
 override, nothing lost, changed-only embeddings, stale draft, discard, rollback, worker failures) and
 `cd apps/admin && pnpm exec playwright test e2e/datasets.spec.ts --workers=1`.
+
+## Phase 4.4 (part 1): knowledge editors and review queues
+
+The admin **Knowledge** page edits the knowledge in a **draft**, never live: changes are published through the
+dataset pipeline (Datasets page: evaluation, gate, publish). Super admins and content admins edit (`knowledge.edit`);
+support agents and mechanics cannot.
+
+- **Drafts**: "Start an edit draft" copies the live version (about a minute and a half in the worker). Uploaded drafts
+  can be edited too. The bar at the top shows which draft you are editing.
+- **Faults**: details, applicability (what the car must have), weight (engine v2 prior), symptoms, causes, diagnostic
+  steps, repair steps, advice, safety precautions, towing, mechanic lines (internal), synonyms (Hinglish, English or
+  Hindi in Devanagari), pictures (from the dataset files) and safety rules; new faults get the next key of their
+  category's file.
+- **Questions**: text, stage, answers and their effects on faults (supports / rules out, strong / moderate / weak:
+  the weights the engine uses).
+- **Tiles & categories**: problem tiles, the emergency row, the inspection booking, categories (kind, Beta, wave,
+  vehicle filters, engine settings) and vehicle filters. This replaces editing data/schema/taxonomy.yaml.
+- **Safety rules**: every change shows a warning, needs a confirmation and is audited with its old and new values
+  (`knowledge.safety_edit`). Rules are never deleted (status rejected).
+- **Sign-off**: items checked automatically ("claude_code (auto, pending mechanic sign-off)": questions, reviewed
+  phrases, safety rules and triggers, photo labels) with a filter for those still pending; "Sign off as me" records
+  your name and today's date (a safety rule becomes approved).
+- **Changes in this draft**: every edit with its old and new values and a revert. The publish page (Datasets, the
+  version) shows the same: counts per table, every safety change by name, conflicts and edits not applied.
+- **Surviving a re-import**: edits are overrides on top of the imported data (`knowledge_edits`), re-applied as a
+  pipeline step after every import. If a new Excel file changes a field you edited, your edit is kept and the draft
+  lists it as a conflict; if the file removes the item, the edit is listed as not applied.
+- **Review queues** (Knowledge → proposed questions and sign-off): questions proposed by the LLM (edit and approve
+  into the draft, or reject; empty while no LLM API is configured) and the questions waiting for sign-off. **Vehicles**:
+  cars customers typed because they were not listed: add to the catalogue (live at once, audited; `vehicles.seed`
+  never deletes them unless run with `--prune`) or dismiss.
+
+```bash
+cd backend && uv run alembic upgrade head            # migration 0018
+# restart the worker (it runs the new "editor edits apply" step) and the API
+cd backend && uv run arq app.datasets.worker.WorkerSettings
+cd backend && uv run uvicorn app.main:app --reload --port 8000
+pnpm dev:admin                                       # http://localhost:3001/knowledge
+```
+
+Tests: `cd backend && uv run pytest tests/test_knowledge_editors.py`; `cd apps/admin && pnpm test` and
+`pnpm exec playwright test e2e/knowledge.spec.ts --workers=1`.
 
 ## LLM layer (off by default)
 

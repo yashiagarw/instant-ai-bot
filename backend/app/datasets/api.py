@@ -96,6 +96,10 @@ class VersionDetail(VersionOut):
     eval: dict
     publish: PublishState
     jobs: list[JobOut]
+    editor: dict = Field(
+        description="Editor edits in this version: counts per table, every safety change by name (old and new "
+        "values), conflicts with the imported data and edits that could not be applied."
+    )
 
 
 class CategoryFile(BaseModel):
@@ -135,7 +139,7 @@ class CreatedOut(BaseModel):
 # ---------------------------------------------------------------- helpers
 
 
-def _job_out(j: DatasetJob) -> JobOut:
+def job_out(j: DatasetJob) -> JobOut:
     return JobOut(
         id=j.id, kind=str(j.kind), status=str(j.status), progress=j.progress, step=j.step, log=list(j.log or []),
         error=j.error, result=dict(j.result or {}), dataset_version_id=j.dataset_version_id, created_by=j.created_by,
@@ -143,7 +147,7 @@ def _job_out(j: DatasetJob) -> JobOut:
     )  # fmt: skip
 
 
-def _version_out(v: DatasetVersion, live: DatasetVersion | None) -> VersionOut:
+def version_out(v: DatasetVersion, live: DatasetVersion | None) -> VersionOut:
     val, diff, ev = v.validation or {}, v.diff or {}, v.eval or {}
     checks = val.get("checks")
     gate = ev.get("gate")
@@ -183,7 +187,7 @@ def _queue(request: Request) -> jobs.JobQueue:
     return queue
 
 
-def _start(
+def start_job(
     request: Request,
     session: Session,
     staff,
@@ -232,7 +236,7 @@ def _detail(session: Session, v: DatasetVersion, staff) -> VersionDetail:
         select(DatasetJob).where(DatasetJob.dataset_version_id == v.id).order_by(DatasetJob.id.desc()).limit(10)
     )
     return VersionDetail(
-        **_version_out(v, live).model_dump(),
+        **version_out(v, live).model_dump(),
         validation=v.validation or {},
         diff=v.diff or {},
         eval=v.eval or {},
@@ -242,8 +246,20 @@ def _detail(session: Session, v: DatasetVersion, staff) -> VersionDetail:
             can_publish=v.status == DatasetStatus.validated and not hard and (not reasons or can_override),
             can_override=can_override,
         ),
-        jobs=[_job_out(j) for j in recent],
+        jobs=[job_out(j) for j in recent],
+        editor=_editor(session, v),
     )
+
+
+def _editor(session: Session, v: DatasetVersion) -> dict:
+    from app.knowledge.edits import service as edits
+
+    applied = ((v.validation or {}).get("publish_steps") or (v.validation or {}).get("steps") or {}).get("edits") or {}
+    return {
+        **edits.summary(session, v),
+        "conflicts": applied.get("conflicts", []),
+        "orphans": applied.get("orphans", []),
+    }
 
 
 def _safe_name(name: str) -> str:
@@ -296,10 +312,10 @@ def overview(staff: CurrentStaff, session: DbSession):
         .order_by(DatasetJob.id.desc())
     )
     return OverviewOut(
-        live=_version_out(live, live) if live else None,
-        versions=[_version_out(v, live) for v in versions],
+        live=version_out(live, live) if live else None,
+        versions=[version_out(v, live) for v in versions],
         categories=categories,
-        active_job=_job_out(active) if active else None,
+        active_job=job_out(active) if active else None,
         can_manage=Perm.datasets_manage in staff.perms,
         can_override=Perm.datasets_override in staff.perms,
     )
@@ -318,7 +334,7 @@ def get_job(job_id: int, session: DbSession):
     job = session.get(DatasetJob, job_id)
     if job is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Job not found")
-    return _job_out(job)
+    return job_out(job)
 
 
 # ---------------------------------------------------------------- write
@@ -383,9 +399,9 @@ def upload(
     )
     session.add(version)
     session.flush()
-    job = _start(request, session, staff, JobKind.build, version, "dataset.upload", {"category": category,
+    job = start_job(request, session, staff, JobKind.build, version, "dataset.upload", {"category": category,
                  "file_no": file_no, "sha256": sha})  # fmt: skip
-    return CreatedOut(version=_version_out(version, live), job=_job_out(job))
+    return CreatedOut(version=version_out(version, live), job=job_out(job))
 
 
 @router.post("/versions/{version_id}/rebuild", response_model=JobOut, status_code=202, responses={404: {}, 409: {}})
@@ -398,7 +414,7 @@ def rebuild(version_id: int, request: Request, staff: CurrentStaff, session: DbS
     live = live_version(session)
     before = {"base_version_id": v.base_version_id}
     v.base_version_id, v.status, v.eval = (live.id if live else None), DatasetStatus.draft, {}
-    return _job_out(_start(request, session, staff, JobKind.build, v, "dataset.rebuild", before=before))
+    return job_out(start_job(request, session, staff, JobKind.build, v, "dataset.rebuild", before=before))
 
 
 @router.post("/versions/{version_id}/eval", response_model=JobOut, status_code=202, responses={404: {}, 409: {}})
@@ -408,7 +424,7 @@ def run_eval(version_id: int, body: EvalIn, request: Request, staff: CurrentStaf
     v = _version_or_404(session, version_id)
     if v.status != DatasetStatus.validated:
         raise HTTPException(status.HTTP_409_CONFLICT, "Only a validated draft can be evaluated.")
-    return _job_out(_start(request, session, staff, JobKind.eval, v, "dataset.eval", {"full": body.full}))
+    return job_out(start_job(request, session, staff, JobKind.eval, v, "dataset.eval", {"full": body.full}))
 
 
 @router.post(
@@ -434,11 +450,11 @@ def publish(version_id: int, body: PublishIn, request: Request, staff: CurrentSt
                 f"Write why you are overriding (at least {MIN_OVERRIDE_REASON} characters).",
             )
     params = {"override_reason": reason} if reasons else {}
-    job = _start(
+    job = start_job(
         request, session, staff, JobKind.publish, v, "dataset.publish_requested", params,
         before={"gate": reasons, "override_reason": reason or None},
     )  # fmt: skip
-    return _job_out(job)
+    return job_out(job)
 
 
 class RollbackIn(BaseModel):
@@ -461,7 +477,7 @@ def rollback(
     if category and not any(category in e.categories.values() for e in load_config().files.values()):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, f"Unknown category '{category}'")
     params = {"category": category} if category else {}
-    return _job_out(_start(request, session, staff, JobKind.rollback, v, "dataset.rollback_requested", params))
+    return job_out(start_job(request, session, staff, JobKind.rollback, v, "dataset.rollback_requested", params))
 
 
 @router.delete("/versions/{version_id}", status_code=status.HTTP_204_NO_CONTENT, responses={404: {}, 409: {}})
@@ -523,4 +539,4 @@ def cancel_job(job_id: int, staff: CurrentStaff, session: DbSession):
     )
     session.commit()
     session.refresh(job)
-    return _job_out(job)
+    return job_out(job)

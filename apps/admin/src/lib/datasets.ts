@@ -20,16 +20,22 @@ export function versionTitle(v: Pick<DatasetVersion, "id" | "origin" | "categori
   return `v${v.id} · ${what}`;
 }
 
-/** 0.6421 -> "64.2%"; null -> "–". */
+/** 0.98864 -> "98.86%"; null -> "–". */
 export function pct(rate: number | null | undefined): string {
-  return rate === null || rate === undefined ? "–" : `${(rate * 100).toFixed(1)}%`;
+  return rate === null || rate === undefined ? "–" : `${(rate * 100).toFixed(2)}%`;
 }
 
-/** Change in points between two rates: "+1.5", "-3.2", "0.0" (draft minus live). */
+/** Change in points between two rates: "+1.50", "-3.20", "0.00" (draft minus live). */
 export function points(draft: number | null | undefined, live: number | null | undefined): string {
   if (draft === null || draft === undefined || live === null || live === undefined) return "–";
-  const d = Math.round((draft - live) * 1000) / 10;
-  return `${d > 0 ? "+" : ""}${d.toFixed(1)}`;
+  const d = Math.round((draft - live) * 10000) / 100;
+  return `${d > 0 ? "+" : ""}${d.toFixed(2)}`;
+}
+
+/** "2 of 176 danger cases missed (98.86%)". */
+export function missed(s: { safety_n: number; safety_missed: number; safety_recall: number | null }): string {
+  if (!s.safety_n) return "no danger cases";
+  return `${s.safety_missed} of ${s.safety_n} danger cases missed (${pct(s.safety_recall)})`;
 }
 
 export const JOB_KIND: Record<DatasetJob["kind"], string> = {

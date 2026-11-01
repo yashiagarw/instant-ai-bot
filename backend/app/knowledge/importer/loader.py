@@ -207,14 +207,17 @@ def part_verification(text: object) -> str:
 # ---------------------------------------------------------------- taxonomy
 
 
-def sync_taxonomy(session: Session, config: ImportConfig) -> None:
-    """Upsert categories, category sources and problem groups from taxonomy.yaml."""
-    tax = config.taxonomy
-    filters = tax["vehicle_filters"]
+def sync_taxonomy(session: Session, config: ImportConfig, taxonomy: dict | None = None) -> None:
+    """Upsert categories, category sources and problem groups from a taxonomy: by default taxonomy.yaml with the
+    published editor edits applied (app/knowledge/edits/taxonomy.py), so an import never undoes them."""
+    from app.knowledge.edits.taxonomy import category_filters, groups_of, published_taxonomy
+
+    tax = taxonomy if taxonomy is not None else published_taxonomy(session, config.taxonomy)
     for c in tax["categories"]:
         cat = session.get(Category, c["code"]) or Category(code=c["code"])
         cat.name, cat.kind, cat.beta, cat.wave = c["name"], c["kind"], c["beta"], c["wave"]
-        cat.vehicle_filters = [{"name": f, **filters[f]} for f in c.get("filters", [])]
+        cat.vehicle_filters = category_filters(tax, c.get("filters", []))
+        cat.config = dict(c.get("config") or {})
         session.add(cat)
     session.flush()
 
@@ -234,9 +237,18 @@ def sync_taxonomy(session: Session, config: ImportConfig) -> None:
             )
 
     session.execute(delete(ProblemGroupCategory))
-    groups = [(t, "tile", "diagnose") for t in tax["tiles"]]
-    groups += [(t, "emergency", "fast_track") for t in tax["emergency"]["topics"]]
-    groups += [(tax["inspection"], "inspection", "inspect")]
+    groups = groups_of(tax)
+    from app.diagnosis.models import DiagnosisSession
+
+    for gone in session.scalars(
+        select(ProblemGroup).where(ProblemGroup.code.not_in([g["code"] for g, _, _ in groups]))
+    ):
+        # A tile or emergency topic removed in the editor: deleted, or retired (position -1, never shown) while
+        # earlier diagnosis sessions still point at it.
+        if session.scalar(select(DiagnosisSession.id).where(DiagnosisSession.problem_group_code == gone.code).limit(1)):
+            gone.position = -1
+        else:
+            session.delete(gone)
     for position, (g, group_type, mode) in enumerate(groups):
         pg = session.get(ProblemGroup, g["code"]) or ProblemGroup(code=g["code"])
         pg.group_type, pg.label_en, pg.label_hi = group_type, g["label_en"], g["label_hi"]

@@ -3,6 +3,9 @@
     questions load --all, merges apply, requirements apply, phrases load, safety_triggers apply, parts build,
     vision catalogue seed, embeddings sync
 
+plus, after safety_triggers apply, the admin editors' edits (app.knowledge.edits): they are overrides on top of the
+import and the reviewed files, so the steps after them (parts, photo labels, embeddings) see the edited data.
+
 Each reads its reviewed file(s) from data/review (or data/catalogue) and writes to the given version only, so a
 draft can be prepared without touching the version the app serves. The photo label list (image_labels) is the one
 global table: for a draft it is only resolved (checked), and it is seeded inside the publish transaction.
@@ -19,6 +22,7 @@ from sqlalchemy.orm import Session
 
 from app.knowledge import embeddings as embeddings_mod
 from app.knowledge import merges, phrases, requirements, safety_triggers
+from app.knowledge.edits.apply import apply_all as apply_edits
 from app.knowledge.importer.embed import Embedder
 from app.knowledge.models import DatasetVersion, Fault, FaultPrior
 from app.knowledge.questions import review as questions_review
@@ -33,6 +37,7 @@ STEP_NAMES = (
     "requirements apply",
     "phrases load",
     "safety_triggers apply",
+    "editor edits apply",
     "parts build",
     "vision catalogue seed",
     "embeddings sync",
@@ -51,6 +56,14 @@ class StepInputs:
     parts_review_dir: Path = parts_build.REVIEW_DIR
     parts_team_dir: Path = parts_build.TEAM_DIR
     image_labels_path: Path = catalogue.SPEC
+    taxonomy: dict | None = None  # taxonomy.yaml (loaded when not given)
+
+    def taxonomy_base(self) -> dict:
+        if self.taxonomy is None:
+            from app.knowledge.importer.config import load_config
+
+            self.taxonomy = load_config().taxonomy
+        return self.taxonomy
 
     def label_spec(self) -> dict[str, list[dict]]:
         """The photo label file (an empty list per mode when there is none)."""
@@ -69,9 +82,10 @@ class StepReport:
     lines: dict[str, str] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     embeddings: dict[str, int] = field(default_factory=dict)  # embedded (run through the model), reused, ...
+    edits: dict = field(default_factory=dict)  # editor edits: applied, conflicts, orphans (app.knowledge.edits)
 
     def as_dict(self) -> dict:
-        return {"steps": self.lines, "warnings": self.warnings, "embeddings": self.embeddings}
+        return {"steps": self.lines, "warnings": self.warnings, "embeddings": self.embeddings, "edits": self.edits}
 
 
 Progress = Callable[[str, float], None]  # (step label, fraction 0-1 of the steps)
@@ -185,27 +199,35 @@ def _run_steps(
         report.lines[STEP_NAMES[4]] = "no trigger file"
 
     start(5)
+    edits = apply_edits(session, version, inputs.taxonomy_base())
+    report.edits = edits.as_dict()
+    report.lines[STEP_NAMES[5]] = (
+        f"{edits.applied} edits applied, {len(edits.conflicts)} conflicts, {len(edits.orphans)} not applied"
+    )
+    report.warnings += [f"editor edit {c['name']}: {c['message']}" for c in edits.conflicts + edits.orphans]
+
+    start(6)
     b = parts_build.build(
         session, version, review_dir=inputs.parts_review_dir, team_dir=inputs.parts_team_dir, write_unmatched=False
     )
-    report.lines[STEP_NAMES[5]] = f"{sum(s.price_rows for s in b.files.values())} price rows, " + (
+    report.lines[STEP_NAMES[6]] = f"{sum(s.price_rows for s in b.files.values())} price rows, " + (
         f"{len(b.unmatched_fits)} fit texts not matched"
     )
 
-    start(6)
+    start(7)
     labels = (catalogue.seed if seed_labels else catalogue.resolve)(session, inputs.label_spec(), version)
     unresolved = [lb.code for lb in labels if not lb.symptom_ids]
-    report.lines[STEP_NAMES[6]] = f"{len(labels)} photo labels {'written' if seed_labels else 'resolve'}" + (
+    report.lines[STEP_NAMES[7]] = f"{len(labels)} photo labels {'written' if seed_labels else 'resolve'}" + (
         f", {len(unresolved)} without symptom lines" if unresolved else ""
     )
 
-    start(7)
+    start(8)
     if embedder is None:
-        report.lines[STEP_NAMES[7]] = "skipped (no embedding model)"
+        report.lines[STEP_NAMES[8]] = "skipped (no embedding model)"
         report.warnings.append("embeddings not synced: no embedding model in the worker")
     else:
         e = embeddings_mod.sync(session, version.id, embedder)
-        report.lines[STEP_NAMES[7]] = (
+        report.lines[STEP_NAMES[8]] = (
             f"{e.embedded} embedded, {e.reused} reused, {e.unchanged} unchanged, {e.removed} removed"
         )
         report.embeddings = {"embedded": e.embedded, "reused": e.reused, "unchanged": e.unchanged}

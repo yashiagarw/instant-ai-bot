@@ -247,7 +247,34 @@ export interface EvalRun {
   skipped: string[];
 }
 
+export interface CommonStats {
+  n: number;
+  ranked_n: number;
+  top1: number | null;
+  top3: number | null;
+  safety_n: number;
+  safety_missed: number;
+  safety_recall: number | null;
+}
+
+export interface CaseBrief {
+  key: string;
+  type: string;
+  category: string;
+  label: string;
+}
+
+export interface Comparison {
+  common: number;
+  live: CommonStats;
+  draft: CommonStats;
+  only_live: CaseBrief[];
+  only_draft: CaseBrief[];
+  safety_changed: { key: string; category: string; label: string; live: "fired" | "missed" | "absent"; draft: "fired" | "missed" | "absent" }[];
+}
+
 export interface Evaluation {
+  comparison?: Comparison | null;
   ran_at?: string;
   scope?: { categories: string[] | null; split: string; full: boolean };
   draft?: EvalRun;
@@ -262,6 +289,7 @@ export interface VersionDetail extends DatasetVersion {
   eval: Evaluation;
   publish: { blockers: string[]; gate_reasons: string[]; can_publish: boolean; can_override: boolean };
   jobs: DatasetJob[];
+  editor: EditorSummary;
 }
 
 export interface DatasetCategory {
@@ -279,6 +307,212 @@ export interface DatasetsOverview {
   can_manage: boolean;
   can_override: boolean;
 }
+
+// ---------------------------------------------------------------- knowledge editors (backend/app/knowledge/edits/api.py)
+
+export interface Draft {
+  id: number;
+  origin: "edit" | "upload";
+  status: string;
+  category_code: string | null;
+  created_by: string | null;
+  base_version_id: number | null;
+  stale: boolean;
+  edits: number;
+  building: boolean;
+}
+
+export interface FaultRow {
+  key: string;
+  name: string;
+  category: string;
+  needs_review: boolean;
+  safety_critical: boolean;
+  lines: Record<string, number>;
+  edited: boolean;
+  new: boolean;
+}
+
+export interface FaultData {
+  name: string;
+  description: string;
+  likely_fault: string;
+  road_repairable: "yes" | "limited" | "no" | "unknown";
+  road_repairable_text: string;
+  repair_location: string;
+  towing_conditions_text: string;
+  repair_time_text: string;
+  severity: "low" | "medium" | "high" | null;
+  safety_critical: boolean;
+  requires: Record<string, string | string[]>[];
+  prior: number | null;
+  category_code?: string | null;
+}
+
+export interface Phrase {
+  key: string;
+  text: string;
+  language: string;
+  english_gloss: string;
+  source: string;
+  held_out: boolean;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  pending_signoff: boolean;
+  edit: number | null;
+}
+
+export interface SafetyData {
+  risk_level: "low" | "medium" | "high";
+  stop_driving_trigger: string;
+  roadside_action: string;
+  towing_recommendation: string;
+  status: "draft" | "active_pending_signoff" | "approved" | "rejected";
+  signed_off_by: string | null;
+  signed_off_at: string | null;
+  trigger_phrases: string[];
+}
+
+export interface SafetyRuleRow extends SafetyData {
+  key: string;
+  scope: string;
+  category?: string | null;
+  fault_key?: string | null;
+  source: string;
+  kind: string;
+  edit: number | null;
+}
+
+export interface FaultDetail {
+  key: string;
+  fault: FaultData;
+  fault_edit: number | null;
+  items: Record<string, { key: string; lines: string[]; edit: number | null }>;
+  phrases: Phrase[];
+  deleted_phrases: { key: string; edit: number }[];
+  images: { sha1: string; url: string; caption: string | null }[];
+  images_edit: number | null;
+  safety_rules: SafetyRuleRow[];
+  file_no: number;
+}
+
+export interface Effect {
+  fault: string;
+  effect: "supports" | "rules_out";
+  strength: "strong" | "moderate" | "weak";
+}
+
+export interface QuestionData {
+  stage: number;
+  text: string;
+  status: "approved" | "draft" | "rejected";
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  options: { label: string; not_sure: boolean; effects: Effect[] }[];
+}
+
+export interface QuestionRow extends QuestionData {
+  key: string;
+  pending_signoff: boolean;
+  edit: number | null;
+}
+
+export interface CategoryData {
+  name: string;
+  kind: "diagnose" | "fast_track" | "inspect";
+  beta: boolean;
+  wave: number;
+  filters: string[];
+  config: { question_budget: number | null; stop_probability: number | null; stop_margin: number | null; min_questions: number | null };
+}
+
+export interface GroupData {
+  group_type: "tile" | "emergency" | "inspection";
+  label_en: string;
+  label_hi: string;
+  hi_reviewed: boolean;
+  categories: string[];
+  position: number;
+  variants: Record<string, unknown>[];
+}
+
+export interface FilterData {
+  fuel: string[];
+  transmission: string[];
+}
+
+export interface Taxonomy {
+  groups: (GroupData & { code: string; edit: number | null })[];
+  categories: (CategoryData & { code: string; sources: { file: number; prefix: string }[]; edit: number | null })[];
+  vehicle_filters: (FilterData & { name: string; edit: number | null })[];
+}
+
+export interface SignoffItem {
+  entity: "question" | "phrase" | "safety_rule" | "image_label";
+  key: string;
+  category: string | null;
+  text: string;
+  reviewed_by: string | null;
+  pending: boolean;
+  edit: number | null;
+}
+
+export interface EditRow {
+  id: number;
+  entity: string;
+  table: string;
+  key: string;
+  name: string;
+  op: "added" | "changed" | "deleted" | "signed off";
+  safety: boolean;
+  status: string;
+  by: string;
+  at: string;
+  reason: string;
+  changes: { field: string; before: unknown; after: unknown }[];
+}
+
+export interface EditorSummary {
+  tables: Record<string, Record<string, number>>;
+  safety: { edit: number; name: string; key: string; by: string; changes: { field: string; before: unknown; after: unknown }[] }[];
+  conflicts?: { edit: number; name: string; key: string; message: string }[];
+  orphans?: { edit: number; name: string; key: string; message: string }[];
+}
+
+export interface SaveResult<T = unknown> {
+  key: string;
+  item: T | null;
+  edit: { id: number; safety: boolean } | null;
+  warning: string | null;
+}
+
+export interface GeneratedQuestion {
+  id: number;
+  created_at: string;
+  category_code: string | null;
+  text: string;
+  options: string[];
+  reason: string;
+  status: "generated" | "approved" | "rejected";
+  reviewed_by: string | null;
+}
+
+export interface UnlistedCar {
+  id: number;
+  created_at: string;
+  raw_text: string;
+  typed_make: string | null;
+  typed_model: string | null;
+  typed_year: number | null;
+  fuel: string | null;
+  transmission: string | null;
+  price_segment: string | null;
+  reviewed: boolean;
+  sessions: number;
+}
+
+/** The API's media address for a picture path like /media/F08/x.png. */
+export const mediaUrl = (path: string) => `${API_URL}${path}`;
 
 function query(params: object): string {
   const q = new URLSearchParams();
@@ -330,4 +564,44 @@ export const adminApi = {
     call<DatasetJob>("POST", `/datasets/versions/${id}/rollback`, category ? { category } : {}),
   discardDataset: (id: number) => call<void>("DELETE", `/datasets/versions/${id}`),
   cancelJob: (id: number) => call<DatasetJob>("POST", `/datasets/jobs/${id}/cancel`),
+
+  drafts: (signal?: AbortSignal) => call<Draft[]>("GET", "/knowledge/drafts", undefined, signal),
+  startDraft: () => call<{ version_id: number; job: DatasetJob }>("POST", "/knowledge/drafts"),
+  taxonomy: (v: number, signal?: AbortSignal) => call<Taxonomy>("GET", `/knowledge/versions/${v}/taxonomy`, undefined, signal),
+  faults: (v: number, category?: string, signal?: AbortSignal) =>
+    call<FaultRow[]>("GET", `/knowledge/versions/${v}/faults${query({ category })}`, undefined, signal),
+  fault: (v: number, key: string, signal?: AbortSignal) =>
+    call<FaultDetail>("GET", `/knowledge/versions/${v}/faults/${encodeURIComponent(key)}`, undefined, signal),
+  questions: (v: number, category: string, signal?: AbortSignal) =>
+    call<{ questions: QuestionRow[]; faults: { key: string; name: string }[] }>(
+      "GET",
+      `/knowledge/versions/${v}/questions${query({ category })}`,
+      undefined,
+      signal,
+    ),
+  safetyRules: (v: number, signal?: AbortSignal) => call<SafetyRuleRow[]>("GET", `/knowledge/versions/${v}/safety`, undefined, signal),
+  signoffQueue: (v: number, signal?: AbortSignal) => call<SignoffItem[]>("GET", `/knowledge/versions/${v}/signoff`, undefined, signal),
+  edits: (v: number, signal?: AbortSignal) =>
+    call<{ edits: EditRow[]; summary: EditorSummary; conflicts: EditorSummary["conflicts"]; orphans: EditorSummary["orphans"] }>(
+      "GET",
+      `/knowledge/versions/${v}/edits`,
+      undefined,
+      signal,
+    ),
+  images: (fileNo?: number) => call<{ sha1: string; url: string; caption: string | null }[]>("GET", `/knowledge/images${query({ file_no: fileNo })}`),
+  saveEdit: <T = unknown>(v: number, entity: string, key: string, data: unknown, reason = "") =>
+    call<SaveResult<T>>("POST", `/knowledge/versions/${v}/edits`, { entity, key, data, reason }),
+  signOff: (v: number, entity: string, key: string) => call<SaveResult>("POST", `/knowledge/versions/${v}/signoff`, { entity, key }),
+  revertEdit: (v: number, id: number) => call<void>("DELETE", `/knowledge/versions/${v}/edits/${id}`),
+
+  generatedQuestions: (status?: string, signal?: AbortSignal) =>
+    call<GeneratedQuestion[]>("GET", `/content/generated-questions${query({ status })}`, undefined, signal),
+  approveGenerated: (id: number, body: { version_id: number; category: string; stage: number; text: string; options: string[] }) =>
+    call<{ question: string; version_id: number }>("POST", `/knowledge/generated-questions/${id}/approve`, body),
+  rejectGenerated: (id: number) => call<GeneratedQuestion>("POST", `/content/generated-questions/${id}/review`, { decision: "rejected" }),
+
+  unlisted: (signal?: AbortSignal) => call<UnlistedCar[]>("GET", "/vehicles/unlisted", undefined, signal),
+  makes: () => call<{ name: string; models: string[] }[]>("GET", "/vehicles/makes"),
+  addUnlisted: (id: number, body: unknown) => call<{ created: string[] }>("POST", `/vehicles/unlisted/${id}/add`, body),
+  dismissUnlisted: (id: number) => call<{ ok: boolean }>("POST", `/vehicles/unlisted/${id}/dismiss`),
 };

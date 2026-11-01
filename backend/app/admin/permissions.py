@@ -23,6 +23,8 @@ class Perm(StrEnum):
     content_review = "content.review"  # approve / reject generated questions
     datasets_manage = "datasets.manage"  # upload a category file, evaluate, publish, discard, roll back
     datasets_override = "datasets.override"  # publish although the eval gate blocks it (written reason, audited)
+    knowledge_edit = "knowledge.edit"  # edit knowledge in a draft version, sign items off, review generated questions
+    vehicles_manage = "vehicles.manage"  # the car catalogue and the unlisted-vehicles queue (live, audited)
 
 
 PUBLIC = "public"  # no login needed (only the staff login itself)
@@ -30,7 +32,14 @@ PUBLIC = "public"  # no login needed (only the staff login itself)
 ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
     RoleCode.super_admin: frozenset(Perm),
     RoleCode.content_admin: frozenset(
-        {Perm.self_service, Perm.content_read, Perm.content_review, Perm.datasets_manage}
+        {
+            Perm.self_service,
+            Perm.content_read,
+            Perm.content_review,
+            Perm.datasets_manage,
+            Perm.knowledge_edit,
+            Perm.vehicles_manage,
+        }
     ),
     RoleCode.support_agent: frozenset(
         {

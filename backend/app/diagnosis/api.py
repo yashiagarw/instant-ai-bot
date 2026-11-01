@@ -177,7 +177,9 @@ def list_categories(
     ]
     mode = {"tile": "diagnose", "emergency": "fast_track", "inspection": "inspect"}
     topics = []
-    for g in session.scalars(select(ProblemGroup).order_by(ProblemGroup.group_type, ProblemGroup.position)):
+    for g in session.scalars(
+        select(ProblemGroup).where(ProblemGroup.position >= 0).order_by(ProblemGroup.group_type, ProblemGroup.position)
+    ):
         label, label_hi = g.label_en, g.label_hi
         codes = [pc.category_code for pc in g.categories]
         variant = topic_variant(engine.k.groups[g.code], vehicle) if vehicle and g.code in engine.k.groups else None

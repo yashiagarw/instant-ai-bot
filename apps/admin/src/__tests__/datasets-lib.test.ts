@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DatasetJob, DatasetVersion } from "@/lib/api";
-import { isActive, pct, points, versionState, versionTitle, waitingSeconds } from "@/lib/datasets";
+import { isActive, missed, pct, points, versionState, versionTitle, waitingSeconds } from "@/lib/datasets";
 
 const base: DatasetVersion = {
   id: 7, status: "validated", origin: "upload", category_code: "battery", source_file_no: 8, upload_name: "b.xlsx",
@@ -27,11 +27,12 @@ describe("datasets display helpers", () => {
   });
 
   it("formats rates and changes in points", () => {
-    expect(pct(0.6421)).toBe("64.2%");
+    expect(pct(0.98864)).toBe("98.86%");
     expect(pct(null)).toBe("–");
-    expect(points(0.75, 0.8)).toBe("-5.0");
-    expect(points(0.815, 0.8)).toBe("+1.5");
-    expect(points(0.8, 0.8)).toBe("0.0");
+    expect(points(0.75, 0.8)).toBe("-5.00");
+    expect(points(0.8155, 0.8)).toBe("+1.55");
+    expect(points(0.8, 0.8)).toBe("0.00");
+    expect(missed({ safety_n: 176, safety_missed: 2, safety_recall: 0.98864 })).toBe("2 of 176 danger cases missed (98.86%)");
     expect(points(null, 0.8)).toBe("–");
   });
 
