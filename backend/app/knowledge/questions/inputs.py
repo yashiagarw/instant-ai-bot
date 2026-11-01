@@ -3,16 +3,18 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.knowledge.models import Category, DatasetVersion, DiagnosisRuleRaw, Fault, SafetyRule
+from app.knowledge.models import Category, DatasetOrigin, DatasetVersion, DiagnosisRuleRaw, Fault, SafetyRule
 
 
 def target_version(session: Session) -> DatasetVersion:
-    """The published dataset version, else the newest unpublished one."""
+    """The dataset version the app serves: the published one, else the newest unpublished import (before the first
+    publish). Drafts uploaded on the admin Datasets page are never served before they are published."""
     version = session.scalar(select(DatasetVersion).where(DatasetVersion.status == "published"))
     version = version or session.scalar(
         select(DatasetVersion)
-        .where(DatasetVersion.status.in_(["validated", "draft"]))
+        .where(DatasetVersion.status.in_(["validated", "draft"]), DatasetVersion.origin == DatasetOrigin.import_)
         .order_by(DatasetVersion.id.desc())
+        .limit(1)
     )
     if version is None:
         raise SystemExit("No dataset version found. Run the importer first: python -m app.knowledge.importer --all")

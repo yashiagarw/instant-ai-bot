@@ -8,7 +8,6 @@ from app.estimates import maths as M
 from app.estimates import schemas as S
 from app.estimates import service
 from app.estimates.zones import zones
-from app.knowledge.questions.inputs import target_version
 from engine.core import DISCLAIMER
 
 router = APIRouter(tags=["estimates"])
@@ -76,7 +75,9 @@ def get_estimates(
     ranked = [r.fault_id for r in result.ranked[:TOP]]
     today = service.today_in_india()
     snapshot = ds.vehicle_snapshot or {}
-    found = service.estimate_faults(session, target_version(session), ranked, snapshot, choice.zone, today)
+    found = service.estimate_faults(
+        session, diagnosis.session_version(session, ds), ranked, snapshot, choice.zone, today
+    )
     return S.EstimatesOut(
         session_id=str(ds.id),
         segment=snapshot.get("segment"),

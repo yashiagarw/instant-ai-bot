@@ -21,13 +21,17 @@ class Perm(StrEnum):
     customers_contact = "customers.contact"  # show one customer's full phone number (each time audited)
     content_read = "content.read"  # generated questions, photo labels
     content_review = "content.review"  # approve / reject generated questions
+    datasets_manage = "datasets.manage"  # upload a category file, evaluate, publish, discard, roll back
+    datasets_override = "datasets.override"  # publish although the eval gate blocks it (written reason, audited)
 
 
 PUBLIC = "public"  # no login needed (only the staff login itself)
 
 ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
     RoleCode.super_admin: frozenset(Perm),
-    RoleCode.content_admin: frozenset({Perm.self_service, Perm.content_read, Perm.content_review}),
+    RoleCode.content_admin: frozenset(
+        {Perm.self_service, Perm.content_read, Perm.content_review, Perm.datasets_manage}
+    ),
     RoleCode.support_agent: frozenset(
         {
             Perm.self_service,

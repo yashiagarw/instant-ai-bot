@@ -126,16 +126,17 @@ def admin_routes(router: APIRouter) -> list[APIRoute]:
     return [r for r in router.routes if isinstance(r, APIRoute)]
 
 
-def check_admin_routes(app: FastAPI, router: APIRouter) -> None:
-    """The app does not start unless the admin router runs `enforce`, each admin endpoint declares a permission, and
-    no other route sits under /api/admin (checked against the app's OpenAPI paths)."""
-    if not any(d.dependency is enforce for d in router.dependencies):
-        raise RuntimeError("the admin router must depend on app.admin.deps.enforce")
+def check_admin_routes(app: FastAPI, *routers: APIRouter) -> None:
+    """The app does not start unless every admin router runs `enforce`, each admin endpoint declares a permission,
+    and no other route sits under /api/admin (checked against the app's OpenAPI paths)."""
     declared = set()
-    for r in admin_routes(router):
-        if getattr(r.endpoint, ATTR, None) is None:
-            raise RuntimeError(f"{r.path} declares no permission (use @requires or @public)")
-        declared.add("/api" + r.path)
+    for router in routers:
+        if not any(d.dependency is enforce for d in router.dependencies):
+            raise RuntimeError("the admin router must depend on app.admin.deps.enforce")
+        for r in admin_routes(router):
+            if getattr(r.endpoint, ATTR, None) is None:
+                raise RuntimeError(f"{r.path} declares no permission (use @requires or @public)")
+            declared.add("/api" + r.path)
     stray = [p for p in app.openapi()["paths"] if p.startswith(ADMIN_PREFIX) and p not in declared]
     if stray:
         raise RuntimeError(f"routes under /api/admin outside the admin router: {stray}")

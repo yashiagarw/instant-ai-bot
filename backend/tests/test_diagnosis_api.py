@@ -52,11 +52,18 @@ def knowledge(db_session, tmp_path):
     cfg = load_config()
     cfg.files = {8: dataclasses.replace(cfg.files[8], path=path)}
     cfg.review_dir, cfg.media_dir = tmp_path / "review", tmp_path / "media"
-    run_import(db_session, cfg, [cfg.files[8]], all_files=True, embedder=FakeEmbedder(), log=lambda _: None)
+    run = run_import(db_session, cfg, [cfg.files[8]], all_files=True, embedder=FakeEmbedder(), log=lambda _: None)
     f = {x.source_id: x for x in db_session.scalars(select(Fault))}
 
     def question(stage, text, options):
-        q = Question(category_code="battery", stage=stage, text_en=text, status="approved", created_by="test")
+        q = Question(
+            dataset_version_id=run.version.id,
+            category_code="battery",
+            stage=stage,
+            text_en=text,
+            status="approved",
+            created_by="test",
+        )
         for pos, (label, _effects, not_sure) in enumerate(options):
             q.options.append(QuestionOption(position=pos, label_en=label, is_not_sure=not_sure))
         db_session.add(q)

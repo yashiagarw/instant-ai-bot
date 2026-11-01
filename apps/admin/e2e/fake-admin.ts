@@ -5,14 +5,17 @@
 
 import type { Page, Route } from "@playwright/test";
 
+import { FakeDatasets } from "./fake-datasets";
+
 export const API = "http://localhost:8000/api/admin";
 export const PASSWORD = "a long staff passphrase 1";
 export const SETUP_KEY = "JBSWY3DPEHPK3PXPJBSWY3DP";
 
 const PERMS: Record<string, string[]> = {
   super_admin: ["self", "staff.read", "staff.manage", "audit.read", "requests.read", "requests.contact",
-    "requests.update", "customers.read", "customers.contact", "content.read", "content.review"],
-  content_admin: ["self", "content.read", "content.review"],
+    "requests.update", "customers.read", "customers.contact", "content.read", "content.review", "datasets.manage",
+    "datasets.override"],
+  content_admin: ["self", "content.read", "content.review", "datasets.manage"],
   support_agent: ["self", "requests.read", "requests.contact", "requests.update", "customers.read", "customers.contact"],
   mechanic: ["self", "requests.read"],
 }; // prettier-ignore
@@ -72,6 +75,7 @@ export class FakeAdmin {
   signedIn: Account | null = null;
   pending: Account | null = null; // between password and setup confirm
   auditQueries: string[] = [];
+  datasets = new FakeDatasets();
   revealed: string[] = [];
 
   /** Signed in already (skips the login screen). */
@@ -179,7 +183,7 @@ export class FakeAdmin {
       const action = url.searchParams.get("action");
       return { status: 200, json: this.audit.filter((r) => !action || r.action === action) };
     }
-    return { status: 404, json: { detail: "Not Found" } };
+    return this.datasets.handle(method, path, url, body, perms, a.email) ?? { status: 404, json: { detail: "Not Found" } };
   }
 
   async install(page: Page): Promise<this> {
@@ -187,7 +191,7 @@ export class FakeAdmin {
       const req = route.request();
       const url = new URL(req.url());
       const path = url.pathname.replace("/api/admin", "");
-      const raw = req.postData();
+      const raw = req.headers()["content-type"]?.includes("json") ? req.postData() : null; // uploads are files
       const res = this.handle(req.method(), path, url, raw ? JSON.parse(raw) : {});
       await route.fulfill({
         status: res.status,

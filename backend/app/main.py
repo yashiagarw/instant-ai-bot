@@ -10,6 +10,7 @@ from app.admin.deps import check_admin_routes
 from app.admin.security import fernet
 from app.api import health
 from app.config import Settings, get_settings
+from app.datasets import api as datasets_api
 from app.db import make_engine, make_session_factory
 from app.diagnosis import api as diagnosis_api
 from app.estimates import api as estimates_api
@@ -50,7 +51,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(accounts_api.requests_router, prefix="/api")
     app.include_router(uploads_api.router, prefix="/api")
     app.include_router(admin_api.router, prefix="/api")
-    check_admin_routes(app, admin_api.router)  # every /api/admin route runs the access check with a permission
+    app.include_router(datasets_api.router, prefix="/api")
+    # every /api/admin route runs the access check with a permission
+    check_admin_routes(app, admin_api.router, datasets_api.router)
     if settings.media_dir.is_dir():
         app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
     return app

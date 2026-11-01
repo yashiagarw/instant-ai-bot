@@ -17,7 +17,7 @@ import yaml
 from sqlalchemy import and_, delete, or_, select, update
 from sqlalchemy.orm import Session
 
-from app.knowledge.models import Fault, FaultLink, LinkRelation, LinkSource
+from app.knowledge.models import DatasetVersion, Fault, FaultLink, LinkRelation, LinkSource
 from app.knowledge.questions.inputs import target_version
 
 MERGES_PATH = Path(__file__).resolve().parents[3] / "data" / "review" / "merges.yaml"
@@ -58,8 +58,8 @@ def validate(doc: dict, keys: set[str]) -> list[tuple[str, str, str]]:
     return out
 
 
-def apply_merges(session: Session, doc: dict) -> MergeReport:
-    version = target_version(session)
+def apply_merges(session: Session, doc: dict, version: DatasetVersion | None = None) -> MergeReport:
+    version = version or target_version(session)
     ids = dict(session.execute(select(Fault.fault_key, Fault.id).where(Fault.dataset_version_id == version.id)).all())
     triples = validate(doc, set(ids))
     in_version = select(Fault.id).where(Fault.dataset_version_id == version.id)

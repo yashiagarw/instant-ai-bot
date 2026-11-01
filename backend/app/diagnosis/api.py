@@ -36,7 +36,17 @@ ERRORS = {
 
 
 def get_engine(request: Request, session: DbSession) -> eng.Engine:
-    return service.get_engine(request.app.state, session, request.app.state.settings)
+    """The engine of the served dataset version; for a route on an existing session, of the version that session
+    started on (a publish on the admin Datasets page never breaks a conversation in progress)."""
+    version_id = None
+    if raw := request.path_params.get("session_id") or request.query_params.get("session_id"):
+        try:
+            version_id = session.scalar(
+                select(DiagnosisSession.dataset_version_id).where(DiagnosisSession.id == uuid.UUID(str(raw)))
+            )
+        except ValueError:
+            version_id = None
+    return service.get_engine(request.app.state, session, request.app.state.settings, version_id)
 
 
 EngineDep = Annotated[eng.Engine, Depends(get_engine)]
@@ -153,7 +163,13 @@ def list_categories(
         return vehicle is None or vehicle_allows(engine.k.categories[code], vehicle)
 
     rows = {c.code: c for c in session.scalars(select(Category).order_by(Category.wave, Category.code))}
-    with_questions = set(session.scalars(select(Question.category_code).where(Question.status == "approved")))
+    with_questions = set(
+        session.scalars(
+            select(Question.category_code).where(
+                Question.status == "approved", Question.dataset_version_id == engine.k.dataset_version_id
+            )
+        )
+    )
     cats = [
         s.CategoryOut(code=c.code, name=c.name, kind=c.kind, beta=c.beta, has_questions=c.code in with_questions)
         for c in rows.values()

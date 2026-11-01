@@ -5,6 +5,7 @@ phrases, costs, images, links, notes, raw rules) belong to that fault and are ve
 through it.
 """
 
+import uuid
 from datetime import date, datetime
 from decimal import Decimal
 from enum import StrEnum
@@ -26,6 +27,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -189,10 +191,19 @@ class SourceFile(Base):
     imported_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class DatasetOrigin(StrEnum):
+    import_ = "import"  # the importer CLI (all files from data/raw)
+    upload = "upload"  # a file uploaded for one category on the admin Datasets page
+    rollback = "rollback"  # a category restored to an archived version's file
+
+
 class DatasetVersion(CreatedAtMixin, Base):
+    """A complete copy of the knowledge (every category). Exactly one is published: the one the app serves, so each
+    category has exactly one published version. An upload or rollback version changes one category's source file
+    and copies the rest from the version it was built on (base_version_id). See app/datasets."""
+
     __tablename__ = "dataset_versions"
     __table_args__ = (
-        # At most one published version (Phase 4 moves this to per-category publishing).
         Index("uq_dataset_versions_one_published", "status", unique=True, postgresql_where="status = 'published'"),
     )
 
@@ -201,7 +212,72 @@ class DatasetVersion(CreatedAtMixin, Base):
     status: Mapped[DatasetStatus] = mapped_column(
         str_enum(DatasetStatus, "status"), default=DatasetStatus.draft, server_default="draft"
     )
+    # Importer report; report["files"][file_no] = {"path", "sha256", ...}: the files this version was built from.
     report: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    origin: Mapped[DatasetOrigin] = mapped_column(
+        str_enum(DatasetOrigin, "origin"), default=DatasetOrigin.import_, server_default="import"
+    )
+    category_code: Mapped[str | None] = mapped_column(ForeignKey("categories.code"))
+    source_file_no: Mapped[int | None] = mapped_column(SmallInteger)
+    base_version_id: Mapped[int | None] = mapped_column(ForeignKey("dataset_versions.id", ondelete="SET NULL"))
+    rollback_of_id: Mapped[int | None] = mapped_column(ForeignKey("dataset_versions.id", ondelete="SET NULL"))
+    upload_name: Mapped[str | None] = mapped_column(Text)
+    created_by: Mapped[str | None] = mapped_column(Text)
+    validation: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    diff: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    eval: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    published_by: Mapped[str | None] = mapped_column(Text)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    override_reason: Mapped[str | None] = mapped_column(Text)
+
+
+class JobKind(StrEnum):
+    build = "build"  # import a draft, run the steps, validate, diff
+    eval = "eval"  # run the eval harness on a draft and the live version
+    publish = "publish"  # re-run the steps, check nothing is lost, switch the published version
+    rollback = "rollback"  # build a category from an archived version's file and publish it
+
+
+class JobStatus(StrEnum):
+    queued = "queued"
+    running = "running"
+    succeeded = "succeeded"
+    failed = "failed"
+
+
+class DatasetJob(CreatedAtMixin, Base):
+    """A background job of the dataset pipeline (run by the arq worker). One at a time: a partial unique index allows
+    a single queued or running job, so two publishes can never race."""
+
+    __tablename__ = "dataset_jobs"
+    __table_args__ = (
+        Index(
+            "uq_dataset_jobs_one_active",
+            text("(true)"),
+            unique=True,
+            postgresql_where="status IN ('queued', 'running')",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    kind: Mapped[JobKind] = mapped_column(str_enum(JobKind, "kind"))
+    dataset_version_id: Mapped[int | None] = mapped_column(
+        ForeignKey("dataset_versions.id", ondelete="CASCADE"), index=True
+    )
+    params: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    status: Mapped[JobStatus] = mapped_column(
+        str_enum(JobStatus, "status"), default=JobStatus.queued, server_default="queued"
+    )
+    progress: Mapped[int] = mapped_column(SmallInteger, default=0, server_default="0")  # 0-100
+    step: Mapped[str] = mapped_column(Text, default="", server_default="")
+    log: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    error: Mapped[str | None] = mapped_column(Text)
+    result: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    created_by_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("staff_users.id", ondelete="SET NULL"))
+    created_by: Mapped[str] = mapped_column(Text, default="", server_default="")
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 # ---------------------------------------------------------------- taxonomy
@@ -564,6 +640,9 @@ class Question(CreatedAtMixin, Base):
     __table_args__ = (CheckConstraint("stage >= 2", name="stage_after_vehicle"),)
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    # Questions belong to a dataset version (their effects point at its faults), so loading a draft's questions
+    # never changes the live ones.
+    dataset_version_id: Mapped[int] = mapped_column(ForeignKey("dataset_versions.id", ondelete="CASCADE"), index=True)
     category_code: Mapped[str] = mapped_column(ForeignKey("categories.code"), index=True)
     stage: Mapped[int] = mapped_column(SmallInteger)  # 2 = main complaint, 3+ = follow-up
     text_en: Mapped[str] = mapped_column(Text)

@@ -33,6 +33,7 @@ from app.diagnosis.models import (
 from app.diagnosis.search import SEARCH_STOPWORDS, HybridSearch
 from app.knowledge.models import (
     Category,
+    DatasetVersion,
     Fault,
     FaultImage,
     FaultItem,
@@ -71,13 +72,33 @@ class SessionStateError(ValueError):
 _engine_lock = threading.Lock()
 
 
-def get_engine(state, session: Session, settings: Settings) -> eng.Engine:
-    """Built once from the database at first use. Restart the API after loading new data or questions."""
+MAX_ENGINES = 3  # the served version plus the ones sessions in progress started on
+
+
+def get_engine(state, session: Session, settings: Settings, version_id: int | None = None) -> eng.Engine:
+    """One engine per dataset version, built from the database at first use. Without `version_id`: the version the
+    app serves now, so publishing a version on the admin Datasets page needs no restart. A session keeps using the
+    version it started on (its fault ids belong to it). Restart the API after loading data outside the pipeline."""
+    from app.knowledge.questions.inputs import target_version
+
+    version = session.get(DatasetVersion, version_id) if version_id else None
+    version = version or target_version(session)
     with _engine_lock:
-        if getattr(state, "diagnosis_engine", None) is None:
-            search = hybrid_search(state) if settings.diagnosis_search == "hybrid" else None
-            state.diagnosis_engine = eng.make_engine(settings.diagnosis_engine, load_knowledge(session), search=search)
-        return state.diagnosis_engine
+        engines: dict[int, eng.Engine] | None = getattr(state, "diagnosis_engines", None)
+        if engines is None:
+            engines = state.diagnosis_engines = {}
+        engine = engines.get(version.id)
+        if engine is None:
+            search = None
+            if settings.diagnosis_search == "hybrid":
+                if getattr(state, "hybrid_search", None) is None:
+                    state.hybrid_search = hybrid_search(state)  # shared by every version (it filters by fault id)
+                search = state.hybrid_search
+            engine = eng.make_engine(settings.diagnosis_engine, load_knowledge(session, version), search=search)
+            engines[version.id] = engine
+            while len(engines) > MAX_ENGINES:
+                engines.pop(next(iter(engines)))
+        return engine
 
 
 def get_llm(state) -> LLMClient | None:
@@ -246,11 +267,18 @@ def estimated_costs(session: Session, ds: DiagnosisSession, fault_ids: list[int]
     """Fault id -> the result page's cost, from the estimate service (app.estimates), so the result page and
     GET /api/estimates never disagree. The zone comes from a service request made from the session, if any."""
     from app.estimates import service as estimates
-    from app.knowledge.questions.inputs import target_version
 
     zone = estimates.resolve_zone(session, ds.id, None, None).zone
-    found = estimates.estimate_faults(session, target_version(session), fault_ids, ds.vehicle_snapshot or {}, zone)
+    found = estimates.estimate_faults(session, session_version(session, ds), fault_ids, ds.vehicle_snapshot or {}, zone)
     return {e.fault_id: estimates.cost_out(e) for e in found}
+
+
+def session_version(session: Session, ds: DiagnosisSession) -> DatasetVersion:
+    """The dataset version a session started on (its fault ids belong to it), else the served one."""
+    from app.knowledge.questions.inputs import target_version
+
+    version = session.get(DatasetVersion, ds.dataset_version_id) if ds.dataset_version_id else None
+    return version or target_version(session)
 
 
 def pending_question(session: Session, ds: DiagnosisSession) -> dict | None:

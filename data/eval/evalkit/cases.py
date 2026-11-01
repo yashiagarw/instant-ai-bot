@@ -297,15 +297,23 @@ def split_of(case: Case) -> str:
 # ---------------------------------------------------------------- YAML cases (written by people)
 
 
-def load_yaml_cases(knowledge, directory: Path) -> list[Case]:
-    """Every *.yaml file in `directory` (format: cases/README.md). Question and option text resolve to ids."""
+def load_yaml_cases(knowledge, directory: Path, skipped: list[str] | None = None) -> list[Case]:
+    """Every *.yaml file in `directory` (format: cases/README.md). Question and option text resolve to ids.
+    With `skipped`, a case that names a fault the knowledge does not have is left out and its error added there
+    (the dataset pipeline evaluates drafts that may remove faults); otherwise it raises."""
     by_key = {f.key: f for f in knowledge.faults.values()}
     by_alias = {alias: f for f in knowledge.faults.values() for alias in f.alias_keys}
     out: list[Case] = []
     seen: set[str] = set()
     for path in sorted(directory.glob("*.yaml")):
         for raw in yaml.safe_load(path.read_text(encoding="utf-8")) or []:
-            out.append(_yaml_case(knowledge, path, raw, by_key, by_alias))
+            try:
+                out.append(_yaml_case(knowledge, path, raw, by_key, by_alias))
+            except CaseError as e:
+                if skipped is None or "unknown expected fault" not in str(e):
+                    raise
+                skipped.append(str(e))
+                continue
             if out[-1].id in seen:
                 raise CaseError(f"{path.name}: duplicate case id {raw['id']}")
             seen.add(out[-1].id)

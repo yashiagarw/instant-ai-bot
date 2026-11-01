@@ -34,6 +34,8 @@ table against it and calls every admin endpoint with every role.
 | `customers.contact` | yes | no | yes | no | no |
 | `content.read` | yes | yes | no | no | no |
 | `content.review` | yes | yes | no | no | no |
+| `datasets.manage` | yes | yes | no | no | no |
+| `datasets.override` | yes | no | no | no | no |
 
 What each permission covers:
 
@@ -49,6 +51,9 @@ What each permission covers:
 | `requests.update` | `PATCH /api/admin/requests/{id}` (status) |
 | `content.read` | `GET /api/admin/content/generated-questions`, `GET /api/admin/content/image-labels` |
 | `content.review` | `POST /api/admin/content/generated-questions/{id}/review` (approve / reject) |
+| `content.read` (datasets) | `GET /api/admin/datasets` (versions, categories, active job), `GET /api/admin/datasets/versions/{id}` (validation report, diff, eval), `GET /api/admin/datasets/jobs/{id}` (progress) |
+| `datasets.manage` | `POST /api/admin/datasets/uploads` (a category file: a draft built in the background), `POST .../versions/{id}/rebuild`, `.../eval`, `.../publish`, `.../rollback`, `DELETE .../versions/{id}` (discard a draft), `POST .../jobs/{id}/cancel` (a job not started yet) |
+| `datasets.override` | publish although the eval gate blocks it (top-3 down more than 3 points, or safety recall down): `override_reason` of at least 15 characters, written to the audit log |
 | `customers.read` | `GET /api/admin/customers` (search by name or the last digits of the phone): phone numbers always masked |
 | `customers.contact` | `POST /api/admin/customers/{id}/reveal-phone`: one customer's full number, each time written to the audit log |
 
@@ -97,3 +102,6 @@ The table is append-only (a trigger refuses UPDATE and DELETE).
 | `staff.create`, `staff.set_roles`, `staff.activate`, `staff.deactivate`, `staff.unlock`, `staff.reset_two_factor`, `staff.change_password` | staff accounts (API or CLI) |
 | `request.set_status` | a mechanic request's status changed |
 | `content.review_question` | a generated question approved or rejected |
+| `dataset.upload`, `dataset.rebuild`, `dataset.eval`, `dataset.publish_requested`, `dataset.rollback_requested`, `dataset.discard`, `dataset.job_cancel` | Datasets page actions (the job id in `after`) |
+| `dataset.publish`, `dataset.rollback` | the worker switched the published version (`before`: the version archived) |
+| `dataset.publish_override` | published although the eval gate blocked it: the gate's reasons in `before`, the written reason in `after` |

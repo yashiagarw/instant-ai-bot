@@ -1,5 +1,6 @@
-# Local services: PostgreSQL 16 with pgvector, and S3-compatible storage for customer photos (SeaweedFS).
-#   docker compose up -d db storage
+# Local services: PostgreSQL 16 with pgvector, S3-compatible storage for customer photos (SeaweedFS) and Redis for
+# background jobs (the dataset publish pipeline's worker runs outside Docker: see README).
+#   docker compose up -d db storage redis
 # Values come from the root .env (copy .env.example); defaults match it.
 services:
   db:
@@ -51,6 +52,20 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+
+  # Job queue for the dataset worker (arq). Jobs and their progress are kept in Postgres (dataset_jobs), so Redis
+  # needs no persistence: queued jobs are put back on Redis when the worker starts. No UI.
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "64mb"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   pgdata:

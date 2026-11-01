@@ -17,6 +17,7 @@ from app.knowledge.models import (
     LIVE_SAFETY_STATUSES,
     Category,
     CustomerPhrase,
+    DatasetVersion,
     Fault,
     FaultCost,
     FaultItem,
@@ -79,8 +80,9 @@ def part_fit_variants(session: Session, fault_ids: list[int]) -> dict[int, set[i
     return out
 
 
-def load_knowledge(session: Session) -> et.Knowledge:
-    version = target_version(session)
+def load_knowledge(session: Session, version: DatasetVersion | None = None) -> et.Knowledge:
+    """The engine's knowledge for `version` (default: the version the app serves)."""
+    version = version or target_version(session)
 
     categories = {
         c.code: _known(
@@ -202,7 +204,11 @@ def load_knowledge(session: Session) -> et.Knowledge:
     questions: dict[int, et.Question] = {}
     q_rows = session.scalars(
         select(Question)
-        .where(Question.status == ReviewStatus.approved, Question.category_code.in_(list(categories)))
+        .where(
+            Question.dataset_version_id == version.id,
+            Question.status == ReviewStatus.approved,
+            Question.category_code.in_(list(categories)),
+        )
         .options(selectinload(Question.options))
     ).all()
     option_ids = [o.id for q in q_rows for o in q.options]

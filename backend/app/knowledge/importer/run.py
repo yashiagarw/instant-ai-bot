@@ -6,6 +6,8 @@ Version rules:
   version). Same inputs -> same version, rows replaced: re-running never duplicates. After a
   successful run, older unpublished versions are deleted (they can be regenerated from data/raw).
 - --file: replaces that file's rows in the latest unpublished version (created if none).
+- The CLI only reuses or deletes its own versions (origin import): drafts from the admin Datasets page (app/datasets)
+  are left alone. The pipeline passes its version in explicitly.
 """
 
 import csv
@@ -30,6 +32,7 @@ from app.knowledge.importer.loader import (
     sync_taxonomy,
 )
 from app.knowledge.models import (
+    DatasetOrigin,
     DatasetVersion,
     Fault,
     FaultCost,
@@ -75,7 +78,11 @@ def choose_version(session: Session, config: ImportConfig, entries: list[FileEnt
     if all_files:
         checksum = input_checksum(config, entries)
         version = session.scalar(
-            select(DatasetVersion).where(DatasetVersion.checksum == checksum, DatasetVersion.status != "archived")
+            select(DatasetVersion).where(
+                DatasetVersion.checksum == checksum,
+                DatasetVersion.status != "archived",
+                DatasetVersion.origin == DatasetOrigin.import_,
+            )
         )
         if version is None:
             version = DatasetVersion(checksum=checksum, status="draft", report={})
@@ -84,7 +91,7 @@ def choose_version(session: Session, config: ImportConfig, entries: list[FileEnt
         return version
     version = session.scalar(
         select(DatasetVersion)
-        .where(DatasetVersion.status.in_(["draft", "validated"]))
+        .where(DatasetVersion.status.in_(["draft", "validated"]), DatasetVersion.origin == DatasetOrigin.import_)
         .order_by(DatasetVersion.id.desc())
         .limit(1)
     )
@@ -333,9 +340,12 @@ def run_import(
     all_files: bool,
     embedder: Embedder | None,
     log: Callable[[str], None] = print,
+    version: DatasetVersion | None = None,
 ) -> RunResult:
+    """Import `entries`. With `version` (the dataset pipeline), import into that version and delete nothing else."""
     sync_taxonomy(session, config)
-    version = choose_version(session, config, entries, all_files)
+    pipeline = version is not None
+    version = version or choose_version(session, config, entries, all_files)
     importer = FileImporter(session, config, version, config.media_dir)
     reports: dict[int, FileReport] = {}
     for entry in sorted(entries, key=lambda e: e.file_no):
@@ -363,10 +373,12 @@ def run_import(
     version.checksum = input_checksum(config, entries) if all_files else version_checksum(session, config, version)
     session.flush()
 
-    if all_files:  # older unpublished versions are superseded
+    if all_files and not pipeline:  # older unpublished imports are superseded
         session.execute(
             delete(DatasetVersion).where(
-                DatasetVersion.id != version.id, DatasetVersion.status.in_(["draft", "validated"])
+                DatasetVersion.id != version.id,
+                DatasetVersion.status.in_(["draft", "validated"]),
+                DatasetVersion.origin == DatasetOrigin.import_,
             )
         )
     counts = {

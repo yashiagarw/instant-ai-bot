@@ -17,3 +17,6 @@ coverage/
 
 # Pictures extracted by the importer (regenerate: cd backend && uv run python -m app.knowledge.importer --all)
 data/media/
+
+# Dataset files uploaded on the admin Datasets page (kept so versions can be rebuilt and rolled back)
+data/uploads/

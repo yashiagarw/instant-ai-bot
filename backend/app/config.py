@@ -119,6 +119,12 @@ class Settings(BaseSettings):
     vision_min_confidence: float = 0.6
     # Estimated USD per day (India time) across all live calls; once reached, every step falls back.
     llm_daily_spend_cap_usd: float = 2.0
+    # Dataset publish pipeline (app.datasets): jobs go through Redis to the arq worker
+    # (uv run arq app.datasets.worker.WorkerSettings). docker compose up -d redis starts Redis on 6379.
+    redis_url: str = "redis://localhost:6379/0"
+    # Uploaded dataset files are kept here: a version is rebuilt from its files (rollback, rebuild). Not committed.
+    dataset_upload_dir: Path = Path(__file__).resolve().parents[2] / "data" / "uploads" / "datasets"
+    dataset_upload_max_mb: int = 25
     questions_model: str = "claude-opus-5-5"
     questions_effort: str = "high"
     # OpenAI (used when LLM_PROVIDER=openai). No default model: set the one you want to pay for.

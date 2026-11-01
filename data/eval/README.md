@@ -78,6 +78,14 @@ customer messages to score lower.
 variant, overlap and unlisted variants) stay together; chips split by fault, generated safety cases by rule;
 cases written by people (`synthetic`, `mechanic`, all Hindi) are always test. 2,714 dev / 2,765 test cases.
 
+## Dataset pipeline
+
+The admin Datasets page (backend `app/datasets/evaluation.py`) runs this harness on a draft and the live version in
+the worker: by default the test split of the categories the upload changes, or everything. It differs in two ways
+so that two dataset versions compare like for like: generated safety cases are split by their fault key (rule ids are
+new in every version), and written YAML cases that name a fault the version no longer has are skipped and listed
+(`load_yaml_cases(..., skipped=[])`) instead of stopping the run. The command-line runs above are unchanged.
+
 ## Cases
 
 | Type | What | Where from |

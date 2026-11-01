@@ -282,7 +282,13 @@ def test_approved_safety_rule_needs_sign_off(db_session, version):
 
 
 def test_only_one_not_sure_option_per_question(db_session, version):
-    q = Question(category_code="battery", stage=3, text_en="Do you hear a click?", created_by="test")
+    q = Question(
+        dataset_version_id=version.id,
+        category_code="battery",
+        stage=3,
+        text_en="Do you hear a click?",
+        created_by="test",
+    )
     q.options = [
         QuestionOption(position=0, label_en="Yes"),
         QuestionOption(position=1, label_en="Not sure", is_not_sure=True),

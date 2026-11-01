@@ -17,13 +17,19 @@ export function errorMessage(e: unknown): string {
 }
 
 async function call<T>(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+  const json = body !== undefined && !(body instanceof Blob);
   let res: Response;
   try {
     res = await fetch(`${API_URL}/api/admin${path}`, {
       method,
       credentials: "include",
-      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      headers: json
+        ? { "Content-Type": "application/json" }
+        : body instanceof Blob
+          ? { "Content-Type": body.type || "application/octet-stream" }
+          : undefined,
+      // A file (Blob) is sent as the request body as it is.
+      body: body === undefined ? undefined : json ? JSON.stringify(body) : (body as Blob),
       signal,
       cache: "no-store",
     });
@@ -125,6 +131,155 @@ export interface AuditQuery {
   limit?: number;
 }
 
+// ---------------------------------------------------------------- datasets (backend/app/datasets/api.py)
+
+export type JobStatus = "queued" | "running" | "succeeded" | "failed";
+
+export interface DatasetJob {
+  id: number;
+  kind: "build" | "eval" | "publish" | "rollback";
+  status: JobStatus;
+  progress: number;
+  step: string;
+  log: { at: string; step: string }[];
+  error: string | null;
+  result: Record<string, unknown>;
+  dataset_version_id: number | null;
+  created_by: string;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
+export interface DatasetVersion {
+  id: number;
+  status: "draft" | "validated" | "published" | "archived";
+  origin: "import" | "upload" | "rollback";
+  category_code: string | null;
+  source_file_no: number | null;
+  upload_name: string | null;
+  created_by: string | null;
+  created_at: string;
+  published_at: string | null;
+  published_by: string | null;
+  archived_at: string | null;
+  base_version_id: number | null;
+  rollback_of_id: number | null;
+  override_reason: string | null;
+  categories: string[];
+  stale: boolean;
+  validated: boolean | null;
+  build_error: string | null;
+  losses: number;
+  diff_counts: { added: number; changed: number; removed: number };
+  gate: "passed" | "blocked" | null;
+  gate_reasons: string[];
+}
+
+export interface Check {
+  id: string;
+  label: string;
+  ok: boolean;
+  detail: string;
+  blocking: boolean;
+}
+
+export interface Loss {
+  area: string;
+  category: string;
+  fault_key: string;
+  detail: string;
+  before: number;
+  after: number;
+}
+
+export interface FileReport {
+  file_no: number;
+  path: string;
+  rows_read: number;
+  imported: number;
+  rejected: { row: number; id: string; reason: string }[];
+  review: Record<string, number>;
+  warnings: string[];
+  header_row: number;
+}
+
+export interface Validation {
+  error?: string;
+  built_at?: string;
+  categories?: string[];
+  files?: number[];
+  file_reports?: Record<string, FileReport>;
+  checks?: Check[];
+  losses?: Loss[];
+  steps?: { steps: Record<string, string>; warnings: string[]; embeddings: Record<string, number> };
+  warnings?: string[];
+}
+
+export interface DiffRow {
+  fault_key: string;
+  category: string;
+  name: string;
+  fields?: { field: string; before: string; after: string }[];
+}
+
+export interface Diff {
+  categories?: string[];
+  added?: DiffRow[];
+  changed?: DiffRow[];
+  removed?: DiffRow[];
+  unchanged?: number;
+}
+
+export interface EvalStats {
+  n: number;
+  top1: number | null;
+  top3: number | null;
+  safety_n: number;
+  safety_recall: number | null;
+}
+
+export interface EvalRun {
+  version_id: number;
+  cases: number;
+  overall: EvalStats;
+  by_category: Record<string, EvalStats>;
+  skipped: string[];
+}
+
+export interface Evaluation {
+  ran_at?: string;
+  scope?: { categories: string[] | null; split: string; full: boolean };
+  draft?: EvalRun;
+  current?: EvalRun | null;
+  gate?: { ok: boolean; reasons: string[]; top3_change: number | null; safety_change: number | null; note?: string };
+  skipped?: string;
+}
+
+export interface VersionDetail extends DatasetVersion {
+  validation: Validation;
+  diff: Diff;
+  eval: Evaluation;
+  publish: { blockers: string[]; gate_reasons: string[]; can_publish: boolean; can_override: boolean };
+  jobs: DatasetJob[];
+}
+
+export interface DatasetCategory {
+  code: string;
+  name: string;
+  files: { file_no: number; live_name: string }[];
+  shared_with: string[];
+}
+
+export interface DatasetsOverview {
+  live: DatasetVersion | null;
+  versions: DatasetVersion[];
+  categories: DatasetCategory[];
+  active_job: DatasetJob | null;
+  can_manage: boolean;
+  can_override: boolean;
+}
+
 function query(params: object): string {
   const q = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== "") q.set(k, String(v));
@@ -156,4 +311,23 @@ export const adminApi = {
   revealPhone: (id: string) => call<{ phone: string }>("POST", `/customers/${id}/reveal-phone`),
 
   audit: (q: AuditQuery, signal?: AbortSignal) => call<AuditEntry[]>("GET", `/audit${query(q)}`, undefined, signal),
+
+  datasets: (signal?: AbortSignal) => call<DatasetsOverview>("GET", "/datasets", undefined, signal),
+  datasetVersion: (id: number, signal?: AbortSignal) =>
+    call<VersionDetail>("GET", `/datasets/versions/${id}`, undefined, signal),
+  datasetJob: (id: number, signal?: AbortSignal) => call<DatasetJob>("GET", `/datasets/jobs/${id}`, undefined, signal),
+  uploadDataset: (category: string, file: File, fileNo?: number) =>
+    call<{ version: DatasetVersion; job: DatasetJob }>(
+      "POST",
+      `/datasets/uploads${query({ category, name: file.name, file_no: fileNo })}`,
+      file,
+    ),
+  rebuildDataset: (id: number) => call<DatasetJob>("POST", `/datasets/versions/${id}/rebuild`),
+  evalDataset: (id: number, full: boolean) => call<DatasetJob>("POST", `/datasets/versions/${id}/eval`, { full }),
+  publishDataset: (id: number, override_reason?: string) =>
+    call<DatasetJob>("POST", `/datasets/versions/${id}/publish`, override_reason ? { override_reason } : {}),
+  rollbackDataset: (id: number, category?: string) =>
+    call<DatasetJob>("POST", `/datasets/versions/${id}/rollback`, category ? { category } : {}),
+  discardDataset: (id: number) => call<void>("DELETE", `/datasets/versions/${id}`),
+  cancelJob: (id: number) => call<DatasetJob>("POST", `/datasets/jobs/${id}/cancel`),
 };

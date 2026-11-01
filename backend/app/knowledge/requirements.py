@@ -17,7 +17,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from app.enums import Fuel, Transmission
-from app.knowledge.models import Fault
+from app.knowledge.models import DatasetVersion, Fault
 from app.knowledge.questions.inputs import target_version
 from app.vehicles.features import FEATURES
 
@@ -60,9 +60,9 @@ def validate(doc: dict, keys: set[str]) -> dict[str, list[dict]]:
     return out
 
 
-def apply(session: Session, doc: dict) -> int:
+def apply(session: Session, doc: dict, version: DatasetVersion | None = None) -> int:
     """Write the requirements to the target dataset version's faults. Returns how many faults have some."""
-    version = target_version(session)
+    version = version or target_version(session)
     keys = set(session.scalars(select(Fault.fault_key).where(Fault.dataset_version_id == version.id)))
     reqs = validate(doc, keys)
     session.execute(update(Fault).where(Fault.dataset_version_id == version.id).values(requires=[]))

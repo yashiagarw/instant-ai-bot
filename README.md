@@ -9,7 +9,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `apps/web` | Customer site (port 3000): Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
 | `apps/admin` | Staff admin app (port 3001): sign-in with two-factor, role-based menu, Users, Audit log |
 | `packages/ui` | `@im/ui`, shared by both apps: brand theme, Button, Dialog, the data table (TanStack Table) |
-| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `uploads` (customer photos), `notify` (email and SMS), `llm` (optional LLM layer, off by default), `parts` (parts catalogue) |
+| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `uploads` (customer photos), `notify` (email and SMS), `llm` (optional LLM layer, off by default), `parts` (parts catalogue), `datasets` (dataset publish pipeline and its worker) |
 | `backend/engine` | Diagnosis engine, plain Python with no web imports |
 | `backend/alembic` | Database migrations |
 | `data/raw` | The 18 original Excel datasets. Never edit |
@@ -17,7 +17,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `data/catalogue` | Vehicle catalogue seed (editable YAML); team price sources in `parts/` |
 | `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md) |
 | `scripts` | Offline data scripts (dataset profiler) |
-| `docker-compose.yml` | PostgreSQL 16 + pgvector, and S3-compatible storage for photos (SeaweedFS) |
+| `docker-compose.yml` | PostgreSQL 16 + pgvector, S3-compatible storage for photos (SeaweedFS), Redis for background jobs |
 
 ## Requirements
 
@@ -38,13 +38,14 @@ cp .env.example .env
 cp backend/.env.example backend/.env
 cp apps/web/.env.example apps/web/.env.local
 
-# Database: PostgreSQL 16 + pgvector, plus an autocare_test database for pytest; photo storage (S3, SeaweedFS)
-docker compose up -d db storage
+# Database: PostgreSQL 16 + pgvector, plus an autocare_test database for pytest; photo storage (S3, SeaweedFS);
+# Redis for the background worker (dataset publish pipeline)
+docker compose up -d db storage redis
 
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0016)
+uv run alembic upgrade head                          # all migrations (0001 … 0017)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -57,6 +58,8 @@ uv run python -m app.vision.catalogue seed           # photo labels (warning lig
 uv run python -m app.knowledge.embeddings sync       # search index: embeds only new or changed texts
 uv run python -m app.parts build                     # parts catalogue (after merges): prices, fits, fault links, labour
 cd ..
+# After this first import, publish it once on the admin Datasets page (or keep using these commands): from then on
+# a category file is uploaded there, and the worker runs every step above automatically (Phase 4.3).
 
 # Web apps (one pnpm workspace at the repo root: apps/web, apps/admin, packages/ui)
 pnpm install                                          # from the repo root
@@ -67,12 +70,18 @@ After pulling new code, run `uv run alembic upgrade head` again, and restart `pn
 
 ### 2. Run
 
-Two terminals: the API, then both web apps together.
+Three terminals: the API, the background worker, then both web apps together.
 
 ```bash
+docker compose up -d db storage redis
 cd backend && uv run uvicorn app.main:app --reload --port 8000
 # http://localhost:8000/api/health  ->  {"status":"ok","database":"ok"}
 # http://localhost:8000/docs        ->  API docs with request and response schemas
+```
+
+```bash
+cd backend && uv run arq app.datasets.worker.WorkerSettings   # background jobs (Datasets page): build, eval, publish
+# restart it after changing backend code (arq has no --reload); Ctrl+C waits for the running job to finish
 ```
 
 ```bash
@@ -177,6 +186,8 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `LLM_TIMEOUT_SECONDS`, `LLM_DAILY_SPEND_CAP_USD` | Per-call wall-clock timeout (4 s) and daily estimated spend cap (USD, India-time day); past either, the fallback is used |
 | | `LLM_VISION_MODEL`, `LLM_VISION_TIMEOUT_SECONDS`, `VISION_MIN_CONFIDENCE` | Photo analysis: model (`claude-opus-5-5`), timeout (20 s), and the confidence below which a finding counts as unclear (0.6). Same switch and spend cap as above |
 | | `QUESTIONS_MODEL`, `QUESTIONS_EFFORT`, `OPENAI_API_KEY`, `OPENAI_MODEL`, … | Offline question drafting (`python -m app.knowledge.questions`, `--provider anthropic\|openai`) |
+| | `REDIS_URL` | Redis for background jobs (`redis://localhost:6379/0`; `docker compose up -d redis`) |
+| | `DATASET_UPLOAD_DIR`, `DATASET_UPLOAD_MAX_MB` | Where uploaded dataset files are kept (default `data/uploads/datasets`, not committed; versions are rebuilt and rolled back from them) and the upload limit (25 MB) |
 | `apps/web/.env.local` | `NEXT_PUBLIC_API_URL` | Backend base URL for the browser |
 
 ## Phase 2.5: explanations, typed replies, car features
@@ -458,8 +469,8 @@ brand theme, Button, Dialog, data table). Start both with `pnpm dev` from the re
   else. Sessions: 8 hours, 30 minutes idle.
 - **Menu**: Overview, Requests, Mechanics, Knowledge, Vehicles, Parts & Prices, Datasets, Quality, Users, Audit log.
   Items are hidden by role (table in `docs/permissions.md`) and their pages say "No access" when opened directly;
-  the API checks every call regardless. Requests, Mechanics, Knowledge, Vehicles, Parts & Prices, Datasets and
-  Quality are placeholders for now.
+  the API checks every call regardless. Requests, Mechanics, Knowledge, Vehicles, Parts & Prices and Quality are
+  placeholders for now (Datasets: Phase 4.3).
 - **Users**: the Staff tab (super admin) lists staff with search, role and status filters and CSV export, and lets
   you invite staff (a temporary password shown once), change roles, disable / enable, unlock and reset two-factor.
   The Customers tab (super admin, support agent) lists customer accounts with **masked phone numbers**; "Show"
@@ -472,6 +483,52 @@ brand theme, Button, Dialog, data table). Start both with `pnpm dev` from the re
 
 Tests: `cd apps/admin && pnpm test` (helpers) and `pnpm test:e2e` (Playwright, desktop + phone, API mocked: login
 with two-factor, the setup screen, menus for each role, Users, Audit log); `cd packages/ui && pnpm test` (the table).
+
+## Phase 4.3: dataset publish pipeline
+
+The admin **Datasets** page (`content.read` to see it; super admins and content admins manage it) replaces the
+manual steps after an import. Background jobs run in a worker (arq on Redis) and show their progress on the page.
+
+- **Versions**: every dataset version is a complete copy of the knowledge, in one of four states: `draft`,
+  `validated`, `published`, `archived`. Exactly one is published (the one the app serves), so every category has
+  exactly one published version; publishing switches it in a single transaction (the old one is archived). The API
+  picks up the new version without a restart, and a diagnosis in progress keeps the version it started on.
+- **Upload** a category's Excel file (choose the file when a category has two, e.g. suspension). The draft is
+  built from the live version's files with that one replaced, then every step runs automatically, in the order they
+  were run by hand: questions load --all, merges apply, requirements apply, phrases load, safety_triggers apply,
+  parts build, vision catalogue seed (checked for the draft, written at publish), embeddings sync. Embeddings are
+  recomputed only for new or changed text: the rest reuse their stored vectors.
+- **Validation report**: rows read / imported / rejected with reasons, and a **nothing lost** check against the
+  live version (questions, answer effects, safety rules and trigger phrases, reviewed phrases, merges, requirements,
+  parts links, photo labels, embeddings; unchanged categories must be identical). A draft with rejected rows or a
+  loss stays `draft` and cannot be evaluated or published. A reviewed file that no longer matches (e.g. it names a
+  removed fault) fails the build with the step's name.
+- **Diff** against the live version: added, changed (with the fields, before and after) and removed fault rows.
+- **Eval** in the background: by default the test split of the categories the upload changes (a few minutes), or
+  the full run (optional, slow). The live version runs on the same cases and the page compares them.
+- **Publish** is blocked when top-3 accuracy drops by more than 3 points or safety recall drops at all. A super
+  admin can override with a written reason (at least 15 characters), saved on the version and in the audit log
+  (`dataset.publish_override`). Publishing runs the steps once more, checks nothing is lost, then switches.
+- **Discard** a draft; **Rebuild** a draft that was built before another category was published.
+- **Roll back** from any archived version: choose a category and confirm. A new version is built from the live
+  files with that category's file as it was then, checked and published; other categories keep their data.
+
+```bash
+docker compose up -d db storage redis
+cd backend && uv run alembic upgrade head            # migration 0017
+cd backend && uv run uvicorn app.main:app --reload --port 8000
+cd backend && uv run arq app.datasets.worker.WorkerSettings
+pnpm dev:admin                                       # http://localhost:3001/datasets
+```
+
+Then on the Datasets page: publish the imported version once (it has no history yet), upload a category file, open
+the draft, run the evaluation, publish (or override), and try a rollback from the History table. Uploaded files are
+kept in `data/uploads/datasets/` (not committed). A job that waits for a long time means the worker is not running;
+a job left running by a stopped worker is marked failed when the worker starts again.
+
+Tests: `cd backend && uv run pytest tests/test_datasets.py` (the whole lifecycle with fixture files: blocked publish,
+override, nothing lost, changed-only embeddings, stale draft, discard, rollback, worker failures) and
+`cd apps/admin && pnpm exec playwright test e2e/datasets.spec.ts --workers=1`.
 
 ## LLM layer (off by default)
 

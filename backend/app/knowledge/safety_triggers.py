@@ -15,7 +15,7 @@ import yaml
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.knowledge.models import SafetyRule
+from app.knowledge.models import DatasetVersion, SafetyRule
 from app.knowledge.questions.inputs import target_version
 
 TRIGGERS_PATH = Path(__file__).resolve().parents[3] / "data" / "review" / "safety_global_triggers.yaml"
@@ -37,8 +37,8 @@ def _flat(items: list) -> list[str]:
     return out
 
 
-def apply_triggers(session: Session, doc: dict) -> int:
-    version = target_version(session)
+def apply_triggers(session: Session, doc: dict, version: DatasetVersion | None = None) -> int:
+    version = version or target_version(session)
     rules = {
         r.source_ref: r
         for r in session.scalars(

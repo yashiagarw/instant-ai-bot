@@ -8,6 +8,8 @@ Owners: symptom lines, synonyms (approved customer phrases that are not held out
 English gloss), faults (name
 and the start of the description) and customer-facing diagnostic steps (agent instructions such as "Ask ..." are
 left out). A row is re-embedded only when the SHA-256 of its text changed; rows whose source is gone are removed.
+A new dataset version (an upload on the admin Datasets page) reuses the stored vector of any row with the same text
+and model, so only new or changed text is run through the model.
 """
 
 from __future__ import annotations
@@ -86,9 +88,25 @@ def sources(session: Session, version_id: int) -> list[Source]:
 
 @dataclass
 class SyncResult:
-    embedded: int = 0  # new or changed text
+    embedded: int = 0  # new or changed text, run through the model
     unchanged: int = 0
     removed: int = 0  # source row gone (or held out / rejected since)
+    reused: int = 0  # new rows whose text already has a vector (another dataset version): copied, not embedded
+
+
+def stored_vectors(session: Session, model: str, hashes: set[str]) -> dict[str, list[float]]:
+    """text_hash -> a stored vector of that exact text for this model (from any dataset version)."""
+    out: dict[str, list[float]] = {}
+    todo = sorted(hashes)
+    for i in range(0, len(todo), 1000):
+        rows = session.execute(
+            select(Embedding.text_hash, Embedding.vector).where(
+                Embedding.model_name == model, Embedding.text_hash.in_(todo[i : i + 1000])
+            )
+        )
+        for h, vec in rows:
+            out.setdefault(h, list(vec))
+    return out
 
 
 def sync(
@@ -119,31 +137,44 @@ def sync(
         else:
             todo.append((src, row))
     gone = [row for key, row in existing.items() if key not in wanted]
-    result.embedded, result.removed = len(todo), len(gone)
-    log(f"{model}: {len(todo)} to embed, {result.unchanged} unchanged, {len(gone)} to remove")
+    known = stored_vectors(session, model, {text_hash(src.text) for src, _ in todo})
+    copy = [(src, row) for src, row in todo if text_hash(src.text) in known]
+    encode = [(src, row) for src, row in todo if text_hash(src.text) not in known]
+    result.embedded, result.reused, result.removed = len(encode), len(copy), len(gone)
+    log(
+        f"{model}: {len(encode)} to embed, {len(copy)} reused from another version, {result.unchanged} unchanged, "
+        f"{len(gone)} to remove"
+    )
     if dry_run or embedder is None:
         return result
     for row in gone:
         session.delete(row)
-    for i in range(0, len(todo), BATCH):
-        chunk = todo[i : i + BATCH]
-        for (src, row), vec in zip(chunk, embedder.encode([s.text for s, _ in chunk]), strict=True):
-            if row is None:
-                session.add(
-                    Embedding(
-                        owner_type=src.owner_type,
-                        owner_id=src.owner_id,
-                        fault_id=src.fault_id,
-                        model_name=model,
-                        text=src.text,
-                        text_hash=text_hash(src.text),
-                        vector=vec,
-                    )
+
+    def put(src: Source, row: Embedding | None, vec: list[float]) -> None:
+        if row is None:
+            session.add(
+                Embedding(
+                    owner_type=src.owner_type,
+                    owner_id=src.owner_id,
+                    fault_id=src.fault_id,
+                    model_name=model,
+                    text=src.text,
+                    text_hash=text_hash(src.text),
+                    vector=vec,
                 )
-            else:
-                row.fault_id, row.text, row.text_hash, row.vector = src.fault_id, src.text, text_hash(src.text), vec
+            )
+        else:
+            row.fault_id, row.text, row.text_hash, row.vector = src.fault_id, src.text, text_hash(src.text), vec
+
+    for src, row in copy:
+        put(src, row, known[text_hash(src.text)])
+    session.flush()
+    for i in range(0, len(encode), BATCH):
+        chunk = encode[i : i + BATCH]
+        for (src, row), vec in zip(chunk, embedder.encode([s.text for s, _ in chunk]), strict=True):
+            put(src, row, vec)
         session.flush()
-        log(f"  embedded {min(i + BATCH, len(todo))}/{len(todo)}")
+        log(f"  embedded {min(i + BATCH, len(encode))}/{len(encode)}")
     return result
 
 

@@ -32,7 +32,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.enums import ReviewStatus
-from app.knowledge.models import CustomerPhrase, Fault, PhraseLanguage, PhraseSource
+from app.knowledge.models import CustomerPhrase, DatasetVersion, Fault, PhraseLanguage, PhraseSource
 from app.knowledge.questions.inputs import target_version
 
 PHRASES_DIR = Path(__file__).resolve().parents[3] / "data" / "review" / "phrases"
@@ -134,8 +134,8 @@ def validate(docs: list[tuple[Path, dict]], keys: set[str]) -> None:
             seen.add(k)
 
 
-def load(session: Session, docs: list[tuple[Path, dict]]) -> PhraseReport:
-    version = target_version(session)
+def load(session: Session, docs: list[tuple[Path, dict]], version: DatasetVersion | None = None) -> PhraseReport:
+    version = version or target_version(session)
     faults = dict(
         session.execute(select(Fault.fault_key, Fault.id).where(Fault.dataset_version_id == version.id)).all()
     )

@@ -21,7 +21,7 @@ import yaml
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from app.knowledge.models import Fault, FaultItem, FaultItemType
+from app.knowledge.models import DatasetVersion, Fault, FaultItem, FaultItemType
 from app.knowledge.questions.inputs import target_version
 from app.vision.models import AnalysisMode, ImageLabel, Severity
 
@@ -57,9 +57,11 @@ def meaning_from(description: str | None) -> str:
     return ""
 
 
-def resolve(session: Session, spec: dict[str, list[dict]] | None = None) -> list[Resolved]:
+def resolve(
+    session: Session, spec: dict[str, list[dict]] | None = None, version: DatasetVersion | None = None
+) -> list[Resolved]:
     spec = spec or load_spec()
-    version = target_version(session)
+    version = version or target_version(session)
     out: list[Resolved] = []
     for mode in AnalysisMode:
         for item in spec[mode.value]:
@@ -105,9 +107,11 @@ def resolve(session: Session, spec: dict[str, list[dict]] | None = None) -> list
     return out
 
 
-def seed(session: Session, spec: dict[str, list[dict]] | None = None) -> list[Resolved]:
+def seed(
+    session: Session, spec: dict[str, list[dict]] | None = None, version: DatasetVersion | None = None
+) -> list[Resolved]:
     """Replace image_labels with the resolved list (labels removed from the file are removed)."""
-    labels = resolve(session, spec)
+    labels = resolve(session, spec, version)
     session.execute(delete(ImageLabel))
     for r in labels:
         session.add(

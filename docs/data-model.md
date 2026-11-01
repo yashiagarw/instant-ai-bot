@@ -70,8 +70,26 @@ Types are PostgreSQL. Every table also has `id` (bigint identity) unless a natur
 | id | bigint | |
 | created_at | timestamptz | |
 | checksum | char(64) | hash of all source file hashes + manifest + alias map + taxonomy |
-| status | enum `draft`, `validated`, `published`, `archived` | one `published` at a time (Phase 4 adds per-category publishing) |
-| report | jsonb | the import validation report |
+| status | enum `draft`, `validated`, `published`, `archived` | one `published` at a time: the version the app serves, so every category has exactly one published version (0017) |
+| report | jsonb | the import validation report; `files[n]` = the file each source file was read from (path, sha256) |
+| origin | enum `import`, `upload`, `rollback` | importer CLI, a category file uploaded on the admin Datasets page, or a category restored from an archived version (0017) |
+| category_code, source_file_no | text null, smallint null | what an upload / rollback changes |
+| base_version_id, rollback_of_id | bigint null | the version it was built on; the archived version a rollback restores from |
+| upload_name, created_by | text null | |
+| validation, diff, eval | jsonb | build checks (rejected rows, nothing lost, embeddings), steps report and losses; added / changed / removed fault rows against the base; eval of the draft and the live version on the same cases with the gate result |
+| published_at, published_by, archived_at | | |
+| override_reason | text null | written reason when a super admin published over a blocked eval gate (also in audit_log) |
+
+A version is a complete copy of the knowledge: an upload copies the other categories from its base by importing the
+base's files with one replaced (app/datasets/pipeline.py). The CLI importer only reuses or deletes its own
+(`import`) versions, and the app never serves an unpublished upload.
+
+### dataset_jobs (0017)
+
+Background jobs of the dataset pipeline (arq worker): id, kind `build` / `eval` / `publish` / `rollback`,
+dataset_version_id, params jsonb, status `queued` / `running` / `succeeded` / `failed`, progress 0-100, step, log
+jsonb (last 40 steps), error, result jsonb, created_by_id (staff), created_by, created_at, started_at, finished_at.
+A partial unique index allows only one queued or running job at a time.
 
 ### problem_groups (tiles, emergency topics, inspection)
 
@@ -288,7 +306,7 @@ Filled only by the reviewed structuring step (task 1.4b). Empty after import.
 
 | Table | Columns |
 |---|---|
-| questions | id, category_code, stage (2 = main complaint, 3+ = follow-up), text_en, text_hi null, answer_type `single`, status, source_fault_ids int[], created_by (`llm:<model>` / user), reviewed_by, reviewed_at, version |
+| questions | id, dataset_version_id (0017: questions belong to a version, so a draft's never replace the live ones), category_code, stage (2 = main complaint, 3+ = follow-up), text_en, text_hi null, answer_type `single`, status, source_fault_ids int[], created_by (`llm:<model>` / user), reviewed_by, reviewed_at, version |
 | question_options | id, question_id, position, label_en, label_hi null, is_not_sure |
 | option_effects | option_id, fault_id, effect `supports` / `rules_out`, weight numeric |
 

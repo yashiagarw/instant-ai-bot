@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from app.knowledge.models import Fault, OptionEffect, Question, QuestionOption, SafetyRule
+from app.knowledge.models import DatasetVersion, Fault, OptionEffect, Question, QuestionOption, SafetyRule
 from app.knowledge.questions.inputs import target_version
 
 WEIGHTS = {"strong": 3, "moderate": 2, "weak": 1}
@@ -58,13 +58,13 @@ def _check(doc: dict) -> None:
                     )
 
 
-def load_document(session: Session, doc: dict) -> LoadReport:
+def load_document(session: Session, doc: dict, version: DatasetVersion | None = None) -> LoadReport:
     _check(doc)
     code = doc["category"]
     report = LoadReport(code)
     reviewer = doc["reviewed_by"].strip() if doc.get("reviewed_by") else ""
     now = datetime.now(UTC)
-    version = target_version(session)
+    version = version or target_version(session)
     faults = {
         f.fault_key: f
         for f in session.scalars(
@@ -74,7 +74,7 @@ def load_document(session: Session, doc: dict) -> LoadReport:
     model = (doc.get("generated") or {}).get("model", "unknown")
 
     # Replace the category's questions with the approved set (options and effects cascade).
-    session.execute(delete(Question).where(Question.category_code == code))
+    session.execute(delete(Question).where(Question.dataset_version_id == version.id, Question.category_code == code))
     session.flush()
 
     option_ids: dict[tuple[str, str], int] = {}
@@ -82,6 +82,7 @@ def load_document(session: Session, doc: dict) -> LoadReport:
         if q.get("status") != "approved":
             continue
         question = Question(
+            dataset_version_id=version.id,
             category_code=code,
             stage=q["stage"],
             text_en=q["text"].strip(),
