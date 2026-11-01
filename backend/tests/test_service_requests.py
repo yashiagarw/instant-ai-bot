@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from app.notify.email import ConsoleSender, EmailError
-from app.requests.models import ServiceRequest
+from app.requests.models import RequestEvent, ServiceRequest
 from tests.test_diagnosis_api import (  # noqa: F401 - fixtures
     answer,
     db_connection,
@@ -87,6 +87,15 @@ def test_valid_request_is_stored_with_consent_and_alerts_support(client, knowled
     assert (datetime.now(UTC) - row.consent_at).total_seconds() < 60
     assert row.vehicle_snapshot["variant_id"] == variant.id and "likely cause: Weak battery" in row.problem_summary
     assert row.alert_sent_at is not None and row.alert_error is None
+    # Phase 5.1: the likely category (mechanic skills), the safety level (queue order) and the first event.
+    assert row.category_code == "battery" and row.safety_level != "high"
+    [event] = db_session.scalars(select(RequestEvent).where(RequestEvent.request_id == row.id)).all()
+    assert (event.kind, event.from_status, event.to_status, event.actor_label) == (
+        "status",
+        None,
+        "submitted",
+        "customer",
+    )
 
     [email] = sender.sent
     assert email.to == SUPPORT and out["reference"] in email.subject and not email.subject.startswith("[URGENT]")
@@ -156,6 +165,7 @@ def test_red_safety_alert_makes_the_request_urgent(client, knowledge, variant, d
     assert r.json()["urgent"] is True
     row = db_session.scalars(select(ServiceRequest)).one()
     assert "SAFETY:" in row.problem_summary
+    assert row.safety_level == "high"  # safety-critical: first in the support queue
 
 
 def test_a_failed_email_keeps_the_request(test_settings, db_session, knowledge):  # noqa: F811

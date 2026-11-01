@@ -10,7 +10,7 @@ import { ErrorMessage } from "@/components/error-message";
 import { SafetyBanner } from "@/components/safety-banner";
 import { Skeleton } from "@/components/skeleton";
 import { accountApi, type RequestDetail as RequestDetailType, type TimelineStep } from "@/lib/api";
-import { shortDate } from "@/lib/format";
+import { indiaTime, shortDate } from "@/lib/format";
 import { useLoad } from "@/lib/use-load";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +43,7 @@ function Timeline({ steps }: { steps: TimelineStep[] }) {
               <span className={cn("font-bold", s.state === "upcoming" ? "text-ink/60" : "text-ink")}>{s.label}</span>
               <span className="text-sm text-ink/70">
                 {STATE_LABEL[s.state]}
-                {s.at && ` · ${shortDate(s.at.slice(0, 10))}`}
+                {s.at && ` · ${indiaTime(s.at)}`}
               </span>
             </span>
           </li>
@@ -53,7 +53,7 @@ function Timeline({ steps }: { steps: TimelineStep[] }) {
   );
 }
 
-/** /requests/[id]: one of the customer's own mechanic requests with its status (read-only for now). */
+/** /requests/[id]: one of the customer's own mechanic requests with its status and status changes (India time). */
 export function RequestDetailView() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -88,8 +88,30 @@ function RequestDetail({ r }: { r: RequestDetailType }) {
         <h2 id="status-h" className="mb-3 text-xl font-black text-ink">
           Status: {r.status_label}
         </h2>
+        {r.mechanic_first_name && (
+          <p className="mb-3 text-ink" data-testid="mechanic">
+            Your mechanic: <strong>{r.mechanic_first_name}</strong>
+          </p>
+        )}
         <Timeline steps={r.timeline} />
       </section>
+      {r.updates && r.updates.length > 1 && (
+        <section aria-labelledby="updates-h">
+          <h2 id="updates-h" className="mb-2 text-lg font-black text-ink">
+            Updates
+          </h2>
+          <ul className="flex flex-col gap-1" data-testid="updates">
+            {r.updates.map((u, i) => (
+              <li key={`${u.at}-${i}`} className="flex flex-wrap justify-between gap-x-3 text-ink">
+                <span>{u.label}</span>
+                <time dateTime={u.at} className="text-sm text-ink/70 tabular-nums">
+                  {indiaTime(u.at)}
+                </time>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <dl className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl bg-warm-white p-3">
           <dt className="text-sm font-semibold text-ink/70">Service</dt>

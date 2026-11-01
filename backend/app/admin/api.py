@@ -35,7 +35,7 @@ from app.db import get_session
 from app.diagnosis.models import DiagnosisSession
 from app.llm.models import GeneratedQuestion, GeneratedStatus
 from app.ratelimit import RateLimiter, client_ip
-from app.requests.models import RequestStatus, ServiceRequest
+from app.requests.models import ServiceRequest
 from app.vision.models import ImageLabel
 
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(enforce)])
@@ -156,24 +156,6 @@ class AuditOut(BaseModel):
     before: dict | None
     after: dict | None
     ip: str | None
-
-
-class RequestOut(BaseModel):
-    id: uuid.UUID
-    reference: str
-    created_at: datetime
-    status: RequestStatus
-    name: str
-    phone: str = Field(description="Full number only with requests.contact; otherwise the last 4 digits.")
-    area: str
-    service_type: str
-    urgent: bool
-    problem_summary: str
-    session_id: uuid.UUID | None
-
-
-class RequestStatusIn(BaseModel):
-    status: RequestStatus
 
 
 class QuestionOut(BaseModel):
@@ -546,72 +528,7 @@ def reveal_phone(customer_id: uuid.UUID, staff: CurrentStaff, session: DbSession
     return PhoneOut(phone=user.phone)
 
 
-# ---------------------------------------------------------------- mechanic requests
-
-
-def _request_out(r: ServiceRequest, contact: bool) -> RequestOut:
-    return RequestOut(
-        id=r.id,
-        reference=r.reference,
-        created_at=r.created_at,
-        status=r.status,
-        name=r.name,
-        phone=r.phone if contact else audit.mask_phone(r.phone),
-        area=r.area_text or r.pincode,
-        service_type=str(r.service_type),
-        urgent=r.urgent,
-        problem_summary=r.problem_summary,
-        session_id=r.session_id,
-    )
-
-
-def _request_or_404(session: Session, request_id: uuid.UUID) -> ServiceRequest:
-    row = session.get(ServiceRequest, request_id)
-    if row is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Request not found")
-    return row
-
-
-@router.get("/requests", response_model=list[RequestOut])
-@requires(Perm.requests_read)
-def list_requests(
-    staff: CurrentStaff,
-    session: DbSession,
-    status_filter: Annotated[RequestStatus | None, Query(alias="status")] = None,
-    limit: Annotated[int, Query(ge=1, le=200)] = 50,
-):
-    q = select(ServiceRequest).order_by(ServiceRequest.created_at.desc()).limit(limit)
-    if status_filter:
-        q = q.where(ServiceRequest.status == status_filter)
-    contact = Perm.requests_contact in staff.perms
-    return [_request_out(r, contact) for r in session.scalars(q)]
-
-
-@router.get("/requests/{request_id}", response_model=RequestOut, responses={404: {}})
-@requires(Perm.requests_read)
-def get_request(request_id: uuid.UUID, staff: CurrentStaff, session: DbSession):
-    return _request_out(_request_or_404(session, request_id), Perm.requests_contact in staff.perms)
-
-
-@router.patch("/requests/{request_id}", response_model=RequestOut, responses={404: {}})
-@requires(Perm.requests_update)
-def update_request(request_id: uuid.UUID, body: RequestStatusIn, staff: CurrentStaff, session: DbSession):
-    row = _request_or_404(session, request_id)
-    before = {"status": str(row.status)}
-    row.status = body.status
-    audit.record(
-        session,
-        actor_id=staff.user.id,
-        actor_label=staff.label,
-        action="request.set_status",
-        entity_type="service_request",
-        entity_id=row.id,
-        before=before,
-        after={"status": str(row.status)},
-        ip=staff.ip,
-    )
-    session.commit()
-    return _request_out(row, Perm.requests_contact in staff.perms)
+# ---------------------------------------------------------------- mechanic requests: app/requests/admin_api.py
 
 
 # ---------------------------------------------------------------- content

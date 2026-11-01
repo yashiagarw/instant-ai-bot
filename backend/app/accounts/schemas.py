@@ -82,12 +82,22 @@ class TimelineStep(BaseModel):
     at: datetime | None = None
 
 
+class StatusUpdate(BaseModel):
+    at: datetime
+    status: str
+    label: str
+
+
 class RequestDetailOut(RequestSummaryOut):
     service_type: str
     area: str
     preferred_time: str
     session_id: uuid.UUID | None
     timeline: list[TimelineStep]
+    mechanic_first_name: str | None = Field(
+        default=None, description="Once a mechanic took the job. Never their phone number or documents."
+    )
+    updates: list[StatusUpdate] = Field(default_factory=list, description="Status changes, newest first")
 
 
 class DeleteAccountIn(BaseModel):

@@ -38,6 +38,9 @@ table against it and calls every admin endpoint with every role.
 | `datasets.override` | yes | no | no | no | no |
 | `knowledge.edit` | yes | yes | no | no | no |
 | `vehicles.manage` | yes | yes | no | no | no |
+| `mechanics.read` | yes | no | yes | no | no |
+| `mechanics.manage` | yes | no | yes | no | no |
+| `mechanics.documents` | yes | no | no | no | no |
 
 What each permission covers:
 
@@ -48,9 +51,12 @@ What each permission covers:
 | `staff.read` | `GET /api/admin/staff` |
 | `staff.manage` | `POST /api/admin/staff` (invite: a temporary password returned once), `PUT /api/admin/staff/{id}/roles`, `POST /api/admin/staff/{id}/deactivate`, `.../activate`, `.../unlock`, `.../reset-two-factor` (removes two-factor: set up again at the next sign-in) |
 | `audit.read` | `GET /api/admin/audit` (filters: `action`, `entity_type`, `entity_id`, `actor`, `since`, `until`, `limit`) |
-| `requests.read` | `GET /api/admin/requests`, `GET /api/admin/requests/{id}`: phone numbers show only the last 4 digits |
-| `requests.contact` | the same, with the customer's full phone number (to call them) |
-| `requests.update` | `PATCH /api/admin/requests/{id}` (status) |
+| `requests.read` | `GET /api/admin/requests` (the queue: safety-critical first, then urgent, then oldest; filters `view`, `status`, `safety`, `category`, `mine`, `q`), `GET /api/admin/requests/{id}` (detail, timeline, notes, outcome), `GET .../{id}/suggestions` (matching mechanics with reasons), `GET .../{id}/faults` (what the confirmed fault can be: the diagnosis's top 3, then the category's faults): customer phone numbers always show only the last 4 digits |
+| `requests.contact` | `POST /api/admin/requests/{id}/reveal-phone`: the customer's full number, **only for the agent assigned to the request**; each reveal written to the audit log |
+| `requests.update` | `PATCH /api/admin/requests/{id}` (an allowed status change; cancel / escalate need a note), `PUT .../{id}/agent` (take it; giving it to someone else needs `staff.manage`), `POST .../{id}/offer` (to a mechanic), `.../response` (the mechanic accepted / declined), `.../notes` (internal), `.../outcome` (confirmed fault: completes the job) |
+| `mechanics.read` | `GET /api/admin/mechanics`, `GET /api/admin/mechanics/{id}` (with the mechanic's phone number; jobs today, acceptance rate) |
+| `mechanics.manage` | `POST /api/admin/mechanics`, `PUT .../{id}`, `PUT .../{id}/skills`, `.../zones`, `.../availability` (weekly shifts, India time), `.../duty` (on / off duty); live, audited |
+| `mechanics.documents` | `GET/POST /api/admin/mechanics/{id}/documents`, `GET/DELETE .../documents/{doc}`: ID documents, encrypted with `MECHANIC_DOCS_KEY`; every view written to the audit log |
 | `content.read` | `GET /api/admin/content/generated-questions`, `GET /api/admin/content/image-labels` |
 | `content.review` | `POST /api/admin/content/generated-questions/{id}/review` (approve / reject) |
 | `content.read` (datasets) | `GET /api/admin/datasets` (versions, categories, active job), `GET /api/admin/datasets/versions/{id}` (validation report, diff, eval), `GET /api/admin/datasets/jobs/{id}` (progress) |
@@ -72,7 +78,8 @@ only for convenience: the API checks every call.
 | Menu item | Shown with |
 | --- | --- |
 | Overview | `self` (every staff member) |
-| Requests, Mechanics | `requests.read` (Mechanics also with `staff.read`) |
+| Requests | `requests.read` (actions: `requests.update`; the customer's number: `requests.contact` and owning the request) |
+| Mechanics | `mechanics.read` (editing: `mechanics.manage`; the Documents section: `mechanics.documents`) |
 | Knowledge, Vehicles, Parts & Prices, Datasets, Quality | `content.read` (editing: `knowledge.edit`; the unlisted-vehicles queue: `vehicles.manage`) |
 | Users | `staff.read` (Staff tab) or `customers.read` (Customers tab) |
 | Audit log | `audit.read` |
@@ -107,7 +114,12 @@ The table is append-only (a trigger refuses UPDATE and DELETE).
 | `staff.login`, `staff.login_failed`, `staff.locked`, `staff.login_locked`, `staff.logout`, `staff.two_factor_setup_started`, `staff.two_factor_enrolled` | sign-in events |
 | `customer.reveal_phone` | a customer's full phone number was shown |
 | `staff.create`, `staff.set_roles`, `staff.activate`, `staff.deactivate`, `staff.unlock`, `staff.reset_two_factor`, `staff.change_password` | staff accounts (API or CLI) |
-| `request.set_status` | a mechanic request's status changed |
+| `request.set_status` | a mechanic request's status changed (also an offer, the mechanic's answer and completion; the note or confirmed fault in `after`) |
+| `request.set_agent` | who owns a request changed |
+| `request.reveal_phone` | the assigned agent revealed the customer's full number (masked in the log) |
+| `mechanic.create`, `mechanic.update` | a mechanic added or changed (phone masked) |
+| `mechanic.skills`, `mechanic.zones`, `mechanic.availability`, `mechanic.duty` | their skills, zones, weekly shifts, on / off duty |
+| `mechanic.document_upload`, `mechanic.document_view`, `mechanic.document_delete` | an ID document stored (encrypted), opened, deleted |
 | `content.review_question` | a generated question approved or rejected |
 | `dataset.upload`, `dataset.rebuild`, `dataset.eval`, `dataset.publish_requested`, `dataset.rollback_requested`, `dataset.discard`, `dataset.job_cancel` | Datasets page actions (the job id in `after`) |
 | `dataset.publish`, `dataset.rollback` | the worker switched the published version (`before`: the version archived) |

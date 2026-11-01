@@ -27,10 +27,8 @@ export interface NavItem {
 
 export const NAV: NavItem[] = [
   { key: "overview", label: "Overview", href: "/", icon: LayoutDashboard, anyOf: ["self"] },
-  { key: "requests", label: "Requests", href: "/requests", icon: ClipboardList, anyOf: ["requests.read"],
-    placeholder: "Mechanic requests from customers: status, contact and assignment." },
-  { key: "mechanics", label: "Mechanics", href: "/mechanics", icon: Wrench, anyOf: ["requests.read", "staff.read"],
-    placeholder: "Mechanics, their areas and their assigned jobs." },
+  { key: "requests", label: "Requests", href: "/requests", icon: ClipboardList, anyOf: ["requests.read"] },
+  { key: "mechanics", label: "Mechanics", href: "/mechanics", icon: Wrench, anyOf: ["mechanics.read"] },
   { key: "knowledge", label: "Knowledge", href: "/knowledge", icon: BookOpen, anyOf: ["content.read"] },
   { key: "vehicles", label: "Vehicles", href: "/vehicles", icon: Car, anyOf: ["content.read"] },
   { key: "parts", label: "Parts & Prices", href: "/parts", icon: Tags, anyOf: ["content.read"] },

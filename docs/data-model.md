@@ -114,6 +114,31 @@ with position -1 (never shown).
 - knowledge_edits entities added: `part`, `part_price`, `part_fit`, `labour_rate`, `zone_rate`, `part_images` (applied by
   the "parts edits apply" step after `parts build`).
 
+### Mechanics and the request workflow (0020)
+
+- `service_requests.status`: submitted, triaged, offered, accepted, en_route, arrived, in_progress, completed,
+  cancelled, escalated (allowed moves: `backend/app/requests/workflow.py`). Old rows: new / contacted became
+  triaged, assigned became accepted. New columns: `safety_level` (none / low / medium / high from the diagnosis; high =
+  a red banner alert, first in the queue; old urgent rows became high), `category_code` (the top cause's category,
+  for mechanic skills), `assigned_agent_id` (the agent who owns it: the only one who can reveal the phone),
+  `status_changed_at`.
+- `request_events`: request_id, at, kind (status / offer / response / agent / outcome), from_status, to_status,
+  actor_id, actor_label, note, data. Every status change writes one; the customer's page reads the status events.
+- `request_notes`: internal notes (never shown to the customer).
+- `request_assignments`: request_id, mechanic_id, status (offered / accepted / declined / withdrawn / completed),
+  offered_at, responded_at, offered_by, match (score, distance, reasons when offered), note. At most one open
+  (offered / accepted) per request (partial unique index).
+- `request_outcomes` (training data, one per completed request): confirmed_fault_key (null = "other", then
+  other_text), ai_top1, ai_top3, ai_ranked (the diagnosis's top 3 then), parts_used, final_cost_inr, mechanic_notes,
+  session_id, dataset_version_id (of the diagnosis), mechanic_id, recorded_by, recorded_at.
+- `mechanics`: name (customers see the first word only), phone, staff_user_id, base_pincode, base_area, rating (0-5),
+  max_jobs_per_day, on_duty, active, notes, dev_seed (fake rows from `app.mechanics.dev_seed`).
+  `mechanic_skills` (category codes), `mechanic_zones` (a pincode, or a radius in km around a point / the base),
+  `mechanic_availability` (weekly shifts, India time; none = any time on duty), `mechanic_documents` (Fernet
+  ciphertext with MECHANIC_DOCS_KEY, kind, filename, content type, size).
+- Distances use `data/schema/pincode_centres.yaml` (GeoNames, CC BY 4.0, downloaded 2026-11-01; about half the
+  pincodes are "rough" estimates, flagged in the matching notes).
+
 ### dataset_jobs (0017)
 
 Background jobs of the dataset pipeline (arq worker): id, kind `build` / `eval` / `publish` / `rollback`,
@@ -442,7 +467,7 @@ Implemented with the knowledge tables in migration `0002` (task 1.3). Code: `bac
 | session_events | session_id, event_type, question_id, option_id, payload, created_at | `created_at` is when the question was asked / answered |
 | session_results | session_id, rank, fault_id, fault_key, score, confidence, evidence, cost_snapshot | |
 | feedback | session_id, source (customer / support / mechanic), helpful, comment, confirmed_fault_id | confirmed fault = future training label |
-| service_requests | id (UUID), session_id, name, phone, area_text, vehicle_snapshot, problem_summary, status, consent_given, consent_text_version, consent_at | a CHECK refuses any row without a full consent record |
+| service_requests | id (UUID), session_id, name, phone, area_text, vehicle_snapshot, problem_summary, status, consent_given, consent_text_version, consent_at (+ 0020: safety_level, category_code, assigned_agent_id) | a CHECK refuses any row without a full consent record |
 
 Value sets (fuel, transmission, segment, statuses) are text columns with CHECK constraints rather than native Postgres enums, so adding a value is a one-line migration. Seed data: `data/catalogue/vehicles.yaml` (`uv run python -m app.vehicles.seed`).
 

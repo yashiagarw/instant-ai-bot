@@ -678,6 +678,220 @@ export interface ImportResult {
   rows: ImportRow[];
 }
 
+// ---------------------------------------------------------------- mechanics and requests (phase 5.1)
+
+/** "pincode" (its centre), "rough" (estimated: can be 10-20 km off) or "zone" (only the zone's centre is known). */
+export type Precision = "pincode" | "rough" | "zone";
+
+export interface Zone {
+  pincode: string | null;
+  radius_km: number | null;
+  center_lat: number | null;
+  center_lon: number | null;
+  point: [number, number] | null;
+  precision: Precision | null;
+}
+
+export interface Shift {
+  weekday: number; // 0 = Monday
+  start_time: string; // "09:00", India time
+  end_time: string;
+}
+
+export interface Mechanic {
+  id: number;
+  name: string;
+  phone: string;
+  base_pincode: string;
+  base_area: string;
+  base_point: [number, number] | null;
+  base_precision: Precision | null;
+  rating: number | null;
+  max_jobs_per_day: number;
+  on_duty: boolean;
+  on_duty_changed_at: string | null;
+  active: boolean;
+  staff_user_id: string | null;
+  notes: string;
+  dev_seed: boolean;
+  skills: string[];
+  zones: Zone[];
+  shifts: Shift[];
+  jobs_today: number;
+  acceptance_rate: number | null;
+  documents: number | null;
+}
+
+export interface MechanicInput {
+  name: string;
+  phone: string;
+  base_pincode: string;
+  base_area: string;
+  rating: number | null;
+  max_jobs_per_day: number;
+  active: boolean;
+  notes: string;
+}
+
+export type ZoneInput = Pick<Zone, "pincode" | "radius_km" | "center_lat" | "center_lon">;
+
+export type DocumentKind = "id_proof" | "driving_licence" | "certificate" | "other";
+
+export interface MechanicDocument {
+  id: number;
+  kind: DocumentKind;
+  filename: string;
+  content_type: string;
+  size: number;
+  uploaded_by: string;
+  uploaded_at: string;
+}
+
+export interface CategoryOption {
+  code: string;
+  name: string;
+  kind: string;
+}
+
+export type RequestStatus =
+  | "submitted"
+  | "triaged"
+  | "offered"
+  | "accepted"
+  | "en_route"
+  | "arrived"
+  | "in_progress"
+  | "completed"
+  | "cancelled"
+  | "escalated";
+
+export type SafetyLevel = "none" | "low" | "medium" | "high";
+
+export interface QueueRow {
+  id: string;
+  reference: string;
+  created_at: string;
+  age_minutes: number;
+  status: RequestStatus;
+  safety_level: SafetyLevel;
+  urgent: boolean;
+  name: string;
+  phone: string; // always masked
+  area: string;
+  pincode: string;
+  service_type: string;
+  category_code: string | null;
+  category: string | null;
+  vehicle: string;
+  problem_summary: string;
+  agent: string | null;
+  mechanic: string | null;
+  session_id: string | null;
+}
+
+export interface QueueQuery {
+  view?: "open" | "closed" | "all";
+  status?: string;
+  safety?: string;
+  category?: string;
+  mine?: boolean;
+  q?: string;
+}
+
+export interface Assignment {
+  id: number;
+  mechanic_id: number;
+  mechanic: string;
+  status: "offered" | "accepted" | "declined" | "withdrawn" | "completed";
+  offered_at: string;
+  responded_at: string | null;
+  offered_by: string;
+  match: { suggested?: boolean; score?: number; distance_km?: number | null; reasons?: string[] };
+  note: string;
+}
+
+export interface RequestEvent {
+  id: number;
+  at: string;
+  kind: "status" | "offer" | "response" | "agent" | "outcome";
+  from_status: string | null;
+  to_status: string | null;
+  actor: string;
+  note: string;
+  data: Record<string, unknown>;
+}
+
+export interface PartUsed {
+  name: string;
+  quantity: number;
+  price_inr: number | null;
+}
+
+export interface Outcome {
+  confirmed_fault_key: string | null;
+  confirmed_fault: string | null;
+  other_text: string;
+  ai_top1: boolean | null;
+  ai_top3: boolean | null;
+  ai_ranked: string[];
+  parts_used: PartUsed[];
+  final_cost_inr: number | null;
+  mechanic_notes: string;
+  dataset_version_id: number | null;
+  mechanic_id: number | null;
+  recorded_by: string;
+  recorded_at: string;
+}
+
+export interface RequestDetail extends QueueRow {
+  address: string;
+  preferred_time: string;
+  notes_from_customer: string;
+  phone_revealable: boolean;
+  point: { lat: number; lon: number; precision: Precision } | null;
+  causes: { rank: number; fault_key: string; name: string | null; confidence: string }[];
+  allowed: RequestStatus[];
+  assignments: Assignment[];
+  events: RequestEvent[];
+  internal_notes: { id: number; created_at: string; author: string; text: string }[];
+  outcome: Outcome | null;
+}
+
+export interface Suggestion {
+  mechanic_id: number;
+  name: string;
+  score: number;
+  distance_km: number | null;
+  rating: number | null;
+  acceptance_rate: number | null;
+  jobs_today: number;
+  max_jobs_per_day: number;
+  reasons: string[];
+}
+
+export interface Suggestions {
+  category_code: string | null;
+  point: { lat: number; lon: number; precision: Precision } | null;
+  notes: string[];
+  suggestions: Suggestion[];
+  excluded: { mechanic_id: number; name: string; reasons: string[] }[];
+}
+
+export interface FaultOption {
+  fault_key: string;
+  name: string;
+  category_code: string;
+  ai_rank: number | null;
+}
+
+export interface OutcomeInput {
+  confirmed_fault_key: string;
+  other_text: string;
+  parts_used: PartUsed[];
+  final_cost_inr: number | null;
+  mechanic_notes: string;
+}
+
 /** The API's media address for a picture path like /media/F08/x.png. */
 export const mediaUrl = (path: string) => `${API_URL}${path}`;
 
@@ -792,4 +1006,41 @@ export const adminApi = {
   makes: () => call<{ name: string; models: string[] }[]>("GET", "/vehicles/makes"),
   addUnlisted: (id: number, body: unknown) => call<{ created: string[] }>("POST", `/vehicles/unlisted/${id}/add`, body),
   dismissUnlisted: (id: number) => call<{ ok: boolean }>("POST", `/vehicles/unlisted/${id}/dismiss`),
+
+  /** The public category list (GET /api/categories, no sign-in): names for skills and filters. */
+  categories: async (signal?: AbortSignal): Promise<CategoryOption[]> => {
+    const res = await fetch(`${API_URL}/api/categories`, { signal, cache: "no-store" }).catch(() => null);
+    if (!res?.ok) throw new ApiError("We couldn't load the categories. Please try again.", res?.status ?? 0);
+    const data = (await res.json()) as { categories: CategoryOption[] };
+    return data.categories;
+  },
+
+  mechanics: (includeInactive = false, signal?: AbortSignal) =>
+    call<Mechanic[]>("GET", `/mechanics${query({ include_inactive: includeInactive || undefined })}`, undefined, signal),
+  mechanic: (id: number, signal?: AbortSignal) => call<Mechanic>("GET", `/mechanics/${id}`, undefined, signal),
+  saveMechanic: (id: number | null, body: MechanicInput) =>
+    call<Mechanic>(id ? "PUT" : "POST", `/mechanics${id ? `/${id}` : ""}`, body),
+  setSkills: (id: number, category_codes: string[]) => call<Mechanic>("PUT", `/mechanics/${id}/skills`, { category_codes }),
+  setZones: (id: number, zones: ZoneInput[]) => call<Mechanic>("PUT", `/mechanics/${id}/zones`, { zones }),
+  setShifts: (id: number, shifts: Shift[]) => call<Mechanic>("PUT", `/mechanics/${id}/availability`, { shifts }),
+  setDuty: (id: number, on_duty: boolean) => call<Mechanic>("PUT", `/mechanics/${id}/duty`, { on_duty }),
+  documents: (id: number, signal?: AbortSignal) => call<MechanicDocument[]>("GET", `/mechanics/${id}/documents`, undefined, signal),
+  uploadDocument: (id: number, kind: DocumentKind, file: File) =>
+    call<MechanicDocument>("POST", `/mechanics/${id}/documents${query({ kind, filename: file.name })}`, file),
+  documentUrl: (id: number, doc: number) => `${API_URL}/api/admin/mechanics/${id}/documents/${doc}`,
+  deleteDocument: (id: number, doc: number) => call<void>("DELETE", `/mechanics/${id}/documents/${doc}`),
+
+  requests: (q: QueueQuery, signal?: AbortSignal) =>
+    call<QueueRow[]>("GET", `/requests${query({ ...q, mine: q.mine || undefined })}`, undefined, signal),
+  request: (id: string, signal?: AbortSignal) => call<RequestDetail>("GET", `/requests/${id}`, undefined, signal),
+  revealRequestPhone: (id: string) => call<{ phone: string }>("POST", `/requests/${id}/reveal-phone`),
+  setRequestStatus: (id: string, status: RequestStatus, note = "") => call<RequestDetail>("PATCH", `/requests/${id}`, { status, note }),
+  takeRequest: (id: string) => call<RequestDetail>("PUT", `/requests/${id}/agent`, {}),
+  suggestions: (id: string, signal?: AbortSignal) => call<Suggestions>("GET", `/requests/${id}/suggestions`, undefined, signal),
+  faultOptions: (id: string, signal?: AbortSignal) => call<FaultOption[]>("GET", `/requests/${id}/faults`, undefined, signal),
+  offer: (id: string, mechanic_id: number, note = "") => call<RequestDetail>("POST", `/requests/${id}/offer`, { mechanic_id, note }),
+  mechanicAnswer: (id: string, accepted: boolean, note = "") =>
+    call<RequestDetail>("POST", `/requests/${id}/response`, { accepted, note }),
+  addRequestNote: (id: string, text: string) => call<RequestDetail>("POST", `/requests/${id}/notes`, { text }),
+  completeJob: (id: string, body: OutcomeInput) => call<RequestDetail>("POST", `/requests/${id}/outcome`, body),
 };

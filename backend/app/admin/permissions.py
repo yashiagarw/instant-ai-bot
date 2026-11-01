@@ -25,12 +25,15 @@ class Perm(StrEnum):
     datasets_override = "datasets.override"  # publish although the eval gate blocks it (written reason, audited)
     knowledge_edit = "knowledge.edit"  # edit knowledge in a draft version, sign items off, review generated questions
     vehicles_manage = "vehicles.manage"  # the car catalogue and the unlisted-vehicles queue (live, audited)
+    mechanics_read = "mechanics.read"  # mechanics, their skills, zones and shifts (mechanic phone numbers too)
+    mechanics_manage = "mechanics.manage"  # create and edit mechanics, set on / off duty
+    mechanics_documents = "mechanics.documents"  # mechanics' ID documents (encrypted; each view audited)
 
 
 PUBLIC = "public"  # no login needed (only the staff login itself)
 
 ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
-    RoleCode.super_admin: frozenset(Perm),
+    RoleCode.super_admin: frozenset(Perm),  # the only role with mechanics.documents
     RoleCode.content_admin: frozenset(
         {
             Perm.self_service,
@@ -49,6 +52,8 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
             Perm.requests_update,
             Perm.customers_read,
             Perm.customers_contact,
+            Perm.mechanics_read,
+            Perm.mechanics_manage,
         }
     ),
     RoleCode.mechanic: frozenset({Perm.self_service, Perm.requests_read}),

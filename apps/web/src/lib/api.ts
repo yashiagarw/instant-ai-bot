@@ -651,6 +651,10 @@ export interface RequestDetail extends RequestSummary {
   preferred_time: string;
   session_id: string | null;
   timeline: TimelineStep[];
+  /** Once a mechanic took the job: their first name only (never a phone number). */
+  mechanic_first_name?: string | null;
+  /** Status changes, newest first. */
+  updates?: { at: string; status: string; label: string }[];
 }
 
 export interface AuthConfig {

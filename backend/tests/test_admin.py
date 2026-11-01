@@ -114,7 +114,7 @@ def calls(t: dict, who: str, secret: str) -> list[tuple[str, str, dict | None]]:
         ("GET", "/api/admin/audit", None),
         ("GET", "/api/admin/requests", None),
         ("GET", f"/api/admin/requests/{t['request_id']}", None),
-        ("PATCH", f"/api/admin/requests/{t['request_id']}", {"status": "contacted"}),
+        ("PATCH", f"/api/admin/requests/{t['request_id']}", {"status": "triaged"}),
         ("GET", "/api/admin/content/generated-questions", None),
         ("POST", f"/api/admin/content/generated-questions/{t['question_id']}/review", {"decision": "approved"}),
         ("GET", "/api/admin/content/image-labels", None),
@@ -126,8 +126,9 @@ def calls(t: dict, who: str, secret: str) -> list[tuple[str, str, dict | None]]:
 
 def permission_of(app, method: str, path: str) -> str:
     from app.admin import api
+    from app.requests import admin_api as requests_api
 
-    for r in admin_routes(api.router):
+    for r in [*admin_routes(api.router), *admin_routes(requests_api.router)]:
         pattern = "^/api" + re.sub(r"\{[^}]+\}", "[^/]+", r.path) + "$"
         if method in r.methods and re.match(pattern, path):
             return getattr(r.endpoint, ATTR)
@@ -323,12 +324,15 @@ def test_there_is_always_one_active_super_admin(app, db_session, test_settings):
     assert r.status_code == 422
 
 
-def test_mechanics_see_masked_phone_numbers_support_sees_them_in_full(app, db_session, test_settings, targets):
+def test_request_phone_numbers_are_masked_for_everyone_until_the_owner_reveals_them(
+    app, db_session, test_settings, targets
+):
+    """Phase 5.1: lists and details always mask; only the assigned agent can reveal (tests/test_mechanics.py)."""
     _, m = make_staff(db_session, test_settings, "mech@im.test", ["mechanic"])
     _, s = make_staff(db_session, test_settings, "agent@im.test", ["support_agent"])
     path = f"/api/admin/requests/{targets['request_id']}"
     assert sign_in(app, "mech@im.test", m).get(path).json()["phone"] == "******1234"
-    assert sign_in(app, "agent@im.test", s).get(path).json()["phone"] == "+919800001234"
+    assert sign_in(app, "agent@im.test", s).get(path).json()["phone"] == "******1234"
 
 
 # ---------------------------------------------------------------- audit log
@@ -342,7 +346,7 @@ def test_audit_rows_never_hold_secrets_or_full_phone_numbers(app, db_session, te
     setup = browser(app).post("/api/admin/auth/login", json={"email": "new@im.test", "password": temporary}).json()
     secret = setup["setup"]["secret"]
     c.post(f"/api/admin/staff/{created['staff']['id']}/reset-two-factor")
-    c.patch(f"/api/admin/requests/{targets['request_id']}", json={"status": "contacted"})
+    c.patch(f"/api/admin/requests/{targets['request_id']}", json={"status": "triaged"})
     c.post(f"/api/admin/customers/{targets['customer_id']}/reveal-phone")
     c.post("/api/admin/auth/password", json={"current_password": PASSWORD, "code": code(boss, 1),
                                              "new_password": "an even better passphrase 2"})  # fmt: skip
@@ -353,7 +357,7 @@ def test_audit_rows_never_hold_secrets_or_full_phone_numbers(app, db_session, te
                    "argon2", "gAAAA"):  # fmt: skip
         assert leaked not in dump, leaked
     one = db_session.scalar(select(AuditLog).where(AuditLog.action == "request.set_status"))
-    assert one.before == {"status": "submitted"} and one.after == {"status": "contacted"}
+    assert one.before == {"status": "submitted"} and one.after == {"status": "triaged"}
     assert one.actor_label == "boss@im.test" and str(one.ip) and one.at
 
     m = mask(
@@ -547,12 +551,12 @@ def test_customers_are_listed_with_masked_phones_and_a_reveal_is_audited(app, db
 def test_audit_filters(app, db_session, test_settings, targets):
     _, boss = make_staff(db_session, test_settings, "boss@im.test", ["super_admin"])
     c = sign_in(app, "boss@im.test", boss)
-    c.patch(f"/api/admin/requests/{targets['request_id']}", json={"status": "contacted"})
+    c.patch(f"/api/admin/requests/{targets['request_id']}", json={"status": "triaged"})
     get = lambda q: c.get(f"/api/admin/audit?{q}").json()  # noqa: E731
     assert {r["action"] for r in get("action=request.set_status")} == {"request.set_status"}
     assert {r["entity_type"] for r in get("entity_type=service_request")} == {"service_request"}
     assert {r["actor_label"] for r in get("actor=BOSS")} == {"boss@im.test"}
-    assert get(f"entity_id={targets['request_id']}")[0]["after"] == {"status": "contacted"}
+    assert get(f"entity_id={targets['request_id']}")[0]["after"] == {"status": "triaged"}
     future = (datetime.now(UTC) + timedelta(days=1)).isoformat().replace("+00:00", "Z")
     assert get(f"since={future}") == [] and len(get(f"until={future}&limit=2")) == 2
 

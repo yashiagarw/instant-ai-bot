@@ -20,6 +20,21 @@ export function shortDate(iso: string): string {
     : d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
+const INDIA_TIME = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "Asia/Kolkata",
+  day: "numeric",
+  month: "short",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+});
+
+/** A timestamp in India time, whatever the browser's zone: "2026-11-02T06:30:00Z" → "2 Nov, 12:00 pm". */
+export function indiaTime(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? iso : INDIA_TIME.format(d);
+}
+
 const PLACEHOLDER = /^\s*(not stated|depends|n\/?a|none|nil|-+|–)\.?\s*$/i;
 
 /** The text, or "" when the source cell only holds a placeholder such as "Not stated" or "Depends.". */

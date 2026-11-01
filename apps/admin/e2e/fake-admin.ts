@@ -7,6 +7,7 @@ import type { Page, Route } from "@playwright/test";
 
 import { FakeDatasets } from "./fake-datasets";
 import { FakeKnowledge } from "./fake-knowledge";
+import { CATEGORIES, FakeOps } from "./fake-ops";
 import { FakeParts } from "./fake-parts";
 
 export const API = "http://localhost:8000/api/admin";
@@ -16,9 +17,10 @@ export const SETUP_KEY = "JBSWY3DPEHPK3PXPJBSWY3DP";
 const PERMS: Record<string, string[]> = {
   super_admin: ["self", "staff.read", "staff.manage", "audit.read", "requests.read", "requests.contact",
     "requests.update", "customers.read", "customers.contact", "content.read", "content.review", "datasets.manage",
-    "datasets.override", "knowledge.edit", "vehicles.manage"],
+    "datasets.override", "knowledge.edit", "vehicles.manage", "mechanics.read", "mechanics.manage", "mechanics.documents"],
   content_admin: ["self", "content.read", "content.review", "datasets.manage", "knowledge.edit", "vehicles.manage"],
-  support_agent: ["self", "requests.read", "requests.contact", "requests.update", "customers.read", "customers.contact"],
+  support_agent: ["self", "requests.read", "requests.contact", "requests.update", "customers.read", "customers.contact",
+    "mechanics.read", "mechanics.manage"],
   mechanic: ["self", "requests.read"],
 }; // prettier-ignore
 
@@ -80,6 +82,7 @@ export class FakeAdmin {
   datasets = new FakeDatasets();
   parts = new FakeParts();
   knowledge = new FakeKnowledge(this.parts);
+  ops = new FakeOps();
   revealed: string[] = [];
 
   /** Signed in already (skips the login screen). */
@@ -189,12 +192,18 @@ export class FakeAdmin {
     }
     return (
       this.datasets.handle(method, path, url, body, perms, a.email) ??
+      this.ops.handle(method, path, url, body, perms, a.email, a.name) ??
       this.parts.handle(method, path, body, perms, a.email, raw, url) ??
       this.knowledge.handle(method, path, body, perms) ?? { status: 404, json: { detail: "Not Found" } }
     );
   }
 
   async install(page: Page): Promise<this> {
+    // The public category list (names for skills and filters) and no map tiles from the internet in tests.
+    await page.route("http://localhost:8000/api/categories", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ categories: CATEGORIES, topics: [] }) }),
+    );
+    await page.route(/tile\.openstreetmap\.org/, (route) => route.abort());
     await page.route(`${API}/**`, async (route: Route) => {
       const req = route.request();
       const url = new URL(req.url());

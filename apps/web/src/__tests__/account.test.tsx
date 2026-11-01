@@ -115,7 +115,7 @@ test("account: my garage, diagnosis history, my requests and log out", async () 
   const request = within(screen.getByTestId("my-requests")).getByRole("link");
   expect(request.getAttribute("href")).toBe(`/requests/${REQUEST.id}`);
   expect(request.textContent).toContain("IM-7K3Q9P");
-  expect(request.textContent).toContain("We called you");
+  expect(request.textContent).toContain("Mechanic on the way");
 
   fireEvent.click(screen.getByRole("button", { name: "Log out" }));
   await waitFor(() => expect(push).toHaveBeenCalledWith("/"));
@@ -141,16 +141,24 @@ test("request page: the status timeline, and someone else's request is not found
   params = { id: REQUEST.id };
   render(<RequestDetailView />);
   expect((await screen.findByRole("heading", { level: 1 })).textContent).toBe("IM-7K3Q9P");
-  expect(screen.getByText("Status: We called you")).toBeDefined();
+  expect(screen.getByText("Status: Mechanic on the way")).toBeDefined();
+  expect(screen.getByTestId("mechanic").textContent).toBe("Your mechanic: Sunita");
   const steps = within(screen.getByTestId("timeline")).getAllByRole("listitem");
+  // Times in India time (09:15 UTC = 2:45 pm IST), whatever the test machine's zone.
   expect(steps.map((s) => s.textContent)).toEqual([
-    "Request receivedDone · 30 Oct 2026",
-    "Picked up by our teamDone",
-    "We called youNow",
-    "Mechanic assignedNext",
-    "CompletedNext",
+    "Request receivedDone · 30 Oct, 2:45 pm",
+    "Our team is on itDone · 30 Oct, 2:50 pm",
+    "Mechanic assignedDone · 30 Oct, 3:10 pm",
+    "Mechanic on the wayNow · 30 Oct, 3:15 pm",
+    "Mechanic has arrivedNext",
+    "Repair in progressNext",
+    "DoneNext",
   ]);
-  expect(steps[2].getAttribute("aria-current")).toBe("step");
+  expect(steps[3].getAttribute("aria-current")).toBe("step");
+  const updates = within(screen.getByTestId("updates")).getAllByRole("listitem");
+  expect(updates[0].textContent).toBe("Mechanic on the way30 Oct, 3:15 pm");
+  expect(updates).toHaveLength(5);
+  expect(document.body.textContent).not.toMatch(/\+91|\d{10}/); // never a phone number
   cleanup();
   params = { id: "00000000-0000-4000-8000-000000000099" };
   render(<RequestDetailView />);

@@ -45,7 +45,7 @@ docker compose up -d db storage redis
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0019)
+uv run alembic upgrade head                          # all migrations (0001 … 0020)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -469,8 +469,8 @@ brand theme, Button, Dialog, data table). Start both with `pnpm dev` from the re
   else. Sessions: 8 hours, 30 minutes idle.
 - **Menu**: Overview, Requests, Mechanics, Knowledge, Vehicles, Parts & Prices, Datasets, Quality, Users, Audit log.
   Items are hidden by role (table in `docs/permissions.md`) and their pages say "No access" when opened directly;
-  the API checks every call regardless. Requests, Mechanics and Quality are placeholders for now (Datasets: Phase
-  4.3; Knowledge, Vehicles and Parts & Prices: Phase 4.4).
+  the API checks every call regardless. Quality is a placeholder for now (Datasets: Phase 4.3; Knowledge, Vehicles
+  and Parts & Prices: Phase 4.4; Requests and Mechanics: Phase 4.5).
 - **Users**: the Staff tab (super admin) lists staff with search, role and status filters and CSV export, and lets
   you invite staff (a temporary password shown once), change roles, disable / enable, unlock and reset two-factor.
   The Customers tab (super admin, support agent) lists customer accounts with **masked phone numbers**; "Show"
@@ -607,6 +607,67 @@ pnpm dev:admin                                       # http://localhost:3001/veh
 
 Tests: `cd backend && uv run pytest tests/test_parts_editors.py`; `cd apps/admin && pnpm exec playwright test
 e2e/parts.spec.ts --workers=1`.
+
+## Phase 4.5 (part 1): mechanics and the request workflow (API)
+
+- **Request statuses**: submitted → triaged → offered → accepted → en_route → arrived → in_progress → completed, plus
+  cancelled and escalated. Only the moves in `backend/app/requests/workflow.py` are allowed; every change writes a
+  `request_events` row and an audit entry. Offers, the mechanic's answer and completion have their own actions.
+- **Support queue** `GET /api/admin/requests`: safety-critical first (the diagnosis's red banner = `safety_level`
+  high), then urgent, then the oldest. Customer phone numbers are always masked; only the agent who owns the request
+  (the one who triaged or took it) can reveal the number, and each reveal is audited.
+- **Matching** `GET /api/admin/requests/{id}/suggestions`: on duty and in a shift (India time), works the area
+  (pincode or radius), has the skill (the request's category), not full today; ranked by distance 45 %, rating 25 %,
+  acceptance rate 20 %, jobs today 10 %, with reasons for each suggestion and for each mechanic left out.
+  Suggestions only: an agent offers the job (no auto-assign, no notifications).
+- **Distances** come from `data/schema/pincode_centres.yaml`: pincode centre points from GeoNames (CC BY 4.0, no paid
+  API). About half the NCR pincodes only have rough points; the suggestions say so.
+- **Completing a job** records the confirmed fault (or "other" with a description), whether it was the AI's top 1 /
+  in the top 3, parts used, final cost, mechanic notes and the diagnosis's dataset version (`request_outcomes`).
+- **Mechanics API** `/api/admin/mechanics`: create, edit, skills, zones, shifts, on / off duty. **Documents** are
+  encrypted with `MECHANIC_DOCS_KEY` (super admins only; every view audited). Without the key, uploads are refused.
+- **Customer page** `/requests/[id]`: plain words ("Mechanic on the way"), the steps with India times, the status
+  changes, and the mechanic's first name once one took the job (never a phone number or documents).
+- The admin pages (Mechanics with the map, Requests queue and detail) are part 2 (below).
+
+```bash
+cd backend && uv run alembic upgrade head            # migration 0020
+uv run python -m app.mechanics.dev_seed              # 5 fake mechanics, development only (--remove deletes them)
+# restart the API; add MECHANIC_DOCS_KEY to backend/.env for documents (see .env.example)
+```
+
+Tests: `cd backend && uv run pytest tests/test_mechanics.py`.
+
+## Phase 4.5 (part 2): Requests and Mechanics pages (admin app)
+
+- **Requests** (`/requests`, `requests.read`): the queue in the API's order (safety-critical with a red badge, then
+  urgent, then the oldest), how long each has waited, masked phone numbers. Filters: open / closed / all, status,
+  safety, category, "only mine" and search (reference, name, area, pincode); they are kept in the page address.
+- **Request page** (`/requests/[id]`): the customer (phone masked; "Show number" only for the agent who owns the
+  request, audited; "Take this request" to own it), the car and the AI's top causes, a map of the pincode's centre
+  (**"rough location"** when the pincode only has an estimated point, "area centre only" for a zone centre), the
+  suggested mechanics with their reasons (and who was left out and why), offer a job (someone who is not a
+  suggestion needs a note), the mechanic's answer, the status buttons (cancel / escalate need a note), internal
+  notes, the timeline and, for a job in progress, the **complete-job form**: the confirmed fault (the AI's top 3
+  first, then the category's faults, or "Other" with a description), parts used, final cost and the mechanic's notes.
+- **Mechanics** (`/mechanics`, `mechanics.read`; editing `mechanics.manage`): the list with an on / off duty switch
+  and a map of their bases; add a mechanic; each mechanic's details, skills (categories), zones (pincodes or a radius
+  around the base or a point clicked on the map) on the map, weekly shifts (India time; overlaps refused) and, for
+  super admins only, **documents** (upload, view, delete; encrypted and audited by the API).
+- **Maps**: Leaflet with OpenStreetMap tiles, **for development only**. OSM's public tiles are not for production
+  traffic: set `NEXT_PUBLIC_MAP_TILE_URL` (and `NEXT_PUBLIC_MAP_ATTRIBUTION`) in `apps/admin/.env.local` to a proper
+  tile provider before going live. Every point on a map is also written out as text.
+- API additions: `GET /api/admin/requests/{id}/faults` (the complete-job choices) and the precision of mechanics'
+  base and zone points (`base_precision`, `zones[].precision`).
+
+```bash
+cd backend && uv run uvicorn app.main:app --reload --port 8000   # restart the API (new endpoint)
+uv run python -m app.mechanics.dev_seed                          # optional: 5 fake mechanics
+pnpm dev:admin                                                   # http://localhost:3001/requests and /mechanics
+```
+
+Tests: `cd backend && uv run pytest tests/test_mechanics.py`; `cd apps/admin && pnpm test` and
+`pnpm exec playwright test e2e/requests.spec.ts e2e/mechanics.spec.ts --workers=1`.
 
 ## LLM layer (off by default)
 

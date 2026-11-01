@@ -31,8 +31,10 @@ test("log in with a code, see my garage, history and requests, open a request, l
 
   await page.getByTestId("my-requests").getByRole("link").click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("IM-7K3Q9P");
-  await expect(page.getByTestId("timeline").getByRole("listitem")).toHaveCount(5);
-  await expect(page.locator('[aria-current="step"]')).toContainText("We called you");
+  await expect(page.getByTestId("timeline").getByRole("listitem")).toHaveCount(7);
+  await expect(page.locator('[aria-current="step"]')).toContainText("Mechanic on the way");
+  await expect(page.getByTestId("mechanic")).toHaveText("Your mechanic: Sunita");
+  await expect(page.getByTestId("updates").getByRole("listitem")).toHaveCount(5);
   await expectNoSideScroll(page);
 
   await page.getByRole("link", { name: "Back to my account" }).click();

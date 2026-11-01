@@ -254,3 +254,20 @@ export type LabourForm = z.infer<typeof labourSchema>;
 
 export const triState = (v: boolean | null) => (v === true ? "yes" : v === false ? "no" : "unknown");
 export const fromTriState = (v: "yes" | "no" | "unknown") => (v === "yes" ? true : v === "no" ? false : null);
+
+// ---------------------------------------------------------------- mechanics (backend/app/mechanics/admin_api.py)
+
+/** An Indian mobile number: 10 digits starting 6-9, optionally with +91 (the server stores +91XXXXXXXXXX). */
+export const isMobile = (v: string) => /^(?:\+?91)?[6-9]\d{9}$/.test(v.replace(/[\s-]/g, ""));
+
+export const mechanicSchema = z.object({
+  name: required(2, 80, "The name"),
+  phone: z.string().trim().refine(isMobile, "A 10-digit Indian mobile number"),
+  base_pincode: z.string().trim().regex(/^\d{6}$/, "A pincode has 6 digits"),
+  base_area: text(120),
+  rating: z.number({ invalid_type_error: "A number" }).min(0, "0 to 5").max(5, "0 to 5").nullable(),
+  max_jobs_per_day: z.number({ invalid_type_error: "A number" }).int("A whole number").min(1, "1 to 30").max(30, "1 to 30"),
+  active: z.boolean(),
+  notes: text(1000),
+});
+export type MechanicForm = z.infer<typeof mechanicSchema>;

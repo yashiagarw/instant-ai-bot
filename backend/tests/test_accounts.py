@@ -17,7 +17,7 @@ from app.db import get_session
 from app.diagnosis.models import DiagnosisSession, SessionEvent
 from app.main import create_app
 from app.notify.sms import ConsoleSms, Msg91Sms, SmsError, make_sms, mask_phone
-from app.requests.models import RequestStatus, ServiceRequest
+from app.requests.models import EventKind, RequestEvent, RequestStatus, ServiceRequest
 from app.uploads.models import Upload
 from app.uploads.storage import MemoryStorage
 from app.vehicles.models import UnlistedVehicle
@@ -279,18 +279,35 @@ def test_another_customers_data_is_not_reachable(app, db_session, variant):  # n
 
 
 def test_request_timeline_follows_the_status():
-    r = ServiceRequest(status=RequestStatus.contacted, created_at=datetime.now(UTC))
-    assert [(s.key, s.state) for s in timeline(r)] == [
+    """Plain words, the current step says where things are now; the status events give the times."""
+    now = datetime.now(UTC)
+    r = ServiceRequest(status=RequestStatus.offered, created_at=now)
+    events = [RequestEvent(kind=EventKind.status, from_status="submitted", to_status="triaged", at=now)]
+    steps = timeline(r, events)
+    assert [(s.key, s.state) for s in steps] == [
         ("submitted", "done"),
-        ("new", "done"),
-        ("contacted", "current"),
-        ("assigned", "upcoming"),
+        ("triaged", "current"),
+        ("accepted", "upcoming"),
+        ("en_route", "upcoming"),
+        ("arrived", "upcoming"),
+        ("in_progress", "upcoming"),
         ("completed", "upcoming"),
     ]
+    assert steps[1].label == "Finding a mechanic for you" and steps[1].at == now
+    r.status = RequestStatus.en_route
+    assert next(s for s in timeline(r) if s.state == "current").label == "Mechanic on the way"
     r.status = RequestStatus.completed
     assert {s.state for s in timeline(r)} == {"done"}
     r.status = RequestStatus.cancelled
-    assert [s.state for s in timeline(r)] == ["done", "cancelled"]
+    cancelled = [RequestEvent(kind=EventKind.status, from_status="submitted", to_status="cancelled", at=now)]
+    assert [s.state for s in timeline(r, cancelled)] == ["done", "cancelled"]
+    r.status = RequestStatus.escalated
+    escalated = [*events, RequestEvent(kind=EventKind.status, from_status="triaged", to_status="escalated", at=now)]
+    assert [(s.key, s.state) for s in timeline(r, escalated)][:3] == [
+        ("submitted", "done"),
+        ("triaged", "done"),
+        ("escalated", "current"),
+    ]
 
 
 # ---------------------------------------------------------------- account deletion

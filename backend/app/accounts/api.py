@@ -3,6 +3,7 @@ whose user_id is the logged-in user: another customer's request answers 404, as 
 
 import logging
 import uuid
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
@@ -19,7 +20,15 @@ from app.diagnosis.models import DiagnosisSession, SessionResult
 from app.knowledge.models import ProblemGroup
 from app.notify.sms import SmsError, SmsSender, make_sms, mask_phone
 from app.ratelimit import RateLimiter, client_ip
-from app.requests.models import RequestStatus, ServiceRequest
+from app.requests import workflow
+from app.requests.models import (
+    AssignmentStatus,
+    EventKind,
+    RequestAssignment,
+    RequestEvent,
+    RequestStatus,
+    ServiceRequest,
+)
 
 log = logging.getLogger(__name__)
 auth_router = APIRouter(prefix="/auth", tags=["accounts"])
@@ -27,14 +36,19 @@ me_router = APIRouter(prefix="/me", tags=["accounts"])
 requests_router = APIRouter(prefix="/requests", tags=["accounts"])
 DbSession = Annotated[Session, Depends(get_session)]
 
-STATUS_STEPS = [
-    (RequestStatus.submitted, "Request received"),
-    (RequestStatus.new, "Picked up by our team"),
-    (RequestStatus.contacted, "We called you"),
-    (RequestStatus.assigned, "Mechanic assigned"),
-    (RequestStatus.completed, "Completed"),
-]
-STATUS_LABELS = {**{k.value: v for k, v in STATUS_STEPS}, RequestStatus.cancelled.value: "Cancelled"}
+# Plain words for the customer (app/requests/workflow.py).
+STATUS_LABELS = {k.value: v for k, v in workflow.CUSTOMER_LABELS.items()}
+TIMELINE_LABELS = {  # the steps of the usual path, as the timeline names them
+    RequestStatus.submitted: "Request received",
+    RequestStatus.triaged: "Our team is on it",
+    RequestStatus.accepted: "Mechanic assigned",
+    RequestStatus.en_route: "Mechanic on the way",
+    RequestStatus.arrived: "Mechanic has arrived",
+    RequestStatus.in_progress: "Repair in progress",
+    RequestStatus.completed: "Done",
+}
+# Where a status sits on the usual path (offered: still with our team; escalated: wherever it was).
+STEP_OF = {RequestStatus.offered: RequestStatus.triaged}
 
 
 # ---------------------------------------------------------------- cookies and dependencies
@@ -304,23 +318,79 @@ def my_requests(user: RequiredUser, session: DbSession):
     ]
 
 
-def timeline(r: ServiceRequest) -> list[S.TimelineStep]:
-    keys = [k.value for k, _ in STATUS_STEPS]
-    current = str(r.status)
-    if current == RequestStatus.cancelled:
-        return [
-            S.TimelineStep(key="submitted", label="Request received", state="done", at=r.created_at),
-            S.TimelineStep(key="cancelled", label="Cancelled", state="cancelled"),
+def _status_events(session: Session, r: ServiceRequest) -> list[RequestEvent]:
+    return list(
+        session.scalars(
+            select(RequestEvent)
+            .where(RequestEvent.request_id == r.id, RequestEvent.kind == EventKind.status)
+            .order_by(RequestEvent.at, RequestEvent.id)
+        )
+    )
+
+
+def timeline(r: ServiceRequest, events: list[RequestEvent] | None = None) -> list[S.TimelineStep]:
+    """The usual path with what's done, the current step (in plain words) and what comes next. Times come from the
+    status events (the last time each step was reached)."""
+    events = events or []
+    reached_at: dict[str, datetime] = {"submitted": r.created_at}
+    for e in events:
+        if e.to_status:
+            reached_at[STEP_OF.get(RequestStatus(e.to_status), RequestStatus(e.to_status)).value] = e.at
+    path = workflow.HAPPY_PATH
+    current = RequestStatus(r.status)
+    if current in (RequestStatus.cancelled, RequestStatus.escalated):
+        # The furthest step reached before it was cancelled / escalated.
+        last = next(
+            (RequestStatus(e.from_status) for e in reversed(events) if e.to_status == current and e.from_status), None
+        )
+        step = STEP_OF.get(last, last) if last else RequestStatus.submitted
+        idx = path.index(step) if step in path else 0
+        steps = [
+            S.TimelineStep(key=k.value, label=TIMELINE_LABELS[k], state="done", at=reached_at.get(k.value))
+            for k in path[: idx + 1]
         ]
-    reached = keys.index(current) if current in keys else 0
-    steps = []
-    for i, (key, label) in enumerate(STATUS_STEPS):
-        if i < reached or (i == reached and key == RequestStatus.completed):
+        if current == RequestStatus.cancelled:
+            steps.append(S.TimelineStep(key="cancelled", label="Cancelled", state="cancelled", at=r.status_changed_at))
+            return steps
+        steps.append(
+            S.TimelineStep(key="escalated", label=STATUS_LABELS["escalated"], state="current", at=r.status_changed_at)
+        )
+        return steps + [
+            S.TimelineStep(key=k.value, label=TIMELINE_LABELS[k], state="upcoming") for k in path[idx + 1 :]
+        ]
+    step = STEP_OF.get(current, current)
+    idx = path.index(step)
+    out = []
+    for i, k in enumerate(path):
+        if i < idx or (i == idx and k == RequestStatus.completed):
             state = "done"
         else:
-            state = "current" if i == reached else "upcoming"
-        steps.append(S.TimelineStep(key=key.value, label=label, state=state, at=r.created_at if i == 0 else None))
-    return steps
+            state = "current" if i == idx else "upcoming"
+        # The current step speaks of where things are now ("Finding a mechanic for you").
+        label = STATUS_LABELS[current.value] if state == "current" else TIMELINE_LABELS[k]
+        out.append(
+            S.TimelineStep(key=k.value, label=label, state=state, at=reached_at.get(k.value) if i <= idx else None)
+        )
+    return out
+
+
+def _mechanic_first_name(session: Session, r: ServiceRequest) -> str | None:
+    """The first name of the mechanic who took the job (never their phone number or documents)."""
+    if r.status in (RequestStatus.submitted, RequestStatus.triaged, RequestStatus.offered, RequestStatus.cancelled):
+        return None
+    from app.mechanics.models import Mechanic
+
+    name = session.scalar(
+        select(Mechanic.name)
+        .join(RequestAssignment, RequestAssignment.mechanic_id == Mechanic.id)
+        .where(
+            RequestAssignment.request_id == r.id,
+            RequestAssignment.status.in_((AssignmentStatus.accepted, AssignmentStatus.completed)),
+        )
+        .order_by(RequestAssignment.id.desc())
+        .limit(1)
+    )
+    return name.split()[0] if name and name.split() else None
 
 
 @requests_router.get(
@@ -331,13 +401,20 @@ def my_request(request_id: uuid.UUID, user: RequiredUser, session: DbSession):
     r = session.get(ServiceRequest, request_id)
     if r is None or r.user_id != user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Request not found")
+    events = _status_events(session, r)
     return S.RequestDetailOut(
         **_request_summary(r),
         service_type=str(r.service_type),
         area=r.area_text,
         preferred_time=r.preferred_time,
         session_id=r.session_id,
-        timeline=timeline(r),
+        timeline=timeline(r, events),
+        mechanic_first_name=_mechanic_first_name(session, r),
+        updates=[
+            S.StatusUpdate(at=e.at, status=e.to_status, label=STATUS_LABELS.get(e.to_status, e.to_status))
+            for e in reversed(events)
+            if e.to_status
+        ],
     )
 
 

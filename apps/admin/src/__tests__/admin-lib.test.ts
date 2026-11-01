@@ -19,7 +19,8 @@ test("after sign-in only paths on this site are followed (no open redirect)", ()
 test("menu items follow permissions; every page has one item", () => {
   const labels = (perms: string[]) => visibleNav(perms).map((i) => i.label);
   expect(labels(["self"])).toEqual(["Overview"]);
-  expect(labels(["self", "requests.read"])).toEqual(["Overview", "Requests", "Mechanics"]);
+  expect(labels(["self", "requests.read"])).toEqual(["Overview", "Requests"]);
+  expect(labels(["self", "requests.read", "mechanics.read"])).toEqual(["Overview", "Requests", "Mechanics"]);
   expect(labels(["self", "customers.read"])).toEqual(["Overview", "Users"]);
   expect(labels([])).toEqual([]);
   expect(NAV).toHaveLength(10);

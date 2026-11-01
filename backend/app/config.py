@@ -74,6 +74,9 @@ class Settings(BaseSettings):
     # STAFF_TOTP_KEY encrypts TOTP secrets (a Fernet key); empty = derived from AUTH_SECRET (development only).
     staff_totp_key: str = ""
     staff_totp_issuer: str = "Instant Mechanic"
+    # Fernet key for mechanics' ID documents. No key, no document uploads (never derived from another secret).
+    mechanic_docs_key: str = ""
+    mechanic_doc_max_mb: int = 10
     staff_session_hours: int = 8  # absolute
     staff_idle_minutes: int = 30  # without a request
     staff_max_failed_logins: int = 5  # then locked for staff_lockout_minutes

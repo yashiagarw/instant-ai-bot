@@ -7,7 +7,7 @@ const MENUS: Record<string, string[]> = {
   "boss@im.test": ALL,
   "content@im.test": ["Overview", "Knowledge", "Vehicles", "Parts & Prices", "Datasets", "Quality"],
   "agent@im.test": ["Overview", "Requests", "Mechanics", "Users"],
-  "mech@im.test": ["Overview", "Requests", "Mechanics"],
+  "mech@im.test": ["Overview", "Requests"],
 };
 
 /** The menu links (on phones the menu opens from the header first). */

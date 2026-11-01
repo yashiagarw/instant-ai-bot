@@ -2,6 +2,7 @@
 
 import logging
 import secrets
+from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from sqlalchemy import select
@@ -11,9 +12,9 @@ import engine as eng
 from app.config import Settings
 from app.diagnosis import service as diagnosis
 from app.diagnosis.models import DiagnosisSession
-from app.knowledge.models import ProblemGroup
+from app.knowledge.models import Category, ProblemGroup
 from app.notify.email import Email, EmailError, EmailSender
-from app.requests.models import RequestStatus, ServiceRequest, ServiceType
+from app.requests.models import EventKind, RequestEvent, RequestStatus, SafetyLevel, ServiceRequest, ServiceType
 from app.requests.schemas import PREFERRED_TIMES, ServiceRequestIn
 
 log = logging.getLogger(__name__)
@@ -42,9 +43,30 @@ def new_reference(session: Session) -> str:
             return ref
 
 
-def summarise(session: Session, engine: eng.Engine, ds: DiagnosisSession) -> tuple[bool, str]:
-    """(urgent, problem summary) from the diagnosis. Urgent: a fast-track topic (towing, lockout, ...) or a red
-    safety alert. Built on the server so the team sees what the engine found, not what the browser sent."""
+@dataclass
+class Summary:
+    urgent: bool
+    text: str
+    safety_level: SafetyLevel = SafetyLevel.none
+    category_code: str | None = None
+
+
+def safety_level(result: eng.Result) -> SafetyLevel:
+    """high: a red banner alert (safety-critical, first in the queue). Otherwise the highest other alert, at most
+    medium (a high-risk rule of a less likely cause is not shown as a banner either)."""
+    banner, rest = diagnosis.banner_alerts(result)
+    if banner:
+        return SafetyLevel.high
+    risks = {a.risk for a in rest}
+    if risks & {"high", "medium"}:
+        return SafetyLevel.medium
+    return SafetyLevel.low if "low" in risks else SafetyLevel.none
+
+
+def summarise(session: Session, engine: eng.Engine, ds: DiagnosisSession) -> Summary:
+    """Urgency, problem summary, safety level and likely category from the diagnosis. Urgent: a fast-track topic
+    (towing, lockout, ...) or a red safety alert. Built on the server so the team sees what the engine found, not
+    what the browser sent."""
     result = diagnosis.current_result(session, engine, ds)
     banner, _ = diagnosis.banner_alerts(result)
     topic = session.get(ProblemGroup, ds.problem_group_code) if ds.problem_group_code else None
@@ -54,7 +76,10 @@ def summarise(session: Session, engine: eng.Engine, ds: DiagnosisSession) -> tup
         parts.append(f"likely cause: {top.name} ({top.confidence} confidence)")
     if banner:
         parts.append("SAFETY: " + "; ".join(a.reason for a in banner))
-    return result.mode == "fast_track" or bool(banner), " · ".join(parts)
+    category = result.ranked[0].category if result.ranked else None
+    if category is not None and session.get(Category, category) is None:
+        category = None
+    return Summary(result.mode == "fast_track" or bool(banner), " · ".join(parts), safety_level(result), category)
 
 
 def create(session: Session, engine: eng.Engine, body: ServiceRequestIn) -> ServiceRequest:
@@ -63,8 +88,8 @@ def create(session: Session, engine: eng.Engine, body: ServiceRequestIn) -> Serv
     ds = session.get(DiagnosisSession, body.session_id) if body.session_id else None
     if body.session_id and ds is None:
         raise RequestInputError("unknown session_id")
-    urgent, summary = summarise(session, engine, ds) if ds else (False, "")
-    if not urgent and not body.pincode:
+    found = summarise(session, engine, ds) if ds else Summary(False, "")
+    if not found.urgent and not body.pincode:
         raise RequestInputError("enter a 6-digit pincode")
     now = datetime.now(UTC)
     req = ServiceRequest(
@@ -78,15 +103,22 @@ def create(session: Session, engine: eng.Engine, body: ServiceRequestIn) -> Serv
         service_type=body.service_type,
         preferred_time=body.preferred_time,
         notes=body.notes,
-        urgent=urgent,
+        urgent=found.urgent,
+        safety_level=found.safety_level,
+        category_code=found.category_code,
         vehicle_snapshot=dict(ds.vehicle_snapshot) if ds else {},
-        problem_summary=summary,
+        problem_summary=found.text,
         status=RequestStatus.submitted,
+        status_changed_at=now,
         consent_given=True,
         consent_text_version=body.consent_text_version,
         consent_at=now,
     )
     session.add(req)
+    session.flush()
+    session.add(
+        RequestEvent(request_id=req.id, at=now, kind=EventKind.status, to_status="submitted", actor_label="customer")
+    )
     session.flush()
     return req
 
