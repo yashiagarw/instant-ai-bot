@@ -7,13 +7,14 @@ The rule the API depends on: a part is shown as fitting a car only through a par
 model_id is the car's model (and whose years, fuel and gearbox, when given, match the variant).
 """
 
-from datetime import date
+from datetime import date, datetime
 from enum import StrEnum
 
 from sqlalchemy import (
     BigInteger,
     CheckConstraint,
     Date,
+    DateTime,
     ForeignKey,
     Integer,
     SmallInteger,
@@ -61,6 +62,7 @@ class PartKind(StrEnum):
 
 class PartImageSource(StrEnum):
     picture_id = "picture_id"  # "Picture ID" column of the price sheet -> image_code
+    upload = "upload"  # uploaded in the admin app (SeaweedFS, app.admin_media)
 
 
 class PartType(Base):
@@ -168,6 +170,9 @@ class PartPrice(VersionedRow, Base):
     verification_status: Mapped[PartVerification] = mapped_column(str_enum(PartVerification, "verification_status"))
     model_verified: Mapped[bool] = mapped_column()  # false for segment-column prices ("not model-verified")
     note: Mapped[str | None] = mapped_column(Text)
+    # Prices of SECOND_LOOK_INR or more are flagged until a second person checks them (admin Parts & Prices).
+    second_look_by: Mapped[str | None] = mapped_column(Text)
+    second_look_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class FaultPart(Base):
@@ -227,3 +232,25 @@ class LabourRate(VersionedRow, Base):
     status: Mapped[str] = mapped_column(Text)  # approx / listed, as in the sheet
     checked_on: Mapped[date | None] = mapped_column(Date)
     extra: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+
+
+class ZoneLabourRate(Base):
+    """Mechanic labour per hour by Delhi NCR zone and price segment, per dataset version. Loaded from
+    data/catalogue/zone_labour_rates.yaml on every build, then the admin editor's edits; estimates use the served
+    version's rows. A rate needs a source and a check date (enforced here too)."""
+
+    __tablename__ = "zone_labour_rates"
+    __table_args__ = (
+        UniqueConstraint("dataset_version_id", "zone", "segment"),
+        CheckConstraint("rate_min_inr > 0 AND rate_max_inr >= rate_min_inr", name="rate_range"),
+        CheckConstraint("length(btrim(source)) > 0", name="has_source"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    dataset_version_id: Mapped[int] = mapped_column(ForeignKey("dataset_versions.id", ondelete="CASCADE"), index=True)
+    zone: Mapped[str] = mapped_column(Text)
+    segment: Mapped[PriceSegment] = mapped_column(str_enum(PriceSegment, "segment"))
+    rate_min_inr: Mapped[int] = mapped_column(Integer)
+    rate_max_inr: Mapped[int] = mapped_column(Integer)
+    source: Mapped[str] = mapped_column(Text)
+    checked_on: Mapped[date] = mapped_column(Date)

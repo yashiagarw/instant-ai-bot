@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 from app.knowledge import embeddings as embeddings_mod
 from app.knowledge import merges, phrases, requirements, safety_triggers
 from app.knowledge.edits.apply import apply_all as apply_edits
+from app.knowledge.edits.parts_handlers import load_zone_rates
 from app.knowledge.importer.embed import Embedder
 from app.knowledge.models import DatasetVersion, Fault, FaultPrior
 from app.knowledge.questions import review as questions_review
@@ -39,6 +40,8 @@ STEP_NAMES = (
     "safety_triggers apply",
     "editor edits apply",
     "parts build",
+    "zone labour rates",
+    "parts edits apply",
     "vision catalogue seed",
     "embeddings sync",
 )
@@ -215,19 +218,36 @@ def _run_steps(
     )
 
     start(7)
+    n = load_zone_rates(session, version)
+    report.lines[STEP_NAMES[7]] = f"{n} zone rates from data/catalogue/zone_labour_rates.yaml"
+
+    start(8)
+    parts_edits = apply_edits(session, version, inputs.taxonomy_base(), stage="parts")
+    report.edits = {
+        "applied": report.edits.get("applied", 0) + parts_edits.applied,
+        "conflicts": report.edits.get("conflicts", []) + parts_edits.conflicts,
+        "orphans": report.edits.get("orphans", []) + parts_edits.orphans,
+    }
+    report.lines[STEP_NAMES[8]] = (
+        f"{parts_edits.applied} edits applied, {len(parts_edits.conflicts)} conflicts, "
+        f"{len(parts_edits.orphans)} not applied"
+    )
+    report.warnings += [f"editor edit {c['name']}: {c['message']}" for c in parts_edits.conflicts + parts_edits.orphans]
+
+    start(9)
     labels = (catalogue.seed if seed_labels else catalogue.resolve)(session, inputs.label_spec(), version)
     unresolved = [lb.code for lb in labels if not lb.symptom_ids]
-    report.lines[STEP_NAMES[7]] = f"{len(labels)} photo labels {'written' if seed_labels else 'resolve'}" + (
+    report.lines[STEP_NAMES[9]] = f"{len(labels)} photo labels {'written' if seed_labels else 'resolve'}" + (
         f", {len(unresolved)} without symptom lines" if unresolved else ""
     )
 
-    start(8)
+    start(10)
     if embedder is None:
-        report.lines[STEP_NAMES[8]] = "skipped (no embedding model)"
+        report.lines[STEP_NAMES[10]] = "skipped (no embedding model)"
         report.warnings.append("embeddings not synced: no embedding model in the worker")
     else:
         e = embeddings_mod.sync(session, version.id, embedder)
-        report.lines[STEP_NAMES[8]] = (
+        report.lines[STEP_NAMES[10]] = (
             f"{e.embedded} embedded, {e.reused} reused, {e.unchanged} unchanged, {e.removed} removed"
         )
         report.embeddings = {"embedded": e.embedded, "reused": e.reused, "unchanged": e.unchanged}

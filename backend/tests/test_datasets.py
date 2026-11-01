@@ -121,8 +121,9 @@ def world(tmp_path, db_session):
             ],
         }],
         # BT-03's sheet safety rule fires on the answer "Battery looks swollen" (as in the real AC files).
-        "faults": {"F08-BT-03": {"status": "approved", "danger_phrases": ["battery phool gayi"], "safety_trigger_options": [
-            {"question": "battery-main", "option": "Battery looks swollen"}]}},
+        "faults": {"F08-BT-03": {
+            "status": "approved", "danger_phrases": ["battery phool gayi"],
+            "safety_trigger_options": [{"question": "battery-main", "option": "Battery looks swollen"}]}},
         "safety_rules": [],
     })  # fmt: skip
     write(review / "merges.yaml", {"decided_by": "mechanic", "merge": [

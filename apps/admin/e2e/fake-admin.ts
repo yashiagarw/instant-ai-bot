@@ -7,6 +7,7 @@ import type { Page, Route } from "@playwright/test";
 
 import { FakeDatasets } from "./fake-datasets";
 import { FakeKnowledge } from "./fake-knowledge";
+import { FakeParts } from "./fake-parts";
 
 export const API = "http://localhost:8000/api/admin";
 export const PASSWORD = "a long staff passphrase 1";
@@ -77,7 +78,8 @@ export class FakeAdmin {
   pending: Account | null = null; // between password and setup confirm
   auditQueries: string[] = [];
   datasets = new FakeDatasets();
-  knowledge = new FakeKnowledge();
+  parts = new FakeParts();
+  knowledge = new FakeKnowledge(this.parts);
   revealed: string[] = [];
 
   /** Signed in already (skips the login screen). */
@@ -101,7 +103,7 @@ export class FakeAdmin {
     return { ...this.out(a), permissions: perms, session_expires_at: "2026-11-01T18:00:00Z" };
   }
 
-  handle(method: string, path: string, url: URL, body: Record<string, unknown>): { status: number; json?: unknown } {
+  handle(method: string, path: string, url: URL, body: Record<string, unknown>, raw: string | null = null): { status: number; json?: unknown } {
     if (path === "/auth/login" && method === "POST") {
       const a = this.find(String(body.email));
       if (!a || a.password !== body.password) return { status: 401, json: { detail: "Email, password or code is wrong." } };
@@ -187,6 +189,7 @@ export class FakeAdmin {
     }
     return (
       this.datasets.handle(method, path, url, body, perms, a.email) ??
+      this.parts.handle(method, path, body, perms, a.email, raw, url) ??
       this.knowledge.handle(method, path, body, perms) ?? { status: 404, json: { detail: "Not Found" } }
     );
   }
@@ -197,7 +200,7 @@ export class FakeAdmin {
       const url = new URL(req.url());
       const path = url.pathname.replace("/api/admin", "");
       const raw = req.headers()["content-type"]?.includes("json") ? req.postData() : null; // uploads are files
-      const res = this.handle(req.method(), path, url, raw ? JSON.parse(raw) : {});
+      const res = this.handle(req.method(), path, url, raw ? JSON.parse(raw) : {}, raw ? null : req.postData());
       await route.fulfill({
         status: res.status,
         contentType: "application/json",

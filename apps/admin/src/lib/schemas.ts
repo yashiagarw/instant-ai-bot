@@ -157,3 +157,100 @@ export function requiresFromForm(rows: FaultForm["requires"]): Record<string, st
     field === "feature" ? { feature: value.trim() } : { [field]: value.split(",").map((v) => v.trim()).filter(Boolean) },
   );
 }
+
+// ---------------------------------------------------------------- part 2: vehicles, parts, prices, labour
+
+export const SECOND_LOOK_INR = 20000;
+const isoDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Give the date it was checked")
+  .refine((d) => d <= new Date().toISOString().slice(0, 10), "The check date is in the future");
+const money = (max: number) => z.number({ invalid_type_error: "An amount in rupees" }).int("Whole rupees").min(0).max(max);
+
+export const makeSchema = z.object({ name: required(2, 60, "The name"), aliases: text(300) });
+export const modelSchema = z.object({ name: required(1, 60, "The name"), body_type: text(40), aliases: text(300) });
+const years = { year_from: z.number({ invalid_type_error: "A year" }).int().min(1980).max(2100), year_to: z.number().int().min(1980).max(2100).nullable() };
+export const generationSchema = z
+  .object({ name: required(1, 80, "The name"), ...years })
+  .refine((g) => g.year_to === null || g.year_to >= g.year_from, { message: "The last year is before the first", path: ["year_to"] });
+export const variantSchema = z
+  .object({
+    generation_id: z.number().nullable(),
+    fuel: z.enum(FUELS),
+    transmission: z.enum(TRANSMISSIONS),
+    engine: text(40),
+    ...years,
+    price_segment: z.enum(SEGMENTS),
+    features: z.record(z.enum(["yes", "no", "unknown"])),
+  })
+  .refine((g) => g.year_to === null || g.year_to >= g.year_from, { message: "The last year is before the first", path: ["year_to"] });
+export type VariantForm = z.infer<typeof variantSchema>;
+
+export const partSchema = z
+  .object({
+    description: required(2, 300, "The description"),
+    part_type: required(2, 120, "The part type"),
+    brand: text(120),
+    brand_kind: z.enum(["oem", "oes", "aftermarket", "unspecified"]),
+    part_number: text(80),
+    quantity: z.number().int().min(1).max(50),
+    kind: z.enum(["part", "consumable"]),
+    segment: z.enum(SEGMENTS).nullable(),
+    generic: z.boolean(),
+  })
+  .refine((p) => !p.generic || !p.part_number, { message: "A generic part has no part number", path: ["part_number"] })
+  .refine((p) => !p.generic || p.segment, { message: "A generic part needs its price segment", path: ["segment"] });
+export type PartForm = z.infer<typeof partSchema>;
+
+export const priceSchema = z
+  .object({
+    segment: z.enum(SEGMENTS),
+    price_inr: money(10_000_000),
+    price_max_inr: money(10_000_000).nullable(),
+    supplier: text(500),
+    source_url: text(500),
+    checked_on: isoDate,
+    verification_status: z.enum(["checked", "listed_recheck", "approx"]),
+    gst_included: z.enum(["yes", "no", "unknown"]),
+    fitting_included: z.enum(["yes", "no", "unknown"]),
+    model_verified: z.boolean(),
+    price_basis: text(200),
+    note: text(1000),
+  })
+  .refine((p) => p.supplier || p.source_url, { message: "A price needs its source: the supplier or a link", path: ["supplier"] })
+  .refine((p) => p.price_max_inr === null || p.price_max_inr >= p.price_inr, { message: "The highest price is below the lowest", path: ["price_max_inr"] });
+export type PriceForm = z.infer<typeof priceSchema>;
+
+export const fitSchema = z
+  .object({
+    model_id: z.number({ invalid_type_error: "Choose the car" }).int().positive("Choose the car"),
+    year_from: z.number().int().min(1980).max(2100).nullable(),
+    year_to: z.number().int().min(1980).max(2100).nullable(),
+    fuel: z.enum(FUELS).nullable(),
+    transmission: z.enum(TRANSMISSIONS).nullable(),
+    verification_status: z.enum(["listed", "confirm_fit"]),
+    fit_text: required(2, 300, "Say what the source says"),
+    source_url: text(500),
+  })
+  .refine((f) => !f.year_from || !f.year_to || f.year_to >= f.year_from, { message: "The last year is before the first", path: ["year_to"] });
+export type FitForm = z.infer<typeof fitSchema>;
+
+export const zoneRateSchema = z
+  .object({ rate_min_inr: money(100_000).min(1, "More than 0"), rate_max_inr: money(100_000).min(1, "More than 0"), source: required(3, 500, "The source"), checked_on: isoDate })
+  .refine((r) => r.rate_max_inr >= r.rate_min_inr, { message: "The highest rate is below the lowest", path: ["rate_max_inr"] });
+export type ZoneRateForm = z.infer<typeof zoneRateSchema>;
+
+export const labourSchema = z.object({
+  repair: required(2, 200, "The repair"),
+  segment: z.enum(SEGMENTS),
+  city: required(2, 80, "The city"),
+  amount_inr: money(1_000_000).min(1, "More than 0"),
+  workshop_type: text(120),
+  basis: required(3, 500, "The source (who quoted it, where)"),
+  status: z.enum(["approx", "listed"]),
+  checked_on: isoDate,
+});
+export type LabourForm = z.infer<typeof labourSchema>;
+
+export const triState = (v: boolean | null) => (v === true ? "yes" : v === false ? "no" : "unknown");
+export const fromTriState = (v: "yes" | "no" | "unknown") => (v === "yes" ? true : v === "no" ? false : null);

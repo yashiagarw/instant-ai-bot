@@ -18,7 +18,11 @@ interface Edit extends Json {
   changes: { field: string; before: unknown; after: unknown }[];
 }
 
+import type { FakeParts } from "./fake-parts";
+
 export class FakeKnowledge {
+  constructor(private parts?: FakeParts) {}
+
   items: Record<string, Json | null> = {
     "fault:F08-BT-01": {
       name: "Weak battery", description: "Battery too weak to crank", likely_fault: "Old battery", road_repairable: "yes",
@@ -154,6 +158,8 @@ export class FakeKnowledge {
       const entity = String(body.entity);
       const key = String(body.key);
       const data = body.data as Json | null;
+      const fromParts = this.parts?.save(entity, key, data, "content@im.test");
+      if (fromParts) return fromParts;
       if (entity === "phrase") {
         const existing = this.phrases.find((p) => p.key === key);
         if (existing?.held_out) return { status: 422, json: { detail: "held-out phrases are evaluation cases and cannot be edited" } };

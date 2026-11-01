@@ -281,7 +281,8 @@ def test_inputs_list_sources_dates_and_stale_flags(db_session, shop):
 
 def test_zone_rate_replaces_the_metro_estimate(db_session, shop, monkeypatch):
     rate = ZoneRate(Range(500, 700), "garage survey", date(2026, 10, 30))
-    monkeypatch.setattr(E, "zone_rates", lambda: {("gurugram", "budget"): rate})
+    # The served version's zone rates (zone_labour_rates: the YAML file plus the admin editor's edits).
+    monkeypatch.setattr(E, "version_zone_rates", lambda _session, _version: {("gurugram", "budget"): rate})
     e = estimate(db_session, shop, "F12-EN-01", car=shop.swift, zone=zones()["gurugram"])
     labour = [i for i in e.inputs if i.kind == "labour"][0]
     # 1-2 h x Rs 500-700/h = 500-1,400

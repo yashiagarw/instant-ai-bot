@@ -14,7 +14,7 @@ export function EditorSummaryView({ summary }: { summary: EditorSummary }) {
   const tables = Object.entries(summary.tables);
   const conflicts = summary.conflicts ?? [];
   const orphans = summary.orphans ?? [];
-  if (!tables.length && !conflicts.length && !orphans.length) return <p className="text-ink/70">No editor changes in this version.</p>;
+  if (!tables.length && !conflicts.length && !orphans.length && !summary.second_look?.count) return <p className="text-ink/70">No editor changes in this version.</p>;
   return (
     <div className="flex flex-col gap-3" data-testid="editor-summary">
       {tables.length > 0 && (
@@ -63,6 +63,20 @@ export function EditorSummaryView({ summary }: { summary: EditorSummary }) {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+      {summary.second_look && summary.second_look.count > 0 && (
+        <div className="rounded-2xl bg-amber-bg p-3 text-amber-text" data-testid="second-look">
+          <h3 className="font-bold">Prices of ₹20,000 or more waiting for a second look ({summary.second_look.count})</h3>
+          <ul className="list-disc pl-5">
+            {summary.second_look.items.slice(0, 20).map((x) => (
+              <li key={x.key}>
+                {x.part} ({x.segment}): ₹{x.price_inr.toLocaleString("en-IN")}
+                {x.price_max_inr ? `–₹${x.price_max_inr.toLocaleString("en-IN")}` : ""}
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm">Another person checks them on Parts &amp; Prices → Prices (they do not block publishing).</p>
         </div>
       )}
       {conflicts.length > 0 && (

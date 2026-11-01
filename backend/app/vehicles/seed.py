@@ -5,7 +5,8 @@
     uv run python -m app.vehicles.seed --file other.yaml
 
 Idempotent: running it twice changes nothing. Without --prune nothing is deleted;
-rows missing from the file are only reported.
+rows missing from the file are only reported. Rows added or changed in the admin app (edited_at set) are kept as they
+are and never pruned: the report lists them.
 """
 
 import argparse
@@ -146,6 +147,7 @@ class SeedReport:
     variants_updated: int = 0
     deleted: int = 0
     not_in_file: list[str] = field(default_factory=list)
+    kept_admin_edits: list[str] = field(default_factory=list)  # rows changed in the admin app: not overwritten
 
     def summary(self) -> str:
         lines = [
@@ -153,6 +155,11 @@ class SeedReport:
             f"models added: {self.models_added}",
             f"variants added: {self.variants_added}, updated: {self.variants_updated}",
         ]
+        if self.kept_admin_edits:
+            lines.append(
+                f"{len(self.kept_admin_edits)} rows edited in the admin app kept as they are: "
+                + ", ".join(self.kept_admin_edits[:10])
+            )
         if self.not_in_file:
             verb = "deleted" if self.deleted else "in the database but not in the file (use --prune to delete)"
             lines.append(f"{len(self.not_in_file)} {verb}: " + ", ".join(self.not_in_file[:10]))
@@ -172,7 +179,10 @@ def seed(session: Session, catalogue: CatalogueFile, prune: bool = False) -> See
             make = Make(name=make_spec.name)
             session.add(make)
             report.makes_added += 1
-        make.aliases = " ".join(normalise(a) for a in make_spec.aliases)
+        if make.edited_at is None:
+            make.aliases = " ".join(normalise(a) for a in make_spec.aliases)
+        else:
+            report.kept_admin_edits.append(f"Make {make.name}")
         session.flush()
         keep_makes.add(make.id)
 
@@ -182,9 +192,12 @@ def seed(session: Session, catalogue: CatalogueFile, prune: bool = False) -> See
                 model = Model(make_id=make.id, name=model_spec.name)
                 session.add(model)
                 report.models_added += 1
-            model.body_type = model_spec.body
-            model.aliases = " ".join(normalise(a) for a in model_spec.aliases)
-            model.search_text = search_text(make_spec, model_spec)
+            if model.edited_at is None:
+                model.body_type = model_spec.body
+                model.aliases = " ".join(normalise(a) for a in model_spec.aliases)
+                model.search_text = search_text(make_spec, model_spec)
+            else:
+                report.kept_admin_edits.append(f"Model {make.name} {model.name}")
             session.flush()
             keep_models.add(model.id)
 
@@ -216,6 +229,8 @@ def seed(session: Session, catalogue: CatalogueFile, prune: bool = False) -> See
                         )
                         session.add(variant)
                         report.variants_added += 1
+                    elif variant.edited_at is not None:
+                        report.kept_admin_edits.append(f"Variant {model.name} {variant.name}")
                     elif any(getattr(variant, k) != v for k, v in values.items()):
                         for k, v in values.items():
                             setattr(variant, k, v)
@@ -228,6 +243,8 @@ def seed(session: Session, catalogue: CatalogueFile, prune: bool = False) -> See
         *session.scalars(select(Model).where(Model.id.not_in(keep_models))),
         *session.scalars(select(Make).where(Make.id.not_in(keep_makes))),
     ]
+    # Added or edited in the admin app: never pruned (they are not in the file on purpose).
+    stale = [row for row in stale if row.edited_at is None]
     report.not_in_file = [f"{type(row).__name__} {row.name}" for row in stale]
     if prune:
         for row in stale:  # variants first, then models, then makes

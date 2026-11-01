@@ -26,7 +26,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.enums import ReviewStatus
 from app.estimates import maths as M
-from app.estimates.zones import Zone, zone_for_pincode, zone_rates, zones
+from app.estimates.zones import Zone, version_zone_rates, zone_for_pincode, zone_rates, zones
 from app.knowledge.importer import parse as P
 from app.knowledge.models import DatasetVersion, Fault, FaultCost, PriceBreakdownLine
 from app.parts.fit import VariantFacts
@@ -324,10 +324,12 @@ def _sheet_labour(cost: FaultCost) -> M.Range | None:
     return M.price_range(cost.labour_text)
 
 
-def _labour_inputs(fault: Fault, cost: FaultCost, zone: Zone | None) -> tuple[list[M.Input], str, str]:
+def _labour_inputs(
+    fault: Fault, cost: FaultCost, zone: Zone | None, rates: dict | None = None
+) -> tuple[list[M.Input], str, str]:
     """(inputs, basis, note). Empty inputs = no labour data."""
     segment = str(cost.segment)
-    rate = zone_rates().get((zone.code, segment)) if zone else None
+    rate = (zone_rates() if rates is None else rates).get((zone.code, segment)) if zone else None
     hours = M.parse_hours(fault.repair_time_text)
     note = ""
     if rate and hours:
@@ -424,7 +426,7 @@ def estimate_fault(
     if cost is None:
         est.reasons.append(f"No price data for a {segment} car")
         return est
-    labour, est.labour_basis, _ = _labour_inputs(fault, cost, zone)
+    labour, est.labour_basis, _ = _labour_inputs(fault, cost, zone, version_zone_rates(session, version))
     if not labour:
         est.reasons.append("No labour figure for this repair")
     services = _service_inputs(session, version, fault, segment, cost)

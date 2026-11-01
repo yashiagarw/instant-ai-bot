@@ -1,6 +1,11 @@
-"""Vehicle catalogue: make -> model -> variant, plus cars users type in that we do not list."""
+"""Vehicle catalogue: make -> model -> (generation) -> variant, plus cars users type in that we do not list.
 
-from sqlalchemy import CheckConstraint, ForeignKey, Index, SmallInteger, Text, UniqueConstraint
+Rows changed in the admin app carry edited_by / edited_at: `python -m app.vehicles.seed` then keeps them as they are
+instead of overwriting them from data/catalogue/vehicles.yaml."""
+
+from datetime import datetime
+
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, SmallInteger, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,6 +20,8 @@ class Make(Base):
     name: Mapped[str] = mapped_column(Text, unique=True)
     # Extra words people type for this make ("maruti", "msil"). Space-separated, lower case.
     aliases: Mapped[str] = mapped_column(Text, default="", server_default="")
+    edited_by: Mapped[str | None] = mapped_column(Text)
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     models: Mapped[list["Model"]] = relationship(back_populates="make", order_by="Model.name")
 
@@ -39,11 +46,36 @@ class Model(Base):
     aliases: Mapped[str] = mapped_column(Text, default="", server_default="")
     # Lower-case "make + make aliases + model + model aliases", maintained by the seed.
     search_text: Mapped[str] = mapped_column(Text, default="", server_default="")
+    edited_by: Mapped[str | None] = mapped_column(Text)
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     make: Mapped[Make] = relationship(back_populates="models")
+    generations: Mapped[list["Generation"]] = relationship(
+        back_populates="model", order_by="Generation.year_from", cascade="all, delete-orphan"
+    )
     variants: Mapped[list["Variant"]] = relationship(
         back_populates="model", order_by="(Variant.year_from.desc(), Variant.fuel, Variant.transmission)"
     )
+
+
+class Generation(Base):
+    """A model's generation (e.g. "Swift 3rd gen, 2018-2023"): groups its variants. Added in the admin app."""
+
+    __tablename__ = "generations"
+    __table_args__ = (
+        UniqueConstraint("model_id", "name"),
+        CheckConstraint("year_to IS NULL OR year_to >= year_from", name="year_range"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    model_id: Mapped[int] = mapped_column(ForeignKey("models.id", ondelete="CASCADE"), index=True)
+    name: Mapped[str] = mapped_column(Text)
+    year_from: Mapped[int] = mapped_column(SmallInteger)
+    year_to: Mapped[int | None] = mapped_column(SmallInteger)
+    edited_by: Mapped[str | None] = mapped_column(Text)
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    model: Mapped[Model] = relationship(back_populates="generations")
 
 
 class Variant(Base):
@@ -67,6 +99,9 @@ class Variant(Base):
     price_segment: Mapped[PriceSegment] = mapped_column(str_enum(PriceSegment, "price_segment"))
     # Known features, {"start_stop": false, ...} (app/vehicles/features.py). A missing key means unknown.
     features: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    generation_id: Mapped[int | None] = mapped_column(ForeignKey("generations.id", ondelete="SET NULL"), index=True)
+    edited_by: Mapped[str | None] = mapped_column(Text)
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     model: Mapped[Model] = relationship(back_populates="variants")
 

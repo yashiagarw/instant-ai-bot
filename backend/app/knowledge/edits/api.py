@@ -490,6 +490,30 @@ def _new_key(session: Session, version: DatasetVersion, body: EditIn) -> str:
         while f"{category}/edit-{n + 1}" in existing:
             n += 1
         return f"{category}/edit-{n + 1}"
+    if body.entity == "part":
+        from app.knowledge.edits.parts_handlers import new_part_key
+
+        return new_part_key(HANDLERS["part"].validate(data, exists=False))
+    if body.entity == "part_price":  # key "<part key>|<segment>|": a new editor price
+        from app.parts.models import PartPrice
+
+        part_key, _, segment = body.key.rstrip("|").rpartition("|")
+        n = (
+            session.scalar(
+                select(func.count()).where(
+                    PartPrice.dataset_version_id == version.id, PartPrice.source_ref.like("editor-%")
+                )
+            )
+            or 0
+        )
+        existing = set(session.scalars(select(KnowledgeEdit.key).where(KnowledgeEdit.entity == "part_price")))
+        while f"{part_key}|{segment}|editor-{n + 1}" in existing:
+            n += 1
+        return f"{part_key}|{segment}|editor-{n + 1}"
+    if body.entity == "part_fit":  # key "<part key>|": the rest comes from the fit itself
+        from app.knowledge.edits.parts_handlers import fit_key
+
+        return fit_key(body.key.rstrip("|"), HANDLERS["part_fit"].validate(data, exists=False))
     raise Invalid("every edit needs the item's key")
 
 
@@ -503,7 +527,7 @@ def save_edit(version_id: int, body: EditIn, staff: CurrentStaff, session: DbSes
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, f"Unknown item type {body.entity}")
     try:
         key = body.key
-        if not key or (body.entity == "question" and key.endswith("/")):
+        if not key or (body.entity == "question" and key.endswith("/")) or key.endswith("|"):
             key = _new_key(session, v, body)
         data = body.data
         if body.entity == "question" and data:
@@ -517,6 +541,14 @@ def save_edit(version_id: int, body: EditIn, staff: CurrentStaff, session: DbSes
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, _message(e)) from e
     session.commit()
     out = _edit_out(session, v, e, key, body.entity)
+    if body.entity == "part_price" and out["item"]:
+        from app.knowledge.edits.parts_handlers import SECOND_LOOK_INR, needs_second_look
+
+        if needs_second_look(out["item"]):
+            out["warning"] = (
+                f"This price is {SECOND_LOOK_INR:,} rupees or more: it is flagged until a second person checks it "
+                "(Parts & Prices, Prices, 'Second look')."
+            )
     if untriggered := getattr(HANDLERS[body.entity], "untriggered", None):
         out["warning"] = (
             "Removed answers were safety triggers; those safety rules no longer fire on them: " + "; ".join(untriggered)
@@ -543,6 +575,26 @@ def sign_off(version_id: int, body: SignOffIn, staff: CurrentStaff, session: DbS
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, _message(e)) from e
     session.commit()
     return _edit_out(session, v, e, body.key, body.entity)
+
+
+class BulkSignOffIn(BaseModel):
+    items: list[SignOffIn] = Field(min_length=1, max_length=service.BULK_LIMIT)
+    filter: dict[str, Any] = Field(default_factory=dict, description="The filter that selected them (for the audit)")
+
+
+@router.post("/versions/{version_id}/signoff/bulk", responses={404: {}, 422: {}})
+@requires(Perm.knowledge_edit)
+def bulk_sign_off(version_id: int, body: BulkSignOffIn, staff: CurrentStaff, session: DbSession):
+    """Sign off every listed item under your name and today's date: one audit entry with the count and the filter."""
+    v = _version(session, version_id)
+    try:
+        service.editable(v)
+        out = service.bulk_sign_off(session, v, _actor(staff), [(i.entity, i.key) for i in body.items], body.filter)
+    except (Invalid, ValueError) as e:
+        session.rollback()
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, _message(e)) from e
+    session.commit()
+    return out
 
 
 @router.get("/versions/{version_id}/edits")

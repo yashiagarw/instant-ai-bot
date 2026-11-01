@@ -121,3 +121,23 @@ test("CSV cells: quotes, commas, new lines and formulas", () => {
   expect(csvCell(null)).toBe("");
   expect(toCsv([{ a: "x\ny" }], [{ header: "A", value: (r) => r.a }])).toBe('﻿A\r\n"x\ny"\r\n');
 });
+
+test("a bulk action gets every row the search matches (all pages) and the search used", () => {
+  const seen: { n: number; search: string }[] = [];
+  render(
+    <DataTable
+      data={Array.from({ length: 30 }, (_, i) => ({ name: i % 2 ? `odd ${i}` : `even ${i}` }))}
+      columns={[{ accessorKey: "name", header: "Name" }] as ColumnDef<{ name: string }, unknown>[]}
+      caption="Rows"
+      pageSize={5}
+      bulk={({ rows, search }) => {
+        seen.push({ n: rows.length, search });
+        return <button type="button">Act on {rows.length}</button>;
+      }}
+    />,
+  );
+  expect(screen.getByRole("button", { name: "Act on 30" })).toBeTruthy();
+  fireEvent.change(screen.getByLabelText("Search"), { target: { value: "odd" } });
+  expect(screen.getByRole("button", { name: "Act on 15" })).toBeTruthy();
+  expect(seen.at(-1)).toEqual({ n: 15, search: "odd" });
+});

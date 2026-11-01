@@ -204,6 +204,13 @@ export interface FileReport {
   header_row: number;
 }
 
+export interface StepsRun {
+  steps: Record<string, string>;
+  warnings: string[];
+  embeddings: Record<string, number>;
+  edits?: { applied: number; conflicts: unknown[]; orphans: unknown[] };
+}
+
 export interface Validation {
   error?: string;
   built_at?: string;
@@ -212,7 +219,8 @@ export interface Validation {
   file_reports?: Record<string, FileReport>;
   checks?: Check[];
   losses?: Loss[];
-  steps?: { steps: Record<string, string>; warnings: string[]; embeddings: Record<string, number> };
+  steps?: StepsRun; // when the draft was built
+  publish_steps?: StepsRun; // when it was published (edits saved after the build are applied here)
   warnings?: string[];
 }
 
@@ -473,6 +481,7 @@ export interface EditRow {
 }
 
 export interface EditorSummary {
+  second_look?: { count: number; items: { key: string; part: string; segment: string; price_inr: number; price_max_inr: number | null }[] };
   tables: Record<string, Record<string, number>>;
   safety: { edit: number; name: string; key: string; by: string; changes: { field: string; before: unknown; after: unknown }[] }[];
   conflicts?: { edit: number; name: string; key: string; message: string }[];
@@ -509,6 +518,164 @@ export interface UnlistedCar {
   price_segment: string | null;
   reviewed: boolean;
   sessions: number;
+}
+
+// ---------------------------------------------------------------- vehicles and parts (phase 4.4 part 2)
+
+export interface CatMake {
+  id: number;
+  name: string;
+  aliases: string;
+  edited_by: string | null;
+}
+export interface CatGeneration {
+  id: number;
+  model_id: number;
+  name: string;
+  year_from: number;
+  year_to: number | null;
+  edited_by: string | null;
+}
+export interface CatVariant {
+  id: number;
+  model_id: number;
+  generation_id: number | null;
+  name: string;
+  fuel: string;
+  transmission: string;
+  engine: string;
+  year_from: number;
+  year_to: number | null;
+  price_segment: string;
+  features: Record<string, boolean>;
+  edited_by: string | null;
+}
+export interface CatModel {
+  id: number;
+  make_id: number;
+  name: string;
+  body_type: string | null;
+  aliases: string;
+  edited_by: string | null;
+  generations: CatGeneration[];
+  variants: CatVariant[];
+}
+export interface Catalogue {
+  makes: (CatMake & { models: CatModel[] })[];
+  features: Record<string, string>;
+}
+
+export interface PartRow {
+  key: string;
+  description: string;
+  part_type: string;
+  brand: string;
+  part_number: string;
+  kind: string;
+  prices: number;
+  price_min: number | null;
+  price_max: number | null;
+  second_look: number;
+  fits: number;
+  edited: boolean;
+}
+export interface PartData {
+  description: string;
+  part_type: string;
+  brand: string;
+  brand_kind: "oem" | "oes" | "aftermarket" | "unspecified";
+  part_number: string;
+  quantity: number;
+  kind: "part" | "consumable";
+  segment: "budget" | "mid" | "premium" | null;
+  generic: boolean;
+}
+export interface PriceRow {
+  key: string;
+  segment: string;
+  source: string;
+  source_ref: string;
+  price_inr: number;
+  price_max_inr: number | null;
+  supplier: string;
+  source_url: string;
+  checked_on: string | null;
+  verification_status: string;
+  gst_included: boolean | null;
+  fitting_included: boolean | null;
+  model_verified: boolean;
+  price_basis: string;
+  note: string;
+  second_look_by: string | null;
+  second_look_at: string | null;
+  edit: number | null;
+  flagged: boolean;
+  missing_source: boolean;
+  part_key?: string;
+  part?: string;
+}
+export interface FitRow {
+  key: string;
+  model_id: number;
+  model: string;
+  year_from: number | null;
+  year_to: number | null;
+  fuel: string | null;
+  transmission: string | null;
+  fit_text: string;
+  verification_status: string;
+  source_url: string;
+  source: string;
+  edit: number | null;
+}
+export interface Picture {
+  sha1: string;
+  url: string;
+  caption: string | null;
+}
+export interface PartDetail {
+  key: string;
+  part: PartData;
+  part_edit: number | null;
+  prices: PriceRow[];
+  fits: FitRow[];
+  images: Picture[];
+  images_edit: number | null;
+}
+export interface ZoneRateRow {
+  key: string;
+  zone: string;
+  zone_label: string;
+  segment: string;
+  rate_min_inr: number | null;
+  rate_max_inr: number | null;
+  source: string;
+  checked_on: string | null;
+  edit: number | null;
+}
+export interface LabourRow {
+  key: string;
+  repair: string;
+  segment: string;
+  city: string;
+  amount_inr: number;
+  workshop_type: string;
+  basis: string;
+  status: string;
+  checked_on: string | null;
+  source: string;
+  edit: number | null;
+}
+export interface ImportRow {
+  line: number;
+  row: Record<string, string>;
+  errors: string[];
+  part_key: string | null;
+  flagged: boolean;
+}
+export interface ImportResult {
+  summary: { rows: number; valid: number; errors: number; flagged: number };
+  rows: ImportRow[];
 }
 
 /** The API's media address for a picture path like /media/F08/x.png. */
@@ -599,6 +766,27 @@ export const adminApi = {
   approveGenerated: (id: number, body: { version_id: number; category: string; stage: number; text: string; options: string[] }) =>
     call<{ question: string; version_id: number }>("POST", `/knowledge/generated-questions/${id}/approve`, body),
   rejectGenerated: (id: number) => call<GeneratedQuestion>("POST", `/content/generated-questions/${id}/review`, { decision: "rejected" }),
+
+  bulkSignOff: (v: number, items: { entity: string; key: string }[], filter: Record<string, unknown>) =>
+    call<{ signed_off: number; skipped: string[] }>("POST", `/knowledge/versions/${v}/signoff/bulk`, { items, filter }),
+
+  catalogue: (signal?: AbortSignal) => call<Catalogue>("GET", "/vehicles/catalogue", undefined, signal),
+  saveVehicle: <T>(kind: "makes" | "models" | "generations" | "variants", id: number | null, body: unknown) =>
+    call<T>(id ? "PUT" : "POST", `/vehicles/${kind}${id ? `/${id}` : ""}`, body),
+  deleteVehicle: (kind: "makes" | "models" | "generations" | "variants", id: number) => call<void>("DELETE", `/vehicles/${kind}/${id}`),
+
+  parts: (v: number, signal?: AbortSignal) => call<PartRow[]>("GET", `/parts/versions/${v}/parts`, undefined, signal),
+  part: (v: number, key: string, signal?: AbortSignal) =>
+    call<PartDetail>("GET", `/parts/versions/${v}/parts/${key.split("/").map(encodeURIComponent).join("/")}`, undefined, signal),
+  prices: (v: number, signal?: AbortSignal) => call<PriceRow[]>("GET", `/parts/versions/${v}/prices`, undefined, signal),
+  labour: (v: number, signal?: AbortSignal) =>
+    call<{ zones: ZoneRateRow[]; research: LabourRow[] }>("GET", `/parts/versions/${v}/labour`, undefined, signal),
+  secondLook: (v: number, key: string) => call<unknown>("POST", `/parts/versions/${v}/prices/second-look`, { key }),
+  importPrices: (v: number, file: Blob, commit: boolean) =>
+    call<ImportResult>("POST", `/parts/versions/${v}/import${commit ? "?commit=true" : ""}`, file),
+  zoneRatesYamlUrl: (v: number) => `${API_URL}/api/admin/parts/versions/${v}/zone-rates.yaml`,
+  csvTemplateUrl: () => `${API_URL}/api/admin/parts/csv-template`,
+  uploadPicture: (file: File, caption: string) => call<Picture>("POST", `/media/pictures${query({ caption })}`, file),
 
   unlisted: (signal?: AbortSignal) => call<UnlistedCar[]>("GET", "/vehicles/unlisted", undefined, signal),
   makes: () => call<{ name: string; models: string[] }[]>("GET", "/vehicles/makes"),

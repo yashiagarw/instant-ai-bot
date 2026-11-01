@@ -81,6 +81,7 @@ class Handler:
     can_create: ClassVar[bool] = False
     can_delete: ClassVar[bool] = False
     taxonomy: ClassVar[bool] = False  # writes dataset_versions.taxonomy, not rows
+    stage: ClassVar[str] = "knowledge"  # pipeline step: "knowledge" (before parts build) or "parts" (after it)
     global_table: ClassVar[bool] = False  # a live table written at publish only (photo labels)
 
     def validate(self, data: dict | None, exists: bool) -> dict | None:
@@ -960,6 +961,15 @@ HANDLERS: dict[str, Handler] = {
         ImageLabelHandler(),
     )
 }
+
+
+def _register_parts() -> None:
+    from app.knowledge.edits.parts_handlers import PARTS_HANDLERS
+
+    HANDLERS.update({h.entity: h for h in PARTS_HANDLERS})
+
+
+_register_parts()
 
 
 def copy_data(data: dict | None) -> dict | None:

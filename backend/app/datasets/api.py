@@ -214,9 +214,10 @@ def start_job(
         after={"job": job.id, **{k: v for k, v in (params or {}).items() if k != "override_reason"}},
         ip=staff.ip,
     )
+    job_id = job.id  # read before the commit: nothing of this request's session is open while the job runs
     session.commit()
     try:
-        _queue(request).enqueue(job.id)
+        _queue(request).enqueue(job_id)
     except jobs.QueueUnavailable as e:
         job.status, job.error = JobStatus.failed, "Background jobs are not running."
         session.commit()

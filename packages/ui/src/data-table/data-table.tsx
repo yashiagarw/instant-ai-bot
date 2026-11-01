@@ -43,6 +43,9 @@ export interface DataTableProps<T> {
   empty?: ReactNode;
   /** Extra controls at the right of the toolbar (e.g. an "Invite" button). */
   actions?: ReactNode;
+  /** An action on every row the search and filters match (all pages), e.g. "Sign off all 120": gets those rows and
+   * the search and filters that selected them. */
+  bulk?: (ctx: { rows: T[]; search: string; filters: Record<string, string> }) => ReactNode;
   getRowId?: (row: T) => string;
 }
 
@@ -83,6 +86,7 @@ export function DataTable<T>({
   csv,
   empty = "Nothing matches.",
   actions,
+  bulk,
   getRowId,
 }: DataTableProps<T>) {
   const id = useId();
@@ -183,6 +187,11 @@ export function DataTable<T>({
             </Button>
           )}
           {actions}
+          {bulk?.({
+            rows: table.getFilteredRowModel().rows.map((r) => r.original),
+            search,
+            filters: Object.fromEntries(columnFilters.map((f) => [f.id, String(f.value)])),
+          })}
         </div>
       </div>
 

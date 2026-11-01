@@ -63,3 +63,21 @@ def zone_rates(path: Path = RATES_PATH) -> dict[tuple[str, str], ZoneRate]:
             low, high = (value, value) if isinstance(value, (int, float)) else value
             out[(code, segment)] = ZoneRate(Range(int(low), int(high)), source, checked)
     return out
+
+
+def version_zone_rates(session, version) -> dict[tuple[str, str], ZoneRate]:
+    """(zone, segment) -> hourly rate as a dataset version carries it (table zone_labour_rates: the YAML file loaded
+    when the version was built, plus the admin editor's edits). A version built before that table existed: the file."""
+    from sqlalchemy import select
+
+    from app.parts.models import ZoneLabourRate
+
+    steps = ((version.validation or {}).get("publish_steps") or (version.validation or {}).get("steps") or {}).get(
+        "steps"
+    ) or {}
+    rows = session.scalars(select(ZoneLabourRate).where(ZoneLabourRate.dataset_version_id == version.id)).all()
+    if not rows and "zone labour rates" not in steps:
+        return zone_rates()
+    return {
+        (r.zone, str(r.segment)): ZoneRate(Range(r.rate_min_inr, r.rate_max_inr), r.source, r.checked_on) for r in rows
+    }

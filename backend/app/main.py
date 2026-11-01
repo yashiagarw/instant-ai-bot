@@ -15,8 +15,10 @@ from app.db import make_engine, make_session_factory
 from app.diagnosis import api as diagnosis_api
 from app.estimates import api as estimates_api
 from app.knowledge.edits import api as knowledge_admin_api
+from app.parts import admin_api as parts_admin_api
 from app.parts import api as parts_api
 from app.requests import api as requests_api
+from app.uploads import admin_api as media_admin_api
 from app.uploads import api as uploads_api
 from app.vehicles import admin_api as vehicles_admin_api
 from app.vehicles import api as vehicles_api
@@ -56,9 +58,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(datasets_api.router, prefix="/api")
     app.include_router(knowledge_admin_api.router, prefix="/api")
     app.include_router(vehicles_admin_api.router, prefix="/api")
+    app.include_router(parts_admin_api.router, prefix="/api")
+    app.include_router(media_admin_api.router, prefix="/api")
+    app.include_router(media_admin_api.public_router)  # /media/uploaded/<sha1>.jpg (before the /media files below)
     # every /api/admin route runs the access check with a permission
     check_admin_routes(
-        app, admin_api.router, datasets_api.router, knowledge_admin_api.router, vehicles_admin_api.router
+        app,
+        admin_api.router,
+        datasets_api.router,
+        knowledge_admin_api.router,
+        vehicles_admin_api.router,
+        parts_admin_api.router,
+        media_admin_api.router,
     )
     if settings.media_dir.is_dir():
         app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")

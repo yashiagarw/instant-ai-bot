@@ -13,6 +13,7 @@ import { Dialog } from "@im/ui/dialog";
 import { ErrorBox } from "@/components/error-box";
 import { Checkbox, EditedBadge, numberOrNull, SaveStatus, Select, TextArea, TextInput, useStatus } from "@/components/form";
 import { DraftProvider, useDraft, useDraftData } from "@/components/knowledge/draft";
+import { UploadPicture } from "@/components/upload-picture";
 import { SAFETY_STATUS, SafetyRuleDialog } from "@/components/knowledge/safety-form";
 import { adminApi, errorMessage, type FaultDetail, mediaUrl, type SafetyRuleRow } from "@/lib/api";
 import { type FaultForm, faultSchema, linesSchema, phraseSchema, REQUIREMENT_FIELDS, requiresFromForm, requiresToForm } from "@/lib/schemas";
@@ -371,6 +372,7 @@ function Pictures({ f, onSaved }: { f: FaultDetail; onSaved: () => void }) {
           >
             <ImagePlus aria-hidden="true" className="size-5" /> Add a picture from file {f.file_no}
           </Button>
+          <UploadPicture onUploaded={(img) => setImages([...images, img])} />
           <Button type="button" className="h-11 rounded-full px-5 text-base font-bold" disabled={!dirty} onClick={() => void save()}>
             Save pictures
           </Button>
@@ -379,7 +381,7 @@ function Pictures({ f, onSaved }: { f: FaultDetail; onSaved: () => void }) {
       <SaveStatus status={status} />
       <Dialog open={picking} onOpenChange={setPicking} title={`Pictures in file ${f.file_no}`} className="max-w-3xl">
         {!library && <p role="status">Loading pictures…</p>}
-        {library && library.length === 0 && <p>No pictures in this file. Uploading new pictures comes with Parts &amp; Prices (part 2).</p>}
+        {library && library.length === 0 && <p>No pictures in this file. Upload a new one instead.</p>}
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {library
             ?.filter((x) => !images.some((i) => i.sha1 === x.sha1))

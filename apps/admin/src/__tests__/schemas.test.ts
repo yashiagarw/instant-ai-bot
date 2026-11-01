@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addCarSchema, faultSchema, phraseSchema, questionSchema, requiresFromForm, requiresToForm, safetySchema } from "@/lib/schemas";
+import { addCarSchema, faultSchema, partSchema, phraseSchema, priceSchema, questionSchema, requiresFromForm, requiresToForm, safetySchema, zoneRateSchema } from "@/lib/schemas";
 
 const option = (label: string, notSure = false) => ({ label, not_sure: notSure, effects: [] });
 
@@ -40,5 +40,33 @@ describe("editor form schemas (mirror the server)", () => {
     const car = { make: "Tata", model: "Curvv", body: "", year_from: 2024, year_to: 2023, fuel: "petrol", transmissions: ["mt"], price_segment: "mid", engine: "" };
     expect(addCarSchema.safeParse(car).success).toBe(false); // last year before the first
     expect(addCarSchema.safeParse({ ...car, year_to: null }).success).toBe(true);
+  });
+});
+
+describe("part 2 schemas", () => {
+  const price = { segment: "budget", price_inr: 1450, price_max_inr: null, supplier: "Boodmo", source_url: "", checked_on: "2026-10-30",
+    verification_status: "approx", gst_included: "unknown", fitting_included: "unknown", model_verified: false, price_basis: "", note: "" }; // prettier-ignore
+
+  it("needs a price's source and its check date, not in the future", () => {
+    expect(priceSchema.safeParse(price).success).toBe(true);
+    expect(priceSchema.safeParse({ ...price, supplier: "" }).success).toBe(false);
+    expect(priceSchema.safeParse({ ...price, supplier: "", source_url: "https://boodmo.com/x" }).success).toBe(true);
+    expect(priceSchema.safeParse({ ...price, checked_on: "" }).success).toBe(false);
+    expect(priceSchema.safeParse({ ...price, checked_on: "2999-01-01" }).success).toBe(false);
+    expect(priceSchema.safeParse({ ...price, price_max_inr: 1000 }).success).toBe(false);
+  });
+
+  it("needs a zone rate's source and date; ranges in order", () => {
+    const rate = { rate_min_inr: 500, rate_max_inr: 700, source: "5 garages, phone survey", checked_on: "2026-10-30" };
+    expect(zoneRateSchema.safeParse(rate).success).toBe(true);
+    expect(zoneRateSchema.safeParse({ ...rate, source: "" }).success).toBe(false);
+    expect(zoneRateSchema.safeParse({ ...rate, rate_max_inr: 400 }).success).toBe(false);
+  });
+
+  it("keeps generic parts without a part number and with a segment", () => {
+    const part = { description: "Wiper blade", part_type: "Wiper", brand: "", brand_kind: "unspecified", part_number: "", quantity: 1, kind: "part", segment: null, generic: true };
+    expect(partSchema.safeParse(part).success).toBe(false); // generic needs a segment
+    expect(partSchema.safeParse({ ...part, segment: "budget" }).success).toBe(true);
+    expect(partSchema.safeParse({ ...part, segment: "budget", part_number: "X1" }).success).toBe(false);
   });
 });

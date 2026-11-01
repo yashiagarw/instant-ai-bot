@@ -52,6 +52,9 @@ test("datasets: upload, job progress, validation and diff, eval, a blocked publi
   await button.click();
   await expect(page.getByRole("heading", { name: /v42 · battery/, level: 1 })).toContainText("Live", { timeout: 10_000 });
   await expect(page.getByText("Published over a blocked eval.")).toBeVisible();
+  // The steps of the publish run are shown (open), apart from the build's (before later edits).
+  await expect(page.getByTestId("steps-published")).toContainText("2 edits applied");
+  await expect(page.getByTestId("steps-built")).toContainText("Steps that ran when the draft was built");
   expect(fake.datasets.publishBodies.at(-1)).toEqual({ override_reason: "Two retired faults; mechanic checked it." });
 });
 

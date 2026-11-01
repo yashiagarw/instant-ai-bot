@@ -133,6 +133,7 @@ export class FakeDatasets {
     const old = this.live();
     old.status = "archived";
     Object.assign(v, { status: "published", published_at: NOW, published_by: by });
+    v.validation = { ...v.validation, publish_steps: { steps: { "editor edits apply": "2 edits applied, 0 conflicts, 0 not applied" }, warnings: [], embeddings: {} } };
   }
 
   handle(method: string, path: string, url: URL, body: Json, perms: Set<string>, me: string): Result | null {
@@ -174,6 +175,7 @@ export class FakeDatasets {
         publish: { blockers, gate_reasons: reasons, can_override: perms.has("datasets.override"),
           can_publish: validated && !blockers.length && (!reasons.length || perms.has("datasets.override")) },
         jobs: this.jobs.filter((j) => j.dataset_version_id === v.id).reverse().map((j) => this.jobOut(j)),
+        editor: { tables: {}, safety: [], conflicts: [], orphans: [], second_look: { count: 0, items: [] } },
       } }; // prettier-ignore
     }
 

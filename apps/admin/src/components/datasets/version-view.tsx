@@ -100,7 +100,11 @@ export function VersionView({ id }: { id: number }) {
       )}
 
       <Validation v={ver} canManage={canManage} busy={busy} onStarted={started} />
-      {(Object.keys(ver.editor.tables).length > 0 || (ver.editor.conflicts ?? []).length > 0 || (ver.editor.orphans ?? []).length > 0) && (
+      {ver.editor &&
+        (Object.keys(ver.editor.tables).length > 0 ||
+          (ver.editor.conflicts ?? []).length > 0 ||
+          (ver.editor.orphans ?? []).length > 0 ||
+          (ver.editor.second_look?.count ?? 0) > 0) && (
         <Card title="Editor changes in this version" id="editor-heading">
           <EditorSummaryView summary={ver.editor} />
         </Card>
@@ -263,18 +267,26 @@ function Validation({ v, canManage, busy, onStarted }: { v: VersionDetail; canMa
           </div>
         </div>
       )}
-      {val.steps && (
-        <details>
-          <summary className="min-h-11 cursor-pointer py-2 font-semibold text-orange-text">Steps that ran</summary>
-          <dl className="grid gap-1 text-sm text-ink sm:grid-cols-[max-content_1fr] sm:gap-x-4">
-            {Object.entries(val.steps.steps).map(([k, line]) => (
-              <div key={k} className="contents">
-                <dt className="font-mono font-bold">{k}</dt>
-                <dd>{line}</dd>
-              </div>
-            ))}
-          </dl>
-        </details>
+      {(
+        [
+          [val.publish_steps, "Steps that ran when it was published", "steps-published"],
+          [val.steps, val.publish_steps ? "Steps that ran when the draft was built (before later edits)" : "Steps that ran", "steps-built"],
+        ] as const
+      ).map(
+        ([run, title, id]) =>
+          run && (
+            <details key={id} data-testid={id} open={id === "steps-published"}>
+              <summary className="min-h-11 cursor-pointer py-2 font-semibold text-orange-text">{title}</summary>
+              <dl className="grid gap-1 text-sm text-ink sm:grid-cols-[max-content_1fr] sm:gap-x-4">
+                {Object.entries(run.steps).map(([k, line]) => (
+                  <div key={k} className="contents">
+                    <dt className="font-mono font-bold">{k}</dt>
+                    <dd>{line}</dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+          ),
       )}
       {val.warnings && val.warnings.length > 0 && (
         <details>

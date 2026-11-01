@@ -61,14 +61,20 @@ def conflict(edit: KnowledgeEdit, now: dict | None) -> list[str]:
     ]
 
 
-def apply_all(session: Session, version: DatasetVersion, taxonomy_base: dict) -> ApplyReport:
-    """Make the version's taxonomy taxonomy.yaml + published + its own edits, and apply every other edit to its rows.
-    Photo label sign-offs are applied to the live list at publish (apply_global)."""
+def apply_all(session: Session, version: DatasetVersion, taxonomy_base: dict, stage: str = "knowledge") -> ApplyReport:
+    """Stage "knowledge" (before parts build): make the version's taxonomy taxonomy.yaml + published + its own edits,
+    and apply the other knowledge edits to its rows. Stage "parts" (after parts build): the Parts & Prices edits.
+    Changes to shared rows (photo labels, existing parts) are written at publish (apply_global)."""
     report = ApplyReport()
-    version.taxonomy = published_taxonomy(session, taxonomy_base)
+    if stage == "knowledge":
+        version.taxonomy = published_taxonomy(session, taxonomy_base)
     for e in edits_for(session, version):
         h = HANDLERS.get(e.entity)
-        if h is None or h.global_table:
+        if h is None or h.stage != stage:
+            continue
+        if h.global_table:
+            h.write(session, version, e.key, e.data)  # a new part is created; existing shared rows wait for publish
+            report.applied += 1
             continue
         if e.status == EditStatus.published and h.taxonomy:
             continue  # already in published_taxonomy()

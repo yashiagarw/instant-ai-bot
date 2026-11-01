@@ -45,7 +45,7 @@ docker compose up -d db storage redis
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0018)
+uv run alembic upgrade head                          # all migrations (0001 … 0019)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -469,8 +469,8 @@ brand theme, Button, Dialog, data table). Start both with `pnpm dev` from the re
   else. Sessions: 8 hours, 30 minutes idle.
 - **Menu**: Overview, Requests, Mechanics, Knowledge, Vehicles, Parts & Prices, Datasets, Quality, Users, Audit log.
   Items are hidden by role (table in `docs/permissions.md`) and their pages say "No access" when opened directly;
-  the API checks every call regardless. Requests, Mechanics, Parts & Prices and Quality are placeholders for now
-  (Datasets: Phase 4.3; Knowledge and the Vehicles unlisted-cars queue: Phase 4.4).
+  the API checks every call regardless. Requests, Mechanics and Quality are placeholders for now (Datasets: Phase
+  4.3; Knowledge, Vehicles and Parts & Prices: Phase 4.4).
 - **Users**: the Staff tab (super admin) lists staff with search, role and status filters and CSV export, and lets
   you invite staff (a temporary password shown once), change roles, disable / enable, unlock and reset two-factor.
   The Customers tab (super admin, support agent) lists customer accounts with **masked phone numbers**; "Show"
@@ -574,6 +574,39 @@ pnpm dev:admin                                       # http://localhost:3001/kno
 
 Tests: `cd backend && uv run pytest tests/test_knowledge_editors.py`; `cd apps/admin && pnpm test` and
 `pnpm exec playwright test e2e/knowledge.spec.ts --workers=1`.
+
+## Phase 4.4 (part 2): vehicles, parts & prices, pictures, bulk sign-off
+
+- **Vehicles** (catalogue tab): makes, models, generations and variants (price segment, years, features). The car
+  catalogue is not part of the dataset versions: a change is live at once for new diagnoses and audited. Rows changed
+  here are marked: `python -m app.vehicles.seed` keeps them as they are (and never prunes them) and lists them. A
+  variant that diagnoses or saved cars use cannot be deleted.
+- **Parts & Prices** (edits in a draft, published on the Datasets page; a new pipeline step re-applies them after
+  `parts build`, so every rebuild keeps them):
+  - Parts (new ones are created at once; a change to an existing part reaches the shared parts list at publish),
+    pictures, fits (which cars a part fits) and prices.
+  - Every price needs a **source** (supplier or link) and the **date it was checked**. A price of **₹20,000 or more is
+    flagged** until a second person checks it ("Second look"; never the person who entered it); the publish page lists
+    the ones waiting (they do not block publishing).
+  - **Labour rates**: the zone grid (per hour, zone × segment, with source and date) fills the version's zone rates:
+    estimates use them once published. `data/catalogue/zone_labour_rates.yaml` is loaded on every build; "Download as
+    zone_labour_rates.yaml" gives the file to commit. Plus the per-repair labour research rows.
+  - **CSV import**: download the template, check the file (errors and flags per row, nothing saved), then import the
+    valid rows into the draft (one audit entry).
+- **Pictures** for faults and parts are uploaded through the photo storage (SeaweedFS, the same checks as customer
+  photos: real type, re-encoded JPEG, no metadata) and served at `/media/uploaded/<sha1>.jpg`.
+- **Bulk sign-off**: on the Sign-off tab, "Sign off all N shown" signs off everything the current search and filters
+  show (up to 2,000 at a time) as one audit entry with the count and the filter.
+
+```bash
+cd backend && uv run alembic upgrade head            # migration 0019
+docker compose up -d storage                         # pictures (S3 key pair in backend/.env, as for photos)
+# restart the worker (new pipeline steps) and the API
+pnpm dev:admin                                       # http://localhost:3001/vehicles and /parts
+```
+
+Tests: `cd backend && uv run pytest tests/test_parts_editors.py`; `cd apps/admin && pnpm exec playwright test
+e2e/parts.spec.ts --workers=1`.
 
 ## LLM layer (off by default)
 

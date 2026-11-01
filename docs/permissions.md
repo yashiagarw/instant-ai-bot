@@ -57,7 +57,9 @@ What each permission covers:
 | `datasets.manage` | `POST /api/admin/datasets/uploads` (a category file: a draft built in the background), `POST .../versions/{id}/rebuild`, `.../eval`, `.../publish`, `.../rollback`, `DELETE .../versions/{id}` (discard a draft), `POST .../jobs/{id}/cancel` (a job not started yet) |
 | `content.read` (knowledge) | `GET /api/admin/knowledge/drafts`, `.../versions/{id}/taxonomy`, `.../faults`, `.../faults/{key}`, `.../questions`, `.../safety`, `.../signoff`, `.../edits`, `GET /api/admin/knowledge/images`, `GET /api/admin/vehicles/unlisted`, `GET /api/admin/vehicles/makes` |
 | `knowledge.edit` | `POST /api/admin/knowledge/drafts` (start an edit draft), `POST .../versions/{id}/edits` (save an item: always into a draft, published through the pipeline), `DELETE .../versions/{id}/edits/{edit}` (revert), `POST .../versions/{id}/signoff` (mark reviewed under your own name), `POST /api/admin/knowledge/generated-questions/{id}/approve` |
-| `vehicles.manage` | `POST /api/admin/vehicles/unlisted/{id}/add` (to the car catalogue, live), `POST .../unlisted/{id}/dismiss` |
+| `vehicles.manage` | `POST /api/admin/vehicles/unlisted/{id}/add` (to the car catalogue, live), `POST .../unlisted/{id}/dismiss`; the catalogue: `POST/PUT/DELETE /api/admin/vehicles/makes`, `.../models`, `.../generations`, `.../variants` (live, audited; a variant in use is not deleted) |
+| `content.read` (parts) | `GET /api/admin/vehicles/catalogue`, `GET /api/admin/parts/versions/{id}/parts`, `.../parts/{key}`, `.../prices`, `.../labour`, `.../zone-rates.yaml`, `GET /api/admin/parts/csv-template` |
+| `knowledge.edit` (parts, pictures) | part, price, fit, labour and zone-rate edits through `POST /api/admin/knowledge/versions/{id}/edits`; `POST /api/admin/parts/versions/{id}/prices/second-look` (not the person who entered the price); `POST /api/admin/parts/versions/{id}/import` (CSV, `commit=true` to import); `POST /api/admin/media/pictures` (upload through the photo storage); `POST /api/admin/knowledge/versions/{id}/signoff/bulk` |
 | `datasets.override` | publish although the eval gate blocks it (top-3 down more than 3 points, or safety recall down): `override_reason` of at least 15 characters, written to the audit log |
 | `customers.read` | `GET /api/admin/customers` (search by name or the last digits of the phone): phone numbers always masked |
 | `customers.contact` | `POST /api/admin/customers/{id}/reveal-phone`: one customer's full number, each time written to the audit log |
@@ -113,4 +115,8 @@ The table is append-only (a trigger refuses UPDATE and DELETE).
 | `knowledge.safety_edit`, `knowledge.safety_edit_revert` | a safety rule or trigger change, with its old and new values |
 | `dataset.edit_draft` | an edit draft started |
 | `vehicle.add_from_unlisted`, `vehicle.dismiss_unlisted` | the unlisted-vehicles queue |
+| `vehicle.make_create`, `vehicle.make_update`, `vehicle.make_delete`, and the same for `model`, `generation`, `variant` | the car catalogue (before / after) |
+| `knowledge.signoff_bulk` | a bulk sign-off: the filter used and the count (one entry for all items) |
+| `parts.csv_import` | a CSV price import: rows, valid, errors, flagged |
+| `media.upload` | a picture uploaded in the admin app |
 | `dataset.publish_override` | published although the eval gate blocked it: the gate's reasons in `before`, the written reason in `after` |

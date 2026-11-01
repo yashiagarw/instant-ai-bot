@@ -99,6 +99,7 @@ test("knowledge: a safety rule change warns and needs confirmation; sign-off und
 test("review queues: unlisted cars are added to the catalogue or dismissed", async ({ page }) => {
   const fake = await new FakeAdmin().as("content@im.test").install(page);
   await page.goto("/vehicles");
+  await page.getByRole("tab", { name: "Unlisted cars" }).click();
   const table = page.getByRole("table", { name: "Unlisted cars waiting for review" });
   await expect(table).toContainText("tata curvv 2025");
   await table.getByRole("button", { name: "Add to catalogue" }).click();

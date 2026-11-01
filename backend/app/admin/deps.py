@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -136,7 +137,7 @@ def check_admin_routes(app: FastAPI, *routers: APIRouter) -> None:
         for r in admin_routes(router):
             if getattr(r.endpoint, ATTR, None) is None:
                 raise RuntimeError(f"{r.path} declares no permission (use @requires or @public)")
-            declared.add("/api" + r.path)
+            declared.add("/api" + re.sub(r"\{(\w+):\w+\}", r"{\1}", r.path))  # {key:path} is {key} in OpenAPI
     stray = [p for p in app.openapi()["paths"] if p.startswith(ADMIN_PREFIX) and p not in declared]
     if stray:
         raise RuntimeError(f"routes under /api/admin outside the admin router: {stray}")

@@ -100,6 +100,20 @@ published one), `questions.ref` (the entry id in data/review/questions), and `re
 customer_phrases and image_labels (sign-off). A tile removed in the editor that old sessions still point at is kept
 with position -1 (never shown).
 
+### Catalogue and parts editors (0019)
+
+- `generations`: id, model_id, name, year_from, year_to (a model's generations; `variants.generation_id` groups its
+  variants). `makes`, `models`, `generations`, `variants` get edited_by / edited_at: set by the admin app, and then
+  `app.vehicles.seed` keeps the row as it is and never prunes it.
+- `zone_labour_rates` (per dataset version): zone, segment, rate_min_inr, rate_max_inr, source, checked_on (both
+  required). Loaded from data/catalogue/zone_labour_rates.yaml at every build ("zone labour rates" step), then the
+  editor's `zone_rate` edits; estimates use the served version's rows (a version built before 0019: the file).
+- `part_prices.second_look_by` / `second_look_at`: a second person checked a price of 20,000 rupees or more.
+- `part_images.source` may be `upload` (pictures uploaded in the admin app: `images.path` `data/media/uploaded/<sha1>.jpg`,
+  stored in the photo bucket as media/uploaded/<sha1>.jpg and served by `GET /media/uploaded/<sha1>.jpg`).
+- knowledge_edits entities added: `part`, `part_price`, `part_fit`, `labour_rate`, `zone_rate`, `part_images` (applied by
+  the "parts edits apply" step after `parts build`).
+
 ### dataset_jobs (0017)
 
 Background jobs of the dataset pipeline (arq worker): id, kind `build` / `eval` / `publish` / `rollback`,
