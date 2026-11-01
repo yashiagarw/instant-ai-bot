@@ -8,6 +8,7 @@ import type { Page, Route } from "@playwright/test";
 import { FakeDatasets } from "./fake-datasets";
 import { FakeKnowledge } from "./fake-knowledge";
 import { CATEGORIES, FakeOps } from "./fake-ops";
+import { FakeQuality } from "./fake-quality";
 import { FakeParts } from "./fake-parts";
 
 export const API = "http://localhost:8000/api/admin";
@@ -17,8 +18,10 @@ export const SETUP_KEY = "JBSWY3DPEHPK3PXPJBSWY3DP";
 const PERMS: Record<string, string[]> = {
   super_admin: ["self", "staff.read", "staff.manage", "audit.read", "requests.read", "requests.contact",
     "requests.update", "customers.read", "customers.contact", "content.read", "content.review", "datasets.manage",
-    "datasets.override", "knowledge.edit", "vehicles.manage", "mechanics.read", "mechanics.manage", "mechanics.documents"],
-  content_admin: ["self", "content.read", "content.review", "datasets.manage", "knowledge.edit", "vehicles.manage"],
+    "datasets.override", "knowledge.edit", "vehicles.manage", "mechanics.read", "mechanics.manage", "mechanics.documents",
+    "quality.read", "quality.golden"],
+  content_admin: ["self", "content.read", "content.review", "datasets.manage", "knowledge.edit", "vehicles.manage",
+    "quality.read", "quality.golden"],
   support_agent: ["self", "requests.read", "requests.contact", "requests.update", "customers.read", "customers.contact",
     "mechanics.read", "mechanics.manage"],
   mechanic: ["self", "requests.read"],
@@ -83,6 +86,7 @@ export class FakeAdmin {
   parts = new FakeParts();
   knowledge = new FakeKnowledge(this.parts);
   ops = new FakeOps();
+  quality = new FakeQuality();
   revealed: string[] = [];
 
   /** Signed in already (skips the login screen). */
@@ -193,6 +197,7 @@ export class FakeAdmin {
     return (
       this.datasets.handle(method, path, url, body, perms, a.email) ??
       this.ops.handle(method, path, url, body, perms, a.email, a.name) ??
+      this.quality.handle(method, path, url, body, perms) ??
       this.parts.handle(method, path, body, perms, a.email, raw, url) ??
       this.knowledge.handle(method, path, body, perms) ?? { status: 404, json: { detail: "Not Found" } }
     );

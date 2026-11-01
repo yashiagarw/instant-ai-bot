@@ -28,6 +28,8 @@ class Perm(StrEnum):
     mechanics_read = "mechanics.read"  # mechanics, their skills, zones and shifts (mechanic phone numbers too)
     mechanics_manage = "mechanics.manage"  # create and edit mechanics, set on / off duty
     mechanics_documents = "mechanics.documents"  # mechanics' ID documents (encrypted; each view audited)
+    quality_read = "quality.read"  # quality metrics, review lists, session replays (phones masked)
+    quality_golden = "quality.golden"  # add a real case to the evaluation's golden set (written to data/eval)
 
 
 PUBLIC = "public"  # no login needed (only the staff login itself)
@@ -42,6 +44,8 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[Perm]] = {
             Perm.datasets_manage,
             Perm.knowledge_edit,
             Perm.vehicles_manage,
+            Perm.quality_read,
+            Perm.quality_golden,
         }
     ),
     RoleCode.support_agent: frozenset(

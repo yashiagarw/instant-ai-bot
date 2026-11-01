@@ -147,21 +147,19 @@ def _event(session: Session, ds: DiagnosisSession, kind: EventType, payload: dic
     )
 
 
-def _events(session: Session, ds: DiagnosisSession, kind: EventType | None = None) -> list[SessionEvent]:
-    """The session's events that still count. A message_undone event voids everything from the message it takes back
-    up to itself (the message, the answer it gave, the question it set aside or asked); the rows are kept."""
-    rows = list(session.scalars(select(SessionEvent).where(SessionEvent.session_id == ds.id).order_by(SessionEvent.id)))
+def counting_events(rows: list[SessionEvent]) -> list[SessionEvent]:
+    """Of one session's events (in id order), those that still count. A message_undone event voids everything from
+    the message it takes back up to itself (the message, the answer it gave, the question it set aside or asked)."""
     voids = [(e.payload["from_event_id"], e.id) for e in rows if e.event_type == EventType.message_undone]
-    live = [e for e in rows if not any(start <= e.id < end for start, end in voids)]
-    return [e for e in live if kind is None or e.event_type == kind]
+    return [e for e in rows if not any(start <= e.id < end for start, end in voids)]
 
 
-def _live(session: Session, ds: DiagnosisSession) -> tuple[list[SessionEvent], list[SessionEvent]]:
-    """(questions asked, answers given) that still count. An answer_undone event takes back the last answer and
-    the question asked after it, so the previous question is waiting again. The events themselves are kept."""
+def asked_and_answered(rows: list[SessionEvent]) -> tuple[list[SessionEvent], list[SessionEvent]]:
+    """(questions asked, answers given) that still count, from one session's events in id order. An answer_undone
+    event takes back the last answer and the question asked after it, so the previous question is waiting again."""
     asked: list[SessionEvent] = []
     answers: list[SessionEvent] = []
-    for e in _events(session, ds):
+    for e in counting_events(rows):
         if e.event_type == EventType.question_asked:
             asked.append(e)
         elif e.event_type == EventType.answer_given:
@@ -173,6 +171,18 @@ def _live(session: Session, ds: DiagnosisSession) -> tuple[list[SessionEvent], l
         elif e.event_type == EventType.question_withdrawn and len(asked) > len(answers):
             asked.pop()
     return asked, answers
+
+
+def _events(session: Session, ds: DiagnosisSession, kind: EventType | None = None) -> list[SessionEvent]:
+    """The session's events that still count (counting_events); the voided rows are kept in the table."""
+    rows = list(session.scalars(select(SessionEvent).where(SessionEvent.session_id == ds.id).order_by(SessionEvent.id)))
+    return [e for e in counting_events(rows) if kind is None or e.event_type == kind]
+
+
+def _live(session: Session, ds: DiagnosisSession) -> tuple[list[SessionEvent], list[SessionEvent]]:
+    """(questions asked, answers given) that still count. The events themselves are kept."""
+    rows = list(session.scalars(select(SessionEvent).where(SessionEvent.session_id == ds.id).order_by(SessionEvent.id)))
+    return asked_and_answered(rows)
 
 
 def _vehicle(snapshot: dict) -> eng.Vehicle:

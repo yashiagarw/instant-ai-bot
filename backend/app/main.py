@@ -18,6 +18,7 @@ from app.knowledge.edits import api as knowledge_admin_api
 from app.mechanics import admin_api as mechanics_admin_api
 from app.parts import admin_api as parts_admin_api
 from app.parts import api as parts_api
+from app.quality import api as quality_api
 from app.requests import admin_api as requests_admin_api
 from app.requests import api as requests_api
 from app.uploads import admin_api as media_admin_api
@@ -64,6 +65,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(media_admin_api.router, prefix="/api")
     app.include_router(mechanics_admin_api.router, prefix="/api")
     app.include_router(requests_admin_api.router, prefix="/api")
+    app.include_router(quality_api.router, prefix="/api")
     app.include_router(media_admin_api.public_router)  # /media/uploaded/<sha1>.jpg (before the /media files below)
     # every /api/admin route runs the access check with a permission
     check_admin_routes(
@@ -76,6 +78,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         media_admin_api.router,
         mechanics_admin_api.router,
         requests_admin_api.router,
+        quality_api.router,
     )
     if settings.media_dir.is_dir():
         app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")

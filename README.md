@@ -45,7 +45,7 @@ docker compose up -d db storage redis
 # Backend and data (run in this order)
 cd backend
 uv sync
-uv run alembic upgrade head                          # all migrations (0001 … 0020)
+uv run alembic upgrade head                          # all migrations (0001 … 0021)
 uv run python -m app.vehicles.seed                   # vehicle catalogue from data/catalogue/vehicles.yaml
 uv run python -m app.knowledge.importer --all        # the 18 datasets (first run downloads a ~470 MB model)
 uv run python -m app.knowledge.questions load --all  # approved question flows + safety rules (data/review/questions)
@@ -469,8 +469,8 @@ brand theme, Button, Dialog, data table). Start both with `pnpm dev` from the re
   else. Sessions: 8 hours, 30 minutes idle.
 - **Menu**: Overview, Requests, Mechanics, Knowledge, Vehicles, Parts & Prices, Datasets, Quality, Users, Audit log.
   Items are hidden by role (table in `docs/permissions.md`) and their pages say "No access" when opened directly;
-  the API checks every call regardless. Quality is a placeholder for now (Datasets: Phase 4.3; Knowledge, Vehicles
-  and Parts & Prices: Phase 4.4; Requests and Mechanics: Phase 4.5).
+  the API checks every call regardless (Datasets: Phase 4.3; Knowledge, Vehicles and Parts & Prices: Phase 4.4;
+  Requests and Mechanics: Phase 4.5; Overview numbers and Quality: Phase 4.6).
 - **Users**: the Staff tab (super admin) lists staff with search, role and status filters and CSV export, and lets
   you invite staff (a temporary password shown once), change roles, disable / enable, unlock and reset two-factor.
   The Customers tab (super admin, support agent) lists customer accounts with **masked phone numbers**; "Show"
@@ -668,6 +668,43 @@ pnpm dev:admin                                                   # http://localh
 
 Tests: `cd backend && uv run pytest tests/test_mechanics.py`; `cd apps/admin && pnpm test` and
 `pnpm exec playwright test e2e/requests.spec.ts e2e/mechanics.spec.ts --workers=1`.
+
+## Phase 4.6: Overview and Quality pages
+
+Staff guide in plain English: [docs/admin-guide.md](docs/admin-guide.md) (daily startup, requests, completing a job,
+editing knowledge, publishing and rolling back, sign-off, Quality).
+
+- **Overview** (`GET /api/admin/overview`; every staff member, parts by permission): today in India time. Requests
+  today by status and those with **no agent after 10 minutes** (safety-critical ones in red), for `requests.read`;
+  diagnoses today, safety alerts today and **LLM spend today**, for `quality.read`.
+- **Quality** (`quality.read`: super admins, content admins; last 7 / 30 / 90 days):
+  - Safety: danger cases missed in the latest evaluation, safety alerts shown today.
+  - The latest evaluation of the live dataset version (the Datasets page's eval): accuracy by category; **real cases
+    in their own table**, never mixed in.
+  - Confirmed-outcome accuracy (`request_outcomes`: the engine's top-1 / top-3 against the mechanic's confirmed fault),
+    by category and by dataset version, with case counts; **"not enough data yet" under 30 cases**.
+  - Low-confidence rate, no-match rate, average questions answered (undone answers not counted), helpful rate.
+  - LLM failures and fallback rate. With no live LLM (`LLM_PROVIDER=none`, or no key) every LLM figure says
+    **"LLM off"**, never zeros.
+  - Review lists: negative feedback, low-confidence and no-match sessions. Each opens a **read-only replay** (every
+    question and answer with its time; taken-back answers marked; phone numbers, emails and plates masked).
+- **Golden set** (`quality.golden`): "Add to golden set" on a replay writes one real case to
+  `data/eval/golden/real_cases/` (`source: real`; names, phones, plates, addresses and house numbers removed; pincode
+  and zone only) and records it in `golden_cases` (migration 0021; once per session; audited). The eval harness and
+  the Datasets evaluation run real cases and report them **apart** (report `summary.real`, eval `real`); they never
+  count in the main numbers or the publish gate. Format, and how the old platform's job records can be added later:
+  [data/eval/golden/README.md](data/eval/golden/README.md).
+- New permissions `quality.read`, `quality.golden` (super admin, content admin); Quality moved from `content.read`.
+  New setting `GOLDEN_CASES_DIR` (default `data/eval/golden/real_cases`).
+
+```bash
+cd backend && uv run alembic upgrade head            # migration 0021
+# restart the API and the worker (the worker now evaluates real cases too)
+pnpm dev:admin                                       # http://localhost:3001 (Overview) and /quality
+```
+
+Tests: `cd backend && uv run pytest tests/test_quality.py tests/test_eval_harness.py`; `cd apps/admin && pnpm test`
+and `pnpm exec playwright test e2e/quality.spec.ts --workers=1`.
 
 ## LLM layer (off by default)
 

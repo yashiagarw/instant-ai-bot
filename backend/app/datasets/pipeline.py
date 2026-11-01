@@ -56,6 +56,8 @@ class Pipeline:
     work_dir: Path = REPO_ROOT / "data" / "uploads" / "datasets" / "work"
     embedder_factory: Callable[[], Embedder | None] = lambda: None
     search_factory: Callable[[], object | None] = lambda: None
+    # Real golden cases (GOLDEN_CASES_DIR): evaluated too, reported apart, never part of the gate. None = none.
+    real_cases_dir: Path | None = None
     _embedder: Embedder | None = None
 
     @property
@@ -284,6 +286,7 @@ def evaluate(session: Session, pipe: Pipeline, version: DatasetVersion, full: bo
         scope,
         diagnosis_engine=pipe.diagnosis_engine,
         search=search,
+        real_dir=pipe.real_cases_dir,
         progress=part(0.02, 0.48 if two else 0.96, f"draft v{version.id}"),
     )
     current = None
@@ -294,6 +297,7 @@ def evaluate(session: Session, pipe: Pipeline, version: DatasetVersion, full: bo
             scope,
             diagnosis_engine=pipe.diagnosis_engine,
             search=search,
+            real_dir=pipe.real_cases_dir,
             progress=part(0.5, 0.48, f"live v{live.id}"),
         )
     version.eval = evaluation.evaluation_record(scope, draft, current)

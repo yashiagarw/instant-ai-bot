@@ -33,8 +33,7 @@ export const NAV: NavItem[] = [
   { key: "vehicles", label: "Vehicles", href: "/vehicles", icon: Car, anyOf: ["content.read"] },
   { key: "parts", label: "Parts & Prices", href: "/parts", icon: Tags, anyOf: ["content.read"] },
   { key: "datasets", label: "Datasets", href: "/datasets", icon: Database, anyOf: ["content.read"] },
-  { key: "quality", label: "Quality", href: "/quality", icon: BadgeCheck, anyOf: ["content.read"],
-    placeholder: "Evaluation reports, customer feedback and items waiting for review." },
+  { key: "quality", label: "Quality", href: "/quality", icon: BadgeCheck, anyOf: ["quality.read"] },
   { key: "users", label: "Users", href: "/users", icon: Users, anyOf: ["staff.read", "customers.read"] },
   { key: "audit", label: "Audit log", href: "/audit", icon: ScrollText, anyOf: ["audit.read"] },
 ]; // prettier-ignore

@@ -48,12 +48,26 @@ def group_by(results: list[dict], key) -> dict[str, dict]:
 
 
 def summarise(results: list[dict]) -> dict:
+    """Every block is computed WITHOUT real cases (source real); real cases have their own block, `real` (None when
+    there are none), so real and synthetic results never mix."""
+    real = [r for r in results if r["source"] == "real"]
+    results = [r for r in results if r["source"] != "real"]
     return {
+        "real": summarise_real(real) if real else None,
         "overall": stats(results),
         "phase1": stats([r for r in results if r["category"] in PHASE1]),
         "other_categories": stats([r for r in results if r["category"] not in PHASE1]),
         "by_type": group_by(results, lambda r: r["type"]),
         "by_language": group_by(results, lambda r: r.get("lang") if r["type"] in ("free_text", "overlap") else None),
         "by_source": group_by(results, lambda r: r["source"]),
+        "by_category": group_by(results, lambda r: r["category"]),
+    }
+
+
+def summarise_real(results: list[dict]) -> dict:
+    """Real cases only: overall, by case type and by category."""
+    return {
+        "overall": stats(results),
+        "by_type": group_by(results, lambda r: r["type"]),
         "by_category": group_by(results, lambda r: r["category"]),
     }

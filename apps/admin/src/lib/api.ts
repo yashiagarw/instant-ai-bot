@@ -892,6 +892,157 @@ export interface OutcomeInput {
   mechanic_notes: string;
 }
 
+// ---------------------------------------------------------------- overview and quality (backend/app/quality)
+
+/** Without a live LLM (LLM_PROVIDER=none, or no key) only { live: false }: the pages say "LLM off". */
+export type LlmUsage =
+  | { live: false }
+  | {
+      live: true;
+      calls: number;
+      cost_usd: number;
+      daily_cap_usd: number;
+      failures: number;
+      failure_rate: number | null;
+      fallbacks: number;
+      fallback_rate: number | null;
+      by_outcome: Record<string, number>;
+    };
+
+export interface SafetyAlertCount {
+  alerts: number;
+  sessions: number;
+  by_risk: Record<string, number>;
+}
+
+export interface UnassignedRequest {
+  id: string;
+  reference: string;
+  status: RequestStatus;
+  safety_level: SafetyLevel;
+  urgent: boolean;
+  age_minutes: number;
+  area: string;
+  pincode: string;
+  category_code: string | null;
+}
+
+export interface OverviewData {
+  now: string;
+  day_start: string;
+  requests: { total: number; by_status: Record<string, number>; unassigned_after_minutes: number; unassigned: UnassignedRequest[] } | null;
+  diagnoses: { started: number; completed: number; safety_alerts: SafetyAlertCount } | null;
+  llm: LlmUsage | null;
+}
+
+export interface EvalStatsRow {
+  n?: number;
+  ranked_n?: number;
+  top1?: number | null;
+  top3?: number | null;
+  avg_questions?: number | null;
+  safety_n?: number;
+  safety_recall?: number | null;
+}
+
+export interface Accuracy {
+  cases: number;
+  enough: boolean;
+  top1: number | null;
+  top3: number | null;
+}
+
+export interface QualityData {
+  days: number;
+  since: string;
+  eval: {
+    version_id: number;
+    ran_at: string;
+    scope: { split?: string; categories?: string[] | null; full?: boolean } | null;
+    cases: number | null;
+    overall: EvalStatsRow;
+    danger_missed: number | null;
+    by_category: (EvalStatsRow & { category: string; name: string })[];
+    real: { cases: number; overall: EvalStatsRow; by_category: (EvalStatsRow & { category: string; name: string })[]; skipped: string[] } | null;
+  } | null;
+  confirmed: {
+    min_cases: number;
+    overall: Accuracy;
+    by_category: (Accuracy & { category: string; name: string })[];
+    by_version: (Accuracy & { dataset_version_id: number | null })[];
+  };
+  confirmed_window: Accuracy;
+  sessions: {
+    completed: number;
+    with_result: number;
+    low_confidence: number;
+    low_confidence_rate: number | null;
+    no_match: number;
+    no_match_rate: number | null;
+    avg_questions: number | null;
+  };
+  helpful: { answers: number; helpful: number; rate: number | null };
+  llm: LlmUsage;
+  safety: { alerts_today: SafetyAlertCount };
+}
+
+export type ReviewKind = "negative_feedback" | "low_confidence" | "no_match";
+
+export interface ReviewRow {
+  session_id: string;
+  at: string;
+  vehicle: string;
+  topic: string | null;
+  text: string;
+  top: { fault_key: string; name: string | null; confidence: string } | null;
+  comment: string | null;
+  feedback_source: string | null;
+  golden: boolean;
+}
+
+export interface ReplayStep {
+  id: number;
+  at: string;
+  kind: string;
+  text: string;
+  detail: string;
+  counted: boolean;
+}
+
+export interface Replay {
+  id: string;
+  created_at: string;
+  completed_at: string | null;
+  status: string;
+  vehicle: string;
+  segment: string | null;
+  listed_car: boolean;
+  coverage_level: string | null;
+  topic: string | null;
+  engine_version: string;
+  dataset_version_id: number | null;
+  questions_answered: number;
+  steps: ReplayStep[];
+  results: { rank: number; fault_key: string; name: string | null; confidence: string; score: number }[];
+  feedback: { at: string; source: string; helpful: boolean | null; comment: string }[];
+  request: {
+    reference: string;
+    status: string;
+    confirmed_fault_key: string | null;
+    confirmed_fault: string | null;
+    other_text: string;
+    completed: boolean;
+  } | null;
+  golden: { case_id: string; added_by: string; at: string; expected: string[]; file_path: string } | null;
+}
+
+export interface GoldenInput {
+  expected: string[];
+  expected_alert: "high" | "medium" | "low" | "none" | null;
+  confirmed_by: "mechanic" | "staff";
+  note: string;
+}
+
 /** The API's media address for a picture path like /media/F08/x.png. */
 export const mediaUrl = (path: string) => `${API_URL}${path}`;
 
@@ -1043,4 +1194,13 @@ export const adminApi = {
     call<RequestDetail>("POST", `/requests/${id}/response`, { accepted, note }),
   addRequestNote: (id: string, text: string) => call<RequestDetail>("POST", `/requests/${id}/notes`, { text }),
   completeJob: (id: string, body: OutcomeInput) => call<RequestDetail>("POST", `/requests/${id}/outcome`, body),
+
+  overview: (signal?: AbortSignal) => call<OverviewData>("GET", "/overview", undefined, signal),
+  quality: (days: number, signal?: AbortSignal) => call<QualityData>("GET", `/quality?days=${days}`, undefined, signal),
+  reviewList: (kind: ReviewKind, days: number, signal?: AbortSignal) =>
+    call<ReviewRow[]>("GET", `/quality/review${query({ kind, days })}`, undefined, signal),
+  replay: (id: string, signal?: AbortSignal) => call<Replay>("GET", `/quality/sessions/${id}`, undefined, signal),
+  qualityFaults: (signal?: AbortSignal) => call<Omit<FaultOption, "ai_rank">[]>("GET", "/quality/faults", undefined, signal),
+  addToGolden: (id: string, body: GoldenInput) =>
+    call<{ case_id: string; file_path: string; case: Record<string, unknown>; added_by: string }>("POST", `/quality/sessions/${id}/golden`, body),
 };

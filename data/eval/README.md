@@ -96,8 +96,11 @@ new in every version), and written YAML cases that name a fault the version no l
 | `unlisted` | a car not in the catalogue; coverage must be right | every 10th phrase with an unlisted car with / without a segment (generated); `synthetic_unlisted.yaml` |
 | `safety` | the expected alert must fire (or none must) | every live rule's trigger answer and first two trigger phrases (generated); `synthetic_safety.yaml` |
 
-`source` is `dataset`, `generated`, `synthetic` (written by us to fill gaps: replace with real cases) or
-`mechanic`. Free-text, overlap and unlisted cases run a simulated conversation: a customer who knows the
+`source` is `dataset`, `generated`, `synthetic` (written by us to fill gaps: replace with real cases),
+`mechanic` or `real`. **Real cases** (a real customer with a confirmed fault) live in `golden/real_cases/` (format:
+[golden/README.md](golden/README.md)); they are always test split and reported **apart**: report JSON `summary.real`
+and the "Real cases" section. Every other number in a report (overall, by type, source, category, the comparison)
+leaves them out, so real and synthetic results never mix. Free-text, overlap and unlisted cases run a simulated conversation: a customer who knows the
 (first) expected fault answers each question with the option that supports it most, "Not sure" if none does.
 YAML format: `cases/README.md`.
 

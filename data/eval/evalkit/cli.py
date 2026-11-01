@@ -13,7 +13,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from evalkit import report as rep
-from evalkit.cases import chip_cases, load_yaml_cases, phrase_cases, safety_cases, split_of, unlisted_variants
+from evalkit.cases import (
+    chip_cases,
+    load_real_cases,
+    load_yaml_cases,
+    phrase_cases,
+    safety_cases,
+    split_of,
+    unlisted_variants,
+)
 from evalkit.metrics import summarise
 from evalkit.versions import CURRENT, VersionError, engine_hash, git, git_info, materialise
 
@@ -22,9 +30,10 @@ RUN_EVAL = EVAL_DIR / "run_eval.py"
 REPORT_MARK = "REPORT_JSON: "
 
 
-def build_cases(knowledge, phrases, cases_dir: Path) -> list:
+def build_cases(knowledge, phrases, cases_dir: Path, real_dir: Path | None = None, skipped: list | None = None) -> list:
     """Every case type: dataset phrases (free text, typos, overlap), chips, safety rules, unlisted variants and the
-    YAML files. Case ids are stable, so two runs can be compared case by case."""
+    YAML files, plus the real cases in `real_dir` (reported apart; ones that can't run are added to `skipped`).
+    Case ids are stable, so two runs can be compared case by case."""
     free = phrase_cases(knowledge, phrases)
     return [
         *free,
@@ -32,6 +41,7 @@ def build_cases(knowledge, phrases, cases_dir: Path) -> list:
         *safety_cases(knowledge, knowledge.rules),
         *unlisted_variants(free),
         *load_yaml_cases(knowledge, cases_dir),
+        *load_real_cases(knowledge, real_dir, skipped if skipped is not None else []),
     ]
 
 
@@ -145,7 +155,10 @@ def _load(category: str | None, split: str = "all"):
     with make_session_factory(make_engine(get_settings().database_url))() as session:
         knowledge = load_knowledge(session)
         phrases = held_out_phrases(session, knowledge, with_language=True)
-    cases = build_cases(knowledge, phrases, CASES_DIR)
+    skipped: list[str] = []
+    cases = build_cases(knowledge, phrases, CASES_DIR, get_settings().golden_cases_dir, skipped)
+    for line in skipped:
+        print(f"real case skipped: {line}")
     if category:
         cases = [c for c in cases if c.category == category]
     if split != "all":

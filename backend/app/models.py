@@ -7,6 +7,7 @@ from app.knowledge import models as knowledge  # noqa: F401
 from app.llm import models as llm  # noqa: F401
 from app.mechanics import models as mechanics  # noqa: F401
 from app.parts import models as parts  # noqa: F401
+from app.quality import models as quality  # noqa: F401
 from app.requests import models as requests  # noqa: F401
 from app.uploads import models as uploads  # noqa: F401
 from app.vehicles import models as vehicles  # noqa: F401

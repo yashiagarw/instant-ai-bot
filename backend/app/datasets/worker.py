@@ -26,7 +26,11 @@ def make_pipeline(settings, factory) -> Pipeline:
 
         return SentenceTransformerEmbedder()
 
-    pipe = Pipeline(diagnosis_engine=settings.diagnosis_engine, work_dir=settings.dataset_upload_dir / "work")
+    pipe = Pipeline(
+        diagnosis_engine=settings.diagnosis_engine,
+        work_dir=settings.dataset_upload_dir / "work",
+        real_cases_dir=settings.golden_cases_dir,
+    )
     pipe.embedder_factory = embedder
 
     def search():

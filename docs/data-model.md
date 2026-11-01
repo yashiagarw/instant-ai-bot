@@ -114,6 +114,14 @@ with position -1 (never shown).
 - knowledge_edits entities added: `part`, `part_price`, `part_fit`, `labour_rate`, `zone_rate`, `part_images` (applied by
   the "parts edits apply" step after `parts build`).
 
+### Golden cases (0021)
+
+- `golden_cases`: real sessions added to the evaluation's golden set from the admin Quality page. case_id (the id in
+  the YAML file: `platform-<hash>`, never the session id), session_id (unique: once per session), request_id,
+  expected (fault keys), expected_alert, confirmed_by (mechanic / staff), file_path (under
+  `data/eval/golden/real_cases/`), case (what was written: no personal data), added_by, created_at. The YAML file is
+  what the eval harness reads (format: `data/eval/golden/README.md`).
+
 ### Mechanics and the request workflow (0020)
 
 - `service_requests.status`: submitted, triaged, offered, accepted, en_route, arrived, in_progress, completed,

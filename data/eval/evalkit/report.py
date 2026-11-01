@@ -102,6 +102,20 @@ def markdown(report: dict, misses_per_type: int = 15) -> str:
         f"False alarms (high alert on a case that expects none): {_fmt(s['overall']['false_alarms'], True)} "
         f"of {s['overall']['false_alarm_n']} cases.",
         "",
+        "Every table except the next one leaves out real cases.",
+        "",
+        "## Real cases (confirmed faults from real customers, never mixed with the rest)",
+        "",
+        *(
+            [
+                *_table({"Real cases": s["real"]["overall"]}, "Scope"),
+                "",
+                *_table(s["real"]["by_category"], "Category"),
+            ]
+            if s.get("real")
+            else ["No real cases yet (data/eval/golden/real_cases)."]
+        ),
+        "",
         "## By case type",
         "",
         *_table(s["by_type"], "Type"),
@@ -189,6 +203,7 @@ def compare(base: dict, cand: dict) -> dict:
             "candidate": cand["meta"],
         },
         "overall": deltas(sb["overall"], sc["overall"]),
+        "real": deltas((sb.get("real") or {}).get("overall", {}), (sc.get("real") or {}).get("overall", {})),
         "by_type": {
             t: d
             for t in sorted(sb["by_type"].keys() | sc["by_type"].keys())
@@ -231,10 +246,11 @@ def compare_markdown(cmp: dict, limit: int = 100) -> str:
         "## Metric changes",
         "",
     ]
-    if not (cmp["overall"] or cmp["by_type"] or cmp["by_category"]):
+    if not (cmp["overall"] or cmp.get("real") or cmp["by_type"] or cmp["by_category"]):
         lines.append("No metric changed.")
     for scope, rows in (
-        ("Overall", {"all": cmp["overall"]} if cmp["overall"] else {}),
+        ("Overall (without real cases)", {"all": cmp["overall"]} if cmp["overall"] else {}),
+        ("Real cases", {"real": cmp["real"]} if cmp.get("real") else {}),
         ("By type", cmp["by_type"]),
         ("By category", cmp["by_category"]),
     ):

@@ -41,6 +41,8 @@ table against it and calls every admin endpoint with every role.
 | `mechanics.read` | yes | no | yes | no | no |
 | `mechanics.manage` | yes | no | yes | no | no |
 | `mechanics.documents` | yes | no | no | no | no |
+| `quality.read` | yes | yes | no | no | no |
+| `quality.golden` | yes | yes | no | no | no |
 
 What each permission covers:
 
@@ -57,6 +59,9 @@ What each permission covers:
 | `mechanics.read` | `GET /api/admin/mechanics`, `GET /api/admin/mechanics/{id}` (with the mechanic's phone number; jobs today, acceptance rate) |
 | `mechanics.manage` | `POST /api/admin/mechanics`, `PUT .../{id}`, `PUT .../{id}/skills`, `.../zones`, `.../availability` (weekly shifts, India time), `.../duty` (on / off duty); live, audited |
 | `mechanics.documents` | `GET/POST /api/admin/mechanics/{id}/documents`, `GET/DELETE .../documents/{doc}`: ID documents, encrypted with `MECHANIC_DOCS_KEY`; every view written to the audit log |
+| `self` (overview) | `GET /api/admin/overview`: today (India time). Its parts depend on the caller: requests today by status and the unassigned ones (`requests.read`), diagnoses, safety alerts and LLM spend today (`quality.read`); the rest is null |
+| `quality.read` | `GET /api/admin/quality` (metrics; `days`), `GET /api/admin/quality/review` (`kind`: negative_feedback, low_confidence, no_match; `days`), `GET /api/admin/quality/sessions/{id}` (read-only replay; phone numbers, emails and number plates masked), `GET /api/admin/quality/faults` |
+| `quality.golden` | `POST /api/admin/quality/sessions/{id}/golden`: writes the session as a real case to `data/eval/golden/real_cases/` (no personal data) and records it |
 | `content.read` | `GET /api/admin/content/generated-questions`, `GET /api/admin/content/image-labels` |
 | `content.review` | `POST /api/admin/content/generated-questions/{id}/review` (approve / reject) |
 | `content.read` (datasets) | `GET /api/admin/datasets` (versions, categories, active job), `GET /api/admin/datasets/versions/{id}` (validation report, diff, eval), `GET /api/admin/datasets/jobs/{id}` (progress) |
@@ -80,7 +85,8 @@ only for convenience: the API checks every call.
 | Overview | `self` (every staff member) |
 | Requests | `requests.read` (actions: `requests.update`; the customer's number: `requests.contact` and owning the request) |
 | Mechanics | `mechanics.read` (editing: `mechanics.manage`; the Documents section: `mechanics.documents`) |
-| Knowledge, Vehicles, Parts & Prices, Datasets, Quality | `content.read` (editing: `knowledge.edit`; the unlisted-vehicles queue: `vehicles.manage`) |
+| Knowledge, Vehicles, Parts & Prices, Datasets | `content.read` (editing: `knowledge.edit`; the unlisted-vehicles queue: `vehicles.manage`) |
+| Quality | `quality.read` ("Add to golden set": `quality.golden`) |
 | Users | `staff.read` (Staff tab) or `customers.read` (Customers tab) |
 | Audit log | `audit.read` |
 
@@ -120,6 +126,7 @@ The table is append-only (a trigger refuses UPDATE and DELETE).
 | `mechanic.create`, `mechanic.update` | a mechanic added or changed (phone masked) |
 | `mechanic.skills`, `mechanic.zones`, `mechanic.availability`, `mechanic.duty` | their skills, zones, weekly shifts, on / off duty |
 | `mechanic.document_upload`, `mechanic.document_view`, `mechanic.document_delete` | an ID document stored (encrypted), opened, deleted |
+| `quality.golden_add` | a real session was added to the evaluation's golden set (case id, expected fault, file in `after`) |
 | `content.review_question` | a generated question approved or rejected |
 | `dataset.upload`, `dataset.rebuild`, `dataset.eval`, `dataset.publish_requested`, `dataset.rollback_requested`, `dataset.discard`, `dataset.job_cancel` | Datasets page actions (the job id in `after`) |
 | `dataset.publish`, `dataset.rollback` | the worker switched the published version (`before`: the version archived) |

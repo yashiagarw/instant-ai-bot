@@ -28,7 +28,11 @@ from pathlib import Path
 import yaml
 
 CASE_TYPES = ("chips", "free_text", "overlap", "unlisted", "safety")
-SOURCES = ("dataset", "generated", "synthetic", "mechanic")
+SOURCES = ("dataset", "generated", "synthetic", "mechanic", "real")
+# Real cases (golden/real_cases): a confirmed fault from a real customer. Reported apart from every other source.
+REAL = "real"
+REAL_ORIGINS = ("platform", "legacy")  # this app's sessions / the old platform's job records (golden/README.md)
+CONFIRMED_BY = ("mechanic", "staff")
 COVERAGE_LEVELS = ("part_fit_verified", "segment_estimate", "general_guidance")
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 
@@ -288,7 +292,7 @@ def split_of(case: Case) -> str:
     """dev or test. Tune only on dev; report on test. Cases written by people (synthetic, mechanic: Hindi, typed
     typos, unlisted cars, safety texts) are always test, so nothing is tuned on them. Generated typo variants follow
     their phrase. The rest is split 50/50 by a stable hash of the split key (phrase, fault or rule)."""
-    if case.source in ("synthetic", "mechanic") and not case.split_key:
+    if case.source == REAL or (case.source in ("synthetic", "mechanic") and not case.split_key):
         return "test"
     key = case.split_key or case.id
     return "dev" if int(hashlib.sha1(key.encode()).hexdigest(), 16) % 2 == 0 else "test"
@@ -297,10 +301,13 @@ def split_of(case: Case) -> str:
 # ---------------------------------------------------------------- YAML cases (written by people)
 
 
-def load_yaml_cases(knowledge, directory: Path, skipped: list[str] | None = None) -> list[Case]:
+def load_yaml_cases(
+    knowledge, directory: Path, skipped: list[str] | None = None, *, skip_any: bool = False
+) -> list[Case]:
     """Every *.yaml file in `directory` (format: cases/README.md). Question and option text resolve to ids.
     With `skipped`, a case that names a fault the knowledge does not have is left out and its error added there
-    (the dataset pipeline evaluates drafts that may remove faults); otherwise it raises."""
+    (the dataset pipeline evaluates drafts that may remove faults); otherwise it raises. With `skip_any` too, any
+    case error is skipped that way (real cases: a question whose text was edited since must not stop the run)."""
     by_key = {f.key: f for f in knowledge.faults.values()}
     by_alias = {alias: f for f in knowledge.faults.values() for alias in f.alias_keys}
     out: list[Case] = []
@@ -310,7 +317,7 @@ def load_yaml_cases(knowledge, directory: Path, skipped: list[str] | None = None
             try:
                 out.append(_yaml_case(knowledge, path, raw, by_key, by_alias))
             except CaseError as e:
-                if skipped is None or "unknown expected fault" not in str(e):
+                if skipped is None or not (skip_any or "unknown expected fault" in str(e)):
                     raise
                 skipped.append(str(e))
                 continue
@@ -338,6 +345,11 @@ def _yaml_case(knowledge, path: Path, raw: dict, by_key: dict, by_alias: dict) -
     source = raw.get("source", "synthetic")
     if source not in SOURCES:
         raise CaseError(f"{where}: source must be one of {SOURCES}")
+    if source == REAL:
+        if raw.get("confirmed_by") not in CONFIRMED_BY:
+            raise CaseError(f"{where}: a real case needs confirmed_by: one of {CONFIRMED_BY}")
+        if raw.get("origin", "platform") not in REAL_ORIGINS:
+            raise CaseError(f"{where}: origin must be one of {REAL_ORIGINS}")
     alert = raw.get("expected_alert")
     if alert == "none":
         alert = {"none": True}
@@ -376,3 +388,18 @@ def _yaml_case(knowledge, path: Path, raw: dict, by_key: dict, by_alias: dict) -
         expected_coverage=coverage,
         note=raw.get("note", ""),
     )
+
+
+def load_real_cases(knowledge, directory: Path | None, skipped: list[str]) -> list[Case]:
+    """The real cases (golden/real_cases, format: golden/README.md), or [] without the folder. A case that cannot be
+    run on this knowledge (unknown fault, a question whose text changed) is skipped and listed, never fatal. Every
+    case there must be `source: real`, so real and synthetic results can never mix."""
+    if directory is None or not directory.is_dir():
+        return []
+    out = []
+    for c in load_yaml_cases(knowledge, directory, skipped, skip_any=True):
+        if c.source != REAL:
+            skipped.append(f"{c.id}: only source: real cases belong in {directory.name}")
+            continue
+        out.append(c)
+    return out

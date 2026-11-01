@@ -95,10 +95,13 @@ def run_eval(
     diagnosis_engine: str,
     search=None,
     cases_dir=None,
+    real_dir=None,
     progress: Callable[[int, int], None] = lambda _done, _total: None,
 ) -> dict:
     """Evaluate one version on `scope`. Returns {"version_id", "cases", "overall", "by_category", "skipped",
-    "results"}; results: stable case key -> {type, category, label, hit1, hit3, alert_ok} (for the comparison)."""
+    "results", "real"}; results: stable case key -> {type, category, label, hit1, hit3, alert_ok} (for the
+    comparison and the gate). Real cases (`real_dir`) are run on the same scope but kept out of everything else:
+    "real" is {"cases", "overall", "by_category", "skipped"}, or None without real cases."""
     import engine as eng
 
     ck, run_case, stats, group_by, default_dir, held_out_phrases = _evalkit()
@@ -106,11 +109,17 @@ def run_eval(
     phrases = held_out_phrases(session, knowledge, with_language=True)
     skipped: list[str] = []
     cases = build_cases(knowledge, phrases, cases_dir or default_dir, skipped)
-    if scope["categories"] is not None:
-        wanted = set(scope["categories"])
-        cases = [c for c in cases if c.category in wanted]
-    if scope["split"] != "all":
-        cases = [c for c in cases if ck.split_of(c) == scope["split"]]
+    real_skipped: list[str] = []
+    real_cases = ck.load_real_cases(knowledge, real_dir, real_skipped)
+
+    def in_scope(found: list) -> list:
+        if scope["categories"] is not None:
+            found = [c for c in found if c.category in set(scope["categories"])]
+        if scope["split"] != "all":
+            found = [c for c in found if ck.split_of(c) == scope["split"]]
+        return found
+
+    cases, real_cases = in_scope(cases), in_scope(real_cases)
     engine = eng.make_engine(diagnosis_engine, knowledge, search=search)
     results = []
     per_case: dict[str, dict] = {}
@@ -126,6 +135,7 @@ def run_eval(
         if i % PROGRESS_EVERY == 0 or i == len(cases):
             progress(i, len(cases))
     overall = stats(results)
+    real_results = [run_case(engine, c) for c in real_cases]
     return {
         "version_id": version.id,
         "cases": len(cases),
@@ -133,6 +143,14 @@ def run_eval(
         "by_category": group_by(results, lambda r: r["category"]),
         "skipped": skipped,  # written cases naming a fault this version does not have
         "results": per_case,
+        "real": {
+            "cases": len(real_cases),
+            "overall": stats(real_results),
+            "by_category": group_by(real_results, lambda r: r["category"]),
+            "skipped": real_skipped,
+        }
+        if real_cases or real_skipped
+        else None,
     }
 
 

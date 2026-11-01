@@ -128,6 +128,9 @@ class Settings(BaseSettings):
     # Uploaded dataset files are kept here: a version is rebuilt from its files (rollback, rebuild). Not committed.
     dataset_upload_dir: Path = Path(__file__).resolve().parents[2] / "data" / "uploads" / "datasets"
     dataset_upload_max_mb: int = 25
+    # Real cases added to the evaluation's golden set from the admin Quality page (one YAML file per case; the eval
+    # harness reads every file here, reported apart from synthetic cases). See data/eval/golden/README.md.
+    golden_cases_dir: Path = Path(__file__).resolve().parents[2] / "data" / "eval" / "golden" / "real_cases"
     questions_model: str = "claude-opus-5-5"
     questions_effort: str = "high"
     # OpenAI (used when LLM_PROVIDER=openai). No default model: set the one you want to pay for.
