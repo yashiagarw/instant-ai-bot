@@ -9,6 +9,7 @@ The LLM layer (app.llm) is optional: with no client every step uses its fallback
 itself and questions keep their original wording).
 """
 
+import logging
 import threading
 import uuid
 from dataclasses import asdict, dataclass, field, replace
@@ -31,6 +32,7 @@ from app.diagnosis.models import (
     SessionStatus,
 )
 from app.diagnosis.search import SEARCH_STOPWORDS, HybridSearch
+from app.knowledge.embeddings import version_model
 from app.knowledge.models import (
     Category,
     DatasetVersion,
@@ -69,6 +71,7 @@ class SessionStateError(ValueError):
 
 # ---------------------------------------------------------------- engine (one per process)
 
+log = logging.getLogger(__name__)
 _engine_lock = threading.Lock()
 
 
@@ -91,9 +94,14 @@ def get_engine(state, session: Session, settings: Settings, version_id: int | No
         if engine is None:
             search = None
             if settings.diagnosis_search == "hybrid":
-                if getattr(state, "hybrid_search", None) is None:
-                    state.hybrid_search = hybrid_search(state)  # shared by every version (it filters by fault id)
-                search = state.hybrid_search
+                # One search per embedding model, shared by the versions built with it (it filters by fault id).
+                model = version_model(version)
+                searches = getattr(state, "hybrid_searches", None)
+                if searches is None:
+                    searches = state.hybrid_searches = {}
+                if model not in searches:
+                    searches[model] = hybrid_search(state, model)
+                search = searches[model]
             engine = eng.make_engine(settings.diagnosis_engine, load_knowledge(session, version), search=search)
             engines[version.id] = engine
             while len(engines) > MAX_ENGINES:
@@ -110,14 +118,20 @@ def get_llm(state) -> LLMClient | None:
         return state.llm
 
 
-def hybrid_search(state) -> HybridSearch:
-    """Hybrid search on its own short transactions (the engine is shared between requests). `state.embedder`
-    can be set (tests); otherwise the local multilingual MiniLM model is loaded."""
+def hybrid_search(state, model: str | None = None) -> HybridSearch | None:
+    """Hybrid search on its own short transactions (the engine is shared between requests), over the vectors of
+    `model` (the version's embedding model; default the original). `state.embedder` can be set (tests); otherwise the
+    model is loaded. A model that cannot be loaded (its folder in data/models is missing or was rebuilt) leaves the
+    version on the built-in keyword index, with an error in the log, instead of failing every diagnosis."""
     embedder = getattr(state, "embedder", None)
     if embedder is None:
-        from app.knowledge.importer.embed import SentenceTransformerEmbedder
+        from app.knowledge.importer.embed import MODEL_NAME, ModelError, load_embedder
 
-        embedder = state.embedder = SentenceTransformerEmbedder()
+        try:
+            embedder = load_embedder(model or MODEL_NAME)
+        except ModelError as e:
+            log.error("hybrid search off for embedding model %s: %s", model, e)
+            return None
     lock = threading.Lock()
 
     def embed(text: str) -> list[float]:

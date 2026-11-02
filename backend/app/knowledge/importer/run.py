@@ -111,6 +111,7 @@ def compute_embeddings(session: Session, version: DatasetVersion, embedder: Embe
         return 0
     from app.knowledge.embeddings import sync
 
+    version.embedding_model = embedder.name  # search for this version uses this model (dataset_versions)
     return sync(session, version.id, embedder, log=log).embedded
 
 

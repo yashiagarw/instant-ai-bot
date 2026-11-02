@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     # Diagnosis engine: v2 (Bayesian posterior, information gain; the default since the 2.3 test-split comparison)
     # or v1 (scores and fixed rules).
     diagnosis_engine: Literal["v1", "v2"] = "v2"
+    # Embedding model for search vectors: the original multilingual MiniLM (default), or a fine-tuned folder in
+    # data/models (e.g. minilm-im-v1, built with `python -m app.knowledge.finetune train`). Changing it affects new
+    # dataset builds only: each version keeps the model it was built with, so a new model goes live only by building a
+    # draft on the Datasets page, passing the eval gate and publishing it.
+    embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     # Per-IP limit on new diagnosis sessions: at most N per window.
     session_rate_limit: int = 10
     session_rate_window_seconds: int = 60

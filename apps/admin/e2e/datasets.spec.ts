@@ -28,6 +28,7 @@ test("datasets: upload, job progress, validation and diff, eval, a blocked publi
   // The draft: checks, diff, eval.
   await drafts.getByRole("link", { name: "v42 · battery" }).click();
   await expect(page.getByRole("heading", { name: /v42 · battery/, level: 1 })).toBeVisible();
+  await expect(page.getByText("search model original MiniLM")).toBeVisible();
   await expect(page.getByTestId("check-nothing_lost")).toContainText("Passed");
   await expect(page.getByTestId("diff-counts")).toContainText("1 added · 1 changed · 1 removed");
   await page.locator("summary", { hasText: /^name$/ }).click();

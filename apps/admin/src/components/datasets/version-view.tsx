@@ -15,7 +15,7 @@ import { ErrorBox } from "@/components/error-box";
 import { EditorSummaryView } from "@/components/knowledge/editor-summary";
 import { useMe } from "@/components/staff-shell";
 import { adminApi, type DatasetJob, type DiffRow, errorMessage, type CommonStats, type Comparison, type VersionDetail } from "@/lib/api";
-import { isActive, missed, pct, points, versionTitle } from "@/lib/datasets";
+import { isActive, missed, pct, points, searchModelLabel, versionTitle } from "@/lib/datasets";
 import { dateTime } from "@/lib/format";
 
 const MIN_REASON = 15;
@@ -79,6 +79,7 @@ export function VersionView({ id }: { id: number }) {
           {ver.base_version_id && <> · built on v{ver.base_version_id}</>}
           {ver.published_at && <> · published {dateTime(ver.published_at)} by {ver.published_by}</>}
           {ver.archived_at && <> · archived {dateTime(ver.archived_at)}</>}
+          {" "}· search model {searchModelLabel(ver.embedding_model)}
         </p>
         {ver.override_reason && (
           <p className="rounded-2xl bg-amber-bg p-3 text-amber-text">

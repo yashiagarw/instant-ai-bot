@@ -32,7 +32,8 @@ function version(id: number, over: Partial<Version>): Version {
   return {
     id, status: "archived", origin: "import", category_code: null, source_file_no: null, upload_name: null,
     created_by: "cli", created_at: NOW, published_at: NOW, published_by: "cli", archived_at: null, base_version_id: null,
-    rollback_of_id: null, override_reason: null, categories: [], validation: {}, diff: {}, eval: {}, ...over,
+    rollback_of_id: null, override_reason: null, embedding_model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    categories: [], validation: {}, diff: {}, eval: {}, ...over,
   } as Version; // prettier-ignore
 }
 

@@ -45,17 +45,24 @@ def build_cases(knowledge, phrases, cases_dir: Path, real_dir: Path | None = Non
     ]
 
 
-def make_search(kind: str):
-    """Hybrid search on the configured database and the local model, or None for the keyword index."""
+def make_search(kind: str, embedding_model: str | None = None):
+    """Hybrid search on the configured database, or None for the keyword index. `embedding_model` (EMBEDDING_MODEL
+    form, e.g. minilm-im-v1): search that model's vectors; default the served version's own model, as the live app.
+    The version needs vectors of that model: `python -m app.knowledge.embeddings sync --model <model>`."""
     if kind != "hybrid":
         return None
     from app.config import get_settings
     from app.db import make_engine, make_session_factory
     from app.diagnosis.search import HybridSearch
+    from app.knowledge.embeddings import version_model
     from app.knowledge.importer.embed import SentenceTransformerEmbedder
+    from app.knowledge.questions.inputs import target_version
 
-    model = SentenceTransformerEmbedder()
     factory = make_session_factory(make_engine(get_settings().database_url))
+    if embedding_model is None:
+        with factory() as session:
+            embedding_model = version_model(target_version(session))
+    model = SentenceTransformerEmbedder(embedding_model)
     return HybridSearch(factory.begin, lambda t: model.encode([t])[0], model.name)
 
 
@@ -69,6 +76,7 @@ def evaluate(
     diagnosis_engine: str = "v1",
     extraction: str = "none",
     extra_meta: dict | None = None,
+    embedding_model: str | None = None,
 ) -> dict:
     """Run the cases on the `engine` package this process imported and return the report (meta, summary,
     results)."""
@@ -83,7 +91,7 @@ def evaluate(
         texts = sorted({c.text for c in cases if c.text} | {g.label for g in knowledge.groups.values()} - {""})
         vectors = dict(zip(texts, SentenceTransformerEmbedder().encode(texts), strict=True))
         embed = vectors.__getitem__
-    hybrid = make_search(search)
+    hybrid = make_search(search, embedding_model)
     kwargs = {"embed": embed, **({"search": hybrid} if hybrid else {})}
     if diagnosis_engine == "v2":
         from engine import EngineV2  # not in engine versions before 2.0
@@ -181,6 +189,7 @@ def run_here(args) -> dict:
         diagnosis_engine=args.diagnosis_engine,
         extraction=getattr(args, "extraction", "none"),
         extra_meta=extra,
+        embedding_model=getattr(args, "embedding_model", None),
     )
 
 
@@ -204,6 +213,7 @@ def run_version(spec: str, args, out: Path) -> dict:
     cmd += ["--embeddings"] if args.embeddings else []
     cmd += ["--search", args.search, "--diagnosis-engine", args.diagnosis_engine, "--split", args.split]
     cmd += ["--category", args.category] if args.category else []
+    cmd += ["--embedding-model", args.embedding_model] if getattr(args, "embedding_model", None) else []
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode:
         sys.stderr.write(proc.stdout + proc.stderr)
@@ -263,6 +273,11 @@ def harness(argv: list[str]) -> None:
             help="free-text matching (default: DIAGNOSIS_SEARCH, as in the live app)",
         )
         p.add_argument("--category", help="only cases of this category")
+        p.add_argument(
+            "--embedding-model",
+            help="hybrid search over this model's vectors (EMBEDDING_MODEL form, e.g. minilm-im-v1); default: the "
+            "served version's own model",
+        )
         p.add_argument(
             "--split",
             choices=["all", "dev", "test"],

@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import type { DatasetJob, DatasetVersion } from "@/lib/api";
-import { isActive, missed, pct, points, versionState, versionTitle, waitingSeconds } from "@/lib/datasets";
+import { isActive, missed, pct, points, searchModelLabel, versionState, versionTitle, waitingSeconds } from "@/lib/datasets";
 
 const base: DatasetVersion = {
   id: 7, status: "validated", origin: "upload", category_code: "battery", source_file_no: 8, upload_name: "b.xlsx",
   created_by: "x", created_at: "2026-11-01T10:00:00Z", published_at: null, published_by: null, archived_at: null,
   base_version_id: 6, rollback_of_id: null, override_reason: null, categories: ["battery"], stale: false, validated: true,
+  embedding_model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
   build_error: null, losses: 0, diff_counts: { added: 0, changed: 0, removed: 0 }, gate: null, gate_reasons: [],
 }; // prettier-ignore
 
@@ -42,5 +43,14 @@ describe("datasets display helpers", () => {
     expect(isActive({ ...job, status: "failed" })).toBe(false);
     expect(waitingSeconds(job, Date.parse("2026-11-01T10:00:12Z"))).toBe(12);
     expect(waitingSeconds({ ...job, status: "running" })).toBe(0);
+  });
+});
+
+describe("searchModelLabel", () => {
+  it("names the original model and fine-tuned folders", () => {
+    expect(searchModelLabel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")).toBe("original MiniLM");
+    expect(searchModelLabel("local/minilm-im-v1@1a2b3c4d")).toBe("minilm-im-v1 (fine-tuned, 1a2b3c4d)");
+    expect(searchModelLabel("local/minilm-im-v1")).toBe("minilm-im-v1 (fine-tuned)");
+    expect(searchModelLabel("some/other-model")).toBe("some/other-model");
   });
 });

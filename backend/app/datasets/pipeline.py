@@ -26,6 +26,7 @@ from app.datasets.steps import StepInputs, copy_priors, run_steps
 from app.knowledge.edits import service as edits_service
 from app.knowledge.edits.apply import apply_global
 from app.knowledge.embeddings import sync as embeddings_sync
+from app.knowledge.embeddings import version_model
 from app.knowledge.importer.config import REPO_ROOT, FileEntry, ImportConfig, load_config
 from app.knowledge.importer.embed import Embedder
 from app.knowledge.importer.loader import sync_taxonomy
@@ -54,8 +55,11 @@ class Pipeline:
     config: ImportConfig = field(default_factory=load_config)
     inputs: StepInputs = field(default_factory=StepInputs)
     work_dir: Path = REPO_ROOT / "data" / "uploads" / "datasets" / "work"
+    # New builds embed with embedder_factory() (EMBEDDING_MODEL). A version is evaluated and published with the model
+    # it was built with (dataset_versions.embedding_model): embedder_loader(name) loads another model by stored name.
     embedder_factory: Callable[[], Embedder | None] = lambda: None
-    search_factory: Callable[[], object | None] = lambda: None
+    embedder_loader: Callable[[str], Embedder | None] = lambda _name: None
+    search_factory: Callable[[str], object | None] = lambda _model_name: None  # hybrid search over one model's rows
     # Real golden cases (GOLDEN_CASES_DIR): evaluated too, reported apart, never part of the gate. None = none.
     real_cases_dir: Path | None = None
     _embedder: Embedder | None = None
@@ -65,6 +69,16 @@ class Pipeline:
         if self._embedder is None:
             self._embedder = self.embedder_factory()
         return self._embedder
+
+    def embedder_named(self, name: str) -> Embedder | None:
+        """The embedder whose vectors are stored under `name` (the build model, or another one loaded by name)."""
+        if self.embedder is not None and self.embedder.name == name:
+            return self.embedder
+        return self.embedder_loader(name)
+
+    def embedder_of(self, version: DatasetVersion) -> Embedder | None:
+        """The model `version` was built with (None: no model here, embeddings are skipped and the check warns)."""
+        return self.embedder_named(version_model(version))
 
 
 # ---------------------------------------------------------------- versions and files
@@ -128,9 +142,14 @@ def swap_for(session: Session, version: DatasetVersion) -> dict[int, Path]:
 # ---------------------------------------------------------------- build
 
 
-def build(session: Session, pipe: Pipeline, version: DatasetVersion, progress: Progress) -> dict:
+_BUILD_MODEL = object()  # build()'s default: embed with the build model (EMBEDDING_MODEL)
+
+
+def build(session: Session, pipe: Pipeline, version: DatasetVersion, progress: Progress, embedder=_BUILD_MODEL) -> dict:
     """Import the draft from its files, run the steps, then validate it against its base. Sets status validated
-    (every blocking check passed) or draft, and clears an earlier eval."""
+    (every blocking check passed) or draft, and clears an earlier eval. Embeds with `embedder`, by default the build
+    model (EMBEDDING_MODEL); the version records it."""
+    embedder: Embedder | None = pipe.embedder if embedder is _BUILD_MODEL else embedder
     base = session.get(DatasetVersion, version.base_version_id) if version.base_version_id else None
     swap = swap_for(session, version)
     files = set(swap)
@@ -145,7 +164,7 @@ def build(session: Session, pipe: Pipeline, version: DatasetVersion, progress: P
         config,
         entries,
         all_files=True,
-        embedder=pipe.embedder,
+        embedder=embedder,
         log=lambda _m: None,
         version=version,
     )
@@ -154,7 +173,7 @@ def build(session: Session, pipe: Pipeline, version: DatasetVersion, progress: P
     def step_progress(label: str, fraction: float) -> None:
         progress(label, 0.35 + 0.5 * fraction)
 
-    steps = run_steps(session, version, pipe.inputs, pipe.embedder, step_progress)
+    steps = run_steps(session, version, pipe.inputs, embedder, step_progress)
 
     progress("checking nothing is lost", 0.88)
     report_files = {int(n): r for n, r in (version.report.get("files") or {}).items()}
@@ -195,7 +214,7 @@ def build(session: Session, pipe: Pipeline, version: DatasetVersion, progress: P
             "label": "Every searchable text has an embedding",
             "ok": missing == 0,
             "detail": f"{missing} missing" if missing else "complete",
-            "blocking": pipe.embedder is not None,
+            "blocking": embedder is not None,
         },
     ]
     warnings = list(steps.warnings)
@@ -235,8 +254,8 @@ def _losses(
     files: set[int],
 ) -> tuple[list[checks.Loss], list[checks.Loss], int]:
     missing = 0
-    if pipe.embedder is not None:
-        missing = checks.missing_embeddings(session, version, pipe.embedder.name)
+    if pipe.embedder_of(version) is not None:
+        missing = checks.missing_embeddings(session, version, version_model(version))
     if base is None:
         return [], [], missing
     keys_new = set(session.scalars(select(Fault.fault_key).where(Fault.dataset_version_id == version.id)))
@@ -269,12 +288,14 @@ def evaluate(session: Session, pipe: Pipeline, version: DatasetVersion, full: bo
     if version.status not in (DatasetStatus.validated, DatasetStatus.draft):
         raise PipelineError("Only a draft can be evaluated.")
     live = live_version(session)
-    if pipe.embedder is not None:  # editor edits since the build may have added texts
+    if (own := pipe.embedder_of(version)) is not None:  # editor edits since the build may have added texts
         progress("syncing embeddings", 0.01)
-        embeddings_sync(session, version.id, pipe.embedder)
+        embeddings_sync(session, version.id, own)
     edited = edits_service.scope(session, version)["categories"]
     scope = evaluation.scope_for(sorted(set((version.validation or {}).get("categories") or []) | edited), full)
-    search = pipe.search_factory()
+    # Each version is searched with its own model: a draft built with a new EMBEDDING_MODEL is compared with the live
+    # version as it is served now.
+    search = pipe.search_factory(version_model(version))
     two = live is not None and live.id != version.id
 
     def part(offset: float, share: float, label: str):
@@ -296,7 +317,7 @@ def evaluate(session: Session, pipe: Pipeline, version: DatasetVersion, full: bo
             live,
             scope,
             diagnosis_engine=pipe.diagnosis_engine,
-            search=search,
+            search=pipe.search_factory(version_model(live)),
             real_dir=pipe.real_cases_dir,
             progress=part(0.5, 0.48, f"live v{live.id}"),
         )
@@ -361,10 +382,11 @@ def publish(
     )
     files = set((version.validation or {}).get("files") or [])
 
-    steps = run_steps(session, version, pipe.inputs, pipe.embedder, lambda s, f: progress(s, 0.05 + 0.75 * f))
+    own = pipe.embedder_of(version)  # the model it was built (and evaluated) with
+    steps = run_steps(session, version, pipe.inputs, own, lambda s, f: progress(s, 0.05 + 0.75 * f))
     progress("checking nothing is lost", 0.82)
     lost, label_lost, missing = _losses(session, pipe, base, version, categories, files)
-    if lost or label_lost or (pipe.embedder is not None and missing):
+    if lost or label_lost or (own is not None and missing):
         problems = [f"{x.area} ({x.category} {x.fault_key} {x.detail}): {x.before} -> {x.after}" for x in lost]
         problems += [f"photo label {x.detail} no longer links to symptoms" for x in label_lost]
         if missing:
@@ -461,7 +483,8 @@ def rollback(
     )
     session.add(new)
     session.flush()
-    build(session, pipe, new, lambda s, f: progress(f"rebuilding: {s}", 0.6 * f))
+    # No eval gate here, so the restored data keeps the live version's embedding model (never a new EMBEDDING_MODEL).
+    build(session, pipe, new, lambda s, f: progress(f"rebuilding: {s}", 0.6 * f), embedder=pipe.embedder_of(live))
     if new.status != DatasetStatus.validated:
         failed = [c["label"] for c in new.validation.get("checks", []) if c["blocking"] and not c["ok"]]
         losses = [f"{x['area']} ({x['category']} {x['fault_key']})" for x in new.validation.get("losses", [])]

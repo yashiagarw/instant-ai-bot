@@ -20,3 +20,7 @@ data/media/
 
 # Dataset files uploaded on the admin Datasets page (kept so versions can be rebuilt and rolled back)
 data/uploads/
+
+# Fine-tuned embedding models (hundreds of MB; rebuild with `cd backend && uv run --extra train python -m
+# app.knowledge.finetune train`, see docs/embedding-model.md)
+data/models/

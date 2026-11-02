@@ -166,6 +166,8 @@ export interface DatasetVersion {
   base_version_id: number | null;
   rollback_of_id: number | null;
   override_reason: string | null;
+  /** Embedding model of this version's search vectors (EMBEDDING_MODEL when it was built). */
+  embedding_model: string;
   categories: string[];
   stale: boolean;
   validated: boolean | null;

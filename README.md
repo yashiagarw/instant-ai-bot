@@ -15,7 +15,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `data/raw` | The 18 original Excel datasets. Never edit |
 | `data/schema` | Manifest, column aliases, taxonomy, import rules, CSV templates for price sources (`templates/`) |
 | `data/catalogue` | Vehicle catalogue seed (editable YAML); team price sources in `parts/` |
-| `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md) |
+| `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md), [fine-tuning the search model](docs/embedding-model.md) |
 | `scripts` | Offline data scripts (dataset profiler) |
 | `docker-compose.yml` | PostgreSQL 16 + pgvector, S3-compatible storage for photos (SeaweedFS), Redis for background jobs |
 
@@ -163,6 +163,7 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `TRUST_FORWARDED_FOR` | Use X-Forwarded-For for the client IP (only behind your own proxy) |
 | | `DIAGNOSIS_ENGINE` | `v2` (default: Bayesian posterior over faults, next question by information gain) or `v1` (the earlier score-based engine) |
 | | `DIAGNOSIS_SEARCH` | Free-text matching: `hybrid` (default: keyword index plus full-text + vector + typo search over the `embeddings` table; loads the local multilingual MiniLM model, ~470 MB, at first use) or `keyword` |
+| | `EMBEDDING_MODEL` | Model for new search vectors: the original multilingual MiniLM (default) or a fine-tuned folder in `data/models` (e.g. `minilm-im-v1`). Only new dataset builds use it; each version keeps its own model, so a new one goes live through a draft, the eval gate and publish ([docs/embedding-model.md](docs/embedding-model.md)) |
 | | `MEDIA_DIR` | Fault pictures served at `/media` (default `data/media`) |
 | | `HELPLINE_NUMBER` | Helpline shown on the request form and confirmation (placeholder in `.env.example`) |
 | | `SUPPORT_EMAIL` | New requests are emailed here; empty = no alert (the request is still stored) |

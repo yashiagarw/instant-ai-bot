@@ -571,3 +571,64 @@ def test_an_unchanged_file_evaluates_like_for_like(db_session, world, staff):
     assert ev["draft"]["cases"] == ev["current"]["cases"] > 0
     assert ev["draft"]["overall"] == ev["current"]["overall"]
     assert ev["gate"]["ok"] and ev["gate"]["top3_change"] in (0.0, None)
+
+
+# ---------------------------------------------------------------- the embedding model (EMBEDDING_MODEL)
+
+
+class TunedEmbedder(FakeEmbedder):
+    """A second model: same vectors as FakeEmbedder, its own name (as a fine-tuned model in data/models)."""
+
+    name = "local/minilm-im-v1@abcd1234"
+
+
+def test_a_new_embedding_model_goes_live_only_through_a_draft(db_session, world, staff):
+    from app.datasets.checks import missing_embeddings
+    from app.knowledge.models import Embedding
+
+    content, pipe, fake = staff["content_admin"], world["pipe"], world["embedder"]
+    first = world["first"]
+    assert first.embedding_model == fake.name  # the import recorded its model
+    tuned = TunedEmbedder()
+    # EMBEDDING_MODEL changed: new builds use the tuned model; any version's own model can still be loaded.
+    pipe._embedder, pipe.embedder_factory = None, lambda: tuned
+    pipe.embedder_loader = {fake.name: fake, tuned.name: tuned}.get
+    searched: list[str] = []
+    pipe.search_factory = lambda model: searched.append(model)  # None: keyword search, but records the model
+
+    vid = upload(content, battery_file(world["raw"] / "same.xlsx")).json()["version"]["id"]
+    draft = db_session.get(DatasetVersion, vid)
+    db_session.refresh(draft)
+    assert draft.status == "validated" and draft.embedding_model == tuned.name
+    assert missing_embeddings(db_session, draft, tuned.name) == 0  # every searchable text, synonyms included
+    assert live(db_session).embedding_model == fake.name  # the live version still serves the original
+
+    assert content.post(f"/api/admin/datasets/versions/{vid}/eval", json={"full": True}).status_code == 202
+    assert searched == [tuned.name, fake.name]  # the draft with its new model, the live version with its own
+    assert content.get(f"/api/admin/datasets/versions/{vid}").json()["embedding_model"] == tuned.name
+    assert content.post(f"/api/admin/datasets/versions/{vid}/publish", json={}).status_code == 202
+    now = live(db_session)
+    assert now.id == vid and now.embedding_model == tuned.name
+    rows = db_session.scalar(
+        select(func.count()).where(
+            Embedding.model_name == tuned.name,
+            Embedding.fault_id.in_(select(Fault.id).where(Fault.dataset_version_id == vid)),
+        )  # fmt: skip
+    )
+    assert rows > 0
+
+    # A rollback has no eval gate: it keeps the live version's model even if EMBEDDING_MODEL changed again.
+    other = FakeEmbedder()
+    other.name = "local/other@00000000"
+    pipe._embedder, pipe.embedder_factory = None, lambda: other
+    r = content.post(f"/api/admin/datasets/versions/{first.id}/rollback", json={"category": "battery"})
+    assert db_session.get(DatasetJob, r.json()["id"]).status == "succeeded"
+    assert live(db_session).embedding_model == tuned.name
+
+
+def test_versions_without_a_recorded_model_use_the_original():
+    from app.knowledge.embeddings import version_model
+    from app.knowledge.importer.embed import MODEL_NAME
+
+    assert version_model(DatasetVersion(checksum="x")) == MODEL_NAME
+    assert version_model(DatasetVersion(checksum="x", embedding_model="local/a@1")) == "local/a@1"

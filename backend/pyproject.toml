@@ -26,6 +26,12 @@ dependencies = [
     "uvicorn[standard]>=0.54.0",
 ]
 
+[project.optional-dependencies]
+train = [
+    "accelerate>=1",
+    "datasets>=3",
+]
+
 [tool.uv]
 # Not an installable package: run from this folder (uv run uvicorn app.main:app).
 package = false

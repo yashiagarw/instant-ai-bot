@@ -39,6 +39,13 @@ FAULT_DESCRIPTION_CHARS = 300  # the model reads about 128 tokens; the name and 
 BATCH = 256
 
 
+def version_model(version: DatasetVersion) -> str:
+    """The embedding model a version's search vectors belong to (NULL = the original model)."""
+    from app.knowledge.importer.embed import MODEL_NAME
+
+    return version.embedding_model or MODEL_NAME
+
+
 def text_hash(text: str) -> str:
     """SHA-256 of the exact text (migration 0006 computes the same in SQL)."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -186,18 +193,24 @@ def remove_model(session: Session, model_name: str) -> int:
 def main() -> None:
     from app.config import get_settings
     from app.db import make_engine, make_session_factory
-    from app.knowledge.importer.embed import MODEL_NAME, SentenceTransformerEmbedder
+    from app.knowledge.importer.embed import SentenceTransformerEmbedder, resolve_model
     from app.knowledge.questions.inputs import target_version
 
     ap = argparse.ArgumentParser(prog="python -m app.knowledge.embeddings")
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("sync", help="embed new / changed texts, remove stale rows")
     s.add_argument("--dry-run", action="store_true", help="count only")
+    s.add_argument(
+        "--model",
+        help="embed with this model (EMBEDDING_MODEL form) instead of the version's own; the version keeps serving its "
+        "own model (for offline evaluation: run_eval.py --embedding-model)",
+    )
     sub.add_parser("status", help="rows per owner type and model")
     args = ap.parse_args()
 
     with make_session_factory(make_engine(get_settings().database_url))() as session:
         version: DatasetVersion = target_version(session)
+        own = version_model(version)
         if args.cmd == "status":
             from sqlalchemy import func
 
@@ -208,10 +221,14 @@ def main() -> None:
             )
             for model, owner, n in rows:
                 print(f"{model}  {owner:15s} {n:6d}")
-            print("pending:", sync(session, version.id, _Named(MODEL_NAME), dry_run=True))
+            print(f"version {version.id} serves {own}")
+            print("pending:", sync(session, version.id, _Named(own), dry_run=True))
             return
-        embedder = None if args.dry_run else SentenceTransformerEmbedder()
-        result = sync(session, version.id, embedder or _Named(MODEL_NAME), dry_run=args.dry_run, log=print)
+        wanted = args.model or own
+        if args.dry_run:
+            result = sync(session, version.id, _Named(resolve_model(wanted)[1]), dry_run=True, log=print)
+        else:
+            result = sync(session, version.id, SentenceTransformerEmbedder(wanted), log=print)
         session.commit()
         print(result)
 

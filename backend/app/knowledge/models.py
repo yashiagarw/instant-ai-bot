@@ -234,6 +234,9 @@ class DatasetVersion(CreatedAtMixin, Base):
     # The taxonomy this version serves (taxonomy.yaml + editor edits). Empty = taxonomy.yaml as imported. The live
     # categories / problem_groups tables are synced from the published version's (app/knowledge/edits/taxonomy.py).
     taxonomy: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    # The embedding model of this version's search vectors (EMBEDDING_MODEL when it was built; the stored name, e.g.
+    # "local/minilm-im-v1@1a2b3c4d"). NULL = the original model. Search for this version uses this model.
+    embedding_model: Mapped[str | None] = mapped_column(Text)
 
 
 class EditStatus(StrEnum):

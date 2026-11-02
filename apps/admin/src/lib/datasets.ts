@@ -13,6 +13,18 @@ export function versionState(v: DatasetVersion): { label: string; tone: "live" |
   return { label: "Needs fixes", tone: "attention" };
 }
 
+export const ORIGINAL_EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2";
+
+/** "original MiniLM", or a fine-tuned model's folder and weights hash, e.g. "minilm-im-v1 (fine-tuned, 1a2b3c4d)". */
+export function searchModelLabel(name: string): string {
+  if (name === ORIGINAL_EMBEDDING_MODEL) return "original MiniLM";
+  if (name.startsWith("local/")) {
+    const [folder, hash] = name.slice("local/".length).split("@");
+    return hash ? `${folder} (fine-tuned, ${hash})` : `${folder} (fine-tuned)`;
+  }
+  return name;
+}
+
 export function versionTitle(v: Pick<DatasetVersion, "id" | "origin" | "categories" | "rollback_of_id">): string {
   const what = v.categories.length ? v.categories.join(", ") : "all categories";
   if (v.origin === "rollback") return `v${v.id} · ${what} rolled back to v${v.rollback_of_id}`;

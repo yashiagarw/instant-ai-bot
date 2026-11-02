@@ -22,6 +22,7 @@ from app.admin.permissions import Perm
 from app.datasets import jobs
 from app.datasets.pipeline import live_version, publish_blockers
 from app.db import get_session
+from app.knowledge.embeddings import version_model
 from app.knowledge.importer.config import REPO_ROOT, load_config
 from app.knowledge.models import (
     Category,
@@ -73,6 +74,10 @@ class VersionOut(BaseModel):
     base_version_id: int | None
     rollback_of_id: int | None
     override_reason: str | None
+    embedding_model: str = Field(
+        description="Embedding model of this version's search vectors (EMBEDDING_MODEL when it was built); search for "
+        "this version uses it."
+    )
     categories: list[str] = Field(description="Categories whose rows this version changes (from its file).")
     stale: bool = Field(description="A draft built on a version that is no longer the published one.")
     validated: bool | None = Field(description="null until built (or when the build failed)")
@@ -156,6 +161,7 @@ def version_out(v: DatasetVersion, live: DatasetVersion | None) -> VersionOut:
         source_file_no=v.source_file_no, upload_name=v.upload_name, created_by=v.created_by, created_at=v.created_at,
         published_at=v.published_at, published_by=v.published_by, archived_at=v.archived_at,
         base_version_id=v.base_version_id, rollback_of_id=v.rollback_of_id, override_reason=v.override_reason,
+        embedding_model=version_model(v),
         categories=list(val.get("categories") or ([v.category_code] if v.category_code else [])),
         stale=(
             v.status in (DatasetStatus.draft, DatasetStatus.validated)

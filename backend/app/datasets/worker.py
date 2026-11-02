@@ -21,10 +21,11 @@ from app.db import make_engine, make_session_factory
 
 
 def make_pipeline(settings, factory) -> Pipeline:
-    def embedder():
-        from app.knowledge.importer.embed import SentenceTransformerEmbedder
+    """New builds embed with EMBEDDING_MODEL; evaluating and publishing a version use the model it was built with."""
+    from app.knowledge.importer.embed import load_embedder
 
-        return SentenceTransformerEmbedder()
+    def embedder():
+        return load_embedder(settings.embedding_model)
 
     pipe = Pipeline(
         diagnosis_engine=settings.diagnosis_engine,
@@ -32,13 +33,16 @@ def make_pipeline(settings, factory) -> Pipeline:
         real_cases_dir=settings.golden_cases_dir,
     )
     pipe.embedder_factory = embedder
+    pipe.embedder_loader = load_embedder
 
-    def search():
-        if settings.diagnosis_search != "hybrid" or pipe.embedder is None:
+    def search(model_name: str):
+        if settings.diagnosis_search != "hybrid":
             return None
         from app.diagnosis.search import HybridSearch
 
-        model = pipe.embedder
+        model = pipe.embedder_named(model_name)
+        if model is None:
+            return None
         return HybridSearch(factory.begin, lambda t: model.encode([t])[0], model.name)
 
     pipe.search_factory = search

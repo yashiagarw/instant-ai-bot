@@ -42,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
         from app.knowledge.importer.embed import SentenceTransformerEmbedder
 
         print("Loading embedding model ...")
-        embedder = SentenceTransformerEmbedder()
+        embedder = SentenceTransformerEmbedder(get_settings().embedding_model)
 
     settings = get_settings()
     engine = make_engine(settings.database_url, settings.db_connect_timeout)
