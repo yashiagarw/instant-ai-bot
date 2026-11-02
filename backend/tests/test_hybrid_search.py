@@ -187,6 +187,27 @@ def test_sync_embeds_only_new_or_changed_text(db_session, version, faults):  # n
     assert ("symptom", "tyre went flat") in owners(db_session) and len(owners(db_session)) == 6
 
 
+def test_missing_embeddings_check_counts_customer_phrases(db_session, version, faults):  # noqa: F811
+    """The dataset pipeline's "Every searchable text has an embedding" check (it blocks validation and publishing)
+    must notice customer phrases (synonyms) without a vector, not only symptoms and faults."""
+    from sqlalchemy import delete
+
+    from app.datasets.checks import missing_embeddings
+
+    embedder = FakeEmbedder()
+    assert missing_embeddings(db_session, version, embedder.name) == 7  # nothing synced yet
+    sync(db_session, version.id, embedder)
+    assert missing_embeddings(db_session, version, embedder.name) == 0
+    synonyms = {s.owner_id for s in sources(db_session, version.id) if s.owner_type.value == "synonym"}
+    assert len(synonyms) == 2  # "battery down hai", "tyre flat ho gaya" (held-out and rejected are not searchable)
+    db_session.execute(delete(Embedding).where(Embedding.owner_type == "synonym"))
+    db_session.flush()
+    assert missing_embeddings(db_session, version, embedder.name) == len(synonyms)
+    assert missing_embeddings(db_session, version, "another-model") == 7  # a vector only counts for its own model
+    assert sync(db_session, version.id, embedder).embedded == len(synonyms)  # the next sync puts them back
+    assert missing_embeddings(db_session, version, embedder.name) == 0
+
+
 def test_sources_cover_every_owner_type(db_session, version, faults):  # noqa: F811
     assert {s.owner_type.value for s in sources(db_session, version.id)} == {
         "symptom",
