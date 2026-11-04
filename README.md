@@ -1,6 +1,6 @@
 # Instant Mechanic: AI car diagnosis
 
-AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic](https://instantmechanic.online), Delhi NCR. Project rules are in [CLAUDE.md](CLAUDE.md).
+AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic](https://instantmechanic.online), Delhi NCR.
 
 ## Layout
 
