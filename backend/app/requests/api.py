@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 from app.accounts.api import claim_for_owner
 from app.db import get_session
 from app.diagnosis.api import EngineDep
-from app.notify.email import EmailSender, make_sender
+from app.notify import optins
+from app.notify import service as notify
 from app.ratelimit import RateLimiter, client_ip
 from app.requests import service
 from app.requests.schemas import (
@@ -21,13 +22,6 @@ from app.requests.schemas import (
 
 router = APIRouter(prefix="/service-requests", tags=["service requests"])
 DbSession = Annotated[Session, Depends(get_session)]
-
-
-def get_sender(request: Request) -> EmailSender:
-    state = request.app.state
-    if getattr(state, "email_sender", None) is None:
-        state.email_sender = make_sender(state.settings)
-    return state.email_sender
 
 
 def limit_requests(request: Request) -> None:
@@ -54,6 +48,8 @@ def get_config(request: Request):
         consent_text=service.CONSENT_TEXT,
         helpline_number=request.app.state.settings.helpline_number,
         preferred_times=[PreferredTimeOut(value=k, label=v) for k, v in PREFERRED_TIMES.items()],
+        whatsapp_consent_version=optins.WHATSAPP_CUSTOMER_VERSION,
+        whatsapp_consent_text=optins.WHATSAPP_CUSTOMER_TEXT,
     )
 
 
@@ -74,19 +70,33 @@ def create_request(
     response: Response,
     session: DbSession,
     engine: EngineDep,
-    sender: Annotated[EmailSender, Depends(get_sender)],
 ):
-    """Store the request with status `submitted`, the consent version and time and the linked diagnosis; then
-    email the support team. Requests from a fast-track topic or with a red safety alert are marked urgent."""
+    """Store the request with status `submitted`, the consent version and time and the linked diagnosis, and the
+    optional WhatsApp opt-in (its own wording and version). The support team is alerted by email through the
+    notification worker (with retries). Requests from a fast-track topic or with a red safety alert are urgent."""
+    settings = request.app.state.settings
+    if body.whatsapp_optin and body.whatsapp_consent_version != optins.WHATSAPP_CUSTOMER_VERSION:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            "the WhatsApp wording has changed; please reload the page and tick the box again",
+        )
     try:
         req = service.create(session, engine, body)
     except service.RequestInputError as e:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e)) from e
     claim_for_owner(request, response, session, req)
-    session.commit()  # the request is safe before any email is attempted
-    settings = request.app.state.settings
-    service.send_alert(session, req, sender, settings)
-    session.commit()
+    if body.whatsapp_optin:
+        optins.record(
+            session,
+            settings,
+            phone=req.phone,
+            source="request_form",
+            user_id=req.user_id,
+            request_id=None if req.user_id else req.id,
+            version=optins.WHATSAPP_CUSTOMER_VERSION,
+        )
+    notify.on_submitted(session, req)
+    session.commit()  # the request is safe; the alert goes out from the worker
     return ServiceRequestOut(
         reference=req.reference,
         status=req.status,

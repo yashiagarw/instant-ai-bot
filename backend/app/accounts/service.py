@@ -241,6 +241,13 @@ def attach_anonymous(session: Session, user: User, anon_token: str | None) -> di
         .where(Upload.anon_key_hash == h, Upload.user_id.is_(None))
         .values(user_id=user.id, anon_key_hash=None)
     ).rowcount
+    from app.notify.models import PushSubscription
+
+    session.execute(
+        update(PushSubscription)
+        .where(PushSubscription.anon_key_hash == h, PushSubscription.user_id.is_(None))
+        .values(user_id=user.id, anon_key_hash=None)
+    )
     return {"sessions": len(sessions), "requests": n_requests, "photos": n_photos}
 
 

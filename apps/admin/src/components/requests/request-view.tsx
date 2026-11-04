@@ -13,9 +13,29 @@ import { type MapPoint, MapView } from "@/components/map-view";
 import { CompleteJob } from "@/components/requests/complete-job";
 import { SafetyBadge } from "@/components/requests/queue-view";
 import { useMe } from "@/components/staff-shell";
-import { adminApi, errorMessage, type Mechanic, type RequestDetail, type RequestEvent, type RequestStatus, type Suggestions } from "@/lib/api";
+import {
+  adminApi,
+  errorMessage,
+  type Mechanic,
+  type NotificationRow,
+  type RequestDetail,
+  type RequestEvent,
+  type RequestStatus,
+  type Suggestions,
+} from "@/lib/api";
 import { dateTime } from "@/lib/format";
-import { age, MOVE_LABELS, needsNote, plainMoves, precisionNote, rupees, statusLabel } from "@/lib/ops";
+import {
+  age,
+  channelLabel,
+  MOVE_LABELS,
+  needsNote,
+  notificationOutcome,
+  plainMoves,
+  precisionNote,
+  rupees,
+  statusLabel,
+  templateLabel,
+} from "@/lib/ops";
 import { useLoad } from "@/lib/use-load";
 
 export function RequestView({ id }: { id: string }) {
@@ -93,7 +113,59 @@ export function RequestView({ id }: { id: string }) {
         <Notes request={r} canUpdate={canUpdate} act={act} />
         <Timeline events={r.events} names={Object.fromEntries(r.assignments.map((a) => [a.mechanic_id, a.mechanic]))} />
       </div>
+      <Notifications rows={r.notifications ?? []} />
     </div>
+  );
+}
+
+/** What was sent about this request, to whom (masked) and how it went. Read-only. */
+function Notifications({ rows }: { rows: NotificationRow[] }) {
+  return (
+    <Card title="Notifications">
+      {rows.length === 0 ? (
+        <p className="text-ink/75">Nothing sent about this request yet.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[40rem] text-left text-sm" data-testid="notifications">
+            <thead className="text-ink/70">
+              <tr>
+                <th scope="col" className="py-2 pr-3 font-semibold">When</th>
+                <th scope="col" className="py-2 pr-3 font-semibold">Message</th>
+                <th scope="col" className="py-2 pr-3 font-semibold">To</th>
+                <th scope="col" className="py-2 pr-3 font-semibold">Channel</th>
+                <th scope="col" className="py-2 font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((n) => (
+                <tr key={n.id} className="border-t border-border align-top">
+                  <td className="py-2 pr-3 whitespace-nowrap text-ink/80">{dateTime(n.created_at)}</td>
+                  <td className="py-2 pr-3 text-ink">
+                    {templateLabel(n.template)}
+                    {n.language === "hi" && <span className="text-ink/70"> (Hindi)</span>}
+                  </td>
+                  <td className="py-2 pr-3 text-ink">
+                    {n.recipient} <span className="text-ink/70 tabular-nums">{n.to}</span>
+                  </td>
+                  <td className="py-2 pr-3 text-ink">
+                    {channelLabel(n.channel)}
+                    {n.previous_id !== null && <span className="text-ink/70"> (fallback)</span>}
+                  </td>
+                  <td
+                    className={cn(
+                      "py-2 font-semibold",
+                      n.status === "failed" || n.status === "skipped" ? "text-orange-text" : "text-ink",
+                    )}
+                  >
+                    {notificationOutcome(n)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Card>
   );
 }
 

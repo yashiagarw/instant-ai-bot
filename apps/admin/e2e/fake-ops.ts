@@ -66,6 +66,7 @@ interface Req {
   events: Json[];
   internal_notes: Json[];
   outcome: Json | null;
+  notifications: Json[];
 }
 
 let seq = 0;
@@ -100,6 +101,18 @@ function req(over: Partial<Req> & Pick<Req, "reference" | "age_minutes">): Req {
     events: [{ id: n * 100, at: ago(over.age_minutes), kind: "status", from_status: null, to_status: "submitted", actor: "customer", note: "", data: {} }],
     internal_notes: [],
     outcome: null,
+    // Phase 5.2: the support alert went out; WhatsApp was not configured for the offer, so it fell back to SMS.
+    notifications: [
+      { id: n * 10, created_at: ago(over.age_minutes), event: "submitted", template: "request_submitted", language: "en",
+        recipient: "support", to: "s***@example.com", channel: "email", status: "sent", attempts: 1, provider: "console",
+        error: null, sent_at: ago(over.age_minutes), previous_id: null },
+      { id: n * 10 + 1, created_at: ago(1), event: "offered", template: "job_offer", language: "hi", recipient: "mechanic",
+        to: "+91******0001", channel: "whatsapp", status: "skipped", attempts: 0, provider: "whatsapp_cloud",
+        error: "WHATSAPP_TPL_JOB_OFFER is not set (approved template name)", sent_at: null, previous_id: null },
+      { id: n * 10 + 2, created_at: ago(1), event: "offered", template: "job_offer", language: "hi", recipient: "mechanic",
+        to: "+91******0001", channel: "sms", status: "sent", attempts: 1, provider: "msg91", error: null, sent_at: ago(1),
+        previous_id: n * 10 + 1 },
+    ],
     ...over,
   };
 }

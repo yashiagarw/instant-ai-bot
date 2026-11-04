@@ -1,6 +1,5 @@
 """Store a service request with its consent record and alert the support team by email."""
 
-import logging
 import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -13,11 +12,9 @@ from app.config import Settings
 from app.diagnosis import service as diagnosis
 from app.diagnosis.models import DiagnosisSession
 from app.knowledge.models import Category, ProblemGroup
-from app.notify.email import Email, EmailError, EmailSender
+from app.notify.email import Email
 from app.requests.models import EventKind, RequestEvent, RequestStatus, SafetyLevel, ServiceRequest, ServiceType
 from app.requests.schemas import PREFERRED_TIMES, ServiceRequestIn
-
-log = logging.getLogger(__name__)
 
 CONSENT_VERSION = "request-v1"
 CONSENT_TEXT = (
@@ -148,21 +145,6 @@ def alert_email(req: ServiceRequest, settings: Settings) -> Email:
     lines += ["", f"Consent: {req.consent_text_version} at {req.consent_at.isoformat()}"]
     subject = f"{'[URGENT] ' if req.urgent else ''}New mechanic request {req.reference}"
     return Email(to=settings.support_email, subject=subject, text="\n".join(lines))
-
-
-def send_alert(session: Session, req: ServiceRequest, sender: EmailSender, settings: Settings) -> None:
-    """Email the support team. A failed alert is recorded on the request and logged; the request stays."""
-    if not settings.support_email:
-        req.alert_error = "SUPPORT_EMAIL is not set"
-        log.error("Request %s stored but no alert sent: SUPPORT_EMAIL is not set", req.reference)
-        return
-    try:
-        sender.send(alert_email(req, settings))
-        req.alert_sent_at = datetime.now(UTC)
-        req.alert_error = None
-    except EmailError as e:
-        req.alert_error = str(e)[:500]
-        log.error("Request %s stored but the alert email failed: %s", req.reference, e)
 
 
 def next_steps(req: ServiceRequest, helpline: str) -> list[str]:

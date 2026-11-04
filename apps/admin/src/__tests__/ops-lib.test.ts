@@ -1,6 +1,17 @@
 import { expect, test } from "vitest";
 
-import { age, needsNote, outcomeProblems, plainMoves, precisionNote, queueQuery, shiftProblem } from "@/lib/ops";
+import {
+  age,
+  channelLabel,
+  needsNote,
+  notificationOutcome,
+  outcomeProblems,
+  plainMoves,
+  precisionNote,
+  queueQuery,
+  shiftProblem,
+  templateLabel,
+} from "@/lib/ops";
 import { isMobile } from "@/lib/schemas";
 
 test("plain status moves leave out offered / accepted / completed (they have their own actions)", () => {
@@ -51,4 +62,21 @@ test("complete-job form: a fault, a description for other, named parts, a positi
 test("mechanic mobile numbers", () => {
   expect(["9000000007", "+91 90000 00007", "919000000007"].every(isMobile)).toBe(true);
   expect(["5000000007", "900000000", "+1 9000000007"].some(isMobile)).toBe(false);
+});
+
+test("notifications read as plain words, with the reason when one was not sent", () => {
+  expect([templateLabel("job_offer"), templateLabel("mechanic_en_route"), templateLabel("new_thing")]).toEqual([
+    "Job offer",
+    "On the way",
+    "new thing",
+  ]);
+  expect([channelLabel("whatsapp"), channelLabel("push"), channelLabel("sms")]).toEqual(["WhatsApp", "Browser alert", "SMS"]);
+  expect(notificationOutcome({ status: "sent", error: null, attempts: 1 })).toBe("sent");
+  expect(notificationOutcome({ status: "skipped", error: "WHATSAPP_TPL_JOB_OFFER is not set", attempts: 0 })).toBe(
+    "skipped: WHATSAPP_TPL_JOB_OFFER is not set",
+  );
+  expect(notificationOutcome({ status: "queued", error: "MSG91 not reachable", attempts: 2 })).toBe(
+    "retrying (attempt 2 failed: MSG91 not reachable)",
+  );
+  expect(notificationOutcome({ status: "queued", error: null, attempts: 0 })).toBe("queued");
 });

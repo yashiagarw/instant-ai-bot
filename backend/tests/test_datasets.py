@@ -527,7 +527,12 @@ def test_the_api_switches_engines_without_a_restart(db_session, world, staff, ap
 def test_worker_settings():
     from app.datasets.worker import WorkerSettings, run_dataset_job
 
-    assert WorkerSettings.functions == [run_dataset_job] and WorkerSettings.max_jobs == 1
+    # Phase 5.2: the same worker sends notifications, so it runs more than one job at a time; dataset jobs still
+    # never overlap (one queued or running dataset job, enforced by the database: test_one_job_at_a_time).
+    names = [getattr(f, "name", getattr(f, "__name__", "")) for f in WorkerSettings.functions]
+    assert WorkerSettings.functions[0] is run_dataset_job
+    assert names[1:] == ["send_notification", "handle_whatsapp_inbound"] and WorkerSettings.max_jobs == 4
+    assert [c.name for c in WorkerSettings.cron_jobs] == ["cron:sweep_notifications"]
 
 
 def test_dataset_endpoints_by_role(app, db_session, test_settings, world):  # noqa: F811

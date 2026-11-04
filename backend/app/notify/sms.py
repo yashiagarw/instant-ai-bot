@@ -1,5 +1,6 @@
-"""SMS for login codes. SMS_PROVIDER=console (default) prints the code for local development and tests; msg91 sends
-through MSG91 with a DLT-registered OTP template and is built only when its keys are set.
+"""SMS for login codes and notifications. SMS_PROVIDER=console (default) prints the code or message for local
+development and tests; msg91 sends through MSG91 with DLT-registered templates (the OTP template for codes, the
+transactional templates of app.notify.templates for notifications) and is built only when its keys are set.
 
 Nothing outside the console provider ever logs a full phone number or a code: use mask_phone() in logs.
 """
@@ -26,8 +27,21 @@ def mask_phone(phone: str) -> str:
     return f"+91******{digits}"
 
 
+class SmsSendError(SmsError):
+    """A notification SMS that did not go out. retry: a temporary problem (network, MSG91 down): try again later."""
+
+    def __init__(self, message: str, retry: bool):
+        super().__init__(message)
+        self.retry = retry
+
+
 class SmsSender(Protocol):
     def send_otp(self, phone: str, code: str) -> None: ...
+
+    def send_template(self, phone: str, template_id: str, values: list[str], text: str) -> str:
+        """Send a DLT template with its values (in order); `text` is what it reads (for the console). Returns the
+        provider's id. Raises SmsSendError."""
+        ...
 
 
 class ConsoleSms:
@@ -36,11 +50,17 @@ class ConsoleSms:
     name = "console"
 
     def __init__(self) -> None:
-        self.sent: list[tuple[str, str]] = []
+        self.sent: list[tuple[str, str]] = []  # login codes: (phone, code)
+        self.messages: list[tuple[str, str]] = []  # notifications: (phone, text)
 
     def send_otp(self, phone: str, code: str) -> None:
         self.sent.append((phone, code))
         print(f"\n[console SMS] to {phone}: Your Instant Mechanic login code is {code}. It expires in 5 minutes.\n")
+
+    def send_template(self, phone: str, template_id: str, values: list[str], text: str) -> str:
+        self.messages.append((phone, text))
+        log.warning("SMS (console provider) to %s, template %s: %s", mask_phone(phone), template_id or "-", text)
+        return f"console-sms-{len(self.messages)}"
 
 
 class Msg91Sms:
@@ -93,6 +113,40 @@ class Msg91Sms:
         if body.get("type") != "success":
             log.warning("MSG91 refused a send to %s: %s", mask_phone(phone), body.get("message", "no message"))
             raise SmsError("MSG91 refused the message")
+
+    FLOW_URL = "https://control.msg91.com/api/v5/flow"
+
+    def flow_request(self, phone: str, template_id: str, values: list[str]) -> urllib.request.Request:
+        """MSG91 Flow API: the template (MSG91's id of a DLT-approved template) and its values VAR1, VAR2 ..."""
+        recipient = {"mobiles": phone.lstrip("+"), **{f"VAR{i}": v for i, v in enumerate(values, start=1)}}
+        body = {"template_id": template_id, "short_url": "0", "recipients": [recipient]}
+        return urllib.request.Request(
+            self.FLOW_URL,
+            data=json.dumps(body).encode(),
+            method="POST",
+            headers={
+                "authkey": self.s.msg91_auth_key,
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        )
+
+    def send_template(self, phone: str, template_id: str, values: list[str], text: str) -> str:
+        try:
+            with urllib.request.urlopen(self.flow_request(phone, template_id, values), timeout=10) as res:  # noqa: S310
+                body = json.loads(res.read() or b"{}")
+        except urllib.error.HTTPError as e:
+            retry = e.code == 429 or e.code >= 500
+            log.warning("MSG91 flow send to %s failed: HTTP %s", mask_phone(phone), e.code)
+            raise SmsSendError(f"MSG91 answered HTTP {e.code}", retry=retry) from None
+        except (OSError, ValueError) as e:
+            log.warning("MSG91 flow send to %s failed: %s", mask_phone(phone), type(e).__name__)
+            raise SmsSendError(f"MSG91 not reachable ({type(e).__name__})", retry=True) from None
+        if body.get("type") != "success":
+            reason = str(body.get("message", "no message"))[:200]
+            log.warning("MSG91 refused an SMS to %s: %s", mask_phone(phone), reason)
+            raise SmsSendError(f"MSG91 refused the message: {reason}", retry=False)
+        return str(body.get("message") or "")
 
 
 def make_sms(settings: Settings) -> SmsSender:

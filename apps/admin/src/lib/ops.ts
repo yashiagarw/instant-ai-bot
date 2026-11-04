@@ -117,3 +117,36 @@ export function queueQuery(params: URLSearchParams): QueueQuery {
 }
 
 export const rupees = (n: number | null) => (n === null ? "" : `₹${n.toLocaleString("en-IN")}`);
+
+// ---------------------------------------------------------------- notifications (request page, read-only)
+
+const TEMPLATE_LABELS: Record<string, string> = {
+  request_submitted: "New request alert",
+  request_escalated: "Escalation alert",
+  job_offer: "Job offer",
+  mechanic_assigned: "Mechanic assigned",
+  mechanic_en_route: "On the way",
+  mechanic_arrived: "Arrived",
+  job_completed: "Job done",
+  offer_accepted_ack: "Reply: job confirmed",
+  offer_declined_ack: "Reply: decline noted",
+  offer_closed: "Reply: offer closed",
+  whatsapp_stopped: "Reply: WhatsApp stopped",
+  whatsapp_started: "Reply: WhatsApp started",
+};
+const CHANNEL_LABELS: Record<string, string> = { whatsapp: "WhatsApp", sms: "SMS", push: "Browser alert", email: "Email" };
+
+export function templateLabel(template: string): string {
+  return TEMPLATE_LABELS[template] ?? template.replaceAll("_", " ");
+}
+
+export function channelLabel(channel: string): string {
+  return CHANNEL_LABELS[channel] ?? channel;
+}
+
+/** "sent", or "failed: <why>" / "skipped: <why>", or "queued (attempt 2 failed: <why>)". */
+export function notificationOutcome(n: { status: string; error: string | null; attempts: number }): string {
+  if (n.status === "queued") return n.error ? `retrying (attempt ${n.attempts} failed: ${n.error})` : "queued";
+  if ((n.status === "failed" || n.status === "skipped") && n.error) return `${n.status}: ${n.error}`;
+  return n.status;
+}

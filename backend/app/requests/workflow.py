@@ -118,6 +118,11 @@ def move(
     if to in (S.cancelled, S.escalated, S.triaged):
         _close_open_assignment(session, req, AssignmentStatus.withdrawn, actor, f"request {to}")
     session.flush()
+    # Notifications for this event (offered -> mechanic, accepted ... completed -> customer, escalated -> support),
+    # recorded in this transaction and sent by the worker after commit (app/notify/service.py).
+    from app.notify import service as notify
+
+    notify.on_status(session, req, to, event)
     return event
 
 

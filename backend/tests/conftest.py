@@ -31,6 +31,21 @@ def test_settings() -> Settings:
     )
 
 
+@pytest.fixture(autouse=True)
+def notify_queue(test_settings):
+    """Every test: notifications are recorded on an in-memory queue (never the developer's Redis / worker), with the
+    test settings. Tests that send them use tests.notify_helpers.drain()."""
+    from app.notify import queue as nq
+    from app.notify import service as notify
+
+    q = nq.RecordingQueue()
+    nq.set_queue(q)
+    notify.use_settings(test_settings)
+    yield q
+    nq.set_queue(None)
+    notify.use_settings(None)
+
+
 @pytest.fixture(scope="session")
 def test_engine(test_settings):
     url = make_url(test_settings.database_url)

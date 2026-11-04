@@ -7,6 +7,7 @@ import { Check, Circle, CircleDot, X } from "lucide-react";
 
 import { PhotoGallery, photoAlerts, usePhotos } from "@/components/diagnose/photo-findings";
 import { ErrorMessage } from "@/components/error-message";
+import { AlertsButton } from "@/components/notify/alerts-button";
 import { SafetyBanner } from "@/components/safety-banner";
 import { Skeleton } from "@/components/skeleton";
 import { accountApi, type RequestDetail as RequestDetailType, type TimelineStep } from "@/lib/api";
@@ -130,6 +131,7 @@ function RequestDetail({ r }: { r: RequestDetailType }) {
           </div>
         )}
       </dl>
+      {r.status !== "completed" && r.status !== "cancelled" && <AlertsButton />}
       <PhotoGallery photos={photos} className="border-0 p-0" />
       <div className="flex flex-wrap gap-x-5">
         {r.session_id && (

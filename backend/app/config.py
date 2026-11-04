@@ -136,6 +136,46 @@ class Settings(BaseSettings):
     # Real cases added to the evaluation's golden set from the admin Quality page (one YAML file per case; the eval
     # harness reads every file here, reported apart from synthetic cases). See data/eval/golden/README.md.
     golden_cases_dir: Path = Path(__file__).resolve().parents[2] / "data" / "eval" / "golden" / "real_cases"
+    # ---- Notifications (app.notify, Phase 5.2; docs/notifications-setup.md). Channels are tried in this order for
+    # each kind of recipient, skipping those the recipient has not agreed to or turned off; a channel that is not
+    # configured or fails falls back to the next one.
+    notify_customer_channels: str = "whatsapp,push,sms"
+    notify_mechanic_channels: str = "whatsapp,sms"
+    notify_support_channels: str = "email"
+    notify_mechanic_language: Literal["en", "hi"] = "en"  # job offers (customers: from their diagnosis, else en)
+    notify_max_attempts: int = 4  # per channel, for temporary errors (network, 5xx, rate limits)
+    notify_retry_base_seconds: int = 30  # 30 s, 2 min, 8 min ...
+    # WhatsApp: console (prints, development) or cloud (Meta WhatsApp Cloud API; needs the token, phone number id,
+    # app secret, verify token and the approved template names below).
+    whatsapp_provider: Literal["console", "cloud"] = "console"
+    whatsapp_token: str = ""
+    whatsapp_phone_number_id: str = ""
+    whatsapp_app_secret: str = ""  # checks X-Hub-Signature-256 on the webhook
+    whatsapp_verify_token: str = ""  # the GET check when the webhook is registered
+    whatsapp_api_version: str = "v23.0"
+    # Approved template names (each with an English "en" and Hindi "hi" translation in WhatsApp Manager).
+    whatsapp_tpl_job_offer: str = ""  # with two quick-reply buttons: Accept, Reject
+    whatsapp_tpl_mechanic_assigned: str = ""
+    whatsapp_tpl_mechanic_en_route: str = ""
+    whatsapp_tpl_mechanic_arrived: str = ""
+    whatsapp_tpl_job_completed: str = ""
+    # SMS for notifications uses SMS_PROVIDER and the MSG91 keys above, with one MSG91 template id per message and
+    # language (each a DLT-approved transactional template). Empty = that SMS is not sent (the next channel is tried).
+    msg91_tpl_job_offer_en: str = ""
+    msg91_tpl_job_offer_hi: str = ""
+    msg91_tpl_mechanic_assigned_en: str = ""
+    msg91_tpl_mechanic_assigned_hi: str = ""
+    msg91_tpl_mechanic_en_route_en: str = ""
+    msg91_tpl_mechanic_en_route_hi: str = ""
+    msg91_tpl_mechanic_arrived_en: str = ""
+    msg91_tpl_mechanic_arrived_hi: str = ""
+    msg91_tpl_job_completed_en: str = ""
+    msg91_tpl_job_completed_hi: str = ""
+    # Web push: console (prints) or webpush (VAPID keys: uv run python -m app.notify.push keys).
+    push_provider: Literal["console", "webpush"] = "console"
+    vapid_public_key: str = ""
+    vapid_private_key: str = ""
+    vapid_subject: str = "mailto:support@example.com"
     questions_model: str = "claude-opus-5-5"
     questions_effort: str = "high"
     # OpenAI (used when LLM_PROVIDER=openai). No default model: set the one you want to pay for.

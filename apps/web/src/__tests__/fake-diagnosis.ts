@@ -213,9 +213,21 @@ export class FakeDiagnosis {
   private next = 1;
 
   requests: Record<string, unknown>[] = [];
+  /** GET /api/notifications/config: no push key (alerts hidden) unless a test sets one. */
+  notifications: { push_public_key: string | null; whatsapp_consent_version: string; whatsapp_consent_text: string } = {
+    push_public_key: null,
+    whatsapp_consent_version: "whatsapp-customer-v1",
+    whatsapp_consent_text: "",
+  };
+  pushSubscriptions: Record<string, unknown>[] = [];
 
   handle(method: string, path: string, body?: unknown): FakeResponse | null {
     if (path === "/api/service-requests/config") return ok(REQUEST_CONFIG);
+    if (path === "/api/notifications/config") return ok(this.notifications);
+    if (path === "/api/notifications/push-subscriptions") {
+      this.pushSubscriptions.push({ method, ...(body as Record<string, unknown>) });
+      return ok({ ok: true });
+    }
     if (path === "/api/service-requests" && method === "POST") return this.request(body as Record<string, unknown>);
     const m = path.match(/^\/api\/diagnosis\/sessions(?:\/([^/]+))?(\/.*)?$/);
     if (!m) return null;
@@ -452,6 +464,9 @@ export const REQUEST_CONFIG = {
   consent_text:
     "I agree that Instant Mechanic's team may use my name, mobile number, location and the car and diagnosis details above to contact me and arrange help for this request.",
   helpline_number: "+91-00000-11111",
+  whatsapp_consent_version: "whatsapp-customer-v1",
+  whatsapp_consent_text:
+    "Send me updates about my mechanic request on WhatsApp from Instant Mechanic (mechanic assigned, on the way, arrived, job done). I can stop them at any time by sending STOP.",
   preferred_times: [
     { value: "asap", label: "As soon as possible" },
     { value: "today", label: "Later today" },

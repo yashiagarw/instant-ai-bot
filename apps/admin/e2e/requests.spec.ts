@@ -196,3 +196,19 @@ test("permissions: a support agent works requests and mechanics; a content admin
   await page.goto("/mechanics");
   await expect(page.getByTestId("no-access")).toBeVisible();
 });
+
+test("request page: the notifications sent about it, masked, with why one was skipped (read-only)", async ({ page }) => {
+  const fake = await new FakeAdmin().as("agent@im.test").install(page);
+  await page.goto(`/requests/${idOf(fake, "IM-OLD001")}`);
+  const table = page.getByTestId("notifications");
+  await expect(table.getByRole("row")).toHaveCount(4); // header + 3
+  await expect(table.getByRole("row").nth(1)).toContainText("New request alert");
+  await expect(table.getByRole("row").nth(1)).toContainText("s***@example.com");
+  await expect(table.getByRole("row").nth(2)).toContainText(
+    "skipped: WHATSAPP_TPL_JOB_OFFER is not set (approved template name)",
+  );
+  await expect(table.getByRole("row").nth(3)).toContainText("SMS (fallback)");
+  await expect(table.getByRole("row").nth(3)).toContainText("Job offer (Hindi)");
+  await expect(table).not.toContainText("+919"); // never a full number
+  await expect(page.getByRole("region", { name: "Notifications" }).getByRole("button")).toHaveCount(0); // read-only
+});

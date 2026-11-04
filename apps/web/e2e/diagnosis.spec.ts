@@ -3,6 +3,9 @@ import { expect, type Page, test } from "@playwright/test";
 import { expectNoSideScroll, expectTouchTargets } from "./checks";
 import { mockApi } from "./mock-api";
 
+/** The required consent box of the request form (the WhatsApp box next to it is optional). */
+const consentBox = (page: Page) => page.getByRole("checkbox", { name: /Instant Mechanic's team may use/ });
+
 async function pickSwift(page: Page) {
   await page.goto("/diagnose");
   await page.getByLabel("Search for your car").fill("swift");
@@ -90,7 +93,8 @@ test("full diagnosis: problem tile, questions with a safety alert and Back, resu
   await expect(page.getByTestId("helpline")).toContainText("+91-00000-11111");
   await expect(page.getByTestId("request-car")).toContainText("Maruti Suzuki Swift");
   await expect(page.getByTestId("request-diagnosis")).toContainText("Slow/pinhole puncture");
-  await expect(page.getByRole("checkbox")).not.toBeChecked();
+  await expect(consentBox(page)).not.toBeChecked();
+  await expect(page.getByRole("checkbox", { name: /updates about my mechanic request on WhatsApp/ })).not.toBeChecked();
   await page.getByLabel("Your name", { exact: true }).fill("Asha Verma");
   await page.getByLabel("Mobile number", { exact: true }).fill("12345");
   await page.getByLabel("Area, sector or landmark").fill("Sector 62, Noida");
@@ -98,7 +102,7 @@ test("full diagnosis: problem tile, questions with a safety alert and Back, resu
   await expect(page.getByText(/10-digit Indian mobile/)).toBeVisible();
   await expect(page.getByText(/Tick the box/)).toBeVisible();
   await page.getByLabel("Mobile number", { exact: true }).fill("98765 43210");
-  await page.getByRole("checkbox").check();
+  await consentBox(page).check();
   await expectNoSideScroll(page);
   await expectTouchTargets(page);
   await page.getByRole("button", { name: "Send urgent request" }).click();
@@ -177,7 +181,7 @@ test("unlisted car without a price range gets General guidance and no cost", asy
   await page.getByLabel("Address (optional)").fill("Block C, near the metro");
   await page.getByRole("group", { name: "Preferred time (optional)" }).getByText("Tomorrow morning").click();
   await page.getByLabel("Notes (optional)").fill("Car is old, please bring a battery tester");
-  await page.getByRole("checkbox").check();
+  await consentBox(page).check();
   await page.getByRole("button", { name: "Request a Mechanic" }).click();
   await expect(page.getByTestId("reference")).toHaveText("IM-TEST1");
   expect(fake.requests[0]).toMatchObject({
@@ -210,7 +214,7 @@ test("fast-track topic: at most 3 questions, then safety tips and a large Reques
   await page.getByLabel("Your name", { exact: true }).fill("Ravi");
   await page.getByLabel("Mobile number", { exact: true }).fill("9876543210");
   await page.getByLabel("Area, sector or landmark").fill("NH-48 near Manesar toll");
-  await page.getByRole("checkbox").check();
+  await consentBox(page).check();
   await page.getByRole("button", { name: "Send urgent request" }).click();
   await expect(page.getByTestId("confirmation")).toContainText("(urgent)");
   await expect(page.getByTestId("reference")).toHaveText("IM-TEST1");

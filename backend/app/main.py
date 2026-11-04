@@ -16,6 +16,8 @@ from app.diagnosis import api as diagnosis_api
 from app.estimates import api as estimates_api
 from app.knowledge.edits import api as knowledge_admin_api
 from app.mechanics import admin_api as mechanics_admin_api
+from app.notify import api as notify_api
+from app.notify import service as notify
 from app.parts import admin_api as parts_admin_api
 from app.parts import api as parts_api
 from app.quality import api as quality_api
@@ -35,6 +37,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Instant Mechanic API", version="0.1.0")
 
     app.state.settings = settings
+    notify.use_settings(settings)  # request events queue notifications with these settings
     app.state.engine = make_engine(settings.database_url, settings.db_connect_timeout)
     app.state.session_factory = make_session_factory(app.state.engine)
 
@@ -66,6 +69,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(mechanics_admin_api.router, prefix="/api")
     app.include_router(requests_admin_api.router, prefix="/api")
     app.include_router(quality_api.router, prefix="/api")
+    app.include_router(notify_api.router, prefix="/api")
+    app.include_router(notify_api.me_router, prefix="/api")
+    app.include_router(notify_api.webhook_router, prefix="/api")
+    app.include_router(notify_api.admin_router, prefix="/api")
     app.include_router(media_admin_api.public_router)  # /media/uploaded/<sha1>.jpg (before the /media files below)
     # every /api/admin route runs the access check with a permission
     check_admin_routes(
@@ -79,6 +86,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         mechanics_admin_api.router,
         requests_admin_api.router,
         quality_api.router,
+        notify_api.admin_router,
     )
     if settings.media_dir.is_dir():
         app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")

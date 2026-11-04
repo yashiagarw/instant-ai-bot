@@ -46,6 +46,8 @@ const REQUEST: RequestDetail = {
   ],
 };
 
+const NOW_ISO = "2026-11-04T10:00:00Z";
+
 export class FakeSite extends FakeDiagnosis {
   loggedIn = false;
   deleted = false;
@@ -61,6 +63,17 @@ export class FakeSite extends FakeDiagnosis {
       top_cause: "Slow/pinhole puncture",
     },
   ];
+
+  choices = {
+    sms: true,
+    push: true,
+    whatsapp: {
+      opted_in: false,
+      since: null as string | null,
+      consent_text_version: "whatsapp-customer-v1",
+      consent_text: "Send me updates about my mechanic request on WhatsApp from Instant Mechanic (mechanic assigned, on the way, arrived, job done). I can stop them at any time by sending STOP.",
+    },
+  };
 
   handle(method: string, path: string, body?: unknown): FakeResponse | null {
     const b = (body ?? {}) as Record<string, unknown>;
@@ -99,6 +112,16 @@ export class FakeSite extends FakeDiagnosis {
         return { status: 200, json: {} };
       }
       if (path === "/api/me/sessions") return { status: 200, json: this.history };
+      if (path === "/api/me/notifications" && method === "PUT") {
+        this.choices = { ...this.choices, ...(b as object) };
+        return { status: 200, json: this.choices };
+      }
+      if (path === "/api/me/notifications/whatsapp" && method === "PUT") {
+        if (b.opt_in && b.consent_text_version !== "whatsapp-customer-v1") return { status: 422, json: { detail: "wording" } };
+        this.choices = { ...this.choices, whatsapp: { ...this.choices.whatsapp, opted_in: Boolean(b.opt_in), since: b.opt_in ? NOW_ISO : null } };
+        return { status: 200, json: this.choices };
+      }
+      if (path === "/api/me/notifications") return { status: 200, json: this.choices };
       if (path === "/api/me/requests") return { status: 200, json: [REQUEST] };
       if (path === `/api/requests/${REQUEST.id}`) return { status: 200, json: REQUEST };
       return { status: 404, json: { detail: "Request not found" } };

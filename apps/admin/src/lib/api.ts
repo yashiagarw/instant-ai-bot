@@ -857,6 +857,25 @@ export interface RequestDetail extends QueueRow {
   events: RequestEvent[];
   internal_notes: { id: number; created_at: string; author: string; text: string }[];
   outcome: Outcome | null;
+  notifications?: NotificationRow[];
+}
+
+/** A notification about a request (backend/app/notify): numbers masked, no message text. Read-only. */
+export interface NotificationRow {
+  id: number;
+  created_at: string;
+  event: string;
+  template: string;
+  language: string;
+  recipient: "customer" | "mechanic" | "support";
+  to: string;
+  channel: "whatsapp" | "sms" | "push" | "email";
+  status: "queued" | "sent" | "delivered" | "read" | "failed" | "skipped";
+  attempts: number;
+  provider: string | null;
+  error: string | null;
+  sent_at: string | null;
+  previous_id: number | null;
 }
 
 export interface Suggestion {

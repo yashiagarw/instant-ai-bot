@@ -16,6 +16,9 @@ function session(body: Record<string, unknown>, answers: (number | string)[] = [
   return id;
 }
 
+const consentBox = () => screen.getByRole("checkbox", { name: /Instant Mechanic's team may use/ });
+const whatsappBox = () => screen.getByRole("checkbox", { name: /updates about my mechanic request on WhatsApp/ });
+
 function fill(fields: Record<string, string>) {
   for (const [label, value] of Object.entries(fields)) fireEvent.change(screen.getByLabelText(label), { target: { value } });
 }
@@ -34,7 +37,9 @@ test("prefilled with the car and diagnosis; consent starts unticked; all fields 
   render(<RequestForm sessionId={id} />);
   expect((await screen.findByTestId("request-car")).textContent).toContain("Maruti Suzuki Swift");
   expect(screen.getByTestId("request-diagnosis").textContent).toBe("Tyres · Likely cause: Slow/pinhole puncture");
-  expect(screen.getByRole("checkbox")).toHaveProperty("checked", false);
+  expect(consentBox()).toHaveProperty("checked", false);
+  expect(whatsappBox()).toHaveProperty("checked", false); // optional, separate, never pre-ticked
+  expect(screen.getByTestId("whatsapp-consent-text").textContent).toContain("by sending STOP");
   expect(screen.getByTestId("consent-text").textContent).toContain("Instant Mechanic's team");
   for (const label of ["Your name", "Mobile number", "Area, sector or landmark", "Pincode", "Address (optional)", "Notes (optional)"]) {
     expect(screen.getByLabelText(label)).toBeDefined();
@@ -64,7 +69,7 @@ test("sends the request and shows the reference, next steps and the helpline as 
   fill({ "Your name": "Asha Verma", "Mobile number": "+91 98765 43210", "Area, sector or landmark": "Sector 62, Noida", Pincode: "201309" });
   fireEvent.click(within(screen.getByRole("group", { name: "How should we help?" })).getByRole("radio", { name: /Workshop visit/ }));
   fireEvent.click(within(screen.getByRole("group", { name: "Preferred time (optional)" })).getByRole("radio", { name: "Tomorrow morning" }));
-  fireEvent.click(screen.getByRole("checkbox"));
+  fireEvent.click(consentBox());
   fireEvent.click(screen.getByRole("button", { name: "Request a Mechanic" }));
 
   const done = await screen.findByTestId("confirmation");
@@ -80,8 +85,26 @@ test("sends the request and shows the reference, next steps and the helpline as 
     preferred_time: "tomorrow_morning",
     consent: true,
     consent_text_version: "request-v1",
+    whatsapp_optin: false,
+    whatsapp_consent_version: null,
     urgent: false,
   });
+});
+
+test("WhatsApp updates only when the separate box is ticked, with its wording version", async () => {
+  render(<RequestForm sessionId={null} />);
+  await screen.findByLabelText("Your name");
+  fill({ "Your name": "Asha", "Mobile number": "9876543210", "Area, sector or landmark": "Dwarka", Pincode: "110075" });
+  fireEvent.click(screen.getByRole("radio", { name: /At my location/ }));
+  fireEvent.click(whatsappBox());
+  fireEvent.click(screen.getByRole("button", { name: "Request a Mechanic" }));
+  // Ticking WhatsApp is not the consent to share details: that box is still required.
+  expect(await screen.findByText("Tick the box so we can share your details with our team.")).toBeDefined();
+  expect(fake.requests).toEqual([]);
+  fireEvent.click(consentBox());
+  fireEvent.click(screen.getByRole("button", { name: "Request a Mechanic" }));
+  await screen.findByTestId("confirmation");
+  expect(fake.requests[0]).toMatchObject({ whatsapp_optin: true, whatsapp_consent_version: "whatsapp-customer-v1" });
 });
 
 test("emergency: helpline at the top, optional fields skipped, pincode optional, marked urgent", async () => {
@@ -97,7 +120,7 @@ test("emergency: helpline at the top, optional fields skipped, pincode optional,
   expect(screen.getByLabelText("Pincode (optional)")).toBeDefined();
 
   fill({ "Your name": "Ravi", "Mobile number": "9876543210", "Area, sector or landmark": "NH-48 near Manesar toll" });
-  fireEvent.click(screen.getByRole("checkbox"));
+  fireEvent.click(consentBox());
   fireEvent.click(screen.getByRole("button", { name: "Send urgent request" }));
   expect((await screen.findByTestId("confirmation")).textContent).toContain("(urgent)");
   expect(fake.requests[0]).toMatchObject({ urgent: true, pincode: "", service_type: "at_location", notes: "" });
@@ -119,7 +142,7 @@ test("a refused request shows the reason and keeps the form", async () => {
   await screen.findByLabelText("Your name");
   fill({ "Your name": "Asha", "Mobile number": "9876543210", "Area, sector or landmark": "Dwarka", Pincode: "110075" });
   fireEvent.click(screen.getByRole("radio", { name: /At my location/ }));
-  fireEvent.click(screen.getByRole("checkbox"));
+  fireEvent.click(consentBox());
   fireEvent.click(screen.getByRole("button", { name: "Request a Mechanic" }));
   expect((await screen.findByRole("alert")).textContent).toMatch(/Too many requests from this address\. Please call the helpline/);
   expect(screen.getByLabelText("Your name")).toHaveProperty("value", "Asha");

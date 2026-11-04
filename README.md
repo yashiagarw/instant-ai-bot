@@ -9,13 +9,13 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `apps/web` | Customer site (port 3000): Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
 | `apps/admin` | Staff admin app (port 3001): sign-in with two-factor, role-based menu, Users, Audit log |
 | `packages/ui` | `@im/ui`, shared by both apps: brand theme, Button, Dialog, the data table (TanStack Table) |
-| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `uploads` (customer photos), `notify` (email and SMS), `llm` (optional LLM layer, off by default), `parts` (parts catalogue), `datasets` (dataset publish pipeline and its worker) |
+| `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `uploads` (customer photos), `notify` (notifications: email, SMS, WhatsApp, web push; Phase 5.2), `llm` (optional LLM layer, off by default), `parts` (parts catalogue), `datasets` (dataset publish pipeline and its worker) |
 | `backend/engine` | Diagnosis engine, plain Python with no web imports |
 | `backend/alembic` | Database migrations |
 | `data/raw` | The 18 original Excel datasets. Never edit |
 | `data/schema` | Manifest, column aliases, taxonomy, import rules, CSV templates for price sources (`templates/`) |
 | `data/catalogue` | Vehicle catalogue seed (editable YAML); team price sources in `parts/` |
-| `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md), [fine-tuning the search model](docs/embedding-model.md) |
+| `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md), [fine-tuning the search model](docs/embedding-model.md), [notification accounts and templates](docs/notifications-setup.md) |
 | `scripts` | Offline data scripts (dataset profiler) |
 | `docker-compose.yml` | Development: PostgreSQL 16 + pgvector, S3-compatible storage for photos (SeaweedFS), Redis for background jobs; the apps with hot reload under the `app` profile |
 | `docker-compose.prod.yml`, `docker/caddy` | Production stack behind Caddy with automatic HTTPS ([Phase 5.1](#phase-51-containers-and-production)) |
@@ -191,6 +191,10 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `QUESTIONS_MODEL`, `QUESTIONS_EFFORT`, `OPENAI_API_KEY`, `OPENAI_MODEL`, … | Offline question drafting (`python -m app.knowledge.questions`, `--provider anthropic\|openai`) |
 | | `REDIS_URL` | Redis for background jobs (`redis://localhost:6379/0`; `docker compose up -d redis`) |
 | | `DATASET_UPLOAD_DIR`, `DATASET_UPLOAD_MAX_MB` | Where uploaded dataset files are kept (default `data/uploads/datasets`, not committed; versions are rebuilt and rolled back from them) and the upload limit (25 MB) |
+| | `NOTIFY_CUSTOMER_CHANNELS`, `NOTIFY_MECHANIC_CHANNELS`, `NOTIFY_SUPPORT_CHANNELS`, `NOTIFY_MECHANIC_LANGUAGE`, `NOTIFY_MAX_ATTEMPTS`, `NOTIFY_RETRY_BASE_SECONDS` | Notifications: channel order per recipient, mechanics' language, retries ([Phase 5.2](#phase-52-notifications)) |
+| | `MSG91_TPL_*` (10) | MSG91 template id per notification SMS and language (DLT-approved) |
+| | `WHATSAPP_PROVIDER`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_API_VERSION`, `WHATSAPP_TPL_*` (5) | WhatsApp Cloud API, webhook checks and approved template names (placeholders) |
+| | `PUSH_PROVIDER`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Browser alerts (web push) |
 | `apps/web/.env.local` | `NEXT_PUBLIC_API_URL` | Backend base URL for the browser |
 
 ## Phase 2.5: explanations, typed replies, car features
@@ -839,6 +843,81 @@ cd apps/web && E2E_BASE_URL=https://localhost E2E_API_URL=https://localhost:8443
 
 `E2E_BASE_URL` makes the web Playwright config test a running deployment instead of building and starting its own
 server; without it every suite runs as before.
+
+## Phase 5.2: notifications
+
+Request events notify people through one entry point, `notify()` (`backend/app/notify`): it records a row in
+`notifications` (recipient, channel, template, language, status, attempts, provider, provider id, error) in the same
+transaction as the event, and after commit the **arq worker** sends it, with retries and fallback to the next
+channel. What to set up for each real channel (accounts, DLT and Meta registrations, the exact templates):
+**[docs/notifications-setup.md](docs/notifications-setup.md)**.
+
+| Event | Who | Message |
+|---|---|---|
+| submitted | support (email) | the existing new-request alert (it still fills `alert_sent_at` / `alert_error`) |
+| offered | mechanic | job offer: reference, problem, area, car; on WhatsApp with **Accept / Reject** buttons |
+| accepted / en_route / arrived / completed | customer | mechanic assigned (first name only), on the way, arrived, job done |
+| escalated | support (email) | the reason and a link to the request in the admin app |
+
+- **Channels**, in the order set by `NOTIFY_*_CHANNELS` (customers `whatsapp,push,sms`, mechanics `whatsapp,sms`,
+  support `email`). A person only gets WhatsApp with an **opt-in** for that number, push if a browser turned alerts
+  on, and customers can switch SMS or alerts off in My account. Customers get Hindi when their diagnosis was typed
+  in Hindi or Hinglish, else English; mechanics get `NOTIFY_MECHANIC_LANGUAGE`.
+- **Providers** behind one interface (`app/notify/channels.py`), each with a console version for development:
+  email (the existing console / SMTP / Resend), SMS (the existing console / MSG91, now also sending DLT templates
+  through MSG91's Flow API), WhatsApp (Meta Cloud API) and web push (VAPID). No account is assumed: a provider that
+  is not set up (missing credentials or template id, or a console provider in production) is **skipped with the
+  reason**, logged, and the next channel is tried. Temporary errors (network, 5xx, rate limits) are retried
+  (`NOTIFY_MAX_ATTEMPTS`, 30 s / 2 min / 8 min), then the next channel. A WhatsApp message that Meta later reports
+  as undelivered also falls back to SMS.
+- **WhatsApp Accept / Reject**: `POST /api/webhooks/whatsapp` checks `X-Hub-Signature-256` with
+  `WHATSAPP_APP_SECRET`, stores each message once (by message id), answers 200 and leaves the work to the worker. A
+  press goes through the same state machine as the admin app (`workflow.respond`): the offer must still be open, the
+  sender's number must be that mechanic's, and repeat presses change nothing. It is in the timeline and the audit log
+  as "<first name> (mechanic, WhatsApp)", and the mechanic gets a short reply. STOP withdraws WhatsApp opt-ins,
+  START opts a mechanic in. `GET` answers Meta's verification with `WHATSAPP_VERIFY_TOKEN`. Behind Caddy it is
+  `https://api.instantmechanic.online/api/webhooks/whatsapp` (no Caddy change needed).
+- **Opt-ins** (`notification_optins`): channel, the exact wording and its version, time, source (request form,
+  account page, WhatsApp keyword, staff call) and withdrawal. Customers tick the optional box on the request form
+  (separate from the required consent, unticked) or use My account; an agent records a mechanic's opt-in after a
+  call (`PUT /api/admin/mechanics/{id}/whatsapp-optin`, audited) or the mechanic sends START.
+- **Privacy**: no full phone number in the notification tables or the logs (user / mechanic / request ids, masked
+  numbers, and a keyed hash for opt-ins and WhatsApp senders); numbers are read at send time. Values put into
+  messages lose any phone number first, so a customer's message never carries the mechanic's number and a
+  mechanic's offer never carries the customer's (customers type free text into the area and notes).
+- **Web app**: `public/sw.js` (shows the alert, opens our own site when tapped), a **Turn on alerts** card on the
+  request confirmation, on the customer's request page and in My account, the optional WhatsApp box on the request
+  form, and "Updates about my requests" in My account. Push subscriptions are only accepted for the browsers' real
+  push services (no other address can be made to receive the worker's requests).
+- **Admin**: the request page shows the notifications sent for it (message, masked recipient, channel, status,
+  reason when skipped or failed). Read-only.
+
+```bash
+cd backend && uv sync                                  # new: http-ece, py-vapid (web push)
+cd backend && uv run alembic upgrade head              # migration 0023
+# restart the API and the worker: the worker now also sends notifications (it must run for support alerts too)
+cd backend && uv run arq app.datasets.worker.WorkerSettings
+cd backend && uv run python -m app.notify.push keys    # optional: VAPID keys, so "Turn on alerts" appears locally
+cd backend && uv run python -m app.notify.templates    # the exact WhatsApp / DLT texts to register
+```
+
+Try it locally (all console providers, nothing leaves the machine): submit a request at http://localhost:3000 (tick
+the WhatsApp box), then in the admin app triage it, offer it to a mechanic and move it on. The worker terminal prints
+each message with the number masked (`WHATSAPP (console provider) to +91******3210: …`), and the admin request page
+lists them. Without the WhatsApp tick the customer's updates go by SMS (console), and the mechanic's offer by SMS
+unless they opted in. To try the Accept button without Meta, post a signed webhook body as in
+`backend/tests/test_notify.py` (`button()` and `signed()`).
+
+After pulling: `uv sync`, `alembic upgrade head` (0023), and **restart the worker** (new jobs, a once-a-minute
+sweep, and `max_jobs` 4 so a long dataset job never holds notifications back; dataset jobs still never overlap).
+In production rebuild the API image (new Python packages) and `up -d` (migrations run first). The worker must be
+running: the support alert email now goes out from it.
+
+Tests: `cd backend && uv run pytest tests/test_notify.py tests/test_service_requests.py` (fake providers: retries,
+fallback, missing credentials, opt-ins, webhook signature and dedupe, Accept / Reject through the state machine,
+privacy, the providers' request bodies, web push encryption, and that the setup guide matches the templates);
+`cd apps/web && pnpm test` and `pnpm exec playwright test e2e/notifications.spec.ts --workers=1`;
+`cd apps/admin && pnpm exec playwright test e2e/requests.spec.ts --workers=1`.
 
 ## LLM layer (off by default)
 

@@ -8,8 +8,12 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+from app.notify.channels import EmailChannel
 from app.notify.email import ConsoleSender, EmailError
+from app.notify.models import NotificationOptin
+from app.notify.optins import WHATSAPP_CUSTOMER_TEXT
 from app.requests.models import RequestEvent, ServiceRequest
+from tests.notify_helpers import drain, fake_channels
 from tests.test_diagnosis_api import (  # noqa: F401 - fixtures
     answer,
     db_connection,
@@ -36,10 +40,16 @@ def sender():
 
 
 @pytest.fixture
-def client(test_settings, db_session, knowledge, sender):  # noqa: F811
+def client(test_settings, db_session, knowledge):  # noqa: F811
     with make_client(test_settings, db_session, support_email=SUPPORT, helpline_number=HELPLINE) as c:
-        c.app.state.email_sender = sender
         yield c
+
+
+def send_alerts(client, db_session, queue, sender) -> list[str]:
+    """Run the notification worker's jobs with the real email channel over `sender` (Phase 5.2: the support alert
+    goes out from the worker, with retries)."""
+    settings = client.app.state.settings
+    return drain(db_session, queue, fake_channels(email=EmailChannel(settings, sender)), settings)
 
 
 def body(**overrides):
@@ -72,7 +82,14 @@ def test_config_has_consent_wording_version_and_helpline(client):
     assert [t["value"] for t in cfg["preferred_times"]][0] == "asap"
 
 
-def test_valid_request_is_stored_with_consent_and_alerts_support(client, knowledge, variant, db_session, sender):  # noqa: F811
+def test_valid_request_is_stored_with_consent_and_alerts_support(
+    client,
+    knowledge,  # noqa: F811
+    variant,  # noqa: F811
+    db_session,
+    sender,
+    notify_queue,
+):
     sid = finished_session(client, knowledge, variant)
     r = client.post("/api/service-requests", json=body(session_id=sid, notes="Car is in the basement parking"))
     assert r.status_code == 201, r.text
@@ -86,6 +103,9 @@ def test_valid_request_is_stored_with_consent_and_alerts_support(client, knowled
     assert row.consent_given and row.consent_text_version == "request-v1"
     assert (datetime.now(UTC) - row.consent_at).total_seconds() < 60
     assert row.vehicle_snapshot["variant_id"] == variant.id and "likely cause: Weak battery" in row.problem_summary
+    assert row.alert_sent_at is None and sender.sent == []  # queued for the worker, not sent in the request
+    assert send_alerts(client, db_session, notify_queue, sender) == ["sent"]
+    db_session.refresh(row)
     assert row.alert_sent_at is not None and row.alert_error is None
     # Phase 5.1: the likely category (mechanic skills), the safety level (queue order) and the first event.
     assert row.category_code == "battery" and row.safety_level != "high"
@@ -121,13 +141,13 @@ def test_indian_mobile_formats_are_accepted(client, phone):
     [{"consent": False}, {"consent": None}, {"consent_text_version": "request-v0"}],
     ids=["unticked", "missing", "old-wording"],
 )
-def test_no_request_without_current_consent(client, db_session, sender, change):
+def test_no_request_without_current_consent(client, db_session, sender, change, notify_queue):
     data = body(**change)
     if change.get("consent", True) is None:
         data.pop("consent")
     r = client.post("/api/service-requests", json=data)
     assert r.status_code == 422
-    assert db_session.scalars(select(ServiceRequest)).all() == [] and sender.sent == []
+    assert db_session.scalars(select(ServiceRequest)).all() == [] and notify_queue.jobs == []
 
 
 @pytest.mark.parametrize(
@@ -147,7 +167,7 @@ def test_invalid_input(client, change):
     assert client.post("/api/service-requests", json=body(**change)).status_code == 422
 
 
-def test_emergency_topic_is_urgent_and_needs_no_pincode(client, knowledge, variant, sender):  # noqa: F811
+def test_emergency_topic_is_urgent_and_needs_no_pincode(client, knowledge, variant, sender, db_session, notify_queue):  # noqa: F811, E501
     s = start(client, vehicle={"variant_id": variant.id}, topic_id="battery_dead")
     assert s["mode"] == "fast_track"
     r = client.post(
@@ -156,6 +176,7 @@ def test_emergency_topic_is_urgent_and_needs_no_pincode(client, knowledge, varia
     )
     assert r.status_code == 201, r.text
     assert r.json()["urgent"] is True and "urgent" in r.json()["next_steps"][0]
+    send_alerts(client, db_session, notify_queue, sender)
     assert sender.sent[0].subject.startswith("[URGENT]") and "Tow the car" in sender.sent[0].text
 
 
@@ -168,20 +189,23 @@ def test_red_safety_alert_makes_the_request_urgent(client, knowledge, variant, d
     assert row.safety_level == "high"  # safety-critical: first in the support queue
 
 
-def test_a_failed_email_keeps_the_request(test_settings, db_session, knowledge):  # noqa: F811
-    with make_client(test_settings, db_session, support_email=SUPPORT) as c:
-        c.app.state.email_sender = FailingSender()
+def test_a_failed_email_keeps_the_request(test_settings, db_session, knowledge, notify_queue):  # noqa: F811
+    with make_client(test_settings, db_session, support_email=SUPPORT, notify_retry_base_seconds=0) as c:
         r = c.post("/api/service-requests", json=body())
-    assert r.status_code == 201
+        assert r.status_code == 201
+        # Retried NOTIFY_MAX_ATTEMPTS times (temporary SMTP errors), then recorded on the request.
+        outcomes = send_alerts(c, db_session, notify_queue, FailingSender())
+    assert outcomes == ["retry"] * (test_settings.notify_max_attempts - 1) + ["failed"]
     row = db_session.scalars(select(ServiceRequest)).one()
     assert row.alert_sent_at is None and "connection refused" in row.alert_error
 
 
-def test_no_support_address_keeps_the_request(test_settings, db_session, knowledge):  # noqa: F811
+def test_no_support_address_keeps_the_request(test_settings, db_session, knowledge, notify_queue):  # noqa: F811
+    sender = ConsoleSender()
     with make_client(test_settings, db_session, support_email="") as c:
-        c.app.state.email_sender = ConsoleSender()
         assert c.post("/api/service-requests", json=body()).status_code == 201
-        assert c.app.state.email_sender.sent == []
+        assert send_alerts(c, db_session, notify_queue, sender) == ["skipped"]
+        assert sender.sent == []
     assert db_session.scalars(select(ServiceRequest)).one().alert_error == "SUPPORT_EMAIL is not set"
 
 
@@ -218,3 +242,20 @@ def test_console_provider_is_the_default_and_real_providers_need_their_settings(
         settings = test_settings.model_copy(update={"email_provider": provider, "smtp_host": "", "resend_api_key": ""})
         with pytest.raises(EmailError, match=missing):
             make_sender(settings)
+
+
+def test_request_form_whatsapp_opt_in(client, db_session):
+    cfg = client.get("/api/service-requests/config").json()
+    assert cfg["whatsapp_consent_version"] == "whatsapp-customer-v1" and "STOP" in cfg["whatsapp_consent_text"]
+    form = {"name": "Asha Verma", "phone": "98000 01234", "service_type": "at_location", "area": "Saket",
+            "pincode": "110017", "consent": True, "consent_text_version": "request-v1"}  # fmt: skip
+    bad = client.post("/api/service-requests", json={**form, "whatsapp_optin": True, "whatsapp_consent_version": "v0"})
+    assert bad.status_code == 422 and db_session.scalars(select(ServiceRequest)).all() == []
+    ok = client.post("/api/service-requests", json={**form, "whatsapp_optin": True,
+                                                  "whatsapp_consent_version": "whatsapp-customer-v1"})  # fmt: skip
+    assert ok.status_code == 201, ok.text
+    r = db_session.scalars(select(ServiceRequest)).one()
+    o = db_session.scalars(select(NotificationOptin)).one()
+    assert (o.request_id, o.source, o.consent_text) == (r.id, "request_form", WHATSAPP_CUSTOMER_TEXT)
+    assert client.post("/api/service-requests", json=form).status_code == 201  # unticked: no opt-in
+    assert len(db_session.scalars(select(NotificationOptin)).all()) == 1

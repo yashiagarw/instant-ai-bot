@@ -6,6 +6,7 @@ import { CarFront, CircleCheck, LoaderCircle, Phone } from "lucide-react";
 
 import { ChoiceGroup } from "@/components/choice-group";
 import { ErrorMessage } from "@/components/error-message";
+import { AlertsButton } from "@/components/notify/alerts-button";
 import { Skeleton } from "@/components/skeleton";
 import { TextField } from "@/components/text-field";
 import { Button } from "@/components/ui/button";
@@ -116,6 +117,7 @@ function Confirmation({ out, sessionId }: { out: ServiceRequestOut; sessionId: s
           ))}
         </ol>
       </section>
+      <AlertsButton />
       {out.helpline_number && (
         <p className="rounded-2xl bg-white p-4 text-lg text-ink">
           Helpline: <span className="font-bold tracking-wide">{out.helpline_number}</span>
@@ -157,6 +159,7 @@ function Form({
   const [time, setTime] = useState<string | undefined>();
   const [notes, setNotes] = useState("");
   const [consent, setConsent] = useState(false);
+  const [whatsapp, setWhatsapp] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -197,6 +200,8 @@ function Form({
           notes: urgent ? "" : notes.trim(),
           consent,
           consent_text_version: config.consent_version,
+          whatsapp_optin: whatsapp,
+          whatsapp_consent_version: whatsapp ? config.whatsapp_consent_version : null,
         }),
       );
     } catch (err) {
@@ -315,6 +320,27 @@ function Form({
           </p>
         )}
       </div>
+
+      {/* Optional and separate from the consent above: WhatsApp updates need their own opt-in (stored with this
+          wording and its version). Unticked by default. */}
+      {config.whatsapp_consent_text && (
+        <label
+          htmlFor={`${consentId}-whatsapp`}
+          className="flex min-h-14 cursor-pointer items-start gap-3 rounded-2xl border-2 border-ink/15 bg-white p-4 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring"
+        >
+          <input
+            id={`${consentId}-whatsapp`}
+            type="checkbox"
+            checked={whatsapp}
+            onChange={(e) => setWhatsapp(e.target.checked)}
+            className="mt-0.5 size-6 shrink-0 accent-cta outline-none"
+          />
+          <span className="text-ink" data-testid="whatsapp-consent-text">
+            <span className="font-bold">Optional: </span>
+            {config.whatsapp_consent_text}
+          </span>
+        </label>
+      )}
 
       {error && <ErrorMessage message={error} />}
       <Button type="submit" size="cta" disabled={sending} className="self-stretch sm:self-start">

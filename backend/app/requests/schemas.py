@@ -38,6 +38,8 @@ class RequestConfigOut(BaseModel):
     consent_text: str = Field(description="Show this wording next to the (unticked) consent checkbox.")
     helpline_number: str = Field(description="Shown as text. Empty when not configured.")
     preferred_times: list[PreferredTimeOut]
+    whatsapp_consent_version: str = Field(description="Send back as `whatsapp_consent_version` when ticked.")
+    whatsapp_consent_text: str = Field(description="The optional WhatsApp updates box (unticked by default).")
 
 
 class ServiceRequestIn(BaseModel):
@@ -71,6 +73,12 @@ class ServiceRequestIn(BaseModel):
     notes: str = Field(default="", max_length=500)
     consent: bool = Field(description="Must be true: the customer ticked the consent box.")
     consent_text_version: str = Field(min_length=1, max_length=40)
+    whatsapp_optin: bool = Field(
+        default=False, description="The customer ticked the separate, optional WhatsApp updates box."
+    )
+    whatsapp_consent_version: str | None = Field(
+        default=None, max_length=40, description="The WhatsApp wording version shown (GET /config), when ticked."
+    )
 
     @field_validator("name", "area", "address", "notes", "pincode")
     @classmethod

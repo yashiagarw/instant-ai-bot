@@ -27,6 +27,7 @@ from app.knowledge.models import Category, Fault
 from app.mechanics import matching
 from app.mechanics.geo import locate
 from app.mechanics.models import Mechanic
+from app.notify.models import Notification
 from app.requests import outcomes, workflow
 from app.requests.models import (
     EventKind,
@@ -127,6 +128,25 @@ class OutcomeOut(BaseModel):
     recorded_at: datetime
 
 
+class NotificationOut(BaseModel):
+    """A notification about this request (read-only). Numbers are masked; message text is not stored."""
+
+    id: int
+    created_at: datetime
+    event: str
+    template: str
+    language: str
+    recipient: str = Field(description="customer, mechanic or support")
+    to: str = Field(description="Masked: +91******3210 / s***@example.com")
+    channel: str
+    status: str = Field(description="queued, sent, delivered, read, failed or skipped")
+    attempts: int
+    provider: str | None
+    error: str | None
+    sent_at: datetime | None
+    previous_id: int | None = Field(description="The notification this one replaced (channel fallback)")
+
+
 class RequestDetail(QueueRow):
     address: str
     preferred_time: str
@@ -139,6 +159,7 @@ class RequestDetail(QueueRow):
     events: list[EventOut]
     internal_notes: list[NoteOut]
     outcome: OutcomeOut | None
+    notifications: list[NotificationOut] = Field(default_factory=list)
 
 
 class TransitionIn(BaseModel):
@@ -376,6 +397,27 @@ def _detail(session: Session, r: ServiceRequest, staff) -> RequestDetail:
         events=events,
         internal_notes=notes,
         outcome=outcome,
+        notifications=[
+            NotificationOut(
+                id=n.id,
+                created_at=n.created_at,
+                event=n.event,
+                template=n.template,
+                language=n.language,
+                recipient=str(n.recipient_type),
+                to=n.recipient_masked,
+                channel=str(n.channel),
+                status=str(n.status),
+                attempts=n.attempts,
+                provider=n.provider,
+                error=n.error,
+                sent_at=n.sent_at,
+                previous_id=n.previous_id,
+            )
+            for n in session.scalars(
+                select(Notification).where(Notification.request_id == r.id).order_by(Notification.id)
+            )
+        ],
     )
 
 

@@ -96,6 +96,14 @@ async function post<T>(path: string, body?: unknown): Promise<T> {
   });
 }
 
+async function put<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
 async function del<T>(path: string, body?: unknown): Promise<T> {
   return request<T>(path, {
     method: "DELETE",
@@ -418,6 +426,8 @@ export interface RequestConfig {
   consent_text: string;
   helpline_number: string;
   preferred_times: { value: string; label: string }[];
+  whatsapp_consent_version: string;
+  whatsapp_consent_text: string;
 }
 
 export interface ServiceRequestIn {
@@ -432,6 +442,8 @@ export interface ServiceRequestIn {
   notes: string;
   consent: boolean;
   consent_text_version: string;
+  whatsapp_optin?: boolean;
+  whatsapp_consent_version?: string | null;
 }
 
 export interface ServiceRequestOut {
@@ -766,4 +778,33 @@ export const photosApi = {
     get<Photo[]>(`/uploads?session_id=${encodeURIComponent(sessionId)}`, signal),
   remove: (id: string) => del<void>(`/uploads/${id}`),
   analyze: (id: string, mode: PhotoMode) => post<Finding>(`/uploads/${id}/analyze`, { mode }),
+};
+
+// ---------------------------------------------------------------- Notifications (backend/app/notify)
+
+export interface NotificationsConfig {
+  push_public_key: string | null; // null: browser alerts are not set up on the server
+  whatsapp_consent_version: string;
+  whatsapp_consent_text: string;
+}
+
+export interface PushSubscriptionIn {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+}
+
+export interface NotificationChoices {
+  sms: boolean;
+  push: boolean;
+  whatsapp: { opted_in: boolean; since: string | null; consent_text_version: string; consent_text: string };
+}
+
+export const notifyApi = {
+  config: (signal?: AbortSignal) => get<NotificationsConfig>("/notifications/config", signal),
+  subscribe: (sub: PushSubscriptionIn) => post<{ ok: boolean }>("/notifications/push-subscriptions", sub),
+  unsubscribe: (endpoint: string) => del<{ ok: boolean }>("/notifications/push-subscriptions", { endpoint }),
+  choices: (signal?: AbortSignal) => get<NotificationChoices>("/me/notifications", signal),
+  setChoices: (body: { sms?: boolean; push?: boolean }) => put<NotificationChoices>("/me/notifications", body),
+  setWhatsapp: (optIn: boolean, version?: string) =>
+    put<NotificationChoices>("/me/notifications/whatsapp", { opt_in: optIn, consent_text_version: version ?? null }),
 };

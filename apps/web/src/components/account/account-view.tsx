@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { Car, ClipboardList, History } from "lucide-react";
 
+import { NotificationChoices } from "@/components/account/notification-choices";
 import { ErrorMessage } from "@/components/error-message";
 import { Skeleton } from "@/components/skeleton";
 import { Button } from "@/components/ui/button";
@@ -241,6 +242,8 @@ export function AccountView() {
           </ul>
         )}
       </Section>
+
+      <NotificationChoices />
 
       <DeleteAccount onDeleted={() => setDeleted(true)} />
     </div>
