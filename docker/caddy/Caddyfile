@@ -1,0 +1,64 @@
+# Reverse proxy for docker-compose.prod.yml, with automatic HTTPS (Let's Encrypt / ZeroSSL).
+# Hosts come from the root .env.prod (see .env.prod.example):
+#   WEB_DOMAIN    instantmechanic.online        -> web:3000   (www. redirects here)
+#   ADMIN_DOMAIN  admin.instantmechanic.online  -> admin:3000
+#   API_DOMAIN    api.instantmechanic.online    -> api:8000   (/api, /media, /docs)
+#   FILES_DOMAIN  files.instantmechanic.online  -> storage:8333 (SeaweedFS, only with the `storage` profile)
+# CADDY_TLS: an email address for ACME certificates in production, or `internal` for the local test (Caddy's own CA,
+# hosts localhost, localhost:8443/8444/8445: see docker-compose.prod.local.yml). HSTS_MAX_AGE: 0 locally so browsers
+# do not pin https on localhost.
+
+{
+	admin localhost:2019
+}
+
+(common) {
+	tls {$CADDY_TLS}
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age={$HSTS_MAX_AGE:31536000}"
+		X-Content-Type-Options nosniff
+		-Server
+		-X-Powered-By
+	}
+	log {
+		output stdout
+		format console
+	}
+}
+
+{$WEB_DOMAIN} {
+	import common
+	reverse_proxy web:3000
+}
+
+www.{$WEB_DOMAIN} {
+	import common
+	redir https://{$WEB_DOMAIN}{uri} permanent
+}
+
+{$ADMIN_DOMAIN} {
+	import common
+	reverse_proxy admin:3000
+}
+
+{$API_DOMAIN} {
+	import common
+	# Dataset files (DATASET_UPLOAD_MAX_MB, 25) and mechanic documents (10 MB) are the largest request bodies.
+	request_body {
+		max_size 30MB
+	}
+	# Caddy sets X-Forwarded-For to the real client (incoming values are not trusted): the API reads it with
+	# TRUST_FORWARDED_FOR=true for its per-IP limits.
+	reverse_proxy api:8000
+}
+
+# Customer photo storage (S3 API). The Host header is passed through unchanged, so presigned links signed for
+# S3_PUBLIC_ENDPOINT_URL (https://FILES_DOMAIN) verify. Unused (502) when a cloud bucket is configured instead.
+{$FILES_DOMAIN} {
+	import common
+	request_body {
+		max_size 12MB
+	}
+	reverse_proxy storage:8333
+}

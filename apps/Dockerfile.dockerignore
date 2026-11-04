@@ -1,0 +1,19 @@
+# Build context is the repo root; only the pnpm workspace goes into the web / admin images.
+*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!apps/web
+!apps/admin
+!packages/ui
+**/node_modules
+**/.next
+**/test-results
+**/playwright-report
+**/coverage
+**/*.tsbuildinfo
+**/.DS_Store
+# Never bake local env files (.env.local would override the build args); NEXT_PUBLIC_* come from build args.
+**/.env
+**/.env.*
+apps/Dockerfile*

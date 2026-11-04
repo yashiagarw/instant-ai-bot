@@ -8,6 +8,10 @@ __pycache__/
 .env
 .env.*
 !.env.example
+# Production (docker-compose.prod.yml): real files .env.prod and backend/.env.prod stay local; examples are committed.
+.env.prod
+backend/.env.prod
+!.env.prod.example
 
 # Node / Next.js (apps/web has its own .gitignore too)
 node_modules/

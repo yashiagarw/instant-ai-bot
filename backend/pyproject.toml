@@ -23,6 +23,8 @@ dependencies = [
     "qrcode>=7",
     "sentence-transformers>=6.2.0",
     "sqlalchemy>=2",
+    # Pulled in by sentence-transformers; listed so [tool.uv.sources] can point Linux at the CPU-only wheels.
+    "torch>=2.14.1,<2.15",
     "uvicorn[standard]>=0.54.0",
 ]
 
@@ -35,6 +37,16 @@ train = [
 [tool.uv]
 # Not an installable package: run from this folder (uv run uvicorn app.main:app).
 package = false
+
+# CPU-only torch on Linux (the Docker images and servers: no CUDA libraries, about 4 GB smaller). macOS keeps the
+# PyPI wheel (Apple MPS) for local development and fine-tuning.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [dependency-groups]
 dev = [

@@ -1,0 +1,251 @@
+# Production stack (Phase 5.1). Its own project name and volumes, so it never touches the development database.
+#   cp .env.prod.example .env.prod && cp backend/.env.prod.example backend/.env.prod     # then fill in both
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod build                 # one image at a time: see README
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod --profile storage up -d
+# `migrate` (alembic upgrade head) runs once before the API and the worker start, on every `up`.
+# One-off steps (fresh server): `--profile setup run --rm setup` (bucket + vehicle seed), then the import commands
+# with `run --rm tools ...` (README "Phase 5.1").
+# SeaweedFS (`storage`) is in the `storage` profile for a single server; with a cloud bucket leave the profile off and
+# point the S3_* settings in backend/.env.prod at it.
+name: autocare-prod
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+# The API, the worker and the one-off jobs share one image; only the command differs.
+x-backend: &backend
+  image: ${API_IMAGE:-autocare-api:latest}
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+    target: runtime
+    args:
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
+  env_file:
+    - path: ./backend/.env.prod
+  environment:
+    # Built here from the root .env.prod so the database credentials live in one place (use a URL-safe password).
+    DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-autocare}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}@db:5432/${POSTGRES_DB:-autocare}
+    REDIS_URL: redis://redis:6379/0
+    ENVIRONMENT: production
+    TRUST_FORWARDED_FOR: "true"
+  volumes:
+    # Not in the image: the 18 original Excel files (read only) and the pictures the importer extracts from them.
+    - ${DATA_RAW_DIR:-./data/raw}:/app/data/raw:ro
+    - ${DATA_MEDIA_DIR:-./data/media}:/app/data/media
+    # Uploaded dataset files and their build folders; real cases saved from the admin Quality page.
+    - uploads:/app/data/uploads
+    - real_cases:/app/data/eval/golden/real_cases
+  logging: *logging
+
+services:
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    environment:
+      WEB_DOMAIN: ${WEB_DOMAIN:?set WEB_DOMAIN in .env.prod}
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN:?set ADMIN_DOMAIN in .env.prod}
+      API_DOMAIN: ${API_DOMAIN:?set API_DOMAIN in .env.prod}
+      FILES_DOMAIN: ${FILES_DOMAIN:?set FILES_DOMAIN in .env.prod}
+      CADDY_TLS: ${CADDY_TLS:?set CADDY_TLS (an email address, or internal) in .env.prod}
+      HSTS_MAX_AGE: ${HSTS_MAX_AGE:-31536000}
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+      admin:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:2019/config/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging: *logging
+
+  web:
+    image: ${WEB_IMAGE:-autocare-web:latest}
+    build:
+      context: .
+      dockerfile: apps/Dockerfile
+      args:
+        APP: web
+        NEXT_PUBLIC_API_URL: https://${API_DOMAIN}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    logging: *logging
+
+  admin:
+    image: ${ADMIN_IMAGE:-autocare-admin:latest}
+    build:
+      context: .
+      dockerfile: apps/Dockerfile
+      args:
+        APP: admin
+        NEXT_PUBLIC_API_URL: https://${API_DOMAIN}
+        NEXT_PUBLIC_MAP_TILE_URL: ${NEXT_PUBLIC_MAP_TILE_URL:-}
+        NEXT_PUBLIC_MAP_ATTRIBUTION: ${NEXT_PUBLIC_MAP_ATTRIBUTION:-}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/login"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    logging: *logging
+
+  # One-off: database migrations, before the API and the worker start. Exits when done.
+  migrate:
+    <<: *backend
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *backend
+    restart: unless-stopped
+    volumes:
+      - ${DATA_RAW_DIR:-./data/raw}:/app/data/raw:ro
+      - ${DATA_MEDIA_DIR:-./data/media}:/app/data/media:ro
+      - uploads:/app/data/uploads
+      - real_cases:/app/data/eval/golden/real_cases
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/api/health', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 4
+
+  # Dataset publish pipeline (arq). Same image as the API.
+  worker:
+    <<: *backend
+    command: ["arq", "app.datasets.worker.WorkerSettings"]
+    restart: unless-stopped
+    # Let a running job's transaction end on `docker compose stop` (it is marked failed if the worker is killed).
+    stop_grace_period: 60s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "arq", "--check", "app.datasets.worker.WorkerSettings"]
+      interval: 60s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+  # One-off (profile `setup`): the private photo bucket (lifecycle + CORS) and the vehicle catalogue. Safe to re-run,
+  # but the seed resets vehicles edited on the admin Vehicles page to data/catalogue/vehicles.yaml: run it once.
+  setup:
+    <<: *backend
+    profiles: ["setup"]
+    command: ["sh", "-c", "python -m app.uploads.storage setup && python -m app.vehicles.seed"]
+    restart: "no"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      storage:
+        condition: service_healthy
+        required: false
+
+  # Any backend command (profile `tools`): docker compose ... run --rm tools python -m app.knowledge.importer --all
+  tools:
+    <<: *backend
+    profiles: ["tools"]
+    command: ["python", "-c", "print('usage: run --rm tools <command>')"]
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-autocare}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      POSTGRES_DB: ${POSTGRES_DB:-autocare}
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    logging: *logging
+
+  # Job queue only: jobs and their progress are in Postgres, so no persistence (see docker-compose.yml).
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "64mb"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    logging: *logging
+
+  # Customer photos on the same server (profile `storage`). Browsers upload through Caddy at FILES_DOMAIN
+  # (S3_PUBLIC_ENDPOINT_URL); the API uses http://storage:8333 (S3_ENDPOINT_URL). The S3 key pair and the allowed
+  # browser origin (WEB_ORIGIN) come from backend/.env.prod.
+  storage:
+    image: chrislusf/seaweedfs:3.80
+    profiles: ["storage"]
+    restart: unless-stopped
+    env_file:
+      - path: ./backend/.env.prod
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        : "$${S3_ACCESS_KEY:?set S3_ACCESS_KEY in backend/.env.prod}" "$${S3_SECRET_KEY:?set S3_SECRET_KEY in backend/.env.prod}" &&
+        : "$${WEB_ORIGIN:?set WEB_ORIGIN in backend/.env.prod}" &&
+        printf '{"identities":[{"name":"app","credentials":[{"accessKey":"%s","secretKey":"%s"}],"actions":["Admin","Read","Write","List","Tagging"]}]}'
+        "$$S3_ACCESS_KEY" "$$S3_SECRET_KEY" > /tmp/s3.json &&
+        exec weed server -dir=/data -volume.max=100 -master.volumeSizeLimitMB=64
+        -s3 -s3.port=8333 -s3.config=/tmp/s3.json -s3.allowedOrigins="$$WEB_ORIGIN"
+    volumes:
+      - storagedata_prod:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8333/healthz || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+    logging: *logging
+
+volumes:
+  pgdata_prod:
+  storagedata_prod:
+  uploads:
+  real_cases:
+  caddy_data:
+  caddy_config:

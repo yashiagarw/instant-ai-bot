@@ -78,3 +78,6 @@ class WorkerSettings:
     max_tries = 1  # a failed job is shown as failed; the admin retries it
     job_timeout = 4 * 3600  # a full eval on a laptop takes long
     keep_result = 3600
+    # Liveness key in Redis, refreshed every minute: `arq --check app.datasets.worker.WorkerSettings` (the container
+    # health check) fails once the worker stops polling.
+    health_check_interval = 60

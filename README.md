@@ -17,7 +17,9 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `data/catalogue` | Vehicle catalogue seed (editable YAML); team price sources in `parts/` |
 | `docs` | Dataset profile, findings, data model, [how the engine and LLM layer work](docs/diagnosis-engine.md), [adding a category](docs/adding-a-category.md), [fine-tuning the search model](docs/embedding-model.md) |
 | `scripts` | Offline data scripts (dataset profiler) |
-| `docker-compose.yml` | PostgreSQL 16 + pgvector, S3-compatible storage for photos (SeaweedFS), Redis for background jobs |
+| `docker-compose.yml` | Development: PostgreSQL 16 + pgvector, S3-compatible storage for photos (SeaweedFS), Redis for background jobs; the apps with hot reload under the `app` profile |
+| `docker-compose.prod.yml`, `docker/caddy` | Production stack behind Caddy with automatic HTTPS ([Phase 5.1](#phase-51-containers-and-production)) |
+| `backend/Dockerfile`, `apps/Dockerfile` | Production images: API + worker (one image), web / admin |
 
 ## Requirements
 
@@ -706,6 +708,137 @@ pnpm dev:admin                                       # http://localhost:3001 (Ov
 
 Tests: `cd backend && uv run pytest tests/test_quality.py tests/test_eval_harness.py`; `cd apps/admin && pnpm test`
 and `pnpm exec playwright test e2e/quality.spec.ts --workers=1`.
+
+## Phase 5.1: containers and production
+
+Production images for the four apps, and two compose files. Local development is unchanged: keep running the
+API, the worker and `pnpm dev` on your machine (Phase 1 run guide), with `docker compose up -d db storage redis`.
+
+| File | What |
+|---|---|
+| `backend/Dockerfile` | API **and** worker image (same image, different command). Multi-stage, uv, **CPU-only torch** (Linux wheels from the PyTorch CPU index, set in `pyproject.toml`; macOS keeps its wheel), the embedding model `EMBEDDING_MODEL` downloaded at **build** time and used offline (`HF_HUB_OFFLINE=1`), non-root user `app` (uid 10001). Target `dev` adds the dev group for hot reload |
+| `apps/Dockerfile` | Web **or** admin image (`--build-arg APP=web\|admin`): pnpm workspace, Next.js `output: "standalone"` (only when `NEXT_OUTPUT=standalone`, which the image sets: local `next start` and Playwright are unchanged), runs as the non-root `node` user. `NEXT_PUBLIC_*` are **build args** |
+| `docker-compose.yml` | Development: `db`, `storage` (SeaweedFS), `redis` as before; `api`, `worker`, `web`, `admin` with hot reload under the `app` profile |
+| `docker-compose.prod.yml` | Production, project `autocare-prod` with its **own volumes** (`pgdata_prod`, …): `caddy`, `web`, `admin`, `api`, `worker`, `db` (pgvector), `redis`, one-off `migrate`; `storage` (SeaweedFS) under the `storage` profile; one-off `setup` and `tools` |
+| `docker-compose.prod.local.yml` | Only for the local production test: publishes Caddy's extra localhost ports (see below) |
+| `docker/caddy/Caddyfile` | Reverse proxy with automatic HTTPS |
+| `.env.prod.example`, `backend/.env.prod.example` | Placeholders. The real `.env.prod` and `backend/.env.prod` are git-ignored |
+
+**Domains.** `instantmechanic.online` → web, `admin.instantmechanic.online` → admin, **`api.instantmechanic.online`**
+→ API, `files.instantmechanic.online` → photo storage. The API gets its own subdomain rather than `/api` on the main
+domain because: the API also serves `/media`, `/docs` and `/openapi.json`, which would have to be carved out of the
+web app's paths on one host; the admin app calls the API from another origin either way, so CORS is needed regardless; and it is exactly the
+setup development already uses (two app origins calling a separate API origin, CORS `WEB_ORIGIN` / `ADMIN_ORIGIN`),
+so cookies and CORS behave the same as on localhost. All three are subdomains of one site, so the SameSite customer
+and staff cookies still work. The cost is one more DNS record and certificate. Photos get their own host too
+(`files.`): presigned links are signed for the host and path the browser uses, which a path prefix would break.
+
+**Images.** API / worker: about 3.0 GB on disk, 0.9 GB to download (CPU torch is 650 MB of it, the model 460 MB;
+the default Linux torch would add several GB of CUDA libraries). Web and admin: about 300 MB each, 75 MB to download. Not in any image: `data/raw` (the 18 Excel files), `data/media` (their pictures),
+`data/uploads`, `data/models` and `.env` files; compose mounts them. The model is loaded once per process (API: the
+first free-text search; worker: the first job that embeds).
+
+### Run the production stack locally
+
+Caddy serves the stack on `https://localhost` with its own CA (`CADDY_TLS=internal`, `HSTS_MAX_AGE=0`). Locally the
+admin app, the API and the photo storage are **ports** of localhost (`:8444`, `:8443`, `:8445`) instead of
+subdomains: `localhost` has no registrable domain, so `api.localhost` would be a different *site* from `localhost` and
+browsers would withhold the API's SameSite cookies (anonymous diagnosis, login, photos). Ports do not change the site,
+so this behaves like `instantmechanic.online` and its subdomains in production. The extra ports are published by
+`docker-compose.prod.local.yml`, used only here. Ports 80, 443 and 8443-8445 must be free. The stack uses about
+1.5 GB of RAM in Docker once the model is loaded (the one-off import about 1.5 GB more); on an 8 GB Mac build one image at a time.
+
+```bash
+cp .env.prod.example .env.prod                 # set: WEB_DOMAIN=localhost API_DOMAIN=localhost:8443
+                                               #      ADMIN_DOMAIN=localhost:8444 FILES_DOMAIN=localhost:8445
+                                               #      CADDY_TLS=internal HSTS_MAX_AGE=0 and a POSTGRES_PASSWORD
+cp backend/.env.prod.example backend/.env.prod # set: WEB_ORIGIN=https://localhost ADMIN_ORIGIN=https://localhost:8444
+                                               #      S3_PUBLIC_ENDPOINT_URL=https://localhost:8445 EMAIL_PROVIDER=console,
+                                               #      new AUTH_SECRET, STAFF_TOTP_KEY, MECHANIC_DOCS_KEY, S3 key pair
+# bash / zsh helper (on a real server leave out the docker-compose.prod.local.yml part)
+dcp() { docker compose -f docker-compose.prod.yml -f docker-compose.prod.local.yml --env-file .env.prod "$@"; }
+
+dcp build api                                  # one at a time (8 GB machines): api, then web, then admin
+dcp build web
+dcp build admin
+dcp --profile storage up -d                    # migrate runs first; api and worker wait for it
+dcp --profile storage ps                       # all "healthy"; migrate "exited (0)"
+dcp --profile storage --profile setup run --rm setup   # once: photo bucket and vehicle seed
+```
+
+Then load the data with the commands of step 5 below (about 10 minutes, mostly embeddings on CPU), and open
+https://localhost (admin: https://localhost:8444, API docs: https://localhost:8443/docs). The browser warns about
+the certificate once per port; to trust Caddy's CA instead (macOS):
+`docker compose -p autocare-prod cp caddy:/data/caddy/pki/authorities/local/root.crt caddy-root.crt`, open it and
+mark it trusted in Keychain Access. The login code of the console SMS provider is refused in production mode, so
+customer login is not available locally unless MSG91 is configured.
+
+Stop with `dcp --profile storage down` (add `-v` to delete the production volumes; the development database is a
+different volume of a different project and is never touched).
+
+### Fresh server
+
+1. A Linux server with Docker (Compose 2.24+), 2 vCPU / 4 GB RAM or more. DNS A (and AAAA) records for the four
+   hosts point at it; ports 80 and 443 open.
+2. Clone the repo. Copy the 18 Excel files to `data/raw/` (or set `DATA_RAW_DIR`), and give the app user the
+   pictures folder: `mkdir -p data/media && sudo chown -R 10001:10001 data/media`.
+3. `cp .env.prod.example .env.prod` and `cp backend/.env.prod.example backend/.env.prod`; replace every
+   placeholder (the comments say how to generate each secret). `CADDY_TLS` is your email for certificate notices.
+   Single server: keep the `storage` profile and `S3_ENDPOINT_URL=http://storage:8333`,
+   `S3_PUBLIC_ENDPOINT_URL=https://files.<domain>`. Cloud bucket: point the `S3_*` settings at it and leave the
+   `storage` profile off (Caddy's `files.` host is then unused).
+4. Build and start (as above, without the localhost values): `dcp build api && dcp build web && dcp build admin`,
+   then `dcp --profile storage up -d`.
+5. One-off setup and data import, in this order (each `run --rm` starts a container from the API image and exits):
+
+```bash
+dcp --profile storage --profile setup run --rm setup                     # bucket + CORS + lifecycle, vehicle seed
+dcp run --rm tools python -m app.knowledge.importer --all               # the 18 datasets (+ pictures into data/media)
+dcp run --rm tools python -m app.knowledge.questions load --all
+dcp run --rm tools python -m app.knowledge.merges apply
+dcp run --rm tools python -m app.knowledge.requirements apply
+dcp run --rm tools python -m app.knowledge.phrases load
+dcp run --rm tools python -m app.knowledge.safety_triggers apply
+dcp run --rm tools python -m app.vision.catalogue seed
+dcp run --rm tools python -m app.knowledge.embeddings sync
+dcp run --rm tools python -m app.parts build
+dcp restart api                                                           # loads the new safety rules
+dcp run --rm tools python -m app.admin.cli create-super-admin --email you@example.com --name "Your Name"
+```
+
+6. Sign in at `https://admin.<domain>`, open **Datasets** and **publish** the imported version once (Phase 4.3). From
+   then on category files are uploaded there and the worker runs every step. The importer's review outputs
+   (`data/review/…`) are written inside the one-off container; the reviewed files themselves are part of the image,
+   so a change to them ships with a rebuild.
+
+Updating: `git pull`, rebuild the images (one at a time), `dcp --profile storage up -d` (migrations run first). A
+change to `NEXT_PUBLIC_*`, the domains or `EMBEDDING_MODEL` needs a rebuild of the image that bakes it in.
+
+### Development in containers (optional)
+
+```bash
+docker compose --profile app up --build        # db, storage, redis + api :8000, worker, web :3000, admin :3001
+```
+
+Same ports as the host processes, so stop those first. The API and the worker read `backend/.env` (the database,
+Redis and storage addresses are switched to the containers); the web apps read their `.env.local`. Code changes
+reload the API (uvicorn `--reload`), the worker (`arq --watch`) and both apps (`next dev`). `node_modules` for Linux
+and the downloaded model live in named volumes, so the host's macOS `node_modules` and `.venv` are untouched.
+
+### Tests
+
+```bash
+cd backend && uv run pytest tests/test_deploy_config.py tests/test_uploads_setup.py   # compose / Dockerfile rules,
+                                                                                      # bucket CORS
+# Smoke test of the running local production stack through Caddy (after the data import; Caddy's certificates are
+# accepted in this mode): API health and CORS, a real diagnosis start with a photo upload to the storage and back,
+# the admin sign-in page and its headers, the storage's CORS for the web origin and not for others.
+cd apps/web && E2E_BASE_URL=https://localhost E2E_API_URL=https://localhost:8443 E2E_ADMIN_URL=https://localhost:8444 \
+  E2E_FILES_URL=https://localhost:8445 pnpm exec playwright test e2e/prod-smoke.spec.ts --workers=1
+```
+
+`E2E_BASE_URL` makes the web Playwright config test a running deployment instead of building and starting its own
+server; without it every suite runs as before.
 
 ## LLM layer (off by default)
 

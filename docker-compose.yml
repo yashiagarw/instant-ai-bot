@@ -1,7 +1,10 @@
-# Local services: PostgreSQL 16 with pgvector, S3-compatible storage for customer photos (SeaweedFS) and Redis for
-# background jobs (the dataset publish pipeline's worker runs outside Docker: see README).
+# Development. Local services: PostgreSQL 16 with pgvector, S3-compatible storage for customer photos (SeaweedFS) and
+# Redis for background jobs. The API, worker and web apps usually run on the host (README "Phase 1 run guide"):
 #   docker compose up -d db storage redis
-# Values come from the root .env (copy .env.example); defaults match it.
+# Or run everything in containers with hot reload (profile `app`; stop the host processes first, same ports):
+#   docker compose --profile app up --build
+# Values come from the root .env (copy .env.example) and backend/.env; defaults match them.
+# Production is docker-compose.prod.yml (README "Phase 5.1").
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -48,7 +51,8 @@ services:
     volumes:
       - storagedata:/data
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8333/healthz || exit 1"]
+      # 127.0.0.1, not localhost: localhost is ::1 in the container and SeaweedFS listens on IPv4 only.
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8333/healthz || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -67,6 +71,121 @@ services:
       timeout: 3s
       retries: 10
 
+  # ---------------------------------------------------------------- app containers (profile `app`, hot reload)
+  # Same image as production up to its dependencies (backend/Dockerfile target dev, with the dev group), the source
+  # bind-mounted. Reads backend/.env like the host API; only the addresses of the other containers are changed.
+  api:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: dev
+    image: autocare-api-dev
+    env_file:
+      - path: ./backend/.env
+        required: false
+    environment: &dev-backend-env
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-autocare}:${POSTGRES_PASSWORD:-autocare}@db:5432/${POSTGRES_DB:-autocare}
+      TEST_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-autocare}:${POSTGRES_PASSWORD:-autocare}@db:5432/${POSTGRES_TEST_DB:-autocare_test}
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT_URL: http://storage:8333
+      S3_PUBLIC_ENDPOINT_URL: http://localhost:${S3_PORT:-8333}
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "app", "--reload-dir", "engine"]
+    ports:
+      - "8000:8000"
+    volumes: &dev-backend-volumes
+      - ./backend:/app/backend
+      - ./data:/app/data
+      - hfcache:/opt/hf # the embedding model, downloaded once
+    depends_on: &dev-backend-deps
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/api/health', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 4
+
+  worker:
+    profiles: ["app"]
+    image: autocare-api-dev
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: dev
+    env_file:
+      - path: ./backend/.env
+        required: false
+    environment: *dev-backend-env
+    # --watch restarts the worker when backend code changes (the host command has no reload)
+    command: ["arq", "app.datasets.worker.WorkerSettings", "--watch", "app"]
+    volumes: *dev-backend-volumes
+    depends_on: *dev-backend-deps
+
+  # Installs the pnpm workspace for Linux once (named volumes: the host's macOS node_modules stay untouched).
+  node-deps:
+    profiles: ["app"]
+    image: &node-image node:24-alpine
+    working_dir: /repo
+    command: ["sh", "-c", "npm install -g pnpm@10.33.0 >/dev/null && pnpm install --frozen-lockfile --store-dir /pnpm-store"]
+    environment:
+      CI: "1"
+    volumes:
+      - .:/repo
+      - node_modules:/repo/node_modules
+      - node_modules_web:/repo/apps/web/node_modules
+      - node_modules_admin:/repo/apps/admin/node_modules
+      - node_modules_ui:/repo/packages/ui/node_modules
+      - pnpm_store:/pnpm-store # outside the repo bind mount
+
+  web:
+    profiles: ["app"]
+    image: *node-image
+    working_dir: /repo/apps/web
+    # NEXT_PUBLIC_API_URL comes from apps/web/.env.local (http://localhost:8000: the browser calls the API directly)
+    command: ["sh", "-c", "exec node_modules/.bin/next dev --hostname 0.0.0.0 --port 3000"]
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/repo
+      - node_modules:/repo/node_modules
+      - node_modules_web:/repo/apps/web/node_modules
+      - node_modules_admin:/repo/apps/admin/node_modules
+      - node_modules_ui:/repo/packages/ui/node_modules
+      - next_web:/repo/apps/web/.next
+    depends_on:
+      node-deps:
+        condition: service_completed_successfully
+
+  admin:
+    profiles: ["app"]
+    image: *node-image
+    working_dir: /repo/apps/admin
+    command: ["sh", "-c", "exec node_modules/.bin/next dev --hostname 0.0.0.0 --port 3001"]
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/repo
+      - node_modules:/repo/node_modules
+      - node_modules_web:/repo/apps/web/node_modules
+      - node_modules_admin:/repo/apps/admin/node_modules
+      - node_modules_ui:/repo/packages/ui/node_modules
+      - next_admin:/repo/apps/admin/.next
+    depends_on:
+      node-deps:
+        condition: service_completed_successfully
+
 volumes:
   pgdata:
   storagedata:
+  hfcache:
+  node_modules:
+  node_modules_web:
+  node_modules_admin:
+  node_modules_ui:
+  pnpm_store:
+  next_web:
+  next_admin:

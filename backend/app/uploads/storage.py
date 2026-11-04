@@ -4,7 +4,8 @@ Keys: `incoming/<upload id>` is what the browser sends (presigned POST, size-lim
 after processing and expired by a lifecycle rule after a day); `photos/<upload id>.jpg` is the re-encoded photo. The
 bucket is private: photos are only ever reached through short-lived signed links.
 
-    uv run python -m app.uploads.storage setup   # create the bucket, block public access, expire incoming/ after 1 day
+    uv run python -m app.uploads.storage setup   # create the bucket, block public access, expire incoming/ after 1 day,
+                                                 # and let the web app (WEB_ORIGIN) post uploads to it (CORS)
 """
 
 import sys
@@ -40,6 +41,7 @@ class S3Storage:
             "config": Config(signature_version="s3v4", s3={"addressing_style": "path"}, retries={"max_attempts": 2}),
         }
         self.bucket = settings.s3_bucket
+        self.web_origin = settings.web_origin
         self.client = boto3.client("s3", endpoint_url=settings.s3_endpoint_url, **common)
         # Links handed to browsers are signed for the address the browser uses.
         self.public = boto3.client(
@@ -125,7 +127,32 @@ class S3Storage:
             )
         except ClientError:
             notes.append("public access block not supported (the bucket has no public policy)")
+        try:  # browsers post the presigned form straight to the bucket, from the web app only
+            self.client.put_bucket_cors(Bucket=self.bucket, CORSConfiguration=cors_rules(self.web_origin))
+            # Read it back: some servers (SeaweedFS 3.80) accept the call but keep nothing.
+            self.client.get_bucket_cors(Bucket=self.bucket)
+        except ClientError:
+            notes.append(
+                f"bucket CORS not supported: allow POST from {self.web_origin} in the storage's own settings "
+                "(SeaweedFS: -s3.allowedOrigins, set from WEB_ORIGIN in docker-compose)"
+            )
         return notes
+
+
+def cors_rules(web_origin: str) -> dict:
+    """Bucket CORS: the web app (WEB_ORIGIN) may POST the presigned upload form and GET signed links. Nothing else."""
+    return {
+        "CORSRules": [
+            {
+                "ID": "web-app-uploads",
+                "AllowedOrigins": [web_origin.rstrip("/")],
+                "AllowedMethods": ["POST", "GET", "HEAD"],
+                "AllowedHeaders": ["*"],
+                "ExposeHeaders": ["ETag"],
+                "MaxAgeSeconds": 3600,
+            }
+        ]
+    }
 
 
 class MemoryStorage:
