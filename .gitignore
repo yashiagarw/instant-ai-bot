@@ -28,3 +28,6 @@ data/uploads/
 # Fine-tuned embedding models (hundreds of MB; rebuild with `cd backend && uv run --extra train python -m
 # app.knowledge.finetune train`, see docs/embedding-model.md)
 data/models/
+
+CLAUDE.md
+REVIEW_NOTES.md
