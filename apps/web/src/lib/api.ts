@@ -343,6 +343,8 @@ export interface RankedFault {
   rank: number;
   fault_key: string;
   name: string;
+  /** Reviewed Hindi (Devanagari) name, when the team has one (Phase 5.5); never machine-translated. */
+  name_hi?: string | null;
   category: string;
   score: number;
   confidence: Confidence;
@@ -453,6 +455,8 @@ export interface ServiceRequestIn {
   consent_text_version: string;
   whatsapp_optin?: boolean;
   whatsapp_consent_version?: string | null;
+  /** The language the customer used on the site (Phase 5.5); notifications follow it. */
+  language?: "en" | "hi";
 }
 
 export interface ServiceRequestOut {

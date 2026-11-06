@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { Check, LoaderCircle, Pencil } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
@@ -16,17 +17,16 @@ export interface Note {
 
 /** "We understood: ..." for one message; tapping it offers to take the message back and edit it. */
 function UnderstoodChip({ note, onCorrect, busy }: { note: Note; onCorrect: () => void; busy: boolean }) {
+  const t = useTranslations("diagnose");
   const [open, setOpen] = useState(false);
   const panel = useId();
-  const understood = note.items.length
-    ? `We understood: ${note.items.join(" · ")}`
-    : "We added this to your description";
+  const understood = note.items.length ? t("understood", { items: note.items.join(" · ") }) : t("addedToDescription");
   const chip =
     "inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border-2 border-orange-text/30 bg-warm-white px-4 py-2 text-left text-base font-semibold text-ink";
   return (
     <li className="flex flex-col items-start gap-2">
       <p className="max-w-full rounded-2xl rounded-br-sm bg-ink/5 px-4 py-2 text-ink">
-        <span className="sr-only">You wrote: </span>
+        <span className="sr-only">{t("youWrote")}</span>
         {note.text}
       </p>
       {note.correctable ? (
@@ -39,7 +39,7 @@ function UnderstoodChip({ note, onCorrect, busy }: { note: Note; onCorrect: () =
         >
           <Check aria-hidden="true" className="size-5 shrink-0 text-orange-text" />
           <span className="min-w-0 break-words">{understood}</span>
-          <span className="sr-only">. Tap to correct.</span>
+          <span className="sr-only">{t("tapToCorrect")}</span>
         </button>
       ) : (
         <p className={chip}>
@@ -49,7 +49,7 @@ function UnderstoodChip({ note, onCorrect, busy }: { note: Note; onCorrect: () =
       )}
       {note.correctable && open && (
         <div id={panel} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-white p-3">
-          <p className="text-ink">Not what you meant?</p>
+          <p className="text-ink">{t("notWhatYouMeant")}</p>
           <Button
             type="button"
             variant="outline"
@@ -62,7 +62,7 @@ function UnderstoodChip({ note, onCorrect, busy }: { note: Note; onCorrect: () =
             ) : (
               <Pencil aria-hidden="true" className="size-5" />
             )}
-            Edit my message
+            {t("editMessage")}
           </Button>
         </div>
       )}
@@ -88,21 +88,22 @@ export function ReplyBox({
   sending: string | null;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
 }) {
+  const t = useTranslations("diagnose");
   const id = useId();
   const [error, setError] = useState<string | null>(null);
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!draft.trim()) {
-      setError("Type a few words first, or tap one of the answers above.");
+      setError(t("replyError"));
       return;
     }
     setError(null);
     onSend();
   }
   return (
-    <section aria-label="Type your reply" className="flex flex-col gap-4">
+    <section aria-label={t("replyRegion")} className="flex flex-col gap-4">
       {notes.length > 0 && (
-        <ul aria-label="Your messages" aria-live="polite" className="flex flex-col gap-4">
+        <ul aria-label={t("yourMessages")} aria-live="polite" className="flex flex-col gap-4">
           {notes.map((n, i) => (
             <UnderstoodChip key={i} note={n} onCorrect={onCorrect} busy={sending === "undo-message"} />
           ))}
@@ -110,10 +111,10 @@ export function ReplyBox({
       )}
       <form onSubmit={submit} noValidate className="flex flex-col gap-3">
         <label htmlFor={id} className="text-lg font-bold text-ink">
-          Or type your answer in your own words
+          {t("replyLabel")}
         </label>
         <p id={`${id}-hint`} className="text-ink/75">
-          English, Hindi or Hinglish. For example: &ldquo;hawa 2 din mein kam ho jaati hai&rdquo;.
+          {t("replyHint")}
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
           <textarea
@@ -131,11 +132,11 @@ export function ReplyBox({
             {sending === "message" && (
               <LoaderCircle aria-hidden="true" className="size-5 animate-spin motion-reduce:animate-none" />
             )}
-            Send
+            {t("send")}
           </Button>
         </div>
         {error && (
-          <p id={`${id}-error`} className="text-sm font-semibold text-orange-text">
+          <p id={`${id}-error`} role="alert" className="text-sm font-semibold text-orange-text">
             {error}
           </p>
         )}

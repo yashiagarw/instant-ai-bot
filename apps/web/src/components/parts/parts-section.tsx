@@ -24,11 +24,14 @@ export function PartsSection({
   faultName,
   variantId,
   segment,
+  lang,
 }: {
   faultKey: string;
   faultName: string;
   variantId: number | null | undefined;
   segment: PriceSegment | null;
+  /** "en" on the Hindi result page: this section is English only for now. */
+  lang?: string;
 }) {
   const id = useId();
   const [all, setAll] = useState(false);
@@ -38,7 +41,7 @@ export function PartsSection({
   );
 
   return (
-    <section aria-labelledby={`${id}-heading`} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5">
+    <section lang={lang} aria-labelledby={`${id}-heading`} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5">
       <div>
         <h2 id={`${id}-heading`} className="flex items-center gap-2 text-2xl font-black text-ink">
           <Package aria-hidden="true" className="size-6 text-orange-text" />

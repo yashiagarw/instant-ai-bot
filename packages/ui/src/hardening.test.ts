@@ -87,6 +87,16 @@ describe("Content-Security-Policy", () => {
     expect(dev).toContain("frame-src 'none'");
   });
 
+  test("3D (web): WebAssembly and blob: workers for the Draco decoder, nothing wider", () => {
+    const web = contentSecurityPolicy({ apiUrl: "https://api.instantmechanic.online", threeD: true, dev: false });
+    const w = Object.fromEntries(web.split("; ").map((x) => [x.split(" ")[0], x.split(" ").slice(1)]));
+    expect(w["script-src"]).toEqual(["'self'", "'unsafe-inline'", "'wasm-unsafe-eval'"]);
+    expect(w["worker-src"]).toEqual(["'self'", "blob:"]);
+    expect(web).not.toContain("'unsafe-eval'"); // JavaScript eval stays blocked
+    expect(web).not.toMatch(/gstatic|cdn/i); // the decoder is self-hosted
+    expect(d["worker-src"]).toEqual(["'self'"]); // off unless asked for (admin)
+  });
+
   test("the other headers", () => {
     const h = Object.fromEntries(securityHeaders({ dev: false, referrer: "strict-origin-when-cross-origin", camera: true }).map((x) => [x.key, x.value]));
     expect(h["X-Frame-Options"]).toBe("DENY");

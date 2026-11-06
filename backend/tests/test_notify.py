@@ -189,6 +189,24 @@ def test_customer_language_comes_from_the_diagnosis(db_session, settings):
     assert rows(db_session, template="job_offer")[0].language == settings.notify_mechanic_language
 
 
+def test_the_language_picked_on_the_site_wins_over_detection(db_session, settings):
+    # Phase 5.5: a customer who used the Hindi pages gets Hindi notifications even if they typed in English, and
+    # one who used the English pages gets English even after typing Hinglish.
+    from app.diagnosis.models import DiagnosisSession, EventType, SessionEvent
+
+    ds = DiagnosisSession(vehicle_snapshot={}, engine_version="v2")
+    db_session.add(ds)
+    db_session.flush()
+    db_session.add(
+        SessionEvent(session_id=ds.id, event_type=EventType.free_text, payload={"text": "gaadi garam ho rahi hai"})
+    )
+    hi, en = req(db_session, ref="IM-TEST03"), req(db_session, ref="IM-TEST04", session_id=ds.id)
+    hi.language, en.language = "hi", "en"
+    assert (notify.customer_language(db_session, hi), notify.customer_language(db_session, en)) == ("hi", "en")
+    en.language = None  # not sent: detected from the words
+    assert notify.customer_language(db_session, en) == "hi"
+
+
 # ---------------------------------------------------------------- sending: retries, fallback, missing credentials
 
 

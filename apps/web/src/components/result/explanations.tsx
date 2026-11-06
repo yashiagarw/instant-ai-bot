@@ -2,20 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { CircleMinus, CircleCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Skeleton } from "@/components/skeleton";
 import { type Confidence, type Explanation, type RankedFault, streamExplanations } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-const WORD: Record<Confidence, string> = { high: "High", medium: "Medium", low: "Low" };
 const STEPS: Record<Confidence, number> = { high: 3, medium: 2, low: 1 };
 
-/** Confidence as a word with a 3-step meter and the reason for it. */
+/** Confidence as a word with a 3-step meter and the reason for it. The meter is a real meter for screen readers
+ * (role="meter", 1 to 3, with the word as its value text); the word itself is shown too. */
 export function ConfidenceMeter({ level, reason }: { level: Confidence; reason: string }) {
+  const t = useTranslations("result.confidence");
+  const word = t(level);
   return (
     <div data-testid="confidence" className="flex flex-col gap-1.5">
       <div className="flex items-center gap-3">
-        <span aria-hidden="true" className="flex gap-1">
+        <span
+          role="meter"
+          aria-label={t("label")}
+          aria-valuemin={1}
+          aria-valuemax={3}
+          aria-valuenow={STEPS[level]}
+          aria-valuetext={t("steps", { level: word, n: STEPS[level] })}
+          className="flex gap-1"
+        >
           {[1, 2, 3].map((step) => (
             <span
               key={step}
@@ -24,12 +35,17 @@ export function ConfidenceMeter({ level, reason }: { level: Confidence; reason: 
             />
           ))}
         </span>
-        <p className="font-bold text-ink">
-          {WORD[level]} confidence
-          <span className="sr-only"> ({STEPS[level]} of 3)</span>
+        <p className="font-bold text-ink" aria-hidden="true">
+          {word}
+          <span className="sr-only"> {t("outOf", { n: STEPS[level] })}</span>
         </p>
       </div>
-      {reason && <p className="text-ink/80">{reason}</p>}
+      {/* The reason comes from the engine in English. */}
+      {reason && (
+        <p className="text-ink/80" lang="en">
+          {reason}
+        </p>
+      )}
     </div>
   );
 }
@@ -71,6 +87,7 @@ export function CauseExplanation({ explanation, loading }: { explanation?: Expla
 
 /** Reasons for the cause, then what doesn't fit it. */
 export function EvidenceList({ fault, headingLevel = 3 }: { fault: RankedFault; headingLevel?: 3 | 4 }) {
+  const t = useTranslations("result");
   const H = headingLevel === 3 ? "h3" : "h4";
   const items = fault.evidence_items ?? [];
   const forIt = items.filter((e) => e.supports);
@@ -80,7 +97,7 @@ export function EvidenceList({ fault, headingLevel = 3 }: { fault: RankedFault; 
     <div className="flex flex-col gap-3 rounded-2xl bg-warm-white p-4">
       {forIt.length > 0 && (
         <section>
-          <H className="font-bold text-ink">Why we think this</H>
+          <H className="font-bold text-ink">{t("whyWeThink")}</H>
           <ul className="mt-2 flex flex-col gap-1.5">
             {forIt.map((e, i) => (
               <li key={i} className="flex gap-2 text-ink/90">
@@ -93,7 +110,7 @@ export function EvidenceList({ fault, headingLevel = 3 }: { fault: RankedFault; 
       )}
       {against.length > 0 && (
         <section>
-          <H className="font-bold text-ink">What doesn&apos;t fit</H>
+          <H className="font-bold text-ink">{t("whatDoesntFit")}</H>
           <ul className="mt-2 flex flex-col gap-1.5">
             {against.map((e, i) => (
               <li key={i} className="flex gap-2 text-ink/90">

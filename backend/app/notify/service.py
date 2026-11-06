@@ -216,7 +216,11 @@ def _user_phone(session: Session, user_id) -> str | None:
 
 
 def customer_language(session: Session, req) -> str:
-    """From the diagnosis: what the customer typed (Hindi / Hinglish -> hi), else English."""
+    """The language the customer picked on the site (Phase 5.5) when the request has one; else from the diagnosis:
+    what the customer typed (Hindi / Hinglish -> hi), else English."""
+    picked = getattr(req, "language", None)
+    if picked in T.LANGUAGES:
+        return picked
     if req.session_id is None:
         return "en"
     from app.diagnosis.models import EventType, SessionEvent

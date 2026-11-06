@@ -46,3 +46,8 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Draco decoder, copied from three by scripts/copy-draco.mjs before dev and build
+/public/draco/
+# Service worker, written by scripts/service-worker.mjs before dev and build (one id per build)
+/public/sw.js

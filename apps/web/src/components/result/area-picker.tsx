@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { MapPin } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import type { Area, ZoneCode } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function AreaPicker({
   onChange: (area: Area) => void;
   note?: string;
 }) {
+  const t = useTranslations("result.area");
   const name = useId();
   const [pin, setPin] = useState(area && "pincode" in area ? area.pincode : "");
   const [error, setError] = useState("");
@@ -34,7 +36,7 @@ export function AreaPicker({
   function applyPincode() {
     const p = pin.replace(/\s/g, "");
     if (!/^\d{6}$/.test(p)) {
-      setError("Enter a 6-digit pincode");
+      setError(t("badPincode"));
       return;
     }
     setError("");
@@ -43,10 +45,10 @@ export function AreaPicker({
 
   return (
     <fieldset className="flex flex-col gap-3 rounded-2xl bg-warm-white p-4" data-testid="area-picker">
-      <legend className="sr-only">Your area</legend>
+      <legend className="sr-only">{t("title")}</legend>
       <p aria-hidden="true" className="flex items-center gap-2 font-bold text-ink">
         <MapPin className="size-5 text-orange-text" />
-        Your area
+        {t("title")}
       </p>
       <div className="flex flex-wrap gap-2">
         {ZONES.map((z) => {
@@ -80,7 +82,7 @@ export function AreaPicker({
       </div>
       <div className="flex flex-col gap-1.5">
         <label htmlFor={`${name}-pin`} className="text-sm font-semibold text-ink/80">
-          Or your pincode
+          {t("pincode")}
         </label>
         <div className="flex gap-2">
           <input
@@ -100,17 +102,17 @@ export function AreaPicker({
             onClick={applyPincode}
             className="h-11 rounded-full border-2 border-ink/15 bg-white px-4 font-bold text-ink outline-none hover:border-cta/60 focus-visible:ring-3 focus-visible:ring-ring"
           >
-            Use pincode
+            {t("usePincode")}
           </button>
         </div>
         {error && (
-          <p id={`${name}-pin-error`} className="text-sm font-semibold text-orange-text">
+          <p id={`${name}-pin-error`} role="alert" className="text-sm font-semibold text-orange-text">
             {error}
           </p>
         )}
       </div>
       <p className="text-sm text-ink/80" data-testid="area-note" aria-live="polite">
-        {note || METRO_LABEL}
+        {note || t("metro")}
       </p>
     </fieldset>
   );

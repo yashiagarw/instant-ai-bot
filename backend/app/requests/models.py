@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from enum import StrEnum
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Index, Integer, Text, func
+from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -74,6 +74,10 @@ class ServiceRequest(CreatedAtMixin, Base):
     status: Mapped[RequestStatus] = mapped_column(
         str_enum(RequestStatus, "status"), default=RequestStatus.submitted, server_default="submitted"
     )
+    # The language the customer used on the site (Phase 5.5: "en" or "hi", from the web app's language switch);
+    # notifications about this request use it. NULL: older requests, or not sent: the language is detected from the
+    # customer's own words instead.
+    language: Mapped[str | None] = mapped_column(String(5))
     consent_given: Mapped[bool] = mapped_column()
     # Version id of the consent wording shown, e.g. "request-v1".
     consent_text_version: Mapped[str] = mapped_column(Text)

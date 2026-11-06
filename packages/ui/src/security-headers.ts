@@ -3,6 +3,9 @@
 //   our own files; the API (NEXT_PUBLIC_API_URL); the photo storage (NEXT_PUBLIC_FILES_URL: SeaweedFS behind Caddy,
 //   or a cloud bucket) for uploads and signed photo links; Sentry's ingest host (from NEXT_PUBLIC_SENTRY_DSN) when
 //   it is on; Cloudflare Turnstile (web); the map tile host (admin, src/lib/map-tiles.ts).
+// 3D car (web, Phase 5.5; `threeD`): the Draco decoder for the car model is WebAssembly ('wasm-unsafe-eval': compile
+// WebAssembly only, not JavaScript eval) and runs in a Web Worker that three.js creates from a blob: URL
+// (worker-src blob:). The decoder files themselves are ours (/draco/), so no other host is added.
 // Web push needs no CSP entry (the browser talks to its push service itself; the service worker is our own file).
 //
 // Scripts: 'self' plus 'unsafe-inline', as Next.js documents for apps without nonces. Nonces would force every page
@@ -16,6 +19,8 @@ export interface CspOptions {
   sentryDsn?: string;
   extraImg?: string[];
   turnstile?: boolean;
+  /** The 3D car's Draco decoder (WebAssembly in a blob: worker). */
+  threeD?: boolean;
   dev: boolean;
 }
 
@@ -38,13 +43,13 @@ export function contentSecurityPolicy(o: CspOptions): string {
   const https = !!api && api.startsWith("https://");
   const directives = [
     `default-src 'self'`,
-    `script-src ${list("'self'", "'unsafe-inline'", o.dev && "'unsafe-eval'", o.turnstile && TURNSTILE)}`,
+    `script-src ${list("'self'", "'unsafe-inline'", o.threeD && "'wasm-unsafe-eval'", o.dev && "'unsafe-eval'", o.turnstile && TURNSTILE)}`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src ${list("'self'", "data:", "blob:", api, files, ...(o.extraImg ?? []))}`,
     `font-src 'self'`,
     `connect-src ${list("'self'", api, files, sentry, o.turnstile && TURNSTILE)}`,
     `frame-src ${o.turnstile ? TURNSTILE : "'none'"}`,
-    `worker-src 'self'`,
+    `worker-src ${list("'self'", o.threeD && "blob:")}`,
     `manifest-src 'self'`,
     `object-src 'none'`,
     `base-uri 'self'`,

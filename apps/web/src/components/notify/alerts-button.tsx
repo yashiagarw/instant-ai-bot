@@ -5,6 +5,7 @@ import { BellOff, BellRing, LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { notifyApi } from "@/lib/api";
+import { getServiceWorkerRegistration, registerServiceWorker, serviceWorkerSupported } from "@/lib/service-worker";
 
 type State = "checking" | "unavailable" | "unsupported" | "denied" | "off" | "busy" | "on";
 
@@ -18,11 +19,11 @@ export function keyBytes(base64url: string): Uint8Array<ArrayBuffer> {
 }
 
 function supported(): boolean {
-  return typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  return serviceWorkerSupported() && "PushManager" in window && "Notification" in window;
 }
 
 async function currentSubscription(): Promise<PushSubscription | null> {
-  const reg = await navigator.serviceWorker.getRegistration("/");
+  const reg = await getServiceWorkerRegistration();
   return (await reg?.pushManager.getSubscription()) ?? null;
 }
 
@@ -58,7 +59,8 @@ export function AlertsButton({ onChange }: { onChange?: (on: boolean) => void })
         setState(permission === "denied" ? "denied" : "off");
         return;
       }
-      const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+      const reg = await registerServiceWorker();
+      if (!reg) throw new Error("no service worker");
       await navigator.serviceWorker.ready;
       const sub =
         (await reg.pushManager.getSubscription()) ??

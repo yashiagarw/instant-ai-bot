@@ -1,4 +1,7 @@
+"use client";
+
 import { BadgeCheck, CircleHelp, Gauge } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import type { CoverageLevel } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -24,7 +27,9 @@ export const COVERAGE: Record<CoverageLevel, { label: string; explain: string; c
   },
 };
 
+/** The coverage level, required on every result: the badge (with "Coverage:" for screen readers) and what it means. */
 export function CoverageBadge({ level }: { level: CoverageLevel }) {
+  const t = useTranslations("result.coverage");
   const c = COVERAGE[level];
   return (
     <div className="flex flex-col gap-1.5" data-testid="coverage">
@@ -32,9 +37,10 @@ export function CoverageBadge({ level }: { level: CoverageLevel }) {
         className={cn("inline-flex items-center gap-1.5 self-start rounded-full border px-3 py-1 text-sm font-bold", c.className)}
       >
         <c.Icon aria-hidden="true" className="size-4" />
-        {c.label}
+        <span className="sr-only">{t("label")}: </span>
+        {t(level)}
       </span>
-      <p className="text-sm text-ink/75">{c.explain}</p>
+      <p className="text-sm text-ink/75">{t(`${level}Explain`)}</p>
     </div>
   );
 }

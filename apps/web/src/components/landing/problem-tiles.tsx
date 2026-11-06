@@ -24,9 +24,12 @@ import {
   Zap,
 } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { ErrorMessage } from "@/components/error-message";
 import { Skeleton } from "@/components/skeleton";
 import { api, type Topic } from "@/lib/api";
+import { useLocaleHref, useSiteLocale } from "@/i18n/navigation";
 import { useLoad } from "@/lib/use-load";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -61,11 +64,19 @@ export function TopicIcon({ code, className }: { code: string; className?: strin
 
 type State = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; topics: Topic[] };
 
+/** The topic's name in the page's language: Hindi pages show the Hindi label (a draft until the team reviews it). */
+export function useTopicLabel() {
+  const locale = useSiteLocale();
+  return (topic: Topic) => (locale === "hi" && topic.label_hi ? topic.label_hi : topic.label);
+}
+
 function TopicLink({ topic, emergency = false }: { topic: Topic; emergency?: boolean }) {
   const Icon = ICONS[topic.code] ?? Wrench;
+  const href = useLocaleHref();
+  const label = useTopicLabel();
   return (
     <Link
-      href={`/diagnose?topic=${encodeURIComponent(topic.code)}`}
+      href={href(`/diagnose?topic=${encodeURIComponent(topic.code)}`)}
       className={
         emergency
           ? "flex min-h-12 items-center gap-2 rounded-full border-2 border-ink/15 bg-white px-4 py-2 font-semibold text-ink outline-none hover:border-cta focus-visible:ring-3 focus-visible:ring-ring"
@@ -73,13 +84,14 @@ function TopicLink({ topic, emergency = false }: { topic: Topic; emergency?: boo
       }
     >
       <Icon aria-hidden="true" className={emergency ? "size-5 text-orange-text" : "size-7 text-orange-text"} />
-      <span>{topic.label}</span>
+      <span>{label(topic)}</span>
     </Link>
   );
 }
 
 /** Problem tiles and the emergency row, from GET /api/categories. */
 export function ProblemTiles() {
+  const t = useTranslations("landing");
   const { state: load, retry } = useLoad("categories", (signal) => api.categories(signal));
   const state: State = load.status === "ready" ? { status: "ready", topics: load.data.topics } : load;
 
@@ -90,9 +102,9 @@ export function ProblemTiles() {
     <>
       <section aria-labelledby="emergency-heading" className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
         <h2 id="emergency-heading" className="text-2xl font-black tracking-tight text-ink">
-          Need help right now?
+          {t("helpNow")}
         </h2>
-        <p className="mt-1 text-ink/75">Stuck on the road? Get safety steps and ask for a mechanic.</p>
+        <p className="mt-1 text-ink/75">{t("helpNowText")}</p>
         <div className="mt-4" aria-busy={state.status === "loading"}>
           {state.status === "loading" && (
             <div className="flex flex-wrap gap-2">
@@ -115,13 +127,13 @@ export function ProblemTiles() {
 
       <section aria-labelledby="tiles-heading" className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
         <h2 id="tiles-heading" className="text-3xl font-black tracking-tight text-ink sm:text-4xl">
-          What&apos;s the problem?
+          {t("whatsWrong")}
         </h2>
         <div className="mt-6" aria-busy={state.status === "loading"}>
           {state.status === "loading" && (
             <>
               <span className="sr-only" role="status">
-                Loading problems…
+                {t("loadingProblems")}
               </span>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {Array.from({ length: 8 }, (_, i) => (

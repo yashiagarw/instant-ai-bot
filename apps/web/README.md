@@ -24,6 +24,11 @@ Brand colour tokens live in `src/app/globals.css` (`bg-brand`, `bg-cta`, `text-o
   The choice is saved in sessionStorage (`im.diagnosis.vehicle`) for the Problem step.
 
 - `/diagnose/[sessionId]`: the questions, one at a time. `/diagnose/[sessionId]/result`: the result (shareable).
+- Hindi (Phase 5.5): `/hi`, `/hi/diagnose`, `/hi/diagnose/[sessionId]` and `/hi/diagnose/[sessionId]/result`. The pages
+  live in `src/app/[locale]/`; English addresses are rewritten to `/en/…` in `next.config.ts`. Messages:
+  `src/i18n/messages/` (Hindi drafts to review: `docs/hindi-review.md`).
+- 3D car: `src/components/car3d/` (loaded with next/dynamic, never in the chat), parts per category in
+  `src/lib/car-parts.ts`, model built by `pnpm build:car`, skipped by `src/lib/three-d.ts`.
 - `/request?session=…`: Request a Mechanic, prefilled from the diagnosis; urgent for emergencies; confirmation
   with a reference number. The consent wording and the helpline come from `GET /api/service-requests/config`.
 

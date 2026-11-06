@@ -1,28 +1,21 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { ChoiceGroup } from "@/components/choice-group";
 import { TextField } from "@/components/text-field";
 import { Button } from "@/components/ui/button";
 import type { Fuel, PriceSegment, Transmission } from "@/lib/api";
+import { useVehicleLabels } from "@/lib/use-vehicle-labels";
 import { FUEL_LABELS, SEGMENT_LABELS, TRANSMISSION_LABELS, type VehicleChoice } from "@/lib/vehicle";
 
 const UNSURE = "unsure";
 type Unsure = typeof UNSURE;
 
-const FUELS: { value: Fuel | Unsure; label: string }[] = [
-  ...(Object.entries(FUEL_LABELS) as [Fuel, string][]).map(([value, label]) => ({ value, label })),
-  { value: UNSURE, label: "Not sure" },
-];
-const TRANSMISSIONS: { value: Transmission | Unsure; label: string }[] = [
-  ...(Object.entries(TRANSMISSION_LABELS) as [Transmission, string][]).map(([value, label]) => ({ value, label })),
-  { value: UNSURE, label: "Not sure" },
-];
-const SEGMENTS: { value: PriceSegment | Unsure; label: string }[] = [
-  ...(Object.entries(SEGMENT_LABELS) as [PriceSegment, string][]).map(([value, label]) => ({ value, label })),
-  { value: UNSURE, label: "Not sure" },
-];
+const FUEL_KEYS = Object.keys(FUEL_LABELS) as Fuel[];
+const TRANSMISSION_KEYS = Object.keys(TRANSMISSION_LABELS) as Transmission[];
+const SEGMENT_KEYS = Object.keys(SEGMENT_LABELS) as PriceSegment[];
 
 const MIN_YEAR = 1980;
 
@@ -38,6 +31,22 @@ interface Errors {
 /** Make, model and year typed in; fuel, transmission and rough price picked. Saved to unlisted_vehicles by the
  * API when the diagnosis starts. */
 export function UnlistedCarForm({ onDone, onCancel }: { onDone: (c: VehicleChoice) => void; onCancel: () => void }) {
+  const t = useTranslations("diagnose");
+  const tc = useTranslations("common");
+  const labels = useVehicleLabels();
+  const notSure = { value: UNSURE, label: tc("notSure") } as const;
+  const FUELS: { value: Fuel | Unsure; label: string }[] = [
+    ...FUEL_KEYS.map((value) => ({ value, label: labels.fuel(value) })),
+    notSure,
+  ];
+  const TRANSMISSIONS: { value: Transmission | Unsure; label: string }[] = [
+    ...TRANSMISSION_KEYS.map((value) => ({ value, label: labels.transmission(value) })),
+    notSure,
+  ];
+  const SEGMENTS: { value: PriceSegment | Unsure; label: string }[] = [
+    ...SEGMENT_KEYS.map((value) => ({ value, label: labels.segment(value) })),
+    notSure,
+  ];
   const maxYear = new Date().getFullYear() + 1;
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -51,15 +60,15 @@ export function UnlistedCarForm({ onDone, onCancel }: { onDone: (c: VehicleChoic
     e.preventDefault();
     const y = Number(year);
     const next: Errors = {
-      make: make.trim() ? undefined : "Type the make, for example Maruti Suzuki.",
-      model: model.trim() ? undefined : "Type the model, for example Gypsy.",
+      make: make.trim() ? undefined : t("errMake"),
+      model: model.trim() ? undefined : t("errModel"),
       year:
         Number.isInteger(y) && y >= MIN_YEAR && y <= maxYear
           ? undefined
-          : `Type the year as 4 digits, between ${MIN_YEAR} and ${maxYear}.`,
-      fuel: fuel ? undefined : "Pick a fuel, or Not sure.",
-      transmission: transmission ? undefined : "Pick a gearbox, or Not sure.",
-      segment: segment ? undefined : "Pick a price range, or Not sure.",
+          : t("errYear", { min: MIN_YEAR, max: maxYear }),
+      fuel: fuel ? undefined : t("errFuel"),
+      transmission: transmission ? undefined : t("errGearbox"),
+      segment: segment ? undefined : t("errSegment"),
     };
     setErrors(next);
     if (Object.values(next).some(Boolean)) {
@@ -85,34 +94,34 @@ export function UnlistedCarForm({ onDone, onCancel }: { onDone: (c: VehicleChoic
     <form onSubmit={submit} noValidate aria-labelledby="unlisted-heading" className="flex flex-col gap-7">
       <div>
         <h2 id="unlisted-heading" className="text-2xl font-black tracking-tight text-ink">
-          Tell us about your car
+          {t("unlistedTitle")}
         </h2>
-        <p className="mt-1 text-ink/75">We&apos;ll still help. Your answers help us add more cars.</p>
+        <p className="mt-1 text-ink/75">{t("unlistedText")}</p>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
-        <TextField label="Make" value={make} onChange={setMake} error={errors.make} autoComplete="off" maxLength={60} />
-        <TextField label="Model" value={model} onChange={setModel} error={errors.model} autoComplete="off" maxLength={60} />
+        <TextField label={t("make")} value={make} onChange={setMake} error={errors.make} autoComplete="off" maxLength={60} />
+        <TextField label={t("model")} value={model} onChange={setModel} error={errors.model} autoComplete="off" maxLength={60} />
         <TextField
-          label="Year"
+          label={t("year")}
           value={year}
           onChange={setYear}
           error={errors.year}
           inputMode="numeric"
           pattern="[0-9]*"
           maxLength={4}
-          placeholder="e.g. 2015"
+          placeholder={t("yearPlaceholder")}
         />
       </div>
-      <ChoiceGroup legend="Fuel" choices={FUELS} value={fuel} onChange={setFuel} error={errors.fuel} />
+      <ChoiceGroup legend={t("fuel")} choices={FUELS} value={fuel} onChange={setFuel} error={errors.fuel} />
       <ChoiceGroup
-        legend="Gearbox"
+        legend={t("gearbox")}
         choices={TRANSMISSIONS}
         value={transmission}
         onChange={setTransmission}
         error={errors.transmission}
       />
       <ChoiceGroup
-        legend="Roughly what did the car cost new?"
+        legend={t("pricePaid")}
         choices={SEGMENTS}
         value={segment}
         onChange={setSegment}
@@ -121,10 +130,10 @@ export function UnlistedCarForm({ onDone, onCancel }: { onDone: (c: VehicleChoic
       />
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button type="submit" size="cta">
-          Continue
+          {tc("continue")}
         </Button>
         <Button type="button" size="cta" variant="outline" className="border-2 border-ink/15 bg-white text-ink" onClick={onCancel}>
-          Back to the car list
+          {t("backToList")}
         </Button>
       </div>
     </form>

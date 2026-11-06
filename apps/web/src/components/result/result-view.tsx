@@ -4,12 +4,15 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useId, useState } from "react";
 import { ChevronDown, CircleHelp, RotateCcw, ShieldAlert, Truck, Wrench } from "lucide-react";
+import { useTranslations } from "next-intl";
 
+import { ResultCar } from "@/components/car3d/result-car";
 import { CarSummary } from "@/components/diagnose/car-summary";
+import { MotionCta } from "@/components/motion/motion-cta";
 import { ErrorMessage } from "@/components/error-message";
 import { PhotoGallery, photoAlerts, usePhotos } from "@/components/diagnose/photo-findings";
 import { PartsSection } from "@/components/parts/parts-section";
-import { AreaPicker, METRO_LABEL } from "@/components/result/area-picker";
+import { AreaPicker } from "@/components/result/area-picker";
 import { EstimateCard, type EstimateState } from "@/components/result/estimate-card";
 import { CoverageBadge } from "@/components/result/coverage-badge";
 import { CauseExplanation, ConfidenceMeter, EvidenceList, useExplanations } from "@/components/result/explanations";
@@ -30,9 +33,13 @@ import {
   type RoadsideVerdict,
 } from "@/lib/api";
 import { repeats, roadsideText, towingText } from "@/lib/format";
+import en from "@/i18n/messages/site.en.json";
+import { useLocaleHref, useSiteLocale } from "@/i18n/navigation";
 import { useLoad } from "@/lib/use-load";
 import { cn } from "@/lib/utils";
 
+// Roadside verdicts are safety and towing advice: English (lang="en") on the Hindi pages too, until reviewed Hindi
+// exists (Phase 5.5).
 const VERDICT: Record<Exclude<RoadsideVerdict, "unknown">, { label: string; advice: string; tone: string }> = {
   roadside_fix_possible: {
     label: "Can usually be fixed on the road",
@@ -56,12 +63,22 @@ const VERDICT: Record<Exclude<RoadsideVerdict, "unknown">, { label: string; advi
   },
 };
 
-const CONFIDENCE = { high: "High confidence", medium: "Medium confidence", low: "Low confidence" } as const;
+/** Text from the dataset or the engine is English: marked so on the Hindi pages (screen readers, fonts). */
+function useEnglishContent(): "en" | undefined {
+  return useSiteLocale() === "hi" ? "en" : undefined;
+}
 
-function List({ items, ordered = false }: { items: string[]; ordered?: boolean }) {
+/** A fault's name: the reviewed Hindi one on Hindi pages when it exists, else English. Never machine-translated. */
+function useFaultName() {
+  const locale = useSiteLocale();
+  return (f: RankedFault): { text: string; lang?: "en" | "hi" } =>
+    locale === "hi" && f.name_hi ? { text: f.name_hi, lang: "hi" } : { text: f.name, lang: locale === "hi" ? "en" : undefined };
+}
+
+function List({ items, ordered = false, lang }: { items: string[]; ordered?: boolean; lang?: string }) {
   const Tag = ordered ? "ol" : "ul";
   return (
-    <Tag className={cn("mt-2 flex flex-col gap-1.5 pl-5 text-ink/90", ordered ? "list-decimal" : "list-disc")}>
+    <Tag lang={lang} className={cn("mt-2 flex flex-col gap-1.5 pl-5 text-ink/90", ordered ? "list-decimal" : "list-disc")}>
       {items.map((t, i) => (
         <li key={i}>{t}</li>
       ))}
@@ -73,12 +90,14 @@ const SHOWN_STEPS = 5;
 
 /** The mechanic's steps: the first few, the rest behind "Show all". */
 function Steps({ items }: { items: string[] }) {
+  const t = useTranslations("result");
+  const lang = useEnglishContent();
   const id = useId();
   const [all, setAll] = useState(false);
   const hidden = items.length - SHOWN_STEPS;
   return (
     <>
-      <ol id={id} className="mt-2 flex list-decimal flex-col gap-1.5 pl-5 text-ink/90">
+      <ol id={id} lang={lang} className="mt-2 flex list-decimal flex-col gap-1.5 pl-5 text-ink/90">
         {(all ? items : items.slice(0, SHOWN_STEPS)).map((t, i) => (
           <li key={i}>{t}</li>
         ))}
@@ -91,7 +110,7 @@ function Steps({ items }: { items: string[] }) {
           onClick={() => setAll((v) => !v)}
           className="mt-2 inline-flex min-h-11 items-center rounded-full font-bold text-orange-text underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-ring"
         >
-          {all ? "Show fewer steps" : `Show all ${items.length} steps`}
+          {all ? t("showFewerSteps") : t("showAllSteps", { count: items.length })}
         </button>
       )}
     </>
@@ -100,12 +119,15 @@ function Steps({ items }: { items: string[] }) {
 
 /** Steps, what you can do, what the mechanic will do and pictures; sections with no content are left out. */
 function FaultDetails({ fault, verdict, headingLevel = 2 }: { fault: RankedFault; verdict: RoadsideVerdict; headingLevel?: 2 | 3 }) {
+  const t = useTranslations("result");
+  const lang = useEnglishContent();
+  const name = useFaultName()(fault).text;
   const H = headingLevel === 2 ? "h2" : "h3";
   const advice = verdict !== "unknown" ? VERDICT[verdict].advice : null;
   return (
     <div className="flex flex-col gap-5">
       {fault.media.length > 0 && (
-        <section aria-label={`Illustrations for ${fault.name}`}>
+        <section aria-label={t("illustrations", { name })}>
           <ul className="grid gap-3 sm:grid-cols-2">
             {[...fault.media]
               .sort((a, b) => (a.role === b.role ? 0 : a.role === "main" ? -1 : 1))
@@ -116,15 +138,19 @@ function FaultDetails({ fault, verdict, headingLevel = 2 }: { fault: RankedFault
                       {/* eslint-disable-next-line @next/next/no-img-element -- pictures come from the API's /media */}
                       <img
                         src={mediaUrl(m.file)}
-                        alt={m.caption ? `Illustration: ${m.caption}` : `Illustration for ${fault.name}`}
+                        alt={m.caption ? t("illustrationAlt", { caption: m.caption }) : t("illustrationFor", { name })}
                         loading="lazy"
                         className="aspect-[4/3] w-full bg-warm-white object-contain"
                       />
                       <span className="absolute top-2 left-2 rounded-full bg-ink/80 px-2 py-0.5 text-xs font-bold text-white">
-                        Illustration
+                        {t("illustration")}
                       </span>
                     </div>
-                    {m.caption && <figcaption className="p-3 text-sm text-ink/80">{m.caption}</figcaption>}
+                    {m.caption && (
+                      <figcaption lang={lang} className="p-3 text-sm text-ink/80">
+                        {m.caption}
+                      </figcaption>
+                    )}
                   </figure>
                 </li>
               ))}
@@ -135,18 +161,22 @@ function FaultDetails({ fault, verdict, headingLevel = 2 }: { fault: RankedFault
         <section className="flex flex-col gap-4">
           <H className="flex items-center gap-2 text-lg font-black text-ink">
             <Wrench aria-hidden="true" className="size-5 text-orange-text" />
-            Repair recommendation
+            {t("repairRecommendation")}
           </H>
-          {advice && <p className="font-semibold text-ink">{advice}</p>}
+          {advice && (
+            <p lang="en" className="font-semibold text-ink">
+              {advice}
+            </p>
+          )}
           {fault.what_you_can_do.length > 0 && (
             <div>
-              <p className="font-bold text-ink">What you can do</p>
-              <List items={fault.what_you_can_do} />
+              <p className="font-bold text-ink">{t("whatYouCanDo")}</p>
+              <List items={fault.what_you_can_do} lang={lang} />
             </div>
           )}
           {fault.what_the_mechanic_will_do.length > 0 && (
             <div>
-              <p className="font-bold text-ink">What the mechanic will do</p>
+              <p className="font-bold text-ink">{t("whatMechanicWillDo")}</p>
               <Steps items={fault.what_the_mechanic_will_do} />
             </div>
           )}
@@ -154,8 +184,8 @@ function FaultDetails({ fault, verdict, headingLevel = 2 }: { fault: RankedFault
       )}
       {fault.diagnostic_steps.length > 0 && (
         <section>
-          <H className="text-lg font-black text-ink">How it&apos;s checked</H>
-          <List items={fault.diagnostic_steps} ordered />
+          <H className="text-lg font-black text-ink">{t("howChecked")}</H>
+          <List items={fault.diagnostic_steps} ordered lang={lang} />
         </section>
       )}
     </div>
@@ -163,10 +193,13 @@ function FaultDetails({ fault, verdict, headingLevel = 2 }: { fault: RankedFault
 }
 
 function RequestButton({ sessionId, sticky = false }: { sessionId: string; sticky?: boolean }) {
+  const tc = useTranslations("common");
   const button = (
-    <Button asChild size="cta" className="w-full md:w-auto">
-      <Link href={`/request?session=${sessionId}`}>Request a Mechanic</Link>
-    </Button>
+    <MotionCta className="flex *:flex-1 md:*:flex-none">
+      <Button asChild size="cta" className="w-full md:w-auto">
+        <Link href={`/request?session=${sessionId}`}>{tc("requestMechanic")}</Link>
+      </Button>
+    </MotionCta>
   );
   if (!sticky) return button;
   return (
@@ -191,14 +224,24 @@ function useEstimates(sessionId: string, area: Area) {
   return { data, stateFor };
 }
 
-function areaNote(data: Estimates | null): string {
-  if (!data) return METRO_LABEL;
-  if (data.zone.label) return `Labour priced for ${data.zone.label}`;
-  return data.zone.source === "pincode" ? data.zone.note : METRO_LABEL;
+function useAreaNote() {
+  const t = useTranslations("result.area");
+  return (data: Estimates | null): string => {
+    if (!data) return t("metro");
+    if (data.zone.label) return t("labourFor", { zone: data.zone.label });
+    return data.zone.source === "pincode" ? data.zone.note : t("metro");
+  };
 }
 
 function Result({ r }: { r: ResultOut }) {
+  const t = useTranslations("result");
+  const tc = useTranslations("common");
+  const href = useLocaleHref();
+  const lang = useEnglishContent();
+  const faultName = useFaultName();
+  const areaNote = useAreaNote();
   const [top, ...others] = r.ranked;
+  const topName = top ? faultName(top) : null;
   const [area, setArea] = useState<Area>(null);
   const estimates = useEstimates(r.session_id, area);
   const zoneLabel = estimates.data?.zone.label ?? null;
@@ -218,54 +261,57 @@ function Result({ r }: { r: ResultOut }) {
 
       {r.status === "in_progress" && (
         <p className="rounded-2xl border border-border bg-white p-4 text-ink">
-          This diagnosis isn&apos;t finished yet, so this is the ranking so far.{" "}
-          <Link href={`/diagnose/${r.session_id}`} className="font-bold text-orange-text underline underline-offset-4">
-            Continue the questions
+          {t("notFinished")}{" "}
+          <Link href={href(`/diagnose/${r.session_id}`)} className="font-bold text-orange-text underline underline-offset-4">
+            {t("continueQuestions")}
           </Link>
         </p>
       )}
 
       <header className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5">
-        <h1 className="text-3xl leading-tight font-black tracking-tight text-ink sm:text-4xl">Your result</h1>
+        <h1 className="text-3xl leading-tight font-black tracking-tight text-ink sm:text-4xl">{t("title")}</h1>
         <CarSummary vehicle={r.vehicle} topic={r.topic} />
         <CoverageBadge level={r.coverage_level} />
       </header>
 
-      <PhotoGallery photos={photos} />
+      <div lang={lang} className="contents">
+        <PhotoGallery photos={photos} />
+      </div>
 
       {fastTrack && (
         <section aria-labelledby="tips-heading" className="flex flex-col gap-4 rounded-3xl border-2 border-cta bg-white p-5">
           <h2 id="tips-heading" className="flex items-center gap-2 text-2xl font-black text-ink">
             <ShieldAlert aria-hidden="true" className="size-6 text-orange-text" />
-            {r.mode === "inspect" ? "Book an inspection" : "Stay safe while help comes"}
+            {r.mode === "inspect" ? t("inspectionTitle") : <span lang="en">Stay safe while help comes</span>}
           </h2>
-          {r.safety_tips.length > 0 && <List items={r.safety_tips} />}
+          {/* Safety tips: English until reviewed Hindi exists (never machine-translated). */}
+          {r.safety_tips.length > 0 && <List items={r.safety_tips} lang="en" />}
           <RequestButton sessionId={r.session_id} />
         </section>
       )}
 
       {!top && !fastTrack && (
         <p className="rounded-3xl border border-border bg-white p-5 text-ink">
-          We couldn&apos;t narrow this down from your answers. A mechanic can inspect the car and find the cause.
+          {t("couldNotNarrow")}
         </p>
       )}
 
       {top && (
         <article aria-labelledby="top-cause" className="flex flex-col gap-5 rounded-3xl border-2 border-cta bg-white p-5 sm:p-7">
           <div className="flex flex-col gap-3">
-            <p className="text-sm font-bold tracking-wide text-orange-text uppercase">Most likely cause</p>
-            <h2 id="top-cause" className="text-3xl leading-tight font-black tracking-tight text-ink">
-              {top.name}
+            <p className="text-sm font-bold tracking-wide text-orange-text uppercase">{t("mostLikely")}</p>
+            <h2 id="top-cause" lang={topName?.lang} className="text-3xl leading-tight font-black tracking-tight text-ink">
+              {topName?.text}
             </h2>
             <ConfidenceMeter level={top.confidence} reason={top.confidence_reason} />
           </div>
-          <div aria-live="polite">
+          <div aria-live="polite" lang={lang}>
             <CauseExplanation explanation={explanations.items[top.fault_key]} loading={streaming} />
           </div>
           <EvidenceList fault={top} />
 
           {verdict !== "unknown" && (
-            <section className={cn("rounded-2xl border p-4", VERDICT[verdict].tone)} data-testid="roadside">
+            <section lang="en" className={cn("rounded-2xl border p-4", VERDICT[verdict].tone)} data-testid="roadside">
               <h3 className="flex items-center gap-2 text-lg font-black">
                 <Truck aria-hidden="true" className="size-5" />
                 {VERDICT[verdict].label}
@@ -284,7 +330,7 @@ function Result({ r }: { r: ResultOut }) {
               <AreaPicker area={area} onChange={setArea} note={areaNote(estimates.data)} />
               {verifying && (
                 <p className="px-1 text-sm text-ink/75" data-testid="verifying-note">
-                  Prices are being verified with our mechanics.
+                  {t("verifyingPrices")}
                 </p>
               )}
             </div>
@@ -301,8 +347,13 @@ function Result({ r }: { r: ResultOut }) {
         </article>
       )}
 
+      {/* The diagnosed system on a 3D car (never in the question chat). */}
+      {top && <ResultCar category={top.category} />}
+
+      {/* Parts catalogue and photo findings: English only for now (shared with the English /parts and request pages). */}
       {top && !fastTrack && (
         <PartsSection
+          lang={lang}
           faultKey={top.fault_key}
           faultName={top.name}
           variantId={r.vehicle.variant_id}
@@ -315,10 +366,10 @@ function Result({ r }: { r: ResultOut }) {
           <CircleHelp aria-hidden="true" className="mt-1 size-6 shrink-0 text-orange-text" />
           <div>
             <h2 id="uncertainty-heading" className="text-lg font-black text-ink">
-              We&apos;re not certain yet
+              {t("notCertain")}
             </h2>
             {r.uncertainty.map((u) => (
-              <p key={u.code} className="mt-1 text-ink/90">
+              <p key={u.code} lang={lang} className="mt-1 text-ink/90">
                 {u.message}
               </p>
             ))}
@@ -329,14 +380,16 @@ function Result({ r }: { r: ResultOut }) {
       {others.length > 0 && (
         <section aria-labelledby="others-heading" className="flex flex-col gap-3">
           <h2 id="others-heading" className="text-xl font-black text-ink">
-            Other possible causes
+            {t("otherCauses")}
           </h2>
           {others.map((f) => (
             <details key={f.fault_key} className="group rounded-3xl border border-border bg-white">
               <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-3xl p-4 outline-none focus-visible:ring-3 focus-visible:ring-ring">
                 <span>
-                  <span className="block font-bold text-ink">{f.name}</span>
-                  <span className="text-sm text-ink/70">{CONFIDENCE[f.confidence]}</span>
+                  <span lang={faultName(f).lang} className="block font-bold text-ink">
+                    {faultName(f).text}
+                  </span>
+                  <span className="text-sm text-ink/70">{t(`confidence.${f.confidence}`)}</span>
                 </span>
                 <ChevronDown
                   aria-hidden="true"
@@ -345,7 +398,7 @@ function Result({ r }: { r: ResultOut }) {
               </summary>
               <div className="flex flex-col gap-4 border-t border-border p-4">
                 <ConfidenceMeter level={f.confidence} reason={f.confidence_reason} />
-                <div aria-live="polite">
+                <div aria-live="polite" lang={lang}>
                   <CauseExplanation explanation={explanations.items[f.fault_key]} loading={streaming} />
                 </div>
                 <EvidenceList fault={f} />
@@ -368,27 +421,28 @@ function Result({ r }: { r: ResultOut }) {
         <section aria-labelledby="not-fixed" className="rounded-3xl border border-border bg-white p-5">
           <h2 id="not-fixed" className="flex items-center gap-2 text-xl font-black text-ink">
             <RotateCcw aria-hidden="true" className="size-5 text-orange-text" />
-            If this doesn&apos;t fix it
+            {t("ifNotFixed")}
           </h2>
-          <List items={r.if_not_fixed} />
+          <List items={r.if_not_fixed} lang={lang} />
         </section>
       )}
 
       {!fastTrack && r.safety_tips.length > 0 && (
         <section aria-labelledby="safety-tips" className="rounded-3xl border border-border bg-white p-5">
-          <h2 id="safety-tips" className="text-xl font-black text-ink">
+          <h2 id="safety-tips" lang="en" className="text-xl font-black text-ink">
             Safety tips
           </h2>
-          <List items={r.safety_tips} />
+          {/* English until reviewed Hindi exists (never machine-translated). */}
+          <List items={r.safety_tips} lang="en" />
         </section>
       )}
 
       {r.answers.length > 0 && (
         <details className="rounded-3xl border border-border bg-white">
           <summary className="flex min-h-14 cursor-pointer items-center rounded-3xl p-4 font-bold text-ink outline-none focus-visible:ring-3 focus-visible:ring-ring">
-            Your answers ({r.answers.length})
+            {t("yourAnswers", { count: r.answers.length })}
           </summary>
-          <dl className="flex flex-col gap-3 border-t border-border p-4">
+          <dl lang={lang} className="flex flex-col gap-3 border-t border-border p-4">
             {r.answers.map((a, i) => (
               <div key={i}>
                 <dt className="text-sm text-ink/70">{a.question}</dt>
@@ -400,7 +454,14 @@ function Result({ r }: { r: ResultOut }) {
       )}
 
       <p className="rounded-2xl bg-white p-4 text-sm text-ink/80" data-testid="disclaimer">
-        {r.disclaimer || DISCLAIMER}
+        {/* Every result shows the disclaimer: the standard one in the page's language, any other text as sent. */}
+        {!r.disclaimer || r.disclaimer === DISCLAIMER ? (
+          tc("disclaimer")
+        ) : r.disclaimer === en.result.disclaimer ? (
+          t("disclaimer")
+        ) : (
+          <span lang="en">{r.disclaimer}</span>
+        )}
       </p>
 
       <FeedbackForm sessionId={r.session_id} />
@@ -414,10 +475,11 @@ function Result({ r }: { r: ResultOut }) {
 }
 
 function ResultSkeleton() {
+  const t = useTranslations("result");
   return (
     <div className="flex flex-col gap-6" aria-busy="true">
       <span role="status" className="sr-only">
-        Loading your result…
+        {t("loading")}
       </span>
       <Skeleton className="h-36 rounded-3xl" />
       <Skeleton className="h-80 rounded-3xl" />
@@ -426,17 +488,37 @@ function ResultSkeleton() {
   );
 }
 
+// Phase 5.5: the result's text is the page's largest paint, and it comes from the API. Start that request as soon as
+// this code arrives in the browser, before React has hydrated the page; ResultView picks the promise up.
+let early: { id: string; result: Promise<ResultOut> } | null = null;
+if (typeof window !== "undefined") {
+  const m = /\/diagnose\/([^/]+)\/result\/?$/.exec(window.location.pathname);
+  if (m) {
+    const result = api.result(decodeURIComponent(m[1]));
+    result.catch(() => undefined); // an error is shown by ResultView (which asks again on Try again)
+    early = { id: decodeURIComponent(m[1]), result };
+  }
+}
+function earlyResult(id: string): Promise<ResultOut> | null {
+  if (early?.id !== id) return null;
+  const { result } = early;
+  early = null; // once: Try again and later visits ask the API again
+  return result;
+}
+
 /** The result page; works on its own from a shared link (everything comes from the session id). */
 export function ResultView() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const result = useLoad(`result:${sessionId}`, (signal) => api.result(sessionId, signal));
+  const t = useTranslations("result");
+  const href = useLocaleHref();
+  const result = useLoad(`result:${sessionId}`, (signal) => earlyResult(sessionId) ?? api.result(sessionId, signal));
   if (result.state.status === "loading") return <ResultSkeleton />;
   if (result.state.status === "error") {
     return (
       <div className="flex flex-col gap-4">
         <ErrorMessage message={result.state.message} onRetry={result.retry} />
-        <Link href="/diagnose" className="font-bold text-orange-text underline underline-offset-4">
-          Start a new diagnosis
+        <Link href={href("/diagnose")} className="font-bold text-orange-text underline underline-offset-4">
+          {t("startNew")}
         </Link>
       </div>
     );

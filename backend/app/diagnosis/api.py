@@ -405,6 +405,7 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
     result = service.current_result(session, engine, ds)
     top = result.ranked[:3]
     details = service.public_details(session, engine, [r.fault_id for r in top])
+    hindi = service.hindi_names(session, [r.fault_id for r in top])
     costs = service.estimated_costs(session, ds, [r.fault_id for r in top])  # one source of truth: app.estimates
     lead_key = top[0].fault_key if top else None
     lead = engine.k.faults[top[0].fault_id] if top else None
@@ -423,6 +424,7 @@ def get_result(ds: SessionDep, session: DbSession, engine: EngineDep):
                 rank=i,
                 fault_key=r.fault_key,
                 name=r.name,
+                name_hi=hindi.get(r.fault_id),
                 category=r.category,
                 score=r.score,
                 confidence=r.confidence,

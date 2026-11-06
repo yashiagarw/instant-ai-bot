@@ -8,6 +8,7 @@ import { BellRing, Home, LoaderCircle, UserRound } from "lucide-react";
 import { LangProvider, useT } from "@/components/m/i18n";
 import { cn } from "@/lib/utils";
 import { mechanicApi, MechanicApiError, type MechanicMe } from "@/lib/mechanic-api";
+import { registerServiceWorker } from "@/lib/service-worker";
 
 type MeState = { me: MechanicMe; refresh: () => Promise<void>; setMe: (m: MechanicMe) => void };
 const MeCtx = createContext<MeState | null>(null);
@@ -24,10 +25,8 @@ export const PRIMARY = cn(BIG, "bg-cta text-white");
 export const SECONDARY = cn(BIG, "border-2 border-ink bg-white text-ink");
 
 function registerWorker() {
-  // The site's one service worker (/sw.js): the offline shell for /m, and offer alerts.
-  if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => undefined);
-  }
+  // The site's one service worker (/sw.js): the offline shell for /m, and offer alerts (not under `pnpm dev`).
+  registerServiceWorker().catch(() => undefined);
 }
 
 /** Every signed-in page of the mechanic app: loads who they are (or sends them to sign in) and adds the tabs. */

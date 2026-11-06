@@ -1,21 +1,30 @@
 // The site's one service worker (scope "/"), registered by the customer "Turn on alerts" card and by the mechanic
-// app (/m). Two jobs:
+// app (/m). Served as /sw.js: scripts/service-worker.mjs writes public/sw.js from this file before every build, with
+// __BUILD_ID__ replaced by an id unique to that build (`pnpm dev` gets sw.dev-reset.js instead: no worker in dev).
+//
+// Two jobs:
 // 1. Alerts (web push): shows one notification per message from the server (backend/app/notify/push.py:
 //    {title, body, url, tag}) and opens our own site when it is tapped.
 // 2. Offline shell for the mechanic app: pages under /m are network-first and kept for when the phone has no signal
 //    (slow 4G), with /m/offline.html as the last resort; built JS/CSS (/_next/static, immutable) and the icons are
-//    cache-first. Nothing else is cached: API calls go to the API's own address and are never stored, so no
-//    customer or job data stays on the phone.
+//    cache-first. Nothing else is cached: customer pages always come from the network, and API calls go to the API's
+//    own address and are never stored, so no customer or job data stays on the phone.
+//
+// Updates (Phase 5.5): every build is a new worker (its id changes the file). It takes over at once (skipWaiting +
+// clients.claim) and deletes every cache of earlier builds, so no page or chunk outlives a deploy.
 
-const SHELL = "im-m-shell-v1";
-const STATIC = "im-static-v1";
+const BUILD = "__BUILD_ID__";
+const PREFIX = "im-";
+const SHELL = `${PREFIX}m-shell-${BUILD}`;
+const STATIC = `${PREFIX}static-${BUILD}`;
 const OFFLINE = "/m/offline.html";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(SHELL)
-      .then((cache) => cache.addAll([OFFLINE, "/icons/mechanic-192.png"]))
+      // Straight from the network, not the browser's HTTP cache: the offline page of this build.
+      .then((cache) => cache.addAll([OFFLINE, "/icons/mechanic-192.png"].map((u) => new Request(u, { cache: "reload" }))))
       .catch(() => undefined) // installing must not fail on a bad connection
       .then(() => self.skipWaiting()),
   );
@@ -25,7 +34,12 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== SHELL && k !== STATIC).map((k) => caches.delete(k))))
+      // Every cache of ours from another build (and the unversioned ones from before Phase 5.5) goes.
+      .then((keys) =>
+        Promise.all(
+          keys.filter((k) => k.startsWith(PREFIX) && k !== SHELL && k !== STATIC).map((k) => caches.delete(k)),
+        ),
+      )
       .then(() => self.clients.claim()),
   );
 });
@@ -62,9 +76,13 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return; // the API and anything else: straight to the network
-  if (request.mode === "navigate" && isMechanicPage(url)) {
-    event.respondWith(networkFirst(request, url));
-  } else if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+  if (request.mode === "navigate") {
+    // Pages: the mechanic app network-first (offline copy); every other page straight from the network.
+    if (isMechanicPage(url)) event.respondWith(networkFirst(request, url));
+    return;
+  }
+  // Built files have a content hash in their name and never change; kept only for this build (see "activate").
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
     event.respondWith(cacheFirst(request));
   }
 });

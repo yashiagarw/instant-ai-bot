@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CarFront, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { ChoiceGroup } from "@/components/choice-group";
 import { UnlistedCarForm } from "@/components/diagnose/unlisted-car-form";
@@ -12,16 +13,8 @@ import { Button } from "@/components/ui/button";
 import { api, type Fuel, type Make, type Model, type Transmission, type Variant } from "@/lib/api";
 import { useLoad } from "@/lib/use-load";
 import { cn } from "@/lib/utils";
-import {
-  FUEL_LABELS,
-  matching,
-  SEGMENT_LABELS,
-  splitMakes,
-  TRANSMISSION_LABELS,
-  unique,
-  type VehicleChoice,
-  yearsOf,
-} from "@/lib/vehicle";
+import { useVehicleLabels } from "@/lib/use-vehicle-labels";
+import { matching, splitMakes, unique, type VehicleChoice, yearsOf } from "@/lib/vehicle";
 
 function TileSkeletons({ count, label }: { count: number; label: string }) {
   return (
@@ -40,6 +33,8 @@ function TileSkeletons({ count, label }: { count: number; label: string }) {
 
 /** A finished pick shown as a summary with a Change button. */
 function Picked({ label, value, onChange }: { label: string; value: string; onChange: () => void }) {
+  const t = useTranslations("diagnose");
+  const tc = useTranslations("common");
   return (
     <div className="flex min-h-14 items-center justify-between gap-3 rounded-full border-2 border-cta/40 bg-white py-1.5 pr-1.5 pl-5">
       <p className="text-ink">
@@ -49,23 +44,24 @@ function Picked({ label, value, onChange }: { label: string; value: string; onCh
       <Button
         type="button"
         variant="ghost"
-        aria-label={`Change ${label.toLowerCase()}`}
+        aria-label={t("changeField", { field: label.toLowerCase() })}
         className="h-11 px-4 text-base font-semibold text-orange-text"
         onClick={onChange}
       >
-        Change
+        {tc("change")}
       </Button>
     </div>
   );
 }
 
 function MakeTiles({ makes, onPick }: { makes: Make[]; onPick: (m: Make) => void }) {
+  const t = useTranslations("diagnose");
   const [showAll, setShowAll] = useState(false);
   const { popular, others } = splitMakes(makes);
   const shown = showAll ? [...popular, ...others] : popular;
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-lg font-bold text-ink">Or pick the make</h2>
+      <h2 className="text-lg font-bold text-ink">{t("pickMake")}</h2>
       <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         {shown.map((m) => (
           <li key={m.id}>
@@ -86,7 +82,7 @@ function MakeTiles({ makes, onPick }: { makes: Make[]; onPick: (m: Make) => void
           className="h-12 self-start border-2 border-ink/15 bg-white px-5 text-base font-semibold"
           onClick={() => setShowAll(true)}
         >
-          More makes ({others.length})
+          {t("moreMakes", { count: others.length })}
         </Button>
       )}
     </div>
@@ -104,6 +100,8 @@ interface Selection {
 
 /** Step 1: search, or make → model → year → fuel → gearbox (→ version). "My car isn't listed" opens a form. */
 export function VehicleStep({ onDone }: { onDone: (choice: VehicleChoice) => void }) {
+  const t = useTranslations("diagnose");
+  const labels = useVehicleLabels();
   const [unlisted, setUnlisted] = useState(false);
   const [sel, setSel] = useState<Selection>({});
   const makes = useLoad("makes", (s) => api.makes(s));
@@ -150,18 +148,18 @@ export function VehicleStep({ onDone }: { onDone: (choice: VehicleChoice) => voi
               })
             }
           />
-          {makes.state.status === "loading" && <TileSkeletons count={8} label="Loading makes…" />}
+          {makes.state.status === "loading" && <TileSkeletons count={8} label={t("loadingMakes")} />}
           {makes.state.status === "error" && <ErrorMessage message={makes.state.message} onRetry={makes.retry} />}
           {makes.state.status === "ready" && <MakeTiles makes={makes.state.data} onPick={(make) => setSel({ make })} />}
         </>
       )}
 
-      {sel.make && <Picked label="Make" value={sel.make.name} onChange={() => setSel({})} />}
+      {sel.make && <Picked label={t("make")} value={sel.make.name} onChange={() => setSel({})} />}
 
       {sel.make && !sel.model && (
         <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-bold text-ink">Which {sel.make.name}?</h2>
-          {models.state.status === "loading" && <TileSkeletons count={6} label="Loading models…" />}
+          <h2 className="text-lg font-bold text-ink">{t("whichModel", { make: sel.make.name })}</h2>
+          {models.state.status === "loading" && <TileSkeletons count={6} label={t("loadingModels")} />}
           {models.state.status === "error" && <ErrorMessage message={models.state.message} onRetry={models.retry} />}
           {models.state.status === "ready" && (
             <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -181,9 +179,9 @@ export function VehicleStep({ onDone }: { onDone: (choice: VehicleChoice) => voi
         </div>
       )}
 
-      {sel.model && <Picked label="Model" value={sel.model.name} onChange={() => setSel({ make: sel.make })} />}
+      {sel.model && <Picked label={t("model")} value={sel.model.name} onChange={() => setSel({ make: sel.make })} />}
 
-      {sel.model && variants.state.status === "loading" && <TileSkeletons count={8} label="Loading years…" />}
+      {sel.model && variants.state.status === "loading" && <TileSkeletons count={8} label={t("loadingYears")} />}
       {sel.model && variants.state.status === "error" && (
         <ErrorMessage message={variants.state.message} onRetry={variants.retry} />
       )}
@@ -191,7 +189,7 @@ export function VehicleStep({ onDone }: { onDone: (choice: VehicleChoice) => voi
       {sel.model && variants.state.status === "ready" && (
         <>
           <ChoiceGroup
-            legend="Year"
+            legend={t("year")}
             choices={years.map((y) => ({ value: y, label: String(y) }))}
             value={year}
             onChange={(y) => setSel({ make: sel.make, model: sel.model, year: y })}
@@ -199,23 +197,23 @@ export function VehicleStep({ onDone }: { onDone: (choice: VehicleChoice) => voi
           />
           {year !== undefined && (
             <ChoiceGroup
-              legend="Fuel"
-              choices={fuels.map((f) => ({ value: f, label: FUEL_LABELS[f] }))}
+              legend={t("fuel")}
+              choices={fuels.map((f) => ({ value: f, label: labels.fuel(f) }))}
               value={fuel}
               onChange={(f) => setSel({ make: sel.make, model: sel.model, year, fuel: f })}
             />
           )}
           {fuel !== undefined && (
             <ChoiceGroup
-              legend="Gearbox"
-              choices={gears.map((t) => ({ value: t, label: TRANSMISSION_LABELS[t] }))}
+              legend={t("gearbox")}
+              choices={gears.map((g) => ({ value: g, label: labels.transmission(g) }))}
               value={transmission}
-              onChange={(t) => setSel({ make: sel.make, model: sel.model, year, fuel, transmission: t })}
+              onChange={(g) => setSel({ make: sel.make, model: sel.model, year, fuel, transmission: g })}
             />
           )}
           {versions.length > 1 && (
             <ChoiceGroup
-              legend="Which version?"
+              legend={t("whichVersion")}
               choices={versions.map((v) => ({ value: v.id, label: v.name, hint: v.engine || undefined }))}
               value={variant?.id}
               onChange={(id) => setSel({ ...sel, year, fuel, transmission, variantId: id })}
@@ -234,16 +232,16 @@ export function VehicleStep({ onDone }: { onDone: (choice: VehicleChoice) => voi
                 {sel.make.name} {sel.model.name} {year}
               </span>
               <span className="block text-ink/75">
-                {variant.name} · {FUEL_LABELS[variant.fuel]} · {TRANSMISSION_LABELS[variant.transmission]}
+                {variant.name} · {labels.fuel(variant.fuel)} · {labels.transmission(variant.transmission)}
               </span>
               <span className="mt-1 block text-sm text-ink/75">
-                Price range: {SEGMENT_LABELS[variant.price_segment]} (used for cost estimates)
+                {t("priceForEstimates", { range: labels.segment(variant.price_segment) })}
               </span>
             </span>
           </p>
           <Button type="button" size="cta" onClick={finish} className="self-stretch sm:self-start">
             <Check aria-hidden="true" className="size-5" />
-            This is my car
+            {t("thisIsMyCar")}
           </Button>
         </div>
       )}
@@ -255,7 +253,7 @@ export function VehicleStep({ onDone }: { onDone: (choice: VehicleChoice) => voi
           className="h-12 border-2 border-ink/15 bg-white px-5 text-base font-semibold text-ink"
           onClick={() => setUnlisted(true)}
         >
-          My car isn&apos;t listed
+          {t("notListed")}
         </Button>
       </div>
     </div>

@@ -3,7 +3,8 @@ import { TriangleAlert } from "lucide-react";
 import type { SafetyAlert } from "@/lib/api";
 import { informative, towingText } from "@/lib/format";
 
-/** Safety alerts in red, most serious first. Shown the moment the API returns them. */
+/** Safety alerts in red, most serious first. Shown the moment the API returns them. Always English (lang="en"), also
+ * on the Hindi pages: safety text is never machine-translated, and no reviewed Hindi exists yet (Phase 5.5). */
 export function SafetyBanner({ alerts, id }: { alerts: SafetyAlert[]; id?: string }) {
   if (!alerts.length) return null;
   const order = { high: 0, medium: 1, low: 2 } as const;
@@ -13,6 +14,7 @@ export function SafetyBanner({ alerts, id }: { alerts: SafetyAlert[]; id?: strin
     <section
       id={id}
       role="alert"
+      lang="en"
       aria-labelledby={id ? `${id}-title` : undefined}
       className="rounded-3xl bg-danger p-5 text-white shadow-lg"
       data-testid="safety-banner"
@@ -31,7 +33,7 @@ export function SafetyBanner({ alerts, id }: { alerts: SafetyAlert[]; id?: strin
               <p className="font-bold">{action || a.reason}</p>
               {trigger && trigger !== action && <p className="mt-1 text-white/95">{trigger}</p>}
               {towing && <p className="mt-1 text-white/95">Towing: {towing}</p>}
-              {action && <p className="mt-1 text-sm text-white/85">Why: {a.reason}</p>}
+              {action && <p className="mt-1 text-sm text-white">Why: {a.reason}</p>}
             </li>
           );
         })}

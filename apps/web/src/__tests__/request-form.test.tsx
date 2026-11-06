@@ -147,3 +147,16 @@ test("a refused request shows the reason and keeps the form", async () => {
   expect((await screen.findByRole("alert")).textContent).toMatch(/Too many requests from this address\. Please call the helpline/);
   expect(screen.getByLabelText("Your name")).toHaveProperty("value", "Asha");
 });
+
+test("the request carries the language of the pages the customer used (notifications follow it)", async () => {
+  localStorage.setItem("im.lang", "hi");
+  render(<RequestForm sessionId={null} />);
+  await screen.findByLabelText("Your name");
+  fill({ "Your name": "Asha", "Mobile number": "9876543210", "Area, sector or landmark": "Dwarka", Pincode: "110075" });
+  fireEvent.click(screen.getByRole("radio", { name: /At my location/ }));
+  fireEvent.click(consentBox());
+  fireEvent.click(screen.getByRole("button", { name: "Request a Mechanic" }));
+  await screen.findByTestId("confirmation");
+  expect(fake.requests[0]).toMatchObject({ language: "hi" });
+  localStorage.removeItem("im.lang");
+});

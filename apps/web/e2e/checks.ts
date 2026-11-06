@@ -15,7 +15,8 @@ export async function expectTouchTargets(page: Page) {
         text: el.textContent?.trim().slice(0, 30),
         h: (el.tagName === "INPUT" ? (el.closest("label") ?? el) : el).getBoundingClientRect().height,
       }))
-      .filter((t) => t.h < 44),
+      // Whole pixels: a transform during a short animation can leave 43.99997.
+      .filter((t) => Math.round(t.h) < 44),
   );
   expect(small).toEqual([]);
 }

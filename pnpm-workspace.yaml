@@ -4,6 +4,9 @@ packages:
   - packages/*
 
 ignoredBuiltDependencies:
+  # next-intl's optional message extractor (not used): prebuilt binaries, no install script needed
+  - "@parcel/watcher"
+  - "@swc/core"
   - sharp
   - unrs-resolver
 

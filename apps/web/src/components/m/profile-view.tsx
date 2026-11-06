@@ -9,6 +9,7 @@ import { DutySwitch, PRIMARY, SECONDARY, useMe } from "@/components/m/shell";
 import { keyBytes } from "@/components/notify/alerts-button";
 import { notifyApi } from "@/lib/api";
 import { mechanicApi } from "@/lib/mechanic-api";
+import { getServiceWorkerRegistration, registerServiceWorker, serviceWorkerSupported } from "@/lib/service-worker";
 
 type Alerts = "unknown" | "unavailable" | "blocked" | "off" | "on";
 
@@ -24,11 +25,11 @@ export function ProfileView() {
   useEffect(() => {
     (async () => {
       const cfg = await notifyApi.config().catch(() => null);
-      const ok = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+      const ok = serviceWorkerSupported() && "PushManager" in window && "Notification" in window;
       if (!cfg?.push_public_key || !ok) return setAlerts("unavailable");
       setKey(cfg.push_public_key);
       if (Notification.permission === "denied") return setAlerts("blocked");
-      const reg = await navigator.serviceWorker.getRegistration("/");
+      const reg = await getServiceWorkerRegistration();
       setAlerts((await reg?.pushManager.getSubscription()) ? "on" : "off");
     })().catch(() => setAlerts("unavailable"));
   }, []);
@@ -36,7 +37,8 @@ export function ProfileView() {
   async function turnOn() {
     try {
       if ((await Notification.requestPermission()) !== "granted") return setAlerts("blocked");
-      const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+      const reg = await registerServiceWorker();
+      if (!reg) return setAlerts("unavailable");
       await navigator.serviceWorker.ready;
       const sub =
         (await reg.pushManager.getSubscription()) ??

@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_Devanagari } from "next/font/google";
 import "./globals.css";
+import { DevServiceWorkerReset } from "@/components/dev-service-worker-reset";
 import { ErrorReporting } from "@/components/error-reporting";
+import { sharedMessages } from "@/i18n/messages";
+import { IntlProvider } from "@/i18n/provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +16,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Hindi text (the /hi pages, Hindi tile labels, the mechanic app). Not preloaded: its unicode-range means the browser
+// downloads it only when a page shows Devanagari, so English pages do not pay for it.
+const devanagari = Noto_Sans_Devanagari({
+  variable: "--font-devanagari",
+  subsets: ["devanagari"],
+  preload: false,
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Instant Mechanic: AI car diagnosis",
   description:
@@ -22,17 +34,28 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "Instant Mechanic", statusBarStyle: "default" },
 };
 
+const API_ORIGIN = new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").origin;
+
 export const viewport: Viewport = { themeColor: "#D9620F" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${devanagari.variable} h-full antialiased`}
     >
+      <head>
+        {/* Phase 5.5: every page calls the API right after it starts (categories, the result, sign-in state): open
+            that connection while the page's own files load. The API sends cookies, hence use-credentials. */}
+        <link rel="preconnect" href={API_ORIGIN} crossOrigin="use-credentials" />
+      </head>
       <body className="min-h-full flex flex-col">
         <ErrorReporting />
-        {children}
+        <DevServiceWorkerReset />
+        {/* Header, footer and other shared parts in English; the /hi pages wrap theirs in Hindi ([locale]/layout). */}
+        <IntlProvider locale="en" messages={sharedMessages()}>
+          {children}
+        </IntlProvider>
       </body>
     </html>
   );

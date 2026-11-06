@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, LoaderCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { CarSummary } from "@/components/diagnose/car-summary";
+import { EnterSection } from "@/components/motion/enter";
 import { PhotoStep } from "@/components/diagnose/photo-step";
 import { type Note, ReplyBox } from "@/components/diagnose/reply-box";
 import { ErrorMessage } from "@/components/error-message";
@@ -14,16 +16,18 @@ import { Skeleton } from "@/components/skeleton";
 import { Stepper } from "@/components/stepper";
 import { Button } from "@/components/ui/button";
 import { type AnswerOut, api, errorMessage, type Option } from "@/lib/api";
+import { useLocaleHref, useSiteLocale } from "@/i18n/navigation";
 import { useLoad } from "@/lib/use-load";
 import { cn } from "@/lib/utils";
 
 const NOT_SURE = "not_sure";
 
 function ChatSkeleton() {
+  const t = useTranslations("diagnose");
   return (
     <div className="flex flex-col gap-6" aria-busy="true">
       <span role="status" className="sr-only">
-        Loading your questions…
+        {t("loadingQuestions")}
       </span>
       <Skeleton className="h-14 rounded-2xl" />
       <Skeleton className="h-64 rounded-3xl" />
@@ -35,6 +39,10 @@ function ChatSkeleton() {
  * alerts or the result come back. Each typed message shows what we understood, and the last one can be corrected. */
 export function QuestionChat() {
   const { sessionId } = useParams<{ sessionId: string }>();
+  const t = useTranslations("diagnose");
+  const tc = useTranslations("common");
+  const href = useLocaleHref();
+  const locale = useSiteLocale();
   const router = useRouter();
   const initial = useLoad(`session:${sessionId}`, (signal) => api.session(sessionId, signal));
   const [latest, setLatest] = useState<AnswerOut | null>(null);
@@ -47,7 +55,7 @@ export function QuestionChat() {
 
   const start = initial.state.status === "ready" ? initial.state.data : null;
   const turn: AnswerOut | null = latest ?? start;
-  const resultUrl = `/diagnose/${sessionId}/result`;
+  const resultUrl = href(`/diagnose/${sessionId}/result`);
 
   // Finished (answers done, or a safety stop): the result page shows the safety banner first.
   useEffect(() => {
@@ -120,23 +128,26 @@ export function QuestionChat() {
       {!q && (
         <div className="flex flex-col items-start gap-3">
           <p role="status" className="text-lg text-ink">
-            Getting your result…
+            {t("gettingResult")}
           </p>
           <Button asChild size="cta">
-            <Link href={resultUrl}>See your result</Link>
+            <Link href={resultUrl}>{t("seeResult")}</Link>
           </Button>
         </div>
       )}
 
       {q && (
-        <section
+        // Each new question slides in briefly (Framer Motion; nothing moves with reduced motion). Enter only, no
+        // exit: the new heading must exist at once so it can take focus.
+        <EnterSection
           key={questionKey}
+          enter={!!latest}
           aria-labelledby="question-heading"
-          className="rounded-3xl border border-border bg-white p-5 shadow-sm duration-200 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 sm:p-7"
+          className="rounded-3xl border border-border bg-white p-5 shadow-sm sm:p-7"
         >
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-ink/70" aria-live="polite">
-              Question {number} of about {about}
+              {t("questionOf", { number, about })}
             </p>
             {number > 1 ? (
               <Button
@@ -151,13 +162,13 @@ export function QuestionChat() {
                 ) : (
                   <ChevronLeft aria-hidden="true" className="size-5" />
                 )}
-                Back
+                {t("back")}
               </Button>
             ) : (
               <Button asChild variant="ghost" className="h-11 px-3 text-base font-semibold text-orange-text">
-                <Link href="/diagnose?step=problem">
+                <Link href={href("/diagnose?step=problem")}>
                   <ChevronLeft aria-hidden="true" className="size-5" />
-                  Change problem
+                  {t("changeProblem")}
                 </Link>
               </Button>
             )}
@@ -169,7 +180,9 @@ export function QuestionChat() {
             />
           </div>
 
+          {/* Questions and answers come from the reviewed English flows (no reviewed Hindi yet). */}
           <h1
+            lang={locale === "hi" ? "en" : undefined}
             id="question-heading"
             ref={headingRef}
             tabIndex={-1}
@@ -178,7 +191,7 @@ export function QuestionChat() {
             {q.text}
           </h1>
 
-          <ul className="mt-5 flex flex-col gap-2.5">
+          <ul className="mt-5 flex flex-col gap-2.5" lang={locale === "hi" ? "en" : undefined}>
             {options.map((o) => {
               const before = turn.previous_option_id !== undefined && String(turn.previous_option_id) === String(o.id);
               return (
@@ -204,7 +217,7 @@ export function QuestionChat() {
           </ul>
           {turn.previous_option_id !== undefined && turn.previous_option_id !== null && (
             <p id="previous-answer" className="mt-2 text-sm text-ink/70">
-              Your earlier answer is highlighted. Pick it again or choose another.
+              {t("earlierAnswer")}
             </p>
           )}
           {notSure && (
@@ -218,10 +231,10 @@ export function QuestionChat() {
               {sending === String(notSure.id) && (
                 <LoaderCircle aria-hidden="true" className="size-5 animate-spin motion-reduce:animate-none" />
               )}
-              Not sure
+              {tc("notSure")}
             </Button>
           )}
-        </section>
+        </EnterSection>
       )}
 
       {q && (

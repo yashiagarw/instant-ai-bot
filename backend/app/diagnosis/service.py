@@ -15,7 +15,7 @@ import uuid
 from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 import engine as eng
@@ -32,9 +32,11 @@ from app.diagnosis.models import (
     SessionStatus,
 )
 from app.diagnosis.search import SEARCH_STOPWORDS, HybridSearch
+from app.enums import ReviewStatus
 from app.knowledge.embeddings import version_model
 from app.knowledge.models import (
     Category,
+    CustomerPhrase,
     DatasetVersion,
     Fault,
     FaultImage,
@@ -43,6 +45,7 @@ from app.knowledge.models import (
     FaultLink,
     LinkRelation,
     PartPriceSource,
+    PhraseLanguage,
     ProblemGroup,
     Question,
 )
@@ -614,6 +617,31 @@ def fault_names(engine: eng.Engine) -> dict[str, str]:
         names = {f.key: f.name for f in engine.k.faults.values()}
         names.update({alias: f.name for f in engine.k.faults.values() for alias in f.alias_keys})
         engine._names_by_key = names
+    return names
+
+
+# Devanagari letters (U+0900-U+097F): a Hindi name must be written in Hindi script, not Hinglish.
+DEVANAGARI = "[\u0900-\u097f]"
+
+
+def hindi_names(session: Session, fault_ids: list[int]) -> dict[int, str]:
+    """Reviewed Hindi names for the customer's Hindi pages (Phase 5.5): the shortest approved customer phrase in
+    Devanagari for each fault. Nothing is machine-translated: faults without one are left out (English is shown)."""
+    if not fault_ids:
+        return {}
+    rows = session.execute(
+        select(CustomerPhrase.fault_id, CustomerPhrase.text)
+        .where(
+            CustomerPhrase.fault_id.in_(fault_ids),
+            CustomerPhrase.language == PhraseLanguage.hi,
+            CustomerPhrase.status == ReviewStatus.approved,
+            CustomerPhrase.text.op("~")(DEVANAGARI),
+        )
+        .order_by(CustomerPhrase.fault_id, func.length(CustomerPhrase.text), CustomerPhrase.id)
+    ).all()
+    names: dict[int, str] = {}
+    for fault_id, text in rows:
+        names.setdefault(fault_id, text.strip())
     return names
 
 

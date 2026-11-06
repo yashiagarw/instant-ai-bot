@@ -1079,6 +1079,106 @@ sh scripts/zap-baseline.sh                      # OWASP ZAP baseline against the
 dcp down
 ```
 
+## Phase 5.5: 3D car, motion, Hindi, accessibility
+
+The customer site gets a 3D car, short animations, a Hindi version and an accessibility pass, without slowing it down.
+
+- **3D car** (React Three Fiber + drei). The landing hero shows the static picture first (the LCP). After the page is
+  interactive, as soon as the visitor starts using it (first scroll, tap, mouse move or key), the slowly turning 3D
+  car fades in over it. This is the "facade" pattern: nobody who only glances at the page downloads three.js, and the
+  3D start-up never competes with the page's own. On the result page, *Where it is on the
+  car* shows the diagnosed system in brand orange `#F07A2A` on an x-ray car, loaded only when that card scrolls into
+  view. **Never in the question chat.**
+  - The car is generic and built in the repo: `apps/web/scripts/build-car-model.mts` (`pnpm build:car`) makes
+    `public/3d/car.glb` (57 KB, Draco). It has one named node per part (`clutch`, `brake_disc_fl`, `radiator`, …),
+    so a designer's GLB with the same names can replace it.
+  - `src/lib/car-parts.ts` maps the 41 fault categories to systems and meshes. 7 have no clear part and show the
+    car without a highlight: `stuck`, `not_starting`, `inspection`, `sensor_ecu`, `smoke_fire`, `waterlogging`,
+    `towing_accident`.
+  - Skipped (picture only; nothing 3D downloaded) with `prefers-reduced-motion`, under 4 GB device memory,
+    on slow-2g/2g/3g or Save-Data, or without WebGL (`src/lib/three-d.ts`).
+  - The Draco decoder is self-hosted: `scripts/copy-draco.mjs` copies it from `three` into `public/draco/` before
+    `dev` and `build` (not committed).
+  - CSP (`packages/ui/src/security-headers.ts`, web only): `script-src 'wasm-unsafe-eval'` and `worker-src blob:`.
+    Nothing else changes.
+- **Motion** (Framer Motion, the `motion` package): the next question slides in, CTAs lift on hover and press in on
+  tap, the cost counts up. Its `animate` / `hover` / `press` are imported after the page has loaded
+  (`src/components/motion/load.ts`), so none of it is on the critical path. With reduced motion nothing moves and the final price shows at once. Screen readers always
+  get the final price.
+- **Hindi** (next-intl). English keeps its addresses; Hindi is `/hi`, `/hi/diagnose`, `/hi/diagnose/{id}`,
+  `/hi/diagnose/{id}/result`, with a हिन्दी / English switch in the header. Messages are in `src/i18n/messages/`.
+  The mechanic app (`/m`) uses the same next-intl setup with its own switch (unchanged texts). Font: Noto Sans
+  Devanagari (downloaded only when a page shows Devanagari).
+  - The language the customer used is sent with a service request (`service_requests.language`, migration 0025),
+    and their notifications (5.2) use it. Without it, the language is still detected from what they typed.
+  - Hindi UI text is a machine draft: **review list in [docs/hindi-review.md](docs/hindi-review.md)**
+    (`pnpm --filter web hindi:review` regenerates it).
+  - Safety alerts, safety tips and fault names are never machine-translated. Faults show their reviewed Devanagari
+    name (`name_hi`, 21 of 972 faults today) and everything else is English (`lang="en"`); the same document lists
+    what is missing.
+- **Accessibility:**
+  - the confidence meter is a real `role="meter"`;
+  - the coverage badge says "Coverage:" to screen readers;
+  - form errors are announced (`role="alert"`);
+  - `lang` is set on every Hindi and English part;
+  - the stepper is read as step names, not numbers;
+  - text below 4.5:1 is fixed: the car search placeholder, the small "Why:" line in the red safety banner, a few
+    grey captions.
+
+- **Service worker** (`/sw.js`: web push and the `/m` offline shell) can no longer serve an old build:
+  - `public/sw.js` is generated before every build (`scripts/service-worker.mjs`, from `src/service-worker/`) with a
+    build id. Its caches are named after that id, and a new build takes over at once and deletes the older caches.
+  - Only `/m` pages are cached (network-first, for offline), plus the hashed `/_next/static` files and icons.
+    Customer pages always come from the network.
+  - `/sw.js` is sent with `Cache-Control: no-store` and registered with `updateViaCache: "none"`.
+  - **`pnpm dev` registers no worker.** Its `/sw.js` is a reset worker, and the page removes any worker left from a
+    production build on the same address, so a normal browser no longer needs "Clear site data".
+
+### Lighthouse (mobile, production build, median of 3)
+| Page | Performance before → after | Accessibility before → after |
+|---|---|---|
+| `/` | 97 → 96 | 100 → 100 |
+| `/hi` (new) | – → 100 | – → 100 |
+| `/diagnose` | 91 → 90 | 100 → 100 |
+| `/diagnose/{id}/result` | 84 → 87 | 100 → 100 |
+
+Measured with Lighthouse 13.6 (simulated mobile throttling) on `next build` + `next start` against the real API
+and database (port 8010), one run at a time, median of 3. Slow-phone check (`--throttling-method=devtools`: slow network + 4× CPU): `/` 98,
+`/hi` 99, `/diagnose` 89, result 78. No 3D file was requested on any page (Chrome reports the connection as 2g/3g,
+so the 3D gate keeps the picture even after scrolling).
+
+What keeps it fast: the hero picture stays the largest paint; three.js (about 250 KB) loads only on interaction;
+Framer Motion only when something moves; next-intl's messages are compiled at build time (no ICU parser in the
+browser) and each page gets only its own; the Devanagari web font loads only on the Hindi pages; WebGL is tested only
+just before 3D starts; the result's API request starts before hydration, and the API connection is preconnected.
+
+### After pulling
+```bash
+pnpm install                                                   # three, R3F, drei, motion, next-intl, gltf-transform
+cd backend && uv run alembic upgrade head && cd ..             # 0025: service_requests.language
+# Restart the API (new name_hi on results, request language) and `pnpm dev` (new routes under app/[locale]).
+# If a production build shows old styles: rm -rf apps/web/.next/cache/turbopack (a stale Turbopack build cache
+# kept an old globals.css once while this phase was built).
+```
+No new environment variables. The web Docker image builds as before (`docker build -f apps/Dockerfile --build-arg
+APP=web .`); the decoder is copied during its build.
+
+### Try it
+- http://localhost:3000: move the mouse or scroll and the car starts turning (not with reduced motion: macOS Settings → Accessibility →
+  Display → Reduce motion). Press **हिन्दी** in the header.
+- Finish a diagnosis (e.g. Clutch) and open the result: *Where it is on the car* shows the clutch in orange; on
+  `/hi/...` the reviewed Hindi fault name appears when the fault has one.
+- Chrome DevTools → Network → *3G*, reload: the picture stays and no `car.glb` is requested.
+- Send a request after using the Hindi pages: `select reference, language from service_requests order by created_at
+  desc limit 1;` shows `hi`, and the notifications in the API log are in Hindi.
+
+### Tests
+```bash
+cd backend && uv run pytest -q                                 # + Hindi names, request language
+pnpm test                                                      # + i18n parity/ICU, car parts vs taxonomy and GLB, 3D gate, Hindi pages
+pnpm --filter web exec playwright test --workers=1             # + e2e/visual.spec.ts: 3D within the CSP, skipped on slow/low-memory/reduced motion, Hindi
+```
+
 ## LLM layer (off by default)
 
 `backend/app/llm` adds two optional steps, each with a non-LLM fallback. The engine always decides which question

@@ -19,6 +19,7 @@ import {
   type ServiceRequestOut,
   type ServiceType,
 } from "@/lib/api";
+import { rememberedLanguage } from "@/i18n/preference";
 import { useLoad } from "@/lib/use-load";
 
 const SERVICE_TYPES: { value: ServiceType; label: string; hint: string }[] = [
@@ -213,6 +214,8 @@ function Form({
           consent_text_version: config.consent_version,
           whatsapp_optin: whatsapp,
           whatsapp_consent_version: whatsapp ? config.whatsapp_consent_version : null,
+          // The language of the pages the customer used (Phase 5.5): their notifications follow it.
+          ...(rememberedLanguage() ? { language: rememberedLanguage()! } : {}),
         }, human.token),
       );
     } catch (err) {

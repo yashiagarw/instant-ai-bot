@@ -94,7 +94,7 @@ test("turn on alerts: permission, subscription with our key, saved on the server
   render(<AlertsButton />);
   fireEvent.click(await screen.findByRole("button", { name: "Turn on alerts" }));
   expect((await screen.findByRole("status")).textContent).toBe("Alerts are on for this browser");
-  expect(navigator.serviceWorker.register).toHaveBeenCalledWith("/sw.js", { scope: "/" });
+  expect(navigator.serviceWorker.register).toHaveBeenCalledWith("/sw.js", { scope: "/", updateViaCache: "none" });
   const opts = browser.subscribeOptions as { userVisibleOnly: boolean; applicationServerKey: Uint8Array };
   expect(opts.userVisibleOnly).toBe(true);
   expect(Array.from(opts.applicationServerKey)).toEqual(Array.from(keyBytes(KEY)));

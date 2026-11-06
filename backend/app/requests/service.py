@@ -107,6 +107,7 @@ def create(session: Session, engine: eng.Engine, body: ServiceRequestIn) -> Serv
         problem_summary=found.text,
         status=RequestStatus.submitted,
         status_changed_at=now,
+        language=body.language,
         consent_given=True,
         consent_text_version=body.consent_text_version,
         consent_at=now,

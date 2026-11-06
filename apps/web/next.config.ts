@@ -1,5 +1,6 @@
 import path from "node:path";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 import { securityHeaders } from "../../packages/ui/src/security-headers";
 
@@ -9,6 +10,8 @@ const SECURITY_HEADERS = securityHeaders({
   filesUrl: process.env.NEXT_PUBLIC_FILES_URL ?? "http://localhost:8333",
   sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   turnstile: Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY),
+  // Phase 5.5: the 3D car's self-hosted Draco decoder (WebAssembly in a blob: worker).
+  threeD: true,
   dev: process.env.NODE_ENV === "development",
   referrer: "strict-origin-when-cross-origin",
   camera: true,
@@ -21,8 +24,33 @@ const nextConfig: NextConfig = {
     ? { output: "standalone" as const, outputFileTracingRoot: path.join(__dirname, "../..") }
     : {}),
   poweredByHeader: false,
+  // Phase 5.5: the landing page and the diagnosis live under app/[locale] (en, hi). English keeps its old addresses
+  // (rewritten inside the app, so the address bar shows /diagnose); Hindi is /hi/... ; /en/... redirects to the
+  // address without it. Rewrites are plain routing: no proxy runs on each request, and the pages stay static.
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: "/", destination: "/en" },
+        { source: "/diagnose", destination: "/en/diagnose" },
+        { source: "/diagnose/:path*", destination: "/en/diagnose/:path*" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
+  async redirects() {
+    return [
+      { source: "/en", destination: "/", permanent: true },
+      { source: "/en/:path*", destination: "/:path*", permanent: true },
+    ];
+  },
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      // Phase 5.5: the service worker file is never kept by the browser or a proxy, so each deploy's worker (a new
+      // build id) is picked up on the next page load. It is generated: scripts/service-worker.mjs.
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },
+    ];
   },
   cacheComponents: true,
   partialPrefetching: true,
@@ -36,4 +64,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Phase 5.5: next-intl compiles the messages (src/i18n/messages/*.json) at build time, so browsers get them ready to
+// use and do not download an ICU message parser.
+const withNextIntl = createNextIntlPlugin({
+  requestConfig: "./src/i18n/request.ts",
+  experimental: { messages: { path: "./src/i18n/messages", format: "json", locales: "infer", precompile: true } },
+});
+
+export default withNextIntl(nextConfig);

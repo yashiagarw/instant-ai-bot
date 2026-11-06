@@ -259,3 +259,14 @@ def test_request_form_whatsapp_opt_in(client, db_session):
     assert (o.request_id, o.source, o.consent_text) == (r.id, "request_form", WHATSAPP_CUSTOMER_TEXT)
     assert client.post("/api/service-requests", json=form).status_code == 201  # unticked: no opt-in
     assert len(db_session.scalars(select(NotificationOptin)).all()) == 1
+
+
+def test_request_keeps_the_language_the_customer_used(client, db_session):
+    # Phase 5.5: the web app sends the language of its pages; notifications about the request use it.
+    form = {"name": "Asha Verma", "phone": "98000 01234", "service_type": "at_location", "area": "Saket",
+            "pincode": "110017", "consent": True, "consent_text_version": "request-v1"}  # fmt: skip
+    assert client.post("/api/service-requests", json={**form, "language": "hi"}).status_code == 201
+    assert client.post("/api/service-requests", json=form).status_code == 201  # older clients: not sent
+    assert client.post("/api/service-requests", json={**form, "language": "fr"}).status_code == 422
+    langs = db_session.scalars(select(ServiceRequest.language).order_by(ServiceRequest.created_at)).all()
+    assert sorted(langs, key=str) == sorted(["hi", None], key=str)

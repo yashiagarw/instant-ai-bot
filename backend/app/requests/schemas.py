@@ -3,6 +3,7 @@
 import re
 import uuid
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -78,6 +79,11 @@ class ServiceRequestIn(BaseModel):
     )
     whatsapp_consent_version: str | None = Field(
         default=None, max_length=40, description="The WhatsApp wording version shown (GET /config), when ticked."
+    )
+    language: Literal["en", "hi"] | None = Field(
+        default=None,
+        description="The language the customer used on the site; notifications about this request use it. "
+        "Omitted: detected from what the customer typed.",
     )
 
     @field_validator("name", "area", "address", "notes", "pincode")

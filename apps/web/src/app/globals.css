@@ -12,3 +12,21 @@
     linear-gradient(to bottom, rgb(21 18 15 / 0.05) 1px, transparent 1px);
   background-size: 32px 32px;
 }
+
+/* Phase 5.5: Hindi. On the Hindi pages (wrapper .hindi-page, i18n/provider.tsx) Geist has no Devanagari letters, so the
+   browser takes them from Noto Sans Devanagari (variable, all weights incl. the black headings); Latin text keeps
+   Geist. Elsewhere the few Devanagari words (the हिन्दी switch, Hindi tile labels, the mechanic app) use the device's
+   own Devanagari font, so English pages never download the web font. */
+.hindi-page,
+.hindi-page :is(.font-sans, .font-heading) {
+  /* Tailwind writes the font utilities out in full, so they are listed here too. */
+  font-family: var(--font-geist-sans), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Devanagari needs a little more line height than Latin (matras above and below the line). */
+:lang(hi) {
+  line-height: 1.6;
+}
+:lang(hi) :is(h1, h2, h3) {
+  line-height: 1.3;
+}

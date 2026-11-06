@@ -1,8 +1,12 @@
+"use client";
+
 import { TriangleAlert } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
 export function ErrorMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  const t = useTranslations("common");
   return (
     <div
       role="alert"
@@ -12,7 +16,7 @@ export function ErrorMessage({ message, onRetry }: { message: string; onRetry?: 
       <p className="flex-1 text-base">{message}</p>
       {onRetry && (
         <Button type="button" variant="outline" className="h-11 px-5 text-base font-semibold" onClick={onRetry}>
-          Try again
+          {t("tryAgain")}
         </Button>
       )}
     </div>

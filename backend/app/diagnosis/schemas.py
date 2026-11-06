@@ -257,6 +257,12 @@ class RankedFaultOut(BaseModel):
     rank: int
     fault_key: str = Field(examples=["F04-TY-03"])
     name: str
+    name_hi: str | None = Field(
+        default=None,
+        description="Reviewed Hindi (Devanagari) name for the Hindi pages, from approved customer phrases; null when "
+        "there is none (never machine-translated).",
+        examples=["गाड़ी का क्लच फिसल रहा है"],
+    )
     category: str
     score: float
     confidence: Literal["high", "medium", "low"]

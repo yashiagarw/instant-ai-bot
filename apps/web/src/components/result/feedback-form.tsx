@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { api, errorMessage } from "@/lib/api";
@@ -9,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 /** "Was this helpful?" Yes / No with an optional comment, sent once. */
 export function FeedbackForm({ sessionId }: { sessionId: string }) {
+  const t = useTranslations("result.feedback");
   const id = useId();
   const [helpful, setHelpful] = useState<boolean | null>(null);
   const [comment, setComment] = useState("");
@@ -31,7 +33,7 @@ export function FeedbackForm({ sessionId }: { sessionId: string }) {
   if (state === "sent") {
     return (
       <p role="status" className="rounded-3xl border border-border bg-white p-5 font-semibold text-ink">
-        Thanks for your feedback.
+        {t("thanks")}
       </p>
     );
   }
@@ -54,16 +56,16 @@ export function FeedbackForm({ sessionId }: { sessionId: string }) {
   return (
     <section aria-labelledby={`${id}-heading`} className="rounded-3xl border border-border bg-white p-5">
       <h2 id={`${id}-heading`} className="text-xl font-black text-ink">
-        Was this helpful?
+        {t("title")}
       </h2>
       <div className="mt-3 flex gap-2">
-        {choice(true, "Yes", ThumbsUp)}
-        {choice(false, "No", ThumbsDown)}
+        {choice(true, t("yes"), ThumbsUp)}
+        {choice(false, t("no"), ThumbsDown)}
       </div>
       {helpful !== null && (
         <div className="mt-4 flex flex-col gap-2">
           <label htmlFor={`${id}-comment`} className="font-semibold text-ink">
-            Anything to add? (optional, no personal details)
+            {t("comment")}
           </label>
           <textarea
             id={`${id}-comment`}
@@ -73,7 +75,11 @@ export function FeedbackForm({ sessionId }: { sessionId: string }) {
             onChange={(e) => setComment(e.target.value)}
             className="rounded-2xl border-2 border-ink/15 bg-white p-3 text-ink outline-none focus-visible:border-cta focus-visible:ring-3 focus-visible:ring-ring/40"
           />
-          {error && <p className="text-sm font-semibold text-orange-text">{error}</p>}
+          {error && (
+            <p role="alert" className="text-sm font-semibold text-orange-text">
+              {error}
+            </p>
+          )}
           <Button
             type="button"
             variant="outline"
@@ -81,7 +87,7 @@ export function FeedbackForm({ sessionId }: { sessionId: string }) {
             disabled={state === "sending"}
             onClick={send}
           >
-            Send feedback
+            {t("send")}
           </Button>
         </div>
       )}
