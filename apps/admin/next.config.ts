@@ -1,6 +1,20 @@
 import path from "node:path";
 import type { NextConfig } from "next";
 
+import { securityHeaders } from "../../packages/ui/src/security-headers";
+import { tileConfig } from "./src/lib/map-tiles";
+
+// Phase 5.4: CSP and other security headers, from the values this build uses (packages/ui/src/security-headers.ts),
+// with the map tile host of the configured provider (src/lib/map-tiles.ts).
+const SECURITY_HEADERS = securityHeaders({
+  apiUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000",
+  filesUrl: process.env.NEXT_PUBLIC_FILES_URL ?? "http://localhost:8333",
+  sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  extraImg: [tileConfig(process.env).origin],
+  dev: process.env.NODE_ENV === "development",
+  referrer: "same-origin",
+});
+
 // The staff admin app (port 3001). Shared UI comes from the workspace package @im/ui (packages/ui), which
 // Turbopack compiles automatically.
 const nextConfig: NextConfig = {
@@ -22,12 +36,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/:path*",
-        headers: [
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "same-origin" },
-          { key: "X-Robots-Tag", value: "noindex, nofollow" },
-        ],
+        headers: [...SECURITY_HEADERS, { key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];
   },

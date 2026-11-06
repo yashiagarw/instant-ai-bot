@@ -20,7 +20,7 @@ from app.enums import Fuel, Transmission
 from app.knowledge.models import Category, GroupType, ProblemGroup, Question
 from app.llm import explanation as llm_explanation
 from app.llm.client import LLMClient
-from app.ratelimit import RateLimiter, client_ip
+from app.ratelimit import client_ip, make_limiter
 from engine import vehicle_allows
 from engine.core import topic_variant
 
@@ -61,10 +61,10 @@ LLMDep = Annotated[LLMClient | None, Depends(get_llm)]
 
 def limit_session_creation(request: Request) -> None:
     settings = request.app.state.settings
-    limiter: RateLimiter | None = getattr(request.app.state, "session_limiter", None)
+    limiter = getattr(request.app.state, "session_limiter", None)
     if limiter is None:
-        limiter = request.app.state.session_limiter = RateLimiter(
-            settings.session_rate_limit, settings.session_rate_window_seconds
+        limiter = request.app.state.session_limiter = make_limiter(
+            settings, "diagnosis_sessions", settings.session_rate_limit, settings.session_rate_window_seconds
         )
     wait = limiter.check(client_ip(request, settings.trust_forwarded_for))
     if wait is not None:

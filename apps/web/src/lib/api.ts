@@ -1,5 +1,7 @@
 // Typed client for the FastAPI backend (backend/app/vehicles/api.py, backend/app/diagnosis/api.py).
 
+import { newRequestId } from "@im/ui/observability";
+
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
 
 export type Fuel = "petrol" | "diesel" | "cng" | "hybrid" | "ev";
@@ -84,14 +86,19 @@ export class ApiError extends Error {
   }
 }
 
+/** The Cloudflare Turnstile token of a public form (X-Turnstile-Token), when the check is on. */
+export function humanHeader(token?: string): Record<string, string> {
+  return token ? { "X-Turnstile-Token": token } : {};
+}
+
 async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
   return request<T>(path, { signal });
 }
 
-async function post<T>(path: string, body?: unknown): Promise<T> {
+async function post<T>(path: string, body?: unknown, extra?: Record<string, string>): Promise<T> {
   return request<T>(path, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...extra },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 }
@@ -119,7 +126,8 @@ async function request<T>(path: string, init: RequestInit): Promise<T> {
     res = await fetch(`${API_URL}/api${path}`, {
       ...init,
       credentials: "include",
-      headers: { Accept: "application/json", ...init.headers },
+      // X-Request-ID: one id per call, followed through the API's logs and the worker's jobs (Phase 5.4).
+      headers: { Accept: "application/json", "X-Request-ID": newRequestId("web"), ...init.headers },
     });
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") throw e;
@@ -182,7 +190,8 @@ export const api = {
   undoMessage: (id: string) => post<MessageUndoOut>(`/diagnosis/sessions/${id}/messages/undo`),
   result: (id: string, signal?: AbortSignal) => get<ResultOut>(`/diagnosis/sessions/${id}/result`, signal),
   requestConfig: (signal?: AbortSignal) => get<RequestConfig>("/service-requests/config", signal),
-  createRequest: (body: ServiceRequestIn) => post<ServiceRequestOut>("/service-requests", body),
+  createRequest: (body: ServiceRequestIn, human?: string) =>
+    post<ServiceRequestOut>("/service-requests", body, humanHeader(human)),
   feedback: (id: string, helpful: boolean, comment?: string) =>
     post<{ id: number }>(`/diagnosis/sessions/${id}/feedback`, { helpful, comment: comment || null }),
   makes: (signal?: AbortSignal) => get<Make[]>("/vehicles/makes", signal),
@@ -387,7 +396,7 @@ export async function streamExplanations(
   signal?: AbortSignal,
 ): Promise<void> {
   const res = await fetch(`${API_URL}/api/diagnosis/sessions/${id}/explanations`, {
-    headers: { Accept: "text/event-stream" },
+    headers: { Accept: "text/event-stream", "X-Request-ID": newRequestId("web") },
     credentials: "include",
     signal,
   });
@@ -679,8 +688,8 @@ export interface AuthConfig {
 
 export const accountApi = {
   config: (signal?: AbortSignal) => get<AuthConfig>("/auth/config", signal),
-  requestCode: (phone: string) =>
-    post<{ sent: boolean; phone_masked: string; expires_in: number }>("/auth/otp/request", { phone }),
+  requestCode: (phone: string, human?: string) =>
+    post<{ sent: boolean; phone_masked: string; expires_in: number }>("/auth/otp/request", { phone }, humanHeader(human)),
   verifyCode: (phone: string, code: string, consentVersion: string) =>
     post<{ user: User; attached: { sessions: number; requests: number } }>("/auth/otp/verify", {
       phone,

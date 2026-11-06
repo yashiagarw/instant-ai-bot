@@ -193,6 +193,36 @@ class Settings(BaseSettings):
     call_time_limit_seconds: int = 900
     call_rate_limit: int = 5  # calls asked for per request per window
     call_rate_window_seconds: int = 600
+    # ---- Production hardening (Phase 5.4)
+    # Logs: one JSON object per line (json) or plain text (console); phone numbers, emails and number plates are
+    # masked in every message. Each line carries the request id (X-Request-ID) from the browser through the API to
+    # the worker's jobs.
+    log_format: Literal["json", "console"] = "json"
+    log_level: str = "INFO"
+    # Sentry (errors only, no session replay). Empty DSN = off. Personal data is scrubbed before sending.
+    sentry_dsn: str = ""
+    sentry_environment: str = ""  # empty = ENVIRONMENT
+    sentry_release: str = ""
+    sentry_traces_sample_rate: float = 0.0
+    # Rate limits are counted in Redis (REDIS_URL) so they hold across API processes; "memory" counts per process
+    # (tests, or no Redis). If Redis cannot be reached the API falls back to memory and logs it.
+    rate_limit_backend: Literal["redis", "memory"] = "redis"
+    # A backstop for every /api call per client IP (the endpoints keep their own, tighter limits).
+    global_rate_limit: int = 600
+    global_rate_window_seconds: int = 60
+    # Request bodies above this are refused (413) before they are read, except the upload endpoints, which have
+    # their own limits (dataset files, mechanic documents and photos).
+    api_max_body_bytes: int = 256 * 1024
+    # Cloudflare Turnstile on public forms (request form, login codes). Empty secret = off. Cloudflare's test keys:
+    # secret 1x0000000000000000000000000000000AA always passes, 2x0000000000000000000000000000000AA always fails.
+    turnstile_secret_key: str = ""
+    turnstile_verify_url: str = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+    # Data retention (the worker, daily at 03:00 India time). request_outcomes and the golden set are kept: they hold
+    # no personal data and are future training data.
+    retention_location_days: int = 90  # after a job closes: the address and area text are removed (pincode kept)
+    retention_llm_days: int = 30  # LLM call logs lose their session link and details
+    retention_replay_days: int = 90  # diagnosis sessions lose the customer's typed words (session replays)
+    retention_whatsapp_inbound_days: int = 30  # handled WhatsApp webhook messages are deleted
     questions_model: str = "claude-opus-5-5"
     questions_effort: str = "high"
     # OpenAI (used when LLM_PROVIDER=openai). No default model: set the one you want to pay for.

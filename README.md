@@ -1020,6 +1020,65 @@ cd apps/web && E2E_LIVE_FLOW=1 E2E_PORT=3110 NEXT_PUBLIC_API_URL=http://localhos
 It builds both apps, creates (or reuses) a support agent and a verified "E2E Mechanic" with ready sessions
 (`python -m app.mechanics.e2e_seed`, refused in production) and writes one request into the development database.
 
+## Phase 5.4: production hardening
+
+No new features: the platform is made safe to run. Runbooks: [docs/runbooks/](docs/runbooks/README.md) (deploy,
+rollback, restore, secret rotation, uptime). Reused, not duplicated: staff RBAC, argon2 + TOTP, deny-by-default
+`/api/admin`, the audit log, phone masking, OTP limits, the WhatsApp signature check, Caddy and the prod compose.
+
+| Area | What |
+|---|---|
+| Headers | API: strict CSP (`default-src 'none'`), `frame-ancestors 'none'`, nosniff, no-referrer, no-store (`app/security.py`). Web and admin: CSP allowing only the API, files host, Sentry, Turnstile and the map tiles; frame-ancestors none; referrer policy; Permissions-Policy (`packages/ui/src/security-headers.ts`). HSTS: Caddy (5.1) |
+| CSRF | Unsafe API calls from a browser must come from the web or admin origin (Origin / Referer check, on top of SameSite cookies and CORS). The WhatsApp webhook is exempt and keeps its signature check |
+| Rate limits | All limits counted in Redis (shared by every API process; hashed IPs), falling back to per-process counting if Redis is down. Plus a backstop per IP on every `/api` call (`GLOBAL_RATE_*`) |
+| Turnstile | "I'm human" check on the request form and both login-code forms (`X-Turnstile-Token`). Off without keys |
+| Size limits | JSON bodies over 256 KB → 413; uploads keep their own limits |
+| Logs | JSON, one line per request (method, path, status, duration; no IP, no query string), phone numbers / emails / plates masked, `request_id` in every line. The id goes web → API → arq jobs (notifications, dispatch, datasets) and back in `X-Request-ID` |
+| Sentry | API, worker, web, admin (browser and server). Off without a DSN. Phone numbers, names, addresses, OTP codes, cookies, headers, bodies and tokens scrubbed; no replay, no tracing by default |
+| Health | `/api/health/live`, `/api/health/ready` (database, migrations at head, Redis); `/healthz` on web and admin. Docker health checks use them |
+| Backups | `backup` service: daily `pg_dump` + photo bucket + `data/media`, encrypted with age to a public key (private key off the server), 30 days here and off-site. `restore.sh` restores into a new database only. `scripts/backup_restore_test.sh` proves it |
+| Retention | Daily worker job: request address / notes cleared 90 days after the job closed; LLM call logs unlinked and emptied after 30 days; typed text in diagnosis session replays and feedback comments removed after 90 days; handled `whatsapp_inbound` rows deleted after 30 days. `request_outcomes` and the golden set are kept (no personal data). Each run is in the audit log |
+| Your data | My account: **Download my data** (JSON). Deleting the account anonymises its requests (the confirmed-fault outcomes stay) |
+| Legal | `/privacy`, `/terms`, `/disclaimer` (DPDP Act 2023), marked **draft, pending legal review**, with [BRACKETED] placeholders for the company name, address and grievance officer; the privacy notice quotes every consent text (a backend test keeps them in sync); footer links |
+| Scanning | `pnpm test:all` = backend + frontend tests and lint + `uv audit` + `pnpm audit` (fails on high/critical) + Trivy on the built images (fails on fixable high/critical) |
+| Admin map | Tile provider by key (`NEXT_PUBLIC_MAP_PROVIDER` stadia / maptiler, `NEXT_PUBLIC_MAP_KEY`); Stadia works on localhost without a key |
+
+**Map tiles: sign up for Stadia Maps.** Localhost works with no key (nothing to do for development). For
+production, its free tier is for non-commercial use only, so take the **Starter plan** (commercial use allowed),
+create a key under "Manage properties", add `admin.instantmechanic.online` as an allowed domain, and set
+`NEXT_PUBLIC_MAP_KEY` in `.env.prod`. MapTiler also works (`NEXT_PUBLIC_MAP_PROVIDER=maptiler`), but its free
+plan is also non-commercial, it needs a key even on localhost, and its paid plan costs more.
+
+### After pulling
+```bash
+pnpm install                                   # zod 4, @sentry/browser, minimatch override
+cd backend && uv sync && uv run alembic upgrade head && cd ..   # sentry-sdk; no new migration
+# backend/.env: nothing required. Optional, to try Turnstile locally with Cloudflare's always-pass test keys:
+#   backend/.env:       TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+#   apps/web/.env.local: NEXT_PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+# Restart the API and the worker (new middleware, retention cron).
+```
+Production (`.env.prod` / `backend/.env.prod`, compare with the `.example` files): set `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
++ `TURNSTILE_SECRET_KEY`, `SENTRY_DSN` (API) + `NEXT_PUBLIC_SENTRY_DSN` (browsers), `NEXT_PUBLIC_MAP_KEY`,
+`BACKUP_AGE_RECIPIENT` and the `BACKUP_S3_*` / `BACKUP_REMOTE` values ([restore.md](docs/runbooks/restore.md)
+"The key"). Then rebuild every image and `dcp up -d` ([deploy.md](docs/runbooks/deploy.md)).
+
+### Tests
+```bash
+pnpm test:all                                   # backend + frontend tests and lint, dependency and image scans
+pnpm test:security                              # scans only (SCAN_IMAGES=0: dependencies only)
+pnpm --filter web exec playwright test --workers=1
+pnpm --filter admin exec playwright test --workers=1
+```
+On an 8 GB Mac, run the production stack and the ZAP scan one after the other, not with the dev servers:
+```bash
+dcp() { docker compose -f docker-compose.prod.yml -f docker-compose.prod.local.yml --env-file .env.prod --profile storage "$@"; }
+dcp build api && dcp build web && dcp build admin && dcp build backup && dcp up -d
+sh scripts/backup_restore_test.sh               # backup, restore into a throwaway Postgres container, compare
+sh scripts/zap-baseline.sh                      # OWASP ZAP baseline against the local stack (report in zap-reports/)
+dcp down
+```
+
 ## LLM layer (off by default)
 
 `backend/app/llm` adds two optional steps, each with a non-LLM fallback. The engine always decides which question

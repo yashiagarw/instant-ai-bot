@@ -1,7 +1,9 @@
 // Client for the mechanic app API (backend/app/mechanics/app_api.py). The mechanic's sign-in cookie (im_mech,
 // HttpOnly, path /api/mechanic) goes with every call. Errors carry the status: 401 = sign in again.
 
-import { API_URL } from "@/lib/api";
+import { newRequestId } from "@im/ui/observability";
+
+import { API_URL, humanHeader } from "@/lib/api";
 
 export class MechanicApiError extends Error {
   constructor(
@@ -13,14 +15,19 @@ export class MechanicApiError extends Error {
   }
 }
 
-async function call<T>(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+async function call<T>(method: string, path: string, body?: unknown, signal?: AbortSignal, extra?: Record<string, string>): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${API_URL}/api/mechanic${path}`, {
       method,
       signal,
       credentials: "include",
-      headers: body === undefined ? { Accept: "application/json" } : { Accept: "application/json", "Content-Type": "application/json" },
+      headers: {
+        Accept: "application/json",
+        "X-Request-ID": newRequestId("mech"),
+        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+        ...extra,
+      },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch (e) {
@@ -104,7 +111,8 @@ export interface StatusIn {
 }
 
 export const mechanicApi = {
-  requestCode: (phone: string) => call<{ sent: boolean; phone_masked: string }>("POST", "/auth/otp/request", { phone }),
+  requestCode: (phone: string, human?: string) =>
+    call<{ sent: boolean; phone_masked: string }>("POST", "/auth/otp/request", { phone }, undefined, humanHeader(human)),
   verifyCode: (phone: string, code: string) => call<{ ok: boolean; first_name: string }>("POST", "/auth/otp/verify", { phone, code }),
   logout: () => call<{ ok: boolean }>("POST", "/auth/logout"),
   me: (signal?: AbortSignal) => call<MechanicMe>("GET", "/me", undefined, signal),

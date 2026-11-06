@@ -27,6 +27,7 @@ const STRINGS = {
     en: "No code? If this number belongs to one of our mechanics a code will arrive. Otherwise call support.",
   },
   signIn: { hi: "साइन इन", en: "Sign in" },
+  humanCheck: { hi: "पहले 'मैं इंसान हूँ' जाँच पूरी करें", en: 'Please complete the "I\'m human" check first' },
   badPhone: { hi: "10 अंकों का मोबाइल नंबर डालें", en: "Enter a 10-digit mobile number" },
   // duty
   onDuty: { hi: "ड्यूटी पर", en: "On duty" },

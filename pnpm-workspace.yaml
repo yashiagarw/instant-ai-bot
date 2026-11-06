@@ -6,3 +6,9 @@ packages:
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+# Security fixes for transitive packages (Phase 5.4, pnpm audit): minimatch < 11.0.1 (GHSA-g3hv-75wg-m249, only in the
+# ESLint toolchain) to the patched major.
+overrides:
+  "minimatch@>=7.0.0 <11.0.1": "^11.0.1"
+

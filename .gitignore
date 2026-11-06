@@ -31,3 +31,6 @@ data/models/
 
 CLAUDE.md
 REVIEW_NOTES.md
+
+# OWASP ZAP reports (scripts/zap-baseline.sh)
+zap-reports/

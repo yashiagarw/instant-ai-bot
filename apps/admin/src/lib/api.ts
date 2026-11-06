@@ -1,3 +1,5 @@
+import { newRequestId } from "@im/ui/observability";
+
 // The staff API (backend/app/admin/api.py). Every call sends the staff cookie (credentials: include); it is
 // HttpOnly, so this code never sees it. 401 = not signed in (the app goes to /login); 403 = no access.
 
@@ -23,11 +25,14 @@ async function call<T>(method: string, path: string, body?: unknown, signal?: Ab
     res = await fetch(`${API_URL}/api/admin${path}`, {
       method,
       credentials: "include",
-      headers: json
-        ? { "Content-Type": "application/json" }
-        : body instanceof Blob
-          ? { "Content-Type": body.type || "application/octet-stream" }
-          : undefined,
+      headers: {
+        "X-Request-ID": newRequestId("adm"),
+        ...(json
+          ? { "Content-Type": "application/json" }
+          : body instanceof Blob
+            ? { "Content-Type": body.type || "application/octet-stream" }
+            : {}),
+      },
       // A file (Blob) is sent as the request body as it is.
       body: body === undefined ? undefined : json ? JSON.stringify(body) : (body as Blob),
       signal,
@@ -1209,7 +1214,7 @@ export const adminApi = {
 
   /** The public category list (GET /api/categories, no sign-in): names for skills and filters. */
   categories: async (signal?: AbortSignal): Promise<CategoryOption[]> => {
-    const res = await fetch(`${API_URL}/api/categories`, { signal, cache: "no-store" }).catch(() => null);
+    const res = await fetch(`${API_URL}/api/categories`, { signal, cache: "no-store", headers: { "X-Request-ID": newRequestId("adm") } }).catch(() => null);
     if (!res?.ok) throw new ApiError("We couldn't load the categories. Please try again.", res?.status ?? 0);
     const data = (await res.json()) as { categories: CategoryOption[] };
     return data.categories;

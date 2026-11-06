@@ -9,7 +9,7 @@ import { NotificationChoices } from "@/components/account/notification-choices";
 import { ErrorMessage } from "@/components/error-message";
 import { Skeleton } from "@/components/skeleton";
 import { Button } from "@/components/ui/button";
-import { accountApi, ApiError, errorMessage, type Me, type RequestSummary, type SavedCar, type SessionSummary } from "@/lib/api";
+import { accountApi, API_URL, ApiError, errorMessage, type Me, type RequestSummary, type SavedCar, type SessionSummary } from "@/lib/api";
 import { shortDate } from "@/lib/format";
 
 type Data = { me: Me; cars: SavedCar[]; sessions: SessionSummary[]; requests: RequestSummary[] };
@@ -44,7 +44,8 @@ function DeleteAccount({ onDeleted }: { onDeleted: () => void }) {
         Delete my account
       </h2>
       <p className="text-ink/85">
-        This removes your mobile number, saved cars, diagnosis history, mechanic requests and anything you uploaded. It
+        This removes your mobile number, saved cars, diagnosis history and anything you uploaded. Your mechanic requests
+        are kept only without your name, number, address and notes (the fault the mechanic found helps us improve). It
         cannot be undone.
       </p>
       {!open ? (
@@ -244,6 +245,26 @@ export function AccountView() {
       </Section>
 
       <NotificationChoices />
+
+      <section aria-labelledby="mydata-h" className="flex flex-col gap-3 rounded-3xl border border-border bg-white p-5">
+        <h2 id="mydata-h" className="text-xl font-black text-ink">
+          My data
+        </h2>
+        <p className="text-ink/85">
+          Download everything we keep about you as a file (JSON): your account, cars, diagnoses, requests, choices and
+          consents.
+        </p>
+        <Link href="/privacy" className="inline-flex min-h-11 items-center self-start font-bold text-orange-text underline underline-offset-4">
+          How we use your data: our privacy notice
+        </Link>
+        <a
+          href={`${API_URL}/api/me/export`}
+          data-testid="download-data"
+          className="inline-flex h-12 items-center self-start rounded-full border-2 border-ink/15 px-6 text-base font-bold text-ink outline-none focus-visible:ring-3 focus-visible:ring-ring"
+        >
+          Download my data
+        </a>
+      </section>
 
       <DeleteAccount onDeleted={() => setDeleted(true)} />
     </div>

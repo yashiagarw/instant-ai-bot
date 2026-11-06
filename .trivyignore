@@ -1,0 +1,16 @@
+# Accepted image vulnerabilities (Trivy), one id per line with the reason and an expiry (exp:), after which the scan
+# reports them again. Only add ones that have no fix or do not apply, after reading them.
+#
+# Reviewed 2026-11-06 (Phase 5.4). autocare-api: pcre2 10.32-3.el8_6 is not Debian's (that one is patched,
+# 10.42-1+deb12u2) but the copy bundled inside the psycopg-binary wheel (psycopg_binary.libs/libpcre2-8-*.so, built on
+# a RHEL 8 manylinux image; unchanged in the latest wheel, 3.3.8). Red Hat backports fixes into el8 builds, so the
+# Debian fixed versions Trivy compares with do not apply; it is loaded only by the bundled libselinux and never
+# compiles untrusted regular expressions. Removing it means dropping psycopg-binary for a source build against
+# Debian's libpq (follow-up), not a safe change in a hardening phase.
+CVE-2022-1586 exp:2027-02-06
+CVE-2022-1587 exp:2027-02-06
+CVE-2019-20454 exp:2027-02-06
+CVE-2026-103111 exp:2027-02-06
+CVE-2026-86145 exp:2027-02-06
+CVE-2026-89157 exp:2027-02-06
+CVE-2026-89161 exp:2027-02-06

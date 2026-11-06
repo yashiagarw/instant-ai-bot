@@ -43,6 +43,8 @@ m = SentenceTransformer(sys.argv[1], device='cpu'); print('baked', sys.argv[1], 
 # ---------------------------------------------------------------- production runtime
 FROM ${PYTHON_IMAGE} AS runtime
 ARG EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+# Debian security updates newer than the base image (Trivy, Phase 5.4: e.g. pcre2).
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 10001 app \
     && useradd --system --uid 10001 --gid app --home-dir /app --no-create-home --shell /usr/sbin/nologin app
 ENV PATH=/opt/venv/bin:$PATH \
@@ -75,8 +77,9 @@ RUN mkdir -p /app/data/raw /app/data/media /app/data/uploads/datasets /app/data/
 USER app
 EXPOSE 8000
 # One process per container: the embedding model is loaded once (app.knowledge.importer.embed.load_embedder) and
-# shared by every request thread. Behind Caddy: X-Forwarded-* from the proxy network are trusted.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*", "--no-server-header"]
+# shared by every request thread. Behind Caddy: X-Forwarded-* from the proxy network are trusted. Uvicorn's own
+# access log is off: the API writes one JSON line per request without the client IP (app/security.py).
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*", "--no-server-header", "--no-access-log"]
 
 # ---------------------------------------------------------------- development (docker compose --profile app)
 # The source is bind-mounted over /app; the venv lives in /opt/venv so the host's .venv (macOS) is never used.

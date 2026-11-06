@@ -34,7 +34,7 @@ export function ChangePassword({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5" noValidate>
+    <form method="post" onSubmit={submit} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-5" noValidate>
       <Field label="Current password" name="current" type="password" autoComplete="current-password" required />
       <Field label="Code from your authenticator app" name="code" inputMode="numeric" autoComplete="one-time-code"
              pattern="[0-9]{6}" maxLength={6} required /> {/* prettier-ignore */}

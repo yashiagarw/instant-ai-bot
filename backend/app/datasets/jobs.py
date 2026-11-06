@@ -46,12 +46,16 @@ class ArqQueue:
         from arq import create_pool
         from arq.connections import RedisSettings
 
+        from app.observability.logs import current_request_id
+
+        request_id = current_request_id()
+
         async def go() -> None:
             settings = RedisSettings.from_dsn(self.redis_url)
             settings.conn_timeout, settings.conn_retries = 2, 0
             pool = await create_pool(settings)
             try:
-                await pool.enqueue_job(JOB_FUNCTION, job_id, _job_id=f"dataset-job-{job_id}")
+                await pool.enqueue_job(JOB_FUNCTION, job_id, request_id=request_id, _job_id=f"dataset-job-{job_id}")
             finally:
                 await pool.aclose()
 

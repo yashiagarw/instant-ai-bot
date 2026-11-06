@@ -10,6 +10,9 @@
 
 {
 	admin localhost:2019
+	# Clients that send no TLS server name (Java, hence OWASP ZAP, for "localhost"; old clients) get the main site's
+	# certificate instead of a failed handshake.
+	default_sni {$WEB_DOMAIN}
 }
 
 (common) {

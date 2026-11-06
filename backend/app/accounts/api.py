@@ -19,7 +19,7 @@ from app.db import get_session
 from app.diagnosis.models import DiagnosisSession, SessionResult
 from app.knowledge.models import ProblemGroup
 from app.notify.sms import SmsError, SmsSender, make_sms, mask_phone
-from app.ratelimit import RateLimiter, client_ip
+from app.ratelimit import client_ip, make_limiter
 from app.requests import workflow
 from app.requests.models import (
     AssignmentStatus,
@@ -29,6 +29,7 @@ from app.requests.models import (
     RequestStatus,
     ServiceRequest,
 )
+from app.turnstile import require_human
 
 log = logging.getLogger(__name__)
 auth_router = APIRouter(prefix="/auth", tags=["accounts"])
@@ -105,9 +106,9 @@ def get_sms(request: Request) -> SmsSender:
 
 def _limit(request: Request, name: str, limit: int, window: int) -> None:
     state = request.app.state
-    limiter: RateLimiter | None = getattr(state, name, None)
+    limiter = getattr(state, name, None)
     if limiter is None:
-        limiter = RateLimiter(limit, window)
+        limiter = make_limiter(state.settings, name, limit, window)
         setattr(state, name, limiter)
     wait = limiter.check(client_ip(request, state.settings.trust_forwarded_for))
     if wait is not None:
@@ -155,7 +156,7 @@ def auth_config(request: Request):
     "/otp/request",
     response_model=S.OtpRequestOut,
     status_code=status.HTTP_202_ACCEPTED,
-    dependencies=[Depends(limit_otp_request)],
+    dependencies=[Depends(limit_otp_request), Depends(require_human)],
     responses={422: {"description": "Not an Indian mobile number"}, 429: {"description": "Too many codes"}},
 )
 def otp_request(
@@ -225,6 +226,23 @@ def me(user: RequiredUser, session: DbSession):
         vehicles=count(UserVehicle, UserVehicle.user_id),
         sessions=count(DiagnosisSession, DiagnosisSession.user_id),
         requests=count(ServiceRequest, ServiceRequest.user_id),
+    )
+
+
+@me_router.get("/export", responses={401: {"description": "Not logged in"}, 429: {}})
+def export_me(request: Request, user: RequiredUser, session: DbSession):
+    """Everything we keep about the customer, as a JSON file (DPDP Act). A few times an hour at most."""
+    from datetime import date
+
+    from fastapi.responses import JSONResponse
+
+    from app.accounts import export
+
+    _limit(request, "export_limiter", 5, 3600)
+    name = f"instant-mechanic-my-data-{date.today().isoformat()}.json"
+    return JSONResponse(
+        export.build(session, user),
+        headers={"Content-Disposition": f'attachment; filename="{name}"', "Cache-Control": "no-store"},
     )
 
 
@@ -420,8 +438,9 @@ def my_request(request_id: uuid.UUID, user: RequiredUser, session: DbSession):
 
 @me_router.delete("", response_model=S.DeleteAccountOut, responses={401: {"description": "Not logged in"}, 422: {}})
 def delete_me(body: S.DeleteAccountIn, request: Request, response: Response, user: RequiredUser, session: DbSession):
-    """Delete the account and all personal data linked to it: phone, saved cars, diagnosis history, requests (with
-    contact details and consent records) and uploads. Cannot be undone."""
+    """Delete the account and all personal data linked to it: phone, saved cars, diagnosis history and uploads; the
+    requests are anonymised (contact details, place, opt-ins removed) so their confirmed-fault outcomes stay.
+    Cannot be undone."""
     from app.uploads.api import get_storage
     from app.uploads.storage import StorageError
 

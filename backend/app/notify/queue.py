@@ -35,13 +35,17 @@ class ArqNotifyQueue:
         from arq import create_pool
         from arq.connections import RedisSettings
 
+        from app.observability.logs import current_request_id
+
+        request_id = current_request_id()  # the request (or job) that queued them: the job logs under the same id
+
         async def go() -> None:
             settings = RedisSettings.from_dsn(self.redis_url)
             settings.conn_timeout, settings.conn_retries = 2, 0
             pool = await create_pool(settings)
             try:
                 for function, arg, job_id, when in jobs:
-                    await pool.enqueue_job(function, arg, _job_id=job_id, _defer_until=when)
+                    await pool.enqueue_job(function, arg, request_id=request_id, _job_id=job_id, _defer_until=when)
             finally:
                 await pool.aclose()
 

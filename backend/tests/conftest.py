@@ -27,6 +27,11 @@ def test_settings() -> Settings:
             "environment": "test",
             "diagnosis_search": "keyword",
             "llm_provider": "none",
+            # Limits counted per test app, not in the developer's Redis (tests/test_hardening.py tests the Redis one).
+            "rate_limit_backend": "memory",
+            "turnstile_secret_key": "",
+            "sentry_dsn": "",
+            "log_format": "console",
         }
     )
 

@@ -1,0 +1,15 @@
+# ZAP baseline rule decisions (tab-separated: id, IGNORE/INFO/WARN/FAIL, reason). Unlisted rules: WARN.
+# Reviewed 2026-11-06 (Phase 5.4).
+10038	FAIL	Content Security Policy header missing
+10020	FAIL	Anti-clickjacking header missing
+10021	FAIL	X-Content-Type-Options missing
+10035	FAIL	Strict-Transport-Security missing or disabled (scripts/zap-baseline.sh: INFO on localhost, where HSTS_MAX_AGE=0 on purpose)
+10024	FAIL	Sensitive information in URL (forms with credentials or personal data use method="post")
+10063	WARN	Permissions-Policy missing
+10055	WARN	CSP script-src 'unsafe-inline': accepted. Next.js inlines its bootstrap scripts; nonces would make every page dynamic (packages/ui/src/security-headers.ts). No user HTML is rendered (no dangerouslySetInnerHTML)
+90004	INFO	COEP / CORP: COEP require-corp would block Turnstile and map tiles; the API sends CORP same-site on purpose (the website on the sibling host reads it)
+10015	INFO	Cache-control: pages are public; the API sends no-store
+10049	INFO	Non-storable content: intended (no-store on the API)
+10109	INFO	Modern web application: informational
+10111	INFO	Authentication request identified: informational
+10202	INFO	No anti-CSRF token in forms: they never post to a server (JavaScript calls the API, which checks Origin / Referer: app/security.py)

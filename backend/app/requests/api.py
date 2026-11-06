@@ -10,7 +10,7 @@ from app.db import get_session
 from app.diagnosis.api import EngineDep
 from app.notify import optins
 from app.notify import service as notify
-from app.ratelimit import RateLimiter, client_ip
+from app.ratelimit import client_ip, make_limiter
 from app.requests import service
 from app.requests.schemas import (
     PREFERRED_TIMES,
@@ -19,6 +19,7 @@ from app.requests.schemas import (
     ServiceRequestIn,
     ServiceRequestOut,
 )
+from app.turnstile import require_human
 
 router = APIRouter(prefix="/service-requests", tags=["service requests"])
 DbSession = Annotated[Session, Depends(get_session)]
@@ -26,10 +27,10 @@ DbSession = Annotated[Session, Depends(get_session)]
 
 def limit_requests(request: Request) -> None:
     settings = request.app.state.settings
-    limiter: RateLimiter | None = getattr(request.app.state, "request_limiter", None)
+    limiter = getattr(request.app.state, "request_limiter", None)
     if limiter is None:
-        limiter = request.app.state.request_limiter = RateLimiter(
-            settings.request_rate_limit, settings.request_rate_window_seconds
+        limiter = request.app.state.request_limiter = make_limiter(
+            settings, "service_requests", settings.request_rate_limit, settings.request_rate_window_seconds
         )
     wait = limiter.check(client_ip(request, settings.trust_forwarded_for))
     if wait is not None:
@@ -62,7 +63,7 @@ def get_config(request: Request):
         422: {"description": "Invalid input (for example a wrong mobile number or no consent)"},
         429: {"description": "Too many requests from this address"},
     },
-    dependencies=[Depends(limit_requests)],
+    dependencies=[Depends(limit_requests), Depends(require_human)],
 )
 def create_request(
     body: ServiceRequestIn,

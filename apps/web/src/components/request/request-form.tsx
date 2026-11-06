@@ -9,6 +9,7 @@ import { ErrorMessage } from "@/components/error-message";
 import { AlertsButton } from "@/components/notify/alerts-button";
 import { Skeleton } from "@/components/skeleton";
 import { TextField } from "@/components/text-field";
+import { useHumanCheck } from "@/components/turnstile";
 import { Button } from "@/components/ui/button";
 import {
   api,
@@ -165,6 +166,7 @@ function Form({
   const [notes, setNotes] = useState("");
   const [consent, setConsent] = useState(false);
   const [whatsapp, setWhatsapp] = useState(false);
+  const human = useHumanCheck();
   const [errors, setErrors] = useState<Errors>({});
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -189,6 +191,10 @@ function Form({
       );
       return;
     }
+    if (human.required && !human.token) {
+      setError('Please complete the "I\'m human" check above the button.');
+      return;
+    }
     setSending(true);
     setError(null);
     try {
@@ -207,16 +213,17 @@ function Form({
           consent_text_version: config.consent_version,
           whatsapp_optin: whatsapp,
           whatsapp_consent_version: whatsapp ? config.whatsapp_consent_version : null,
-        }),
+        }, human.token),
       );
     } catch (err) {
       setError(errorMessage(err));
+      human.reset(); // a token works once
       setSending(false);
     }
   }
 
   return (
-    <form onSubmit={submit} noValidate className="flex flex-col gap-6" aria-labelledby="request-heading">
+    <form method="post" onSubmit={submit} noValidate className="flex flex-col gap-6" aria-labelledby="request-heading">
       <div>
         <h1 id="request-heading" className="text-4xl leading-tight font-black tracking-tight text-ink sm:text-5xl">
           {urgent ? "Get help now" : "Request a Mechanic"}
@@ -347,6 +354,7 @@ function Form({
         </label>
       )}
 
+      {human.box}
       {error && <ErrorMessage message={error} />}
       <Button type="submit" size="cta" disabled={sending} className="self-stretch sm:self-start">
         {sending && <LoaderCircle aria-hidden="true" className="size-5 animate-spin motion-reduce:animate-none" />}

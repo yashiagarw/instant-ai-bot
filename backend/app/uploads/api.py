@@ -24,7 +24,7 @@ from app.db import get_session
 from app.diagnosis import service as diagnosis_service
 from app.diagnosis.models import DiagnosisSession
 from app.diagnosis.schemas import SafetyAlertOut
-from app.ratelimit import RateLimiter, client_ip
+from app.ratelimit import client_ip, make_limiter
 from app.uploads.imaging import MESSAGES, ImageRejected, process
 from app.uploads.models import Upload, UploadStatus
 from app.uploads.storage import Storage, StorageError, make_storage
@@ -53,7 +53,7 @@ def limit_uploads(request: Request) -> None:
     state = request.app.state
     s = state.settings
     if getattr(state, "upload_limiter", None) is None:
-        state.upload_limiter = RateLimiter(s.upload_rate_limit, s.upload_rate_window_seconds)
+        state.upload_limiter = make_limiter(s, "uploads", s.upload_rate_limit, s.upload_rate_window_seconds)
     wait = state.upload_limiter.check(client_ip(request, s.trust_forwarded_for))
     if wait is not None:
         raise HTTPException(

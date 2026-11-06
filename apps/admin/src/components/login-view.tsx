@@ -106,7 +106,7 @@ export function LoginView() {
       </p>
 
       {step.kind === "password" && (
-        <form onSubmit={submitPassword} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-6">
+        <form method="post" onSubmit={submitPassword} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-6">
           <h1 className="text-3xl font-black text-ink">Staff sign in</h1>
           <Field label="Email" name="email" type="email" autoComplete="username" required autoFocus />
           <Field label="Password" name="password" type="password" autoComplete="current-password" required />
@@ -119,7 +119,7 @@ export function LoginView() {
       )}
 
       {step.kind === "code" && (
-        <form onSubmit={submitCode} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-6">
+        <form method="post" onSubmit={submitCode} className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-6">
           <h1 className="text-3xl font-black text-ink">Two-factor code</h1>
           <p className="text-ink/80">Open your authenticator app and type the code for Instant Mechanic.</p>
           {codeField}

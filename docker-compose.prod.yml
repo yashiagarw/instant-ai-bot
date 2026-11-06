@@ -82,9 +82,13 @@ services:
       args:
         APP: web
         NEXT_PUBLIC_API_URL: https://${API_DOMAIN}
+        NEXT_PUBLIC_FILES_URL: ${NEXT_PUBLIC_FILES_URL:-https://${FILES_DOMAIN}}
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
+        NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/healthz"]
       interval: 30s
       timeout: 5s
       start_period: 20s
@@ -99,11 +103,16 @@ services:
       args:
         APP: admin
         NEXT_PUBLIC_API_URL: https://${API_DOMAIN}
+        NEXT_PUBLIC_FILES_URL: ${NEXT_PUBLIC_FILES_URL:-https://${FILES_DOMAIN}}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
+        NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
+        NEXT_PUBLIC_MAP_PROVIDER: ${NEXT_PUBLIC_MAP_PROVIDER:-}
+        NEXT_PUBLIC_MAP_KEY: ${NEXT_PUBLIC_MAP_KEY:-}
         NEXT_PUBLIC_MAP_TILE_URL: ${NEXT_PUBLIC_MAP_TILE_URL:-}
         NEXT_PUBLIC_MAP_ATTRIBUTION: ${NEXT_PUBLIC_MAP_ATTRIBUTION:-}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/login"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/healthz"]
       interval: 30s
       timeout: 5s
       start_period: 20s
@@ -135,7 +144,8 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/api/health', timeout=4)"]
+      # Ready: the database answers and its migrations are at head (docs/runbooks/uptime.md).
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/api/health/ready', timeout=4)"]
       interval: 15s
       timeout: 5s
       start_period: 30s
@@ -185,6 +195,45 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # Daily encrypted backups (Phase 5.4): Postgres, the photo bucket and data/media, encrypted with age to
+  # BACKUP_AGE_RECIPIENT (the private key stays off this server), kept BACKUP_RETENTION_DAYS (30) here and in
+  # BACKUP_REMOTE. Off (logged) without a recipient. docs/runbooks/restore.md: restore and the restore test.
+  backup:
+    build:
+      context: docker/backup
+    image: ${BACKUP_IMAGE:-autocare-backup:latest}
+    restart: unless-stopped
+    env_file:
+      - path: ./backend/.env.prod
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-autocare}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      PGDATABASE: ${POSTGRES_DB:-autocare}
+      POSTGRES_DB: ${POSTGRES_DB:-autocare}
+      BACKUP_AGE_RECIPIENT: ${BACKUP_AGE_RECIPIENT:-}
+      BACKUP_REMOTE: ${BACKUP_REMOTE:-}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
+      BACKUP_AT: ${BACKUP_AT:-21:00}
+      RCLONE_CONFIG_OFFSITE_TYPE: s3
+      RCLONE_CONFIG_OFFSITE_PROVIDER: ${BACKUP_S3_PROVIDER:-Other}
+      RCLONE_CONFIG_OFFSITE_ENDPOINT: ${BACKUP_S3_ENDPOINT:-}
+      RCLONE_CONFIG_OFFSITE_REGION: ${BACKUP_S3_REGION:-auto}
+      RCLONE_CONFIG_OFFSITE_ACCESS_KEY_ID: ${BACKUP_S3_ACCESS_KEY:-}
+      RCLONE_CONFIG_OFFSITE_SECRET_ACCESS_KEY: ${BACKUP_S3_SECRET_KEY:-}
+    volumes:
+      - backups:/backups
+      - ${DATA_MEDIA_DIR:-./data/media}:/data/media:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "grep -q schedule.sh /proc/1/cmdline"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+    logging: *logging
 
   db:
     image: pgvector/pgvector:pg16
@@ -243,6 +292,7 @@ services:
     logging: *logging
 
 volumes:
+  backups:
   pgdata_prod:
   storagedata_prod:
   uploads:

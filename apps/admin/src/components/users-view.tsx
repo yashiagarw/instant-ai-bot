@@ -359,7 +359,7 @@ function InviteDialog({
           </Button>
         </div>
       ) : (
-        <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
+        <form method="post" onSubmit={submit} className="flex flex-col gap-4" noValidate>
           <Field label="Name" name="name" required autoComplete="off" />
           <Field label="Work email" name="email" type="email" required autoComplete="off" />
           <RoleChecks value={roles} onChange={setRoles} />

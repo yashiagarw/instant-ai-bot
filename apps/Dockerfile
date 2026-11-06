@@ -27,9 +27,21 @@ ARG APP
 ARG NEXT_PUBLIC_API_URL=http://localhost:8000
 ARG NEXT_PUBLIC_MAP_TILE_URL=
 ARG NEXT_PUBLIC_MAP_ATTRIBUTION=
+ARG NEXT_PUBLIC_MAP_PROVIDER=
+ARG NEXT_PUBLIC_MAP_KEY=
+ARG NEXT_PUBLIC_FILES_URL=
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+ARG NEXT_PUBLIC_SENTRY_DSN=
+ARG NEXT_PUBLIC_SENTRY_ENVIRONMENT=production
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
     NEXT_PUBLIC_MAP_TILE_URL=${NEXT_PUBLIC_MAP_TILE_URL} \
     NEXT_PUBLIC_MAP_ATTRIBUTION=${NEXT_PUBLIC_MAP_ATTRIBUTION} \
+    NEXT_PUBLIC_MAP_PROVIDER=${NEXT_PUBLIC_MAP_PROVIDER} \
+    NEXT_PUBLIC_MAP_KEY=${NEXT_PUBLIC_MAP_KEY} \
+    NEXT_PUBLIC_FILES_URL=${NEXT_PUBLIC_FILES_URL} \
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY} \
+    NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN} \
+    NEXT_PUBLIC_SENTRY_ENVIRONMENT=${NEXT_PUBLIC_SENTRY_ENVIRONMENT} \
     NEXT_OUTPUT=standalone \
     NEXT_TELEMETRY_DISABLED=1 \
     NODE_OPTIONS=--max-old-space-size=2048
@@ -47,6 +59,11 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     HOSTNAME=0.0.0.0 \
     PORT=3000
+# Only `node` is needed at run time: the npm / npx / corepack CLIs of the base image go (their bundled undici and
+# brace-expansion had known vulnerabilities, Trivy, Phase 5.4), and apk security updates are applied.
+RUN apk upgrade --no-cache \
+    && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+        /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /opt/yarn-* /usr/local/bin/yarn /usr/local/bin/yarnpkg
 # The traced server, its node_modules and the static files; nothing else from the workspace.
 COPY --from=build --chown=node:node /repo/apps/${APP}/.next/standalone /app
 WORKDIR /app/apps/${APP}

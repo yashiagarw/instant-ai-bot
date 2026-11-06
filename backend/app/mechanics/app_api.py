@@ -41,9 +41,10 @@ from app.notify.models import PushSubscription
 from app.notify.push import allowed_endpoint
 from app.notify.sms import SmsSender, mask_phone
 from app.notify.templates import clean_value
-from app.ratelimit import RateLimiter, client_ip
+from app.ratelimit import client_ip, make_limiter
 from app.requests import dispatch, outcomes, workflow
 from app.requests.models import AssignmentStatus, RequestAssignment, RequestStatus, ServiceRequest
+from app.turnstile import require_human
 
 router = APIRouter(prefix="/mechanic", tags=["mechanic app"])
 DbSession = Annotated[Session, Depends(get_session)]
@@ -68,7 +69,7 @@ def _limit(request: Request, name: str, limit: int, window: int) -> None:
     key = f"mech_limiter_{name}"
     limiter = getattr(state, key, None)
     if limiter is None:
-        limiter = RateLimiter(limit, window)
+        limiter = make_limiter(state.settings, f"mechanic_{name}", limit, window)
         setattr(state, key, limiter)
     wait = limiter.check(client_ip(request, state.settings.trust_forwarded_for))
     if wait is not None:
@@ -289,7 +290,9 @@ def _today_start(now: datetime) -> datetime:
 # ---------------------------------------------------------------- sign in
 
 
-@router.post("/auth/otp/request", status_code=202, responses={422: {}, 429: {}})
+@router.post(
+    "/auth/otp/request", status_code=202, responses={403: {}, 422: {}, 429: {}}, dependencies=[Depends(require_human)]
+)
 def otp_request(body: PhoneIn, request: Request, session: DbSession, sms: Annotated[SmsSender, Depends(get_sms)]):
     """Send a sign-in code. The same answer whether or not the number is a mechanic's (no guessing who works here)."""
     _limit(request, "otp", request.app.state.settings.otp_ip_limit, request.app.state.settings.otp_ip_window_seconds)

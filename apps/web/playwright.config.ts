@@ -10,8 +10,12 @@ const BASE_URL = process.env.E2E_BASE_URL;
 // E2E_LIVE_FLOW: the customer -> support -> mechanic flow against the real API (e2e/live-flow.spec.ts) also needs the
 // admin app: built and served on E2E_ADMIN_PORT (3111) with the same NEXT_PUBLIC_API_URL.
 const ADMIN_PORT = Number(process.env.E2E_ADMIN_PORT ?? 3111);
+// The Content-Security-Policy allows only the photo storage host (NEXT_PUBLIC_FILES_URL): the mocked tests serve
+// photos from https://storage.test (e2e/photos.spec.ts), live runs use the real one from the environment.
+const FILES_URL = process.env.NEXT_PUBLIC_FILES_URL ?? "https://storage.test";
 const web = {
   command: `pnpm build && pnpm start --port ${PORT}`,
+  env: { NEXT_PUBLIC_FILES_URL: FILES_URL },
   url: `http://localhost:${PORT}`,
   reuseExistingServer: !process.env.CI,
   timeout: 180_000,

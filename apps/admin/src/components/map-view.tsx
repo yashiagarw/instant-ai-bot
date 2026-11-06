@@ -1,9 +1,8 @@
 "use client";
 
-// A Leaflet map with OpenStreetMap tiles. Development only: OSM's public tiles are not for production traffic, so
-// production sets NEXT_PUBLIC_MAP_TILE_URL (and its attribution) to a proper tile provider. Leaflet needs the
-// browser, so it is loaded after the first render. The map only illustrates: every point is also listed as text
-// next to it, so nothing depends on seeing the map.
+// A Leaflet map. Tiles come from the provider configured at build time (src/lib/map-tiles.ts: Stadia by default,
+// MapTiler with a key). Leaflet needs the browser, so it is loaded after the first render. The map only
+// illustrates: every point is also listed as text next to it, so nothing depends on seeing the map.
 
 import "leaflet/dist/leaflet.css";
 
@@ -12,9 +11,16 @@ import type { Map as LeafletMap, LayerGroup } from "leaflet";
 
 import { cn } from "@im/ui/cn";
 
-const TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL || "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const ATTRIBUTION =
-  process.env.NEXT_PUBLIC_MAP_ATTRIBUTION || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+import { tileConfig } from "@/lib/map-tiles";
+
+const TILES = tileConfig({
+  NEXT_PUBLIC_MAP_PROVIDER: process.env.NEXT_PUBLIC_MAP_PROVIDER,
+  NEXT_PUBLIC_MAP_KEY: process.env.NEXT_PUBLIC_MAP_KEY,
+  NEXT_PUBLIC_MAP_TILE_URL: process.env.NEXT_PUBLIC_MAP_TILE_URL,
+  NEXT_PUBLIC_MAP_ATTRIBUTION: process.env.NEXT_PUBLIC_MAP_ATTRIBUTION,
+});
+const TILE_URL = TILES.url;
+const ATTRIBUTION = TILES.attribution;
 const DELHI: [number, number] = [28.6139, 77.209];
 
 const TONES = {

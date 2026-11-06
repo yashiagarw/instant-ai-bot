@@ -6,6 +6,7 @@ import { useEffect, useId, useState } from "react";
 import { ErrorMessage } from "@/components/error-message";
 import { Skeleton } from "@/components/skeleton";
 import { Button } from "@/components/ui/button";
+import { useHumanCheck } from "@/components/turnstile";
 import { accountApi, errorMessage } from "@/lib/api";
 import { useLoad } from "@/lib/use-load";
 
@@ -30,6 +31,7 @@ export function LoginView() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [wait, setWait] = useState(0);
+  const human = useHumanCheck();
 
   useEffect(() => {
     if (wait <= 0) return;
@@ -42,10 +44,14 @@ export function LoginView() {
       setError("Enter your 10-digit mobile number");
       return;
     }
+    if (human.required && !human.token) {
+      setError('Please complete the "I\'m human" check first');
+      return;
+    }
     setBusy(true);
     setError("");
     try {
-      const r = await accountApi.requestCode(phone);
+      const r = await accountApi.requestCode(phone, human.token);
       setMasked(r.phone_masked);
       setStep("code");
       setCode("");
@@ -53,6 +59,7 @@ export function LoginView() {
     } catch (e) {
       setError(errorMessage(e));
     } finally {
+      human.reset(); // a token works once
       setBusy(false);
     }
   }
@@ -93,8 +100,10 @@ export function LoginView() {
         </p>
       </div>
 
+      {/* Above both steps, so "Send a new code" can use it too. */}
+      {human.box}
       {step === "phone" ? (
-        <form
+        <form method="post"
           className="flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
@@ -136,7 +145,7 @@ export function LoginView() {
           </Button>
         </form>
       ) : (
-        <form
+        <form method="post"
           className="flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();

@@ -19,16 +19,27 @@ from app.mechanics import admin_api as mechanics_admin_api
 from app.mechanics import app_api as mechanic_app_api
 from app.notify import api as notify_api
 from app.notify import service as notify
+from app.observability import logs
+from app.observability.errors import init_sentry
 from app.parts import admin_api as parts_admin_api
 from app.parts import api as parts_api
 from app.quality import api as quality_api
 from app.requests import admin_api as requests_admin_api
 from app.requests import api as requests_api
 from app.requests import dispatch_admin_api, tracking_api
+from app.security import HardeningMiddleware
 from app.uploads import admin_api as media_admin_api
 from app.uploads import api as uploads_api
 from app.vehicles import admin_api as vehicles_admin_api
 from app.vehicles import api as vehicles_api
+
+_sentry_started = False
+
+
+def init_sentry_once(settings: Settings) -> None:
+    global _sentry_started
+    if not _sentry_started:
+        _sentry_started = init_sentry(settings, "api")
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -36,6 +47,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     if settings.environment == "production" and settings.auth_secret.startswith("dev-only"):
         raise RuntimeError("Set AUTH_SECRET to a long random value in production")
     fernet(settings)  # STAFF_TOTP_KEY must be valid (and set, in production) before staff can sign in
+    logs.configure("api", settings.log_format, settings.log_level)
+    init_sentry_once(settings)
     app = FastAPI(title="Instant Mechanic API", version="0.1.0")
 
     app.state.settings = settings
@@ -43,11 +56,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.engine = make_engine(settings.database_url, settings.db_connect_timeout)
     app.state.session_factory = make_session_factory(app.state.engine)
 
+    # Request id, access log, security headers, body size, CSRF origin check, rate limit backstop (app/security.py).
+    # Added before CORS, so CORS is the outer layer and refusals still carry its headers.
+    app.add_middleware(HardeningMiddleware, settings=settings)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[o for o in (settings.web_origin, settings.admin_origin) if o],
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-        allow_headers=["Content-Type", "Authorization"],
+        allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-Turnstile-Token"],
+        expose_headers=["X-Request-ID"],
         allow_credentials=True,  # login cookies; only WEB_ORIGIN and ADMIN_ORIGIN may send them
     )
 

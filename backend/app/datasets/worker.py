@@ -11,6 +11,10 @@ Dispatch (app/requests/dispatch.py, Phase 5.3): every 20 seconds, offers that ex
 (where auto-offer is on), new requests are auto-offered where it is switched on, and requests nobody accepted in time
 are escalated to support.
 
+Retention (app/retention.py, Phase 5.4): daily at 03:00 India time.
+
+Every job logs under the request id of whatever queued it (X-Request-ID, passed as the job's request_id).
+
 Notifications (app/notify): send_notification sends one queued notification (retries and channel fallback),
 handle_whatsapp_inbound handles one WhatsApp webhook message, and every minute a sweep re-queues due notifications
 and unhandled webhook messages that never reached Redis. They run beside a long dataset job (max_jobs).
@@ -19,6 +23,7 @@ and unhandled webhook messages that never reached Redis. They run beside a long 
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
 
 from arq import cron, func
@@ -32,6 +37,11 @@ from app.notify import inbound as notify_inbound
 from app.notify import queue as notify_queue
 from app.notify import service as notify
 from app.notify.channels import make_channels
+from app.observability import logs
+from app.observability.errors import init_sentry
+from app.observability.logs import clean_request_id, new_request_id, request_id_var
+
+log = logging.getLogger(__name__)
 
 
 def make_pipeline(settings, factory) -> Pipeline:
@@ -64,8 +74,10 @@ def make_pipeline(settings, factory) -> Pipeline:
 
 
 async def startup(ctx: dict) -> None:
-    os.environ.setdefault("HF_HUB_OFFLINE", "1")  # the model is cached by the importer; never download in a job
     settings = get_settings()
+    logs.configure("worker", settings.log_format, settings.log_level)
+    init_sentry(settings, "worker")
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")  # the model is cached by the importer; never download in a job
     engine = make_engine(settings.database_url, settings.db_connect_timeout)
     factory = make_session_factory(engine)
     ctx.update(engine=engine, factory=factory, pipeline=make_pipeline(settings, factory))
@@ -74,7 +86,7 @@ async def startup(ctx: dict) -> None:
     ctx["channels"] = make_channels(settings)
     for channel, provider in ctx["channels"].items():
         if reason := provider.config_error:
-            print(f"Notifications: {channel} ({provider.name}) is not usable: {reason}. Messages fall back.")
+            log.warning("Notifications: %s (%s) is not usable: %s. Messages fall back.", channel, provider.name, reason)
     jobs.fail_stale(factory)
     for job_id in jobs.queued(factory):
         await ctx["redis"].enqueue_job(jobs.JOB_FUNCTION, job_id, _job_id=f"dataset-job-{job_id}")
@@ -85,7 +97,13 @@ async def shutdown(ctx: dict) -> None:
         engine.dispose()
 
 
-async def run_dataset_job(ctx: dict, job_id: int) -> str:
+def _traced(request_id: str | None, prefix: str) -> None:
+    """The job logs under the id of the request that queued it (or a new one for cron runs)."""
+    request_id_var.set(clean_request_id(request_id) or new_request_id(prefix))
+
+
+async def run_dataset_job(ctx: dict, job_id: int, request_id: str | None = None) -> str:
+    _traced(request_id, "job-")
     return await asyncio.to_thread(jobs.execute, ctx["factory"], ctx["pipeline"], job_id)
 
 
@@ -94,7 +112,8 @@ def _send(ctx: dict, notification_id: int) -> str:
         return notify.send(session, ctx["channels"], notify.current_settings(), notification_id)
 
 
-async def send_notification(ctx: dict, notification_id: int) -> str:
+async def send_notification(ctx: dict, notification_id: int, request_id: str | None = None) -> str:
+    _traced(request_id, "job-")
     return await asyncio.to_thread(_send, ctx, notification_id)
 
 
@@ -103,7 +122,8 @@ def _inbound(ctx: dict, inbound_id: int) -> str:
         return notify_inbound.handle(session, notify.current_settings(), inbound_id)
 
 
-async def handle_whatsapp_inbound(ctx: dict, inbound_id: int) -> str:
+async def handle_whatsapp_inbound(ctx: dict, inbound_id: int, request_id: str | None = None) -> str:
+    _traced(request_id, "job-")
     return await asyncio.to_thread(_inbound, ctx, inbound_id)
 
 
@@ -119,6 +139,7 @@ def _sweep(ctx: dict) -> str:
 
 
 async def sweep_notifications(ctx: dict) -> str:
+    _traced(None, "cron-sweep-")
     return await asyncio.to_thread(_sweep, ctx)
 
 
@@ -132,7 +153,21 @@ def _dispatch(ctx: dict) -> str:
 
 
 async def dispatch_requests(ctx: dict) -> str:
+    _traced(None, "cron-dispatch-")
     return await asyncio.to_thread(_dispatch, ctx)
+
+
+def _retention(ctx: dict) -> str:
+    """Personal data past its retention period (app/retention.py)."""
+    from app import retention
+
+    with ctx["factory"].begin() as session:
+        return retention.run(session, notify.current_settings()).summary()
+
+
+async def apply_retention(ctx: dict) -> str:
+    _traced(None, "cron-retention-")
+    return await asyncio.to_thread(_retention, ctx)
 
 
 class WorkerSettings:
@@ -145,6 +180,8 @@ class WorkerSettings:
         cron(sweep_notifications, second=0, run_at_startup=True, timeout=60, keep_result=0),
         # Phase 5.3: offer expiry (OFFER_EXPIRY_SECONDS), auto-offer and escalation, every 20 seconds.
         cron(dispatch_requests, second={5, 25, 45}, timeout=60, keep_result=0, unique=True),
+        # Phase 5.4: retention, daily at 03:00 India time (21:30 UTC).
+        cron(apply_retention, hour=21, minute=30, timeout=600, keep_result=0, unique=True),
     ]
     on_startup = startup
     on_shutdown = shutdown

@@ -265,9 +265,11 @@ class DeletionReport:
 
 def delete_account(session: Session, settings: Settings, user: User, storage: Storage) -> DeletionReport:
     """Delete the user and everything personal linked to them (DPDP Act): logins, codes, saved cars, diagnosis
-    sessions with their answers, typed messages and results, typed-in unlisted cars, service requests with their
-    contact details and consent records, photos (the stored objects first) and the user's uploads folder. A
-    count-only receipt is kept. If the storage cannot be reached nothing is deleted (StorageError): try again."""
+    sessions with their answers, typed messages and results, typed-in unlisted cars, photos (the stored objects
+    first) and the user's uploads folder. Their service requests are anonymised, not deleted (Phase 5.4): name,
+    phone, address, notes, WhatsApp opt-ins and masked numbers go, so the confirmed-fault outcomes (no personal
+    data, future training data) stay. A count-only receipt is kept. If the storage cannot be reached nothing is
+    deleted (StorageError): try again."""
     ids = list(session.scalars(select(DiagnosisSession.id).where(DiagnosisSession.user_id == user.id)))
     mine = Upload.user_id == user.id
     photos = session.scalars(select(Upload).where(mine | Upload.session_id.in_(ids) if ids else mine)).all()
@@ -284,7 +286,7 @@ def delete_account(session: Session, settings: Settings, user: User, storage: St
         )
     ]
     vehicles = session.scalar(select(func.count()).select_from(UserVehicle).where(UserVehicle.user_id == user.id))
-    requests = session.execute(delete(ServiceRequest).where(ServiceRequest.user_id == user.id)).rowcount
+    requests = anonymise_requests(session, user.id)
     if ids:
         session.execute(delete(GeneratedQuestion).where(GeneratedQuestion.session_id.in_(ids)))
         session.execute(
@@ -304,6 +306,42 @@ def delete_account(session: Session, settings: Settings, user: User, storage: St
     session.add(AccountDeletion(counts=report.__dict__))
     session.flush()
     return report
+
+
+DELETED_NAME = "Deleted customer"
+
+
+def anonymise_requests(session: Session, user_id) -> int:
+    """The person's requests without the person: contact details, location, notes, consent-linked records and
+    masked numbers removed; the car, the diagnosis summary, the status history and the outcome stay."""
+    from app.calls.models import MaskedCall
+    from app.notify.models import Notification, NotificationOptin
+
+    ids = list(session.scalars(select(ServiceRequest.id).where(ServiceRequest.user_id == user_id)))
+    if not ids:
+        return 0
+    session.execute(
+        update(ServiceRequest)
+        .where(ServiceRequest.id.in_(ids))
+        .values(name=DELETED_NAME, phone="", address="", area_text="", notes="", user_id=None, anon_key_hash=None)
+    )
+    session.execute(delete(NotificationOptin).where(NotificationOptin.request_id.in_(ids)))
+    session.execute(
+        update(Notification)
+        .where(Notification.request_id.in_(ids), Notification.recipient_type == "customer")
+        .values(recipient_masked="", user_id=None)
+    )
+    session.execute(
+        update(MaskedCall)
+        .where(MaskedCall.request_id.in_(ids), MaskedCall.direction == "customer_to_mechanic")
+        .values(from_masked="deleted")
+    )
+    session.execute(
+        update(MaskedCall)
+        .where(MaskedCall.request_id.in_(ids), MaskedCall.direction == "mechanic_to_customer")
+        .values(to_masked="deleted")
+    )
+    return len(ids)
 
 
 def new_anon_token() -> str:

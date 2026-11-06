@@ -40,7 +40,7 @@ from app.notify import inbound, optins
 from app.notify import whatsapp as wa
 from app.notify.models import Channel, NotificationPreference, PushSubscription
 from app.notify.push import allowed_endpoint
-from app.ratelimit import RateLimiter, client_ip
+from app.ratelimit import client_ip, make_limiter
 
 log = logging.getLogger(__name__)
 DbSession = Annotated[Session, Depends(get_session)]
@@ -115,7 +115,7 @@ def _limit(request: Request) -> None:
     state = request.app.state
     limiter = getattr(state, "push_limiter", None)
     if limiter is None:
-        limiter = state.push_limiter = RateLimiter(20, 600)
+        limiter = state.push_limiter = make_limiter(state.settings, "push_subscriptions", 20, 600)
     if limiter.check(client_ip(request, state.settings.trust_forwarded_for)) is not None:
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Too many requests. Try again shortly.")
 

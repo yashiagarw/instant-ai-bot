@@ -24,7 +24,7 @@ export const faultSchema = z.object({
   severity: z.enum(["low", "medium", "high"]).nullable(),
   safety_critical: z.boolean(),
   requires: z.array(z.object({ field: z.enum(REQUIREMENT_FIELDS), value: z.string().trim().min(1, "Give a value") })),
-  prior: z.number({ invalid_type_error: "A number" }).gt(0, "More than 0").max(1000).nullable(),
+  prior: z.number({ error: "A number" }).gt(0, "More than 0").max(1000).nullable(),
 });
 export type FaultForm = z.infer<typeof faultSchema>;
 
@@ -77,7 +77,7 @@ export const safetySchema = z.object({
   towing_recommendation: text(),
   status: z.enum(["draft", "active_pending_signoff", "approved", "rejected"]),
   trigger_phrases: z.array(z.object({ text: required(2, 120, "A phrase") })),
-  understood: z.literal(true, { errorMap: () => ({ message: "Confirm that you checked this safety change" }) }),
+  understood: z.literal(true, { error: "Confirm that you checked this safety change" }),
 });
 export type SafetyForm = z.infer<typeof safetySchema>;
 
@@ -126,7 +126,7 @@ export const addCarSchema = z
     make: required(2, 60, "The make"),
     model: required(1, 60, "The model"),
     body: text(40),
-    year_from: z.number({ invalid_type_error: "A year" }).int().min(1990).max(thisYear + 1),
+    year_from: z.number({ error: "A year" }).int().min(1990).max(thisYear + 1),
     year_to: z.number().int().min(1990).max(thisYear + 1).nullable(),
     fuel: z.enum(FUELS),
     transmissions: z.array(z.enum(TRANSMISSIONS)).min(1, "Choose at least one gearbox"),
@@ -165,11 +165,11 @@ const isoDate = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Give the date it was checked")
   .refine((d) => d <= new Date().toISOString().slice(0, 10), "The check date is in the future");
-const money = (max: number) => z.number({ invalid_type_error: "An amount in rupees" }).int("Whole rupees").min(0).max(max);
+const money = (max: number) => z.number({ error: "An amount in rupees" }).int("Whole rupees").min(0).max(max);
 
 export const makeSchema = z.object({ name: required(2, 60, "The name"), aliases: text(300) });
 export const modelSchema = z.object({ name: required(1, 60, "The name"), body_type: text(40), aliases: text(300) });
-const years = { year_from: z.number({ invalid_type_error: "A year" }).int().min(1980).max(2100), year_to: z.number().int().min(1980).max(2100).nullable() };
+const years = { year_from: z.number({ error: "A year" }).int().min(1980).max(2100), year_to: z.number().int().min(1980).max(2100).nullable() };
 export const generationSchema = z
   .object({ name: required(1, 80, "The name"), ...years })
   .refine((g) => g.year_to === null || g.year_to >= g.year_from, { message: "The last year is before the first", path: ["year_to"] });
@@ -181,7 +181,7 @@ export const variantSchema = z
     engine: text(40),
     ...years,
     price_segment: z.enum(SEGMENTS),
-    features: z.record(z.enum(["yes", "no", "unknown"])),
+    features: z.record(z.string(), z.enum(["yes", "no", "unknown"])),
   })
   .refine((g) => g.year_to === null || g.year_to >= g.year_from, { message: "The last year is before the first", path: ["year_to"] });
 export type VariantForm = z.infer<typeof variantSchema>;
@@ -223,7 +223,7 @@ export type PriceForm = z.infer<typeof priceSchema>;
 
 export const fitSchema = z
   .object({
-    model_id: z.number({ invalid_type_error: "Choose the car" }).int().positive("Choose the car"),
+    model_id: z.number({ error: "Choose the car" }).int().positive("Choose the car"),
     year_from: z.number().int().min(1980).max(2100).nullable(),
     year_to: z.number().int().min(1980).max(2100).nullable(),
     fuel: z.enum(FUELS).nullable(),
@@ -265,8 +265,8 @@ export const mechanicSchema = z.object({
   phone: z.string().trim().refine(isMobile, "A 10-digit Indian mobile number"),
   base_pincode: z.string().trim().regex(/^\d{6}$/, "A pincode has 6 digits"),
   base_area: text(120),
-  rating: z.number({ invalid_type_error: "A number" }).min(0, "0 to 5").max(5, "0 to 5").nullable(),
-  max_jobs_per_day: z.number({ invalid_type_error: "A number" }).int("A whole number").min(1, "1 to 30").max(30, "1 to 30"),
+  rating: z.number({ error: "A number" }).min(0, "0 to 5").max(5, "0 to 5").nullable(),
+  max_jobs_per_day: z.number({ error: "A number" }).int("A whole number").min(1, "1 to 30").max(30, "1 to 30"),
   active: z.boolean(),
   notes: text(1000),
 });

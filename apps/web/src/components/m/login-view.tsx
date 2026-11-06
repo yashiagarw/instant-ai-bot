@@ -5,6 +5,7 @@ import { type FormEvent, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 
 import { LangProvider, useLang, useT } from "@/components/m/i18n";
+import { useHumanCheck } from "@/components/turnstile";
 import { PRIMARY } from "@/components/m/shell";
 import { mechanicApi, MechanicApiError } from "@/lib/mechanic-api";
 
@@ -27,6 +28,7 @@ function Login() {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const human = useHumanCheck(lang);
 
   function message(e: unknown): string {
     if (e instanceof MechanicApiError) {
@@ -39,13 +41,15 @@ function Login() {
   async function send(e: FormEvent) {
     e.preventDefault();
     if (!MOBILE.test(phone.replace(/[\s-]/g, ""))) return setError(t("badPhone"));
+    if (human.required && !human.token) return setError(t("humanCheck"));
     setBusy(true);
     setError(null);
     try {
-      setSentTo((await mechanicApi.requestCode(phone)).phone_masked);
+      setSentTo((await mechanicApi.requestCode(phone, human.token)).phone_masked);
     } catch (err) {
       setError(message(err));
     } finally {
+      human.reset();
       setBusy(false);
     }
   }
@@ -78,7 +82,7 @@ function Login() {
         </div>
         <h1 className="text-4xl font-black">{t("signInTitle")}</h1>
         {!sentTo ? (
-          <form onSubmit={send} className="flex flex-col gap-4" noValidate>
+          <form method="post" onSubmit={send} className="flex flex-col gap-4" noValidate>
             <p className="text-lg text-white/90">{t("signInHint")}</p>
             <label className="flex flex-col gap-2 text-lg font-bold">
               {t("mobile")}
@@ -91,13 +95,14 @@ function Login() {
                 className="min-h-14 rounded-2xl bg-white px-4 text-2xl font-bold text-ink tabular-nums outline-none focus-visible:ring-4 focus-visible:ring-brand"
               />
             </label>
+            {human.box}
             <button type="submit" className={PRIMARY} disabled={busy}>
               {busy && <LoaderCircle aria-hidden="true" className="size-6 animate-spin motion-reduce:animate-none" />}
               {t("sendCode")}
             </button>
           </form>
         ) : (
-          <form onSubmit={verify} className="flex flex-col gap-4" noValidate>
+          <form method="post" onSubmit={verify} className="flex flex-col gap-4" noValidate>
             <p className="text-lg text-white/90">
               {t("codeSent")} <span className="font-bold tabular-nums">{sentTo}</span>
             </p>

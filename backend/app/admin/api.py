@@ -34,7 +34,7 @@ from app.admin.security import WeakPassword, provisioning_uri
 from app.db import get_session
 from app.diagnosis.models import DiagnosisSession
 from app.llm.models import GeneratedQuestion, GeneratedStatus
-from app.ratelimit import RateLimiter, client_ip
+from app.ratelimit import client_ip, make_limiter
 from app.requests.models import ServiceRequest
 from app.vision.models import ImageLabel
 
@@ -229,7 +229,9 @@ def _login_failed(session: Session, e: staff_service.LoginFailed) -> HTTPExcepti
 def _limit_login(request: Request) -> None:
     state, s = request.app.state, request.app.state.settings
     if getattr(state, "staff_login_limiter", None) is None:
-        state.staff_login_limiter = RateLimiter(s.staff_login_ip_limit, s.staff_login_ip_window_seconds)
+        state.staff_login_limiter = make_limiter(
+            s, "staff_login", s.staff_login_ip_limit, s.staff_login_ip_window_seconds
+        )
     wait = state.staff_login_limiter.check(client_ip(request, s.trust_forwarded_for))
     if wait is not None:
         raise HTTPException(
