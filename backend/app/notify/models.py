@@ -125,11 +125,17 @@ class PushSubscription(CreatedAtMixin, Base):
     """A browser that turned alerts on: its account, or its anonymous cookie (hash) until the customer logs in."""
 
     __tablename__ = "push_subscriptions"
-    __table_args__ = (CheckConstraint("user_id IS NOT NULL OR anon_key_hash IS NOT NULL", name="has_owner"),)
+    __table_args__ = (
+        CheckConstraint(
+            "user_id IS NOT NULL OR anon_key_hash IS NOT NULL OR mechanic_id IS NOT NULL", name="has_owner"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     anon_key_hash: Mapped[str | None] = mapped_column(Text, index=True)
+    # A mechanic's phone with the app (/m): job offers arrive as alerts (Phase 5.3).
+    mechanic_id: Mapped[int | None] = mapped_column(ForeignKey("mechanics.id", ondelete="CASCADE"), index=True)
     endpoint: Mapped[str] = mapped_column(Text, unique=True)
     p256dh: Mapped[str] = mapped_column(Text)
     auth: Mapped[str] = mapped_column(Text)

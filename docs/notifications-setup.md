@@ -13,6 +13,7 @@ tried. In production the console providers count as "not set up" (they would rea
 | Web push | Customers who tap "Turn on alerts" | VAPID keys (a command; no account) | minutes |
 | SMS | Customers (status updates), mechanics (job offers) | DLT registration (India), then MSG91 | 1-2 weeks |
 | WhatsApp | Opted-in customers and mechanics (offers with Accept / Reject) | Meta business verification, WhatsApp Business Account, approved templates | 1-3 weeks |
+| Masked calls | Customer and mechanic during a job | Exotel account with KYC and an ExoPhone | 1-5 days |
 
 Do them in this order: email and web push first (no waiting), then start DLT and Meta verification **in parallel**
 (both wait on reviews).
@@ -46,8 +47,9 @@ No account. The browsers' own push services (Google FCM, Mozilla, Apple, Microso
    `VAPID_SUBJECT=mailto:support@instantmechanic.online` (push services contact this address about problems).
 3. Keep the pair: a new pair means every browser has to turn alerts on again.
 4. HTTPS is required (Caddy provides it). Android Chrome, desktop Chrome / Edge / Firefox / Safari work directly.
-   **iPhone / iPad (iOS 16.4+) only show web push for sites added to the Home Screen**, which needs a web app
-   manifest (not added yet: see the follow-ups in the README).
+   **iPhone / iPad (iOS 16.4+) only show web push for sites added to the Home Screen** (Share > Add to Home Screen;
+   the site has a web app manifest since Phase 5.3). Mechanics get offer alerts the same way from the mechanic app
+   (/m > Profile > Turn on alerts), on the same keys.
 5. Check: on the request confirmation tap **Turn on alerts**, allow, then move the request to "accepted" in the
    admin app: the alert appears.
 
@@ -177,6 +179,30 @@ the person writes to us, which WhatsApp allows without a template.
   turns them on again.
 - No opt-in, no WhatsApp: the message goes by the next channel (push or SMS).
 
+## 5. Masked calls (Exotel)
+
+The customer's "Call <mechanic>" button on the tracking page and the mechanic's "Call customer" button in the app
+never show either number: Exotel rings the person who pressed first, then connects the other, and both see only the
+company's virtual number (ExoPhone). Calls are possible only while a mechanic is on the job (accepted … in progress),
+at most `CALL_RATE_LIMIT` per request per window, and each is recorded (`masked_calls`, masked numbers only).
+
+1. **Exotel account** at exotel.com (business plan with outbound calls). Complete **KYC** for the business: PAN,
+   GST certificate (or certificate of incorporation), address proof, authorised signatory ID, and the signed
+   customer agreement / telemarketer declaration Exotel asks for. Takes 1-5 working days.
+2. **ExoPhone**: buy a virtual number (a landline-style 0xx number in Delhi, or a mobile number) in Exotel's
+   dashboard > ExoPhones. Indian rules require it to be used for **transactional** calls only (no marketing): that is
+   all this does. Ask Exotel to enable "connect two numbers" (Calls / connect API) on the account if it is not on.
+3. **API credentials**: Exotel dashboard > Settings > API: the **API key**, **API token**, **Account SID** and the
+   **subdomain** (`api.exotel.com` for the Singapore cluster, `api.in.exotel.com` for Mumbai).
+4. Settings: `CALL_PROVIDER=exotel`, `EXOTEL_SID`, `EXOTEL_API_KEY`, `EXOTEL_API_TOKEN` (secret), `EXOTEL_SUBDOMAIN`,
+   `EXOTEL_CALLER_ID` (the ExoPhone), optionally `CALL_TIME_LIMIT_SECONDS` (900). Restart the API.
+5. **Recharge** call credit. Each connected call is charged for both legs.
+6. Check: on a job you accepted in the mechanic app, press "Call customer" with your own number as the customer:
+   your phone rings first, then the other phone, and both show the ExoPhone.
+
+Without these settings the call buttons answer "Calls are not set up yet: call support" (development: the console
+provider prints the call with masked numbers).
+
 ---
 
 ## Settings summary
@@ -192,3 +218,4 @@ the person writes to us, which WhatsApp allows without a template.
 | `PUSH_PROVIDER`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | push | see 2 |
 | `SMS_PROVIDER`, `MSG91_AUTH_KEY`, `MSG91_SENDER_ID`, `MSG91_TPL_*` (10) | SMS | see 3 |
 | `WHATSAPP_PROVIDER`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_API_VERSION`, `WHATSAPP_TPL_*` (5) | WhatsApp | see 4 |
+| `CALL_PROVIDER`, `EXOTEL_SID`, `EXOTEL_API_KEY`, `EXOTEL_API_TOKEN`, `EXOTEL_SUBDOMAIN`, `EXOTEL_CALLER_ID`, `CALL_TIME_LIMIT_SECONDS`, `CALL_RATE_LIMIT`, `CALL_RATE_WINDOW_SECONDS` | Masked calls | see 5 |

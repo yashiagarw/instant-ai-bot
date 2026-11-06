@@ -19,7 +19,7 @@ const ICON = { done: Check, current: CircleDot, upcoming: Circle, cancelled: X }
 const STATE_LABEL = { done: "Done", current: "Now", upcoming: "Next", cancelled: "Cancelled" } as const;
 const SERVICE = { at_location: "Mechanic comes to the car", tow: "Tow", workshop: "Workshop visit" } as const;
 
-function Timeline({ steps }: { steps: TimelineStep[] }) {
+export function Timeline({ steps }: { steps: TimelineStep[] }) {
   return (
     <ol className="flex flex-col" data-testid="timeline">
       {steps.map((s, i) => {
@@ -140,6 +140,11 @@ function RequestDetail({ r }: { r: RequestDetailType }) {
             className="inline-flex min-h-11 items-center font-bold text-orange-text underline underline-offset-4"
           >
             See the diagnosis
+          </Link>
+        )}
+        {r.status !== "completed" && r.status !== "cancelled" && (
+          <Link href={`/track/${r.id}`} className="inline-flex min-h-11 items-center font-bold text-orange-text underline underline-offset-4">
+            Live tracking
           </Link>
         )}
         <Link href="/account" className="inline-flex min-h-11 items-center font-bold text-orange-text underline underline-offset-4">

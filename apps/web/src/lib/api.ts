@@ -447,6 +447,7 @@ export interface ServiceRequestIn {
 }
 
 export interface ServiceRequestOut {
+  id: string;
   reference: string;
   status: string;
   urgent: boolean;
@@ -807,4 +808,25 @@ export const notifyApi = {
   setChoices: (body: { sms?: boolean; push?: boolean }) => put<NotificationChoices>("/me/notifications", body),
   setWhatsapp: (optIn: boolean, version?: string) =>
     put<NotificationChoices>("/me/notifications/whatsapp", { opt_in: optIn, consent_text_version: version ?? null }),
+};
+
+// ---------------------------------------------------------------- Live tracking (backend/app/requests/tracking_api.py)
+
+export interface Tracking {
+  id: string;
+  reference: string;
+  status: string;
+  status_label: string;
+  timeline: TimelineStep[];
+  mechanic: { first_name: string; photo_url: string | null } | null;
+  eta_at: string | null;
+  eta_minutes: number | null;
+  can_call: boolean;
+  poll_seconds: number;
+  updated_at: string;
+}
+
+export const trackingApi = {
+  get: (id: string, signal?: AbortSignal) => get<Tracking>(`/requests/${encodeURIComponent(id)}/tracking`, signal),
+  call: (id: string) => post<{ status: string; message: string }>(`/requests/${encodeURIComponent(id)}/call`),
 };

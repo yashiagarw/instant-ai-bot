@@ -89,8 +89,10 @@ def configured(settings: Settings, recipient: RecipientType) -> list[Channel]:
 # ---------------------------------------------------------------- who can get what
 
 
-def _push_targets(session: Session, user_id, anon_key_hash) -> list[PushSubscription]:
+def _push_targets(session: Session, user_id, anon_key_hash, mechanic_id=None) -> list[PushSubscription]:
     owners = []
+    if mechanic_id is not None:
+        owners.append(PushSubscription.mechanic_id == mechanic_id)
     if user_id is not None:
         owners.append(PushSubscription.user_id == user_id)
     if anon_key_hash:
@@ -120,8 +122,8 @@ def plan(session: Session, settings: Settings, recipient: RecipientType, req, me
         elif ch == Channel.email:
             reason = "no email address"
         elif recipient == RecipientType.mechanic:
-            if ch == Channel.push:
-                reason = "mechanics have no browser alerts yet"
+            if ch == Channel.push and not _push_targets(session, None, None, mechanic.id):
+                reason = "no phone with the mechanic app's alerts on"
             elif ch == Channel.whatsapp and not optins.active(
                 session, settings, mechanic.phone, mechanic_id=mechanic.id
             ):
@@ -354,6 +356,8 @@ def build_message(session: Session, settings: Settings, row: Notification) -> tu
         if mech is None:
             return None, "the mechanic no longer exists"
         msg.phone = mech.phone
+        msg.push_targets = _targets(session, None, None, mech.id)
+        msg.url = f"{settings.web_origin}/m/offers" if row.template == "job_offer" else f"{settings.web_origin}/m"
         if row.template == "job_offer" and msg.params.get("assignment_id"):
             aid = msg.params["assignment_id"]
             msg.button_payloads = [f"offer:{aid}:accept", f"offer:{aid}:reject"]
@@ -372,8 +376,9 @@ def build_message(session: Session, settings: Settings, row: Notification) -> tu
     return msg, None
 
 
-def _targets(session: Session, user_id, anon_key_hash) -> list[Target]:
-    return [Target(s.id, s.endpoint, s.p256dh, s.auth) for s in _push_targets(session, user_id, anon_key_hash)]
+def _targets(session: Session, user_id, anon_key_hash, mechanic_id=None) -> list[Target]:
+    subs = _push_targets(session, user_id, anon_key_hash, mechanic_id)
+    return [Target(s.id, s.endpoint, s.p256dh, s.auth) for s in subs]
 
 
 def _next_channel(session: Session, row: Notification) -> Notification | None:

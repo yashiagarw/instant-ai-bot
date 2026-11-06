@@ -19,7 +19,7 @@ const PERMS: Record<string, string[]> = {
   super_admin: ["self", "staff.read", "staff.manage", "audit.read", "requests.read", "requests.contact",
     "requests.update", "customers.read", "customers.contact", "content.read", "content.review", "datasets.manage",
     "datasets.override", "knowledge.edit", "vehicles.manage", "mechanics.read", "mechanics.manage", "mechanics.documents",
-    "quality.read", "quality.golden"],
+    "quality.read", "quality.golden", "dispatch.manage"],
   content_admin: ["self", "content.read", "content.review", "datasets.manage", "knowledge.edit", "vehicles.manage",
     "quality.read", "quality.golden"],
   support_agent: ["self", "requests.read", "requests.contact", "requests.update", "customers.read", "customers.contact",

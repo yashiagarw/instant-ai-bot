@@ -7,6 +7,10 @@ Dataset jobs: one at a time (the database allows only one queued or running job)
 first job that needs it. Jobs left running by a worker that stopped are marked failed at start-up, and queued jobs
 are put back on Redis (Redis may have been restarted).
 
+Dispatch (app/requests/dispatch.py, Phase 5.3): every 20 seconds, offers that expired go to the next suggestion
+(where auto-offer is on), new requests are auto-offered where it is switched on, and requests nobody accepted in time
+are escalated to support.
+
 Notifications (app/notify): send_notification sends one queued notification (retries and channel fallback),
 handle_whatsapp_inbound handles one WhatsApp webhook message, and every minute a sweep re-queues due notifications
 and unhandled webhook messages that never reached Redis. They run beside a long dataset job (max_jobs).
@@ -118,13 +122,30 @@ async def sweep_notifications(ctx: dict) -> str:
     return await asyncio.to_thread(_sweep, ctx)
 
 
+def _dispatch(ctx: dict) -> str:
+    """Offers that expired (next suggestion where auto-offer is on), auto-offer for new requests, escalations."""
+    from app.requests import dispatch
+
+    with ctx["factory"].begin() as session:
+        r = dispatch.sweep(session, notify.current_settings())
+    return f"{r.started} auto-offered, {r.expired} offers expired, {r.escalated} escalated"
+
+
+async def dispatch_requests(ctx: dict) -> str:
+    return await asyncio.to_thread(_dispatch, ctx)
+
+
 class WorkerSettings:
     functions = [
         run_dataset_job,
         func(send_notification, timeout=60, keep_result=0),
         func(handle_whatsapp_inbound, timeout=60, keep_result=0),
     ]
-    cron_jobs = [cron(sweep_notifications, second=0, run_at_startup=True, timeout=60, keep_result=0)]
+    cron_jobs = [
+        cron(sweep_notifications, second=0, run_at_startup=True, timeout=60, keep_result=0),
+        # Phase 5.3: offer expiry (OFFER_EXPIRY_SECONDS), auto-offer and escalation, every 20 seconds.
+        cron(dispatch_requests, second={5, 25, 45}, timeout=60, keep_result=0, unique=True),
+    ]
     on_startup = startup
     on_shutdown = shutdown
     redis_settings = RedisSettings.from_dsn(get_settings().redis_url)

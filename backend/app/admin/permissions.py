@@ -30,6 +30,7 @@ class Perm(StrEnum):
     mechanics_documents = "mechanics.documents"  # mechanics' ID documents (encrypted; each view audited)
     quality_read = "quality.read"  # quality metrics, review lists, session replays (phones masked)
     quality_golden = "quality.golden"  # add a real case to the evaluation's golden set (written to data/eval)
+    dispatch_manage = "dispatch.manage"  # switch auto-offer on / off per zone and job type (super admins only)
 
 
 PUBLIC = "public"  # no login needed (only the staff login itself)

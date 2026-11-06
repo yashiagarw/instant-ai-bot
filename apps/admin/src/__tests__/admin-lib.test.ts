@@ -23,8 +23,9 @@ test("menu items follow permissions; every page has one item", () => {
   expect(labels(["self", "requests.read", "mechanics.read"])).toEqual(["Overview", "Requests", "Mechanics"]);
   expect(labels(["self", "customers.read"])).toEqual(["Overview", "Users"]);
   expect(labels([])).toEqual([]);
-  expect(NAV).toHaveLength(10);
-  expect(new Set(NAV.map((i) => i.href)).size).toBe(10);
+  expect(labels(["self", "mechanics.read", "dispatch.manage"])).toEqual(["Overview", "Mechanics", "Auto-offer"]);
+  expect(NAV).toHaveLength(11);
+  expect(new Set(NAV.map((i) => i.href)).size).toBe(11);
 });
 
 test("setup key in groups of four; staff status worst first; IST day boundaries", () => {

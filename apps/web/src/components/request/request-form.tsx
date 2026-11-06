@@ -123,6 +123,11 @@ function Confirmation({ out, sessionId }: { out: ServiceRequestOut; sessionId: s
           Helpline: <span className="font-bold tracking-wide">{out.helpline_number}</span>
         </p>
       )}
+      <Button asChild size="cta" className="self-stretch sm:self-start">
+        <Link href={`/track/${out.id}`} data-testid="track-link">
+          Track your request live
+        </Link>
+      </Button>
       <div className="flex flex-col gap-3 sm:flex-row">
         {sessionId && (
           <Button asChild size="cta" variant="outline" className="border-2 border-ink/15 bg-white text-ink">

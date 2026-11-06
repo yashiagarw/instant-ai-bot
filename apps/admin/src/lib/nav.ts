@@ -13,6 +13,7 @@ import {
   Tags,
   Users,
   Wrench,
+  Zap,
 } from "lucide-react";
 
 export interface NavItem {
@@ -29,6 +30,7 @@ export const NAV: NavItem[] = [
   { key: "overview", label: "Overview", href: "/", icon: LayoutDashboard, anyOf: ["self"] },
   { key: "requests", label: "Requests", href: "/requests", icon: ClipboardList, anyOf: ["requests.read"] },
   { key: "mechanics", label: "Mechanics", href: "/mechanics", icon: Wrench, anyOf: ["mechanics.read"] },
+  { key: "dispatch", label: "Auto-offer", href: "/dispatch", icon: Zap, anyOf: ["dispatch.manage"] },
   { key: "knowledge", label: "Knowledge", href: "/knowledge", icon: BookOpen, anyOf: ["content.read"] },
   { key: "vehicles", label: "Vehicles", href: "/vehicles", icon: Car, anyOf: ["content.read"] },
   { key: "parts", label: "Parts & Prices", href: "/parts", icon: Tags, anyOf: ["content.read"] },

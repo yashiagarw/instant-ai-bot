@@ -372,7 +372,9 @@ def test_mechanics_editor_permissions_and_audit(app, db_session, agents, world):
     ok = agents["agent"].put(f"/api/admin/mechanics/{mid}/availability", json={"shifts": bad["shifts"][:1]})
     assert ok.json()["shifts"] == [{"weekday": 0, "start_time": "09:00", "end_time": "13:00"}]
     assert agents["agent"].put(f"/api/admin/mechanics/{mid}/duty", json={"on_duty": True}).json()["on_duty"] is True
-    acts = db_session.scalars(select(AuditLog.action).where(AuditLog.entity_type == "mechanic")).all()
+    acts = db_session.scalars(
+        select(AuditLog.action).where(AuditLog.entity_type == "mechanic").order_by(AuditLog.id)
+    ).all()  # in the order they happened (without ORDER BY, Postgres does not promise any order)
     assert acts == ["mechanic.create", "mechanic.skills", "mechanic.zones", "mechanic.availability", "mechanic.duty"]
     created = db_session.scalar(select(AuditLog).where(AuditLog.action == "mechanic.create"))
     assert created.after["phone"] == "******0007"

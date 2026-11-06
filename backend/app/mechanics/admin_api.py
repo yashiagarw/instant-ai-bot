@@ -4,6 +4,7 @@ documents (encrypted, mechanics.documents = super admins only; every view audite
 from __future__ import annotations
 
 import re
+import uuid
 from datetime import UTC, datetime, time
 from decimal import Decimal
 from typing import Annotated
@@ -133,6 +134,10 @@ class MechanicOut(BaseModel):
     jobs_today: int
     acceptance_rate: float | None
     documents: int | None = Field(description="How many documents (null without mechanics.documents)")
+    verified_at: datetime | None = Field(default=None, description="Checked by a super admin: can sign in to /m")
+    verified_by: str = ""
+    photo_url: str | None = Field(default=None, description="Signed link to the photo customers see")
+    whatsapp_opted_in: bool = False
 
 
 class DocumentOut(BaseModel):
@@ -178,7 +183,31 @@ def _out(session: Session, m: Mechanic, staff, load: dict | None = None, accept:
         jobs_today=load.get(m.id, 0),
         acceptance_rate=None if accept.get(m.id) is None else round(accept[m.id], 2),
         documents=n_docs,
+        verified_at=m.verified_at,
+        verified_by=m.verified_by,
+        photo_url=_photo_url(m),
+        whatsapp_opted_in=_whatsapp(session, m),
     )
+
+
+def _photo_url(m: Mechanic) -> str | None:
+    if not m.photo_key:
+        return None
+    from app.notify.service import current_settings
+    from app.uploads.storage import make_storage
+
+    settings = current_settings()
+    try:
+        return make_storage(settings).presign_view(m.photo_key, settings.upload_view_ttl_seconds)
+    except Exception:  # storage down or not configured: no photo link
+        return None
+
+
+def _whatsapp(session: Session, m: Mechanic) -> bool:
+    from app.notify import optins
+    from app.notify.service import current_settings
+
+    return optins.active(session, current_settings(), m.phone, mechanic_id=m.id) is not None
 
 
 def _shift(s: MechanicAvailability | ShiftIn) -> dict:
@@ -481,3 +510,59 @@ def delete_document(mechanic_id: int, document_id: int, staff: CurrentStaff, ses
     _record(session, staff, "mechanic.document_delete", m, {"document_id": d.id, "kind": str(d.kind)}, None)
     session.delete(d)
     session.commit()
+
+
+# ---------------------------------------------------------------- verification and photo (Phase 5.3)
+
+
+class VerifiedIn(BaseModel):
+    verified: bool
+
+
+@router.put("/{mechanic_id}/verified", response_model=MechanicOut, responses={404: {}})
+@requires(Perm.mechanics_documents)
+def set_verified(mechanic_id: int, body: VerifiedIn, staff: CurrentStaff, session: DbSession):
+    """A super admin checked their identity and documents: they can sign in to the mechanic app (/m). Taking it
+    away signs them out at their next request."""
+    m = _get(session, mechanic_id)
+    before = m.verified_at is not None
+    m.verified_at = datetime.now(UTC) if body.verified else None
+    m.verified_by = staff.label if body.verified else ""
+    _record(session, staff, "mechanic.verified", m, {"verified": before}, {"verified": body.verified})
+    session.commit()
+    return _out(session, _get(session, m.id), staff)
+
+
+@router.post("/{mechanic_id}/photo", response_model=MechanicOut, responses={404: {}, 413: {}, 422: {}, 503: {}})
+@requires(Perm.mechanics_manage)
+def upload_photo(
+    mechanic_id: int,
+    request: Request,
+    staff: CurrentStaff,
+    session: DbSession,
+    data: Annotated[bytes, Depends(_doc_body)],
+):
+    """The photo customers see with the mechanic's first name (JPEG, PNG, WebP or HEIC as the body). Re-encoded
+    without any metadata, at most 800 px, stored in the private bucket (shown through short signed links)."""
+    from app.uploads import imaging
+    from app.uploads.api import get_storage
+    from app.uploads.storage import StorageError
+
+    m = _get(session, mechanic_id)
+    settings = request.app.state.settings
+    try:
+        photo = imaging.process(data, settings.upload_max_bytes, 800)
+    except imaging.ImageRejected as e:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Upload a JPEG, PNG, WebP or HEIC photo") from e
+    key = f"mechanics/{m.id}/{uuid.uuid4()}.jpg"
+    try:
+        storage = get_storage(request)
+        storage.put(key, photo.data, "image/jpeg")
+        if m.photo_key:
+            storage.delete([m.photo_key])
+    except StorageError as e:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Photo storage is not reachable") from e
+    m.photo_key = key
+    _record(session, staff, "mechanic.photo", m, None, {"photo": "uploaded", "size": len(photo.data)})
+    session.commit()
+    return _out(session, _get(session, m.id), staff)

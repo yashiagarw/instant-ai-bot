@@ -176,6 +176,23 @@ class Settings(BaseSettings):
     vapid_public_key: str = ""
     vapid_private_key: str = ""
     vapid_subject: str = "mailto:support@example.com"
+    # ---- Dispatch and the mechanic app (Phase 5.3). An open offer expires after OFFER_EXPIRY_SECONDS (then the next
+    # suggestion gets it where auto-offer is on); a request nobody has accepted DISPATCH_ESCALATE_SECONDS after its
+    # first offer is escalated to support. The arq worker checks every 20 seconds.
+    offer_expiry_seconds: int = 180
+    dispatch_escalate_seconds: int = 600
+    mechanic_session_days: int = 30
+    # Masked calls between customer and mechanic: console (prints, development) or exotel (Exotel "connect two
+    # numbers": both see only the ExoPhone). docs/notifications-setup.md has the account steps.
+    call_provider: Literal["console", "exotel"] = "console"
+    exotel_sid: str = ""
+    exotel_api_key: str = ""
+    exotel_api_token: str = ""
+    exotel_subdomain: str = "api.exotel.com"  # api.in.exotel.com for the Mumbai cluster
+    exotel_caller_id: str = ""  # the ExoPhone (virtual number) both people see
+    call_time_limit_seconds: int = 900
+    call_rate_limit: int = 5  # calls asked for per request per window
+    call_rate_window_seconds: int = 600
     questions_model: str = "claude-opus-5-5"
     questions_effort: str = "high"
     # OpenAI (used when LLM_PROVIDER=openai). No default model: set the one you want to pay for.

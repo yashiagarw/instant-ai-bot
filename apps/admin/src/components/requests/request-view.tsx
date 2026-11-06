@@ -315,6 +315,12 @@ function Workflow({ request: r, canUpdate, act }: { request: RequestDetail; canU
 
   return (
     <Card title="Mechanic">
+      {r.auto_dispatch && (
+        <p className="rounded-2xl bg-amber-bg p-3 font-semibold text-amber-text" data-testid="auto-dispatch">
+          Auto-offer is handling this request: it offers the best suggestion and moves on when an offer expires. Take
+          the request (owner: me) to stop it and decide yourself.
+        </p>
+      )}
       <RequestMap request={r} suggestions={sug} mechanics={mechanics.state.kind === "ready" ? mechanics.state.data : []} />
       {open && (
         <div className="flex flex-col gap-2 rounded-2xl bg-warm-white p-4" data-testid="open-assignment">
@@ -322,6 +328,14 @@ function Workflow({ request: r, canUpdate, act }: { request: RequestDetail; canU
             <span className="font-bold">{open.mechanic}</span>{" "}
             {open.status === "offered" ? `was offered the job by ${open.offered_by}, ${dateTime(open.offered_at)}.` : "accepted the job."}
           </p>
+          {open.status === "offered" && open.expires_at && (
+            <p className="text-sm text-ink/80" data-testid="offer-expires">
+              The offer expires at {dateTime(open.expires_at)} if they don&apos;t answer (in the app or on WhatsApp).
+            </p>
+          )}
+          {open.status === "accepted" && r.eta_at && (
+            <p className="text-sm text-ink/80">Their arrival estimate: {dateTime(r.eta_at)}.</p>
+          )}
           {open.status === "offered" && canUpdate && (
             <div className="flex flex-wrap gap-2">
               <Button
@@ -373,6 +387,7 @@ function Workflow({ request: r, canUpdate, act }: { request: RequestDetail; canU
               <li key={a.id} className="text-sm">
                 <span className="font-semibold">{a.mechanic}</span>: {a.status}, offered {dateTime(a.offered_at)} by {a.offered_by}
                 {a.match.suggested === false && " (not a suggestion)"}
+                {a.auto && " (auto-offer)"}
                 {a.note && <span className="block text-ink/75">{a.note}</span>}
               </li>
             ))}

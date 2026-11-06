@@ -5,8 +5,8 @@ from datetime import datetime
 from enum import StrEnum
 
 from fastapi import Request
-from sqlalchemy import DateTime, Engine, Enum, MetaData, create_engine, func, text
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy import DateTime, Engine, Enum, MetaData, create_engine, event, func, text
+from sqlalchemy.orm import DeclarativeBase, Mapped, Mapper, Session, mapped_column, sessionmaker
 
 # Deterministic constraint names, so Alembic migrations are stable.
 NAMING_CONVENTION = {
@@ -65,3 +65,13 @@ def database_is_up(engine: Engine) -> bool:
         return True
     except Exception:
         return False
+
+
+# Every model module imports Base from here, so this is the one place that makes any process (the API, the arq
+# worker, every `python -m app....` command) know every table, whatever it imported itself: foreign keys and
+# relationships to a table the entry point never imported (e.g. mechanics.staff_user_id -> staff_users) then resolve.
+# Loaded when SQLAlchemy first configures the mappers (the first query or new object), not when this module is
+# imported: by then every module has finished importing, so the model modules' imports of each other cannot cycle.
+@event.listens_for(Mapper, "before_configured", once=True)
+def _load_all_models() -> None:
+    import app.models  # noqa: F401

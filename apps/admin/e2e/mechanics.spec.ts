@@ -78,3 +78,37 @@ test("documents: super admins upload, see and delete them", async ({ page }) => 
   await expect(docs.getByText("aadhaar.pdf deleted.")).toBeVisible();
   expect(fake.ops.documents).toHaveLength(0);
 });
+
+test("mechanic app access: super admins verify; WhatsApp opt-in is recorded after reading the wording", async ({ page }) => {
+  const fake = await new FakeAdmin().as("boss@im.test").install(page);
+  await page.goto("/mechanics/1");
+  const section = page.getByRole("region", { name: "Mechanic app and contact" });
+  await expect(section.getByTestId("verified")).toHaveText("not verified (cannot sign in)");
+  await section.getByRole("button", { name: "Mark verified" }).click();
+  await expect(section.getByTestId("verified")).toContainText("verified by boss@im.test");
+  await expect(section.getByText(/I agree to get job offers from Instant Mechanic on WhatsApp/)).toBeVisible();
+  await section.getByRole("button", { name: "Record WhatsApp opt-in" }).click();
+  await expect(section.getByTestId("whatsapp")).toHaveText("opted in");
+  expect(fake.ops.whatsappOptins[0]).toMatchObject({ mechanic_id: 1, opt_in: true });
+});
+
+test("a support agent cannot verify mechanics, but can record their WhatsApp opt-in", async ({ page }) => {
+  await new FakeAdmin().as("agent@im.test").install(page);
+  await page.goto("/mechanics/1");
+  const section = page.getByRole("region", { name: "Mechanic app and contact" });
+  await expect(section.getByRole("button", { name: "Record WhatsApp opt-in" })).toBeVisible();
+  await expect(section.getByRole("button", { name: "Mark verified" })).toHaveCount(0);
+});
+
+test("auto-offer: super admins switch it per zone and job type; others don't see it", async ({ page }) => {
+  const fake = await new FakeAdmin().as("boss@im.test").install(page);
+  await page.goto("/dispatch");
+  const table = page.getByTestId("auto-offer");
+  const sw = table.getByRole("switch", { name: "Auto-offer for Tow in Noida" });
+  await expect(sw).toHaveAttribute("aria-checked", "false"); // off by default
+  await sw.click();
+  await expect(sw).toHaveAttribute("aria-checked", "true");
+  await expect(table).toContainText("boss@im.test");
+  expect(fake.ops.autoOfferChanges).toEqual(["noida/tow=true"]);
+  await expect(table.getByRole("switch", { name: "Auto-offer for Tow in Delhi" })).toHaveAttribute("aria-checked", "false");
+});

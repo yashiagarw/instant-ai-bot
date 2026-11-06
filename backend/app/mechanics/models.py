@@ -48,6 +48,11 @@ class Mechanic(CreatedAtMixin, Base):
     active: Mapped[bool] = mapped_column(default=True, server_default="true")  # false = left; kept for history
     notes: Mapped[str] = mapped_column(Text, default="", server_default="")
     dev_seed: Mapped[bool] = mapped_column(default=False, server_default="false")  # fake, development only
+    # Checked by a super admin (identity, documents): only verified, active mechanics can sign in to the app (/m).
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    verified_by: Mapped[str] = mapped_column(Text, default="", server_default="")
+    # Their photo for customers (SeaweedFS / S3 key, re-encoded without metadata), shown with their first name.
+    photo_key: Mapped[str | None] = mapped_column(Text)
 
     skills: Mapped[list["MechanicSkill"]] = relationship(cascade="all, delete-orphan")
     zones: Mapped[list["MechanicZone"]] = relationship(cascade="all, delete-orphan")
@@ -121,3 +126,16 @@ class MechanicDocument(CreatedAtMixin, Base):
     ciphertext: Mapped[bytes] = mapped_column(LargeBinary)
     uploaded_by: Mapped[str] = mapped_column(Text)
     uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class MechanicSession(CreatedAtMixin, Base):
+    """A mechanic signed in to the app (/m) with a phone code. The cookie holds a random token; the table its hash."""
+
+    __tablename__ = "mechanic_sessions"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    mechanic_id: Mapped[int] = mapped_column(ForeignKey("mechanics.id", ondelete="CASCADE"), index=True)
+    token_hash: Mapped[str] = mapped_column(Text, unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

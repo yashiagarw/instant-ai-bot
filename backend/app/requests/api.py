@@ -98,6 +98,7 @@ def create_request(
     notify.on_submitted(session, req)
     session.commit()  # the request is safe; the alert goes out from the worker
     return ServiceRequestOut(
+        id=req.id,
         reference=req.reference,
         status=req.status,
         urgent=req.urgent,

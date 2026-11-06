@@ -151,6 +151,23 @@ export class FakeOps {
     mechanic(3, "Mohan Lal", { on_duty: false, rating: null, acceptance_rate: null }),
   ];
   documents: Json[] = [];
+  whatsappOptins: Json[] = [];
+  autoOfferChanges: string[] = [];
+  autoOffer = {
+    zones: [
+      { code: "delhi", label: "Delhi" },
+      { code: "noida", label: "Noida" },
+    ],
+    job_types: [
+      { code: "at_location", label: "Mechanic at the car" },
+      { code: "tow", label: "Tow" },
+    ],
+    switches: ["delhi", "noida"].flatMap((zone) =>
+      ["at_location", "tow"].map((service_type) => ({ zone, service_type, enabled: false, updated_by: "", updated_at: null as string | null })),
+    ),
+    offer_expiry_seconds: 180,
+    escalate_seconds: 600,
+  };
   queueQueries: string[] = [];
   offers: Json[] = [];
   outcomes: Json[] = [];
@@ -338,11 +355,34 @@ export class FakeOps {
       this.mechanics.push(m);
       return { status: 201, json: this.mech(m, perms) };
     }
-    const mm = path.match(/^\/mechanics\/(\d+)(?:\/([a-z]+))?(?:\/(\d+))?$/);
+    if (path === "/dispatch/auto-offer") {
+      const denied = deny("dispatch.manage");
+      if (denied) return denied;
+      if (method === "PUT") {
+        const sw = this.autoOffer.switches.find((x) => x.zone === body.zone && x.service_type === body.service_type)!;
+        Object.assign(sw, { enabled: body.enabled, updated_by: email, updated_at: new Date().toISOString() });
+        this.autoOfferChanges.push(`${body.zone}/${body.service_type}=${body.enabled}`);
+      }
+      return { status: 200, json: this.autoOffer };
+    }
+    const mm = path.match(/^\/mechanics\/(\d+)(?:\/([a-z-]+))?(?:\/(\d+))?$/);
     if (mm) {
       const m = this.mechanics.find((x) => x.id === Number(mm[1]));
       if (!m) return { status: 404, json: { detail: "Mechanic not found" } };
       const action = mm[2] ?? "";
+      if (action === "verified") {
+        const denied = deny("mechanics.documents");
+        if (denied) return denied;
+        Object.assign(m, body.verified ? { verified_at: new Date().toISOString(), verified_by: email } : { verified_at: null, verified_by: "" });
+        return { status: 200, json: this.mech(m, perms) };
+      }
+      if (action === "whatsapp-optin") {
+        const denied = deny("mechanics.manage");
+        if (denied) return denied;
+        m.whatsapp_opted_in = Boolean(body.opt_in);
+        this.whatsappOptins.push({ mechanic_id: m.id, ...body });
+        return { status: 200, json: { mechanic_id: m.id, opted_in: m.whatsapp_opted_in, since: null, source: "staff_call" } };
+      }
       if (action === "documents") {
         const denied = deny("mechanics.documents");
         if (denied) return denied;

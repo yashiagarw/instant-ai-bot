@@ -23,6 +23,7 @@ export function mockApi(overrides: Routes = {}, diagnosis = new FakeDiagnosis())
     if (!URL.canParse(String(input))) return new Response("not found", { status: 404 });
     const url = new URL(String(input));
     const overridden = Object.keys(overrides).some((k) => url.pathname.startsWith(k));
+    (diagnosis as { search?: string }).search = url.search; // fakes that need the query string can read it
     const fake = overridden
       ? null
       : diagnosis.handle(init?.method ?? "GET", url.pathname, init?.body ? JSON.parse(String(init.body)) : undefined);

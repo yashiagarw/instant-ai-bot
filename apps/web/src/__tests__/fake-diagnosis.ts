@@ -351,10 +351,12 @@ export class FakeDiagnosis {
     if (!urgent && !b.pincode) return { status: 422, json: { detail: "enter a 6-digit pincode" } };
     this.requests.push({ ...b, urgent });
     const reference = `IM-TEST${this.requests.length}`;
+    const id = `00000000-0000-4000-8000-${String(this.requests.length).padStart(12, "0")}`;
     const helpline = REQUEST_CONFIG.helpline_number;
     return {
       status: 201,
       json: {
+        id,
         reference,
         status: "submitted",
         urgent,

@@ -532,7 +532,7 @@ def test_worker_settings():
     names = [getattr(f, "name", getattr(f, "__name__", "")) for f in WorkerSettings.functions]
     assert WorkerSettings.functions[0] is run_dataset_job
     assert names[1:] == ["send_notification", "handle_whatsapp_inbound"] and WorkerSettings.max_jobs == 4
-    assert [c.name for c in WorkerSettings.cron_jobs] == ["cron:sweep_notifications"]
+    assert [c.name for c in WorkerSettings.cron_jobs] == ["cron:sweep_notifications", "cron:dispatch_requests"]
 
 
 def test_dataset_endpoints_by_role(app, db_session, test_settings, world):  # noqa: F811

@@ -20,6 +20,7 @@ export async function mockApi<T extends FakeDiagnosis = FakeDiagnosis>(page: Pag
     const req = route.request();
     const url = new URL(req.url());
     if (url.pathname.startsWith("/media/")) return route.fulfill({ contentType: "image/svg+xml", body: PICTURE });
+    (fake as { search?: string }).search = url.search; // fakes that need the query string can read it
     const answer = fake.handle(req.method(), url.pathname, req.postData() ? JSON.parse(req.postData()!) : undefined);
     if (answer?.text !== undefined) return route.fulfill({ status: answer.status, body: answer.text, contentType: answer.contentType });
     if (answer) return route.fulfill({ status: answer.status, json: answer.json });

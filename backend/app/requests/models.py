@@ -92,6 +92,13 @@ class ServiceRequest(CreatedAtMixin, Base):
     # Owner, as for diagnosis sessions: a logged-in customer or the hash of the browser's anonymous cookie.
     user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), index=True)
     anon_key_hash: Mapped[str | None] = mapped_column(Text, index=True)
+    # The mechanic's estimate of arrival (entered in the app), shown to the customer as "about N minutes".
+    eta_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    eta_set_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Dispatch (app/requests/dispatch.py): when the current round of offers started (escalated if nobody accepts in
+    # DISPATCH_ESCALATE_SECONDS), and whether the system is offering it (auto-offer) rather than an agent.
+    dispatch_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    auto_dispatch: Mapped[bool] = mapped_column(default=False, server_default="false")
 
 
 class EventKind(StrEnum):
@@ -138,6 +145,7 @@ class AssignmentStatus(StrEnum):
     declined = "declined"
     withdrawn = "withdrawn"  # taken back (the request was cancelled, escalated or given to someone else)
     completed = "completed"
+    expired = "expired"  # not answered within OFFER_EXPIRY_SECONDS
 
 
 class RequestAssignment(Base):
@@ -166,6 +174,21 @@ class RequestAssignment(Base):
     # The match when it was offered: distance, score and reasons (what the agent saw).
     match: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
     note: Mapped[str] = mapped_column(Text, default="", server_default="")
+    # An open offer is closed as expired after this (the dispatch cron). Null for offers made before Phase 5.3.
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    auto: Mapped[bool] = mapped_column(default=False, server_default="false")  # made by auto-offer, not an agent
+
+
+class AutoOfferSetting(Base):
+    """Auto-offer switched on for one zone and one job type (service type). No row, or enabled false = off."""
+
+    __tablename__ = "auto_offer_settings"
+
+    zone: Mapped[str] = mapped_column(Text, primary_key=True)  # data/schema/zones.yaml code: delhi, noida ...
+    service_type: Mapped[ServiceType] = mapped_column(str_enum(ServiceType, "service_type"), primary_key=True)
+    enabled: Mapped[bool] = mapped_column(default=False, server_default="false")
+    updated_by: Mapped[str] = mapped_column(Text, default="", server_default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class RequestOutcome(Base):

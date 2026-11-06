@@ -11,7 +11,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from pydantic import BaseModel, Field
 from sqlalchemy import case, func, or_, select
 from sqlalchemy.orm import Session
@@ -28,7 +28,7 @@ from app.mechanics import matching
 from app.mechanics.geo import locate
 from app.mechanics.models import Mechanic
 from app.notify.models import Notification
-from app.requests import outcomes, workflow
+from app.requests import dispatch, outcomes, workflow
 from app.requests.models import (
     EventKind,
     RequestAssignment,
@@ -92,6 +92,8 @@ class AssignmentOut(BaseModel):
     offered_by: str
     match: dict
     note: str
+    expires_at: datetime | None = None
+    auto: bool = False
 
 
 class EventOut(BaseModel):
@@ -160,6 +162,8 @@ class RequestDetail(QueueRow):
     internal_notes: list[NoteOut]
     outcome: OutcomeOut | None
     notifications: list[NotificationOut] = Field(default_factory=list)
+    auto_dispatch: bool = Field(default=False, description="Auto-offer is offering it (until an agent takes over)")
+    eta_at: datetime | None = Field(default=None, description="The mechanic's arrival estimate")
 
 
 class TransitionIn(BaseModel):
@@ -340,6 +344,8 @@ def _detail(session: Session, r: ServiceRequest, staff) -> RequestDetail:
             offered_by=a.offered_by,
             match=a.match,
             note=a.note,
+            expires_at=a.expires_at,
+            auto=a.auto,
         )
         for a in session.scalars(
             select(RequestAssignment).where(RequestAssignment.request_id == r.id).order_by(RequestAssignment.id)
@@ -397,6 +403,8 @@ def _detail(session: Session, r: ServiceRequest, staff) -> RequestDetail:
         events=events,
         internal_notes=notes,
         outcome=outcome,
+        auto_dispatch=r.auto_dispatch and r.assigned_agent_id is None,
+        eta_at=r.eta_at,
         notifications=[
             NotificationOut(
                 id=n.id,
@@ -523,6 +531,7 @@ def change_status(request_id: uuid.UUID, body: TransitionIn, staff: CurrentStaff
     answer and completion have their own actions."""
     r = _get(session, request_id)
     before = str(r.status)
+    r.auto_dispatch = False  # support took over
     try:
         workflow.transition(session, r, body.status, _actor(staff), body.note)
     except workflow.TransitionError as e:
@@ -544,6 +553,7 @@ def set_agent(request_id: uuid.UUID, body: AgentIn, staff: CurrentStaff, session
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Unknown or inactive staff member")
     before = r.assigned_agent_id
     r.assigned_agent_id = target
+    r.auto_dispatch = False  # an owner: auto-offer stops (support took over)
     workflow.event(session, r, EventKind.agent, _actor(staff), "", {"agent": agent.name})
     audit.record(
         session,
@@ -609,7 +619,7 @@ def fault_options(request_id: uuid.UUID, staff: CurrentStaff, session: DbSession
 
 @router.post("/{request_id}/offer", response_model=RequestDetail, responses={404: {}, 409: {}, 422: {}})
 @requires(Perm.requests_update)
-def offer(request_id: uuid.UUID, body: OfferIn, staff: CurrentStaff, session: DbSession):
+def offer(request_id: uuid.UUID, body: OfferIn, request: Request, staff: CurrentStaff, session: DbSession):
     """Offer the job to a mechanic (after calling them). Usually one of the suggestions; another mechanic is allowed
     with a note saying why."""
     r = _get(session, request_id)
@@ -629,8 +639,12 @@ def offer(request_id: uuid.UUID, body: OfferIn, staff: CurrentStaff, session: Db
     else:
         snapshot = {"suggested": True, "score": match.score, "distance_km": match.distance_km, "reasons": match.reasons}
     before = str(r.status)
+    r.auto_dispatch = False  # an agent offers it: auto-offer stops for this request
+    if r.assigned_agent_id is None:
+        r.assigned_agent_id = staff.user.id
     try:
-        workflow.offer(session, r, mech.id, _actor(staff), snapshot, body.note)
+        expires = dispatch.expiry(request.app.state.settings)
+        workflow.offer(session, r, mech.id, _actor(staff), snapshot, body.note, expires_at=expires)
     except workflow.TransitionError as e:
         raise _workflow_error(e) from e
     _audit_status(session, staff, r, before, f"offered to mechanic {mech.id}")

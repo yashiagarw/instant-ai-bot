@@ -6,7 +6,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 
 | Path | What |
 |---|---|
-| `apps/web` | Customer site (port 3000): Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui |
+| `apps/web` | Customer site (port 3000): Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui; the mechanic app at `/m` (Phase 5.3) |
 | `apps/admin` | Staff admin app (port 3001): sign-in with two-factor, role-based menu, Users, Audit log |
 | `packages/ui` | `@im/ui`, shared by both apps: brand theme, Button, Dialog, the data table (TanStack Table) |
 | `backend/app` | FastAPI app. Modules: `vehicles`, `knowledge`, `diagnosis`, `requests`, `accounts` (phone + OTP login), `uploads` (customer photos), `notify` (notifications: email, SMS, WhatsApp, web push; Phase 5.2), `llm` (optional LLM layer, off by default), `parts` (parts catalogue), `datasets` (dataset publish pipeline and its worker) |
@@ -195,6 +195,8 @@ python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
 | | `MSG91_TPL_*` (10) | MSG91 template id per notification SMS and language (DLT-approved) |
 | | `WHATSAPP_PROVIDER`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_API_VERSION`, `WHATSAPP_TPL_*` (5) | WhatsApp Cloud API, webhook checks and approved template names (placeholders) |
 | | `PUSH_PROVIDER`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Browser alerts (web push) |
+| | `OFFER_EXPIRY_SECONDS`, `DISPATCH_ESCALATE_SECONDS`, `MECHANIC_SESSION_DAYS` | Offer expiry (180 s), escalation (600 s), mechanic app sign-in length ([Phase 5.3](#phase-53-mechanic-app-and-auto-offer)) |
+| | `CALL_PROVIDER`, `EXOTEL_SID`, `EXOTEL_API_KEY`, `EXOTEL_API_TOKEN`, `EXOTEL_SUBDOMAIN`, `EXOTEL_CALLER_ID`, `CALL_TIME_LIMIT_SECONDS`, `CALL_RATE_LIMIT`, `CALL_RATE_WINDOW_SECONDS` | Masked calls between customer and mechanic (placeholders) |
 | `apps/web/.env.local` | `NEXT_PUBLIC_API_URL` | Backend base URL for the browser |
 
 ## Phase 2.5: explanations, typed replies, car features
@@ -918,6 +920,105 @@ fallback, missing credentials, opt-ins, webhook signature and dedupe, Accept / R
 privacy, the providers' request bodies, web push encryption, and that the setup guide matches the templates);
 `cd apps/web && pnpm test` and `pnpm exec playwright test e2e/notifications.spec.ts --workers=1`;
 `cd apps/admin && pnpm exec playwright test e2e/requests.spec.ts --workers=1`.
+
+## Phase 5.3: mechanic app and auto-offer
+
+**Mechanic app** at `/m` in `apps/web`: an installable app ("IM Mechanic", its own manifest and icon) in **Hindi**
+(English on the Profile page), with big high-contrast buttons, made for small Android phones on slow 4G.
+
+- **Sign in** with a code by SMS to the phone number of their mechanic record (the same code machinery as customer
+  login). Only **active, verified** mechanics can sign in: a super admin marks them verified on the mechanic's admin
+  page (removing it signs them out). Their session reaches only `/api/mechanic/*`, and there only their own offers
+  and jobs (anything else is 404).
+- **Today** (on / off duty, new offers, today's jobs), **Offers** (job type, car, diagnosis summary and the
+  *approximate* area only, with the seconds left), **Job** (after accepting: full address, a map link, the
+  customer's masked number and a **call** button; ETA buttons; on my way → arrived → start work → finish with the
+  **confirmed fault**: a searchable picker with Hindi names from the reviewed customer phrases, the diagnosis's top 3
+  first, or "other / not sure" with a note, saved in `request_outcomes`), **Profile** (photo, on / off duty,
+  language, offer alerts on this phone, sign out).
+- **Accept / Reject** from the app and from WhatsApp go through one path (`dispatch.answer` → `workflow.respond`),
+  audited as "<first name> (mechanic, app)" or "(mechanic, WhatsApp)".
+- **Offline**: the site's one service worker (`public/sw.js`, which also shows alerts) keeps the `/m` pages and
+  the built files, with `/m/offline.html` as the last resort. API answers are never cached on the phone.
+
+**Dispatch** (`backend/app/requests/dispatch.py`, run by the existing arq worker every 20 seconds):
+
+- Every offer (by an agent or automatic) **expires** after `OFFER_EXPIRY_SECONDS` (180) and the request goes back to
+  triaged. A request nobody accepts within `DISPATCH_ESCALATE_SECONDS` (600) of its first offer is **escalated**
+  (status escalated, support emailed through `notify()`).
+- **Auto-offer**, off by default, is switched per zone (Delhi, Noida, Gurugram, Ghaziabad, Faridabad: from the
+  pincode) and per job type (mechanic at the car, tow, workshop) on the admin **Auto-offer** page (super admins,
+  audited). Where it is on, a new request is triaged by the system and offered to the best suggestion (the 4.5
+  matching: distance 45 / rating 25 / acceptance 20 / jobs 10); when an offer expires or is rejected, the next
+  suggestion gets it; with nobody left it is escalated. Safety-critical requests are never auto-offered (support
+  calls first). **Support can always take over**: taking the request (owner: me), offering by hand or changing its
+  status stops auto-offer for it. The admin request page says when auto-offer is handling a request and when an
+  offer expires.
+
+**Customer tracking** at `/track/{id}` (linked from the request confirmation and the customer's request page): live
+status, the mechanic's first name and photo, the arrival estimate *they* entered, and a **call** button through the
+masked call provider (Exotel; console in development). It is open to the account that owns the request or the
+browser that made it. It **polls** every 10 seconds while visible rather than using server-sent events: plain
+requests need nothing special from Caddy, survive patchy mobile data and cost a few hundred bytes. No distance is
+ever shown to customers (pincode centres are rough).
+
+**Also**: the customer site's web app manifest and icons (needed for alerts on iPhone), mechanic photos in the
+private SeaweedFS / S3 bucket (re-encoded, no metadata, shown by short signed links), and the WhatsApp opt-in toggle
+on the mechanic's admin page (with the wording to read out). Exotel account steps: `docs/notifications-setup.md`.
+
+### After pulling
+
+```bash
+cd backend && uv sync                               # no new packages, keeps the venv in step
+cd backend && uv run alembic upgrade head           # migration 0024
+# restart the API, and RESTART THE WORKER: it now runs the dispatch cron (every 20 s), and it also fixes a bug where
+# a worker could not query notifications (they stayed "queued"; see below)
+cd backend && uv run arq app.datasets.worker.WorkerSettings
+cd backend && uv run python -m app.mechanics.dev_seed   # optional: fake mechanics, now verified for the app
+pnpm install && pnpm dev                            # http://localhost:3000/m (mechanic app), /track/<id>
+```
+
+Production: rebuild the web, admin and API images and `up -d` (migrations run first). Mechanics can only sign in after
+a super admin marks them verified. Set `CALL_PROVIDER=exotel` and the Exotel settings when the account is ready; until
+then the call buttons say calls are not set up.
+
+Fixed on the way: the worker process did not load every table, so `send_notification` and the notification sweep
+failed with `NoReferencedTableError` in a real worker (tests ran them in-process, with every table loaded). Phase 5.2
+notifications queued on a running worker were not sent; they go out once the restarted worker's sweep picks them up.
+
+### Try it locally
+
+1. `cd backend && uv run python -m app.mechanics.dev_seed` (fake mechanics, verified, on duty).
+2. Open http://localhost:3000/m/login on your phone-sized window, enter a fake mechanic's number (Admin > Mechanics),
+   and type the code the **API terminal** prints (console SMS).
+3. Submit a request at http://localhost:3000/request (pincode near the mechanic), open **Track your request live**.
+4. Admin app: triage it and offer it to that mechanic (or switch auto-offer on for its zone and job type under
+   **Auto-offer** and wait up to 20 seconds). The offer appears in the app; accept it, set an ETA, move it on. The
+   tracking page follows by itself. "Call" prints the bridged call in the API terminal.
+
+### Tests
+
+```bash
+cd backend && uv run pytest tests/test_mechanic_app.py   # access control, sign-in, expiry, escalation, the auto-offer
+                                                         # switch and take-over, answers, tracking, calls, fault picker,
+                                                         # admin switches, and the whole flow over HTTP
+cd apps/web && pnpm test                                 # mechanic app screens and tracking (src/__tests__)
+cd apps/web && pnpm exec playwright test e2e/mechanic.spec.ts --workers=1   # the app on a 360 px phone (API mocked)
+cd apps/admin && pnpm test && pnpm exec playwright test --workers=1
+```
+
+**Live end-to-end flow** (real API and database, both apps, nothing mocked: customer → support → mechanic, with the
+customer's page following by itself). Uses its own ports, so `pnpm dev` and your API keep running:
+
+```bash
+cd backend && WEB_ORIGIN=http://localhost:3110 ADMIN_ORIGIN=http://localhost:3111 LLM_PROVIDER=none \
+  uv run uvicorn app.main:app --port 8010
+cd apps/web && E2E_LIVE_FLOW=1 E2E_PORT=3110 NEXT_PUBLIC_API_URL=http://localhost:8010 \
+  pnpm exec playwright test e2e/live-flow.spec.ts --workers=1 --project=desktop
+```
+
+It builds both apps, creates (or reuses) a support agent and a verified "E2E Mechanic" with ready sessions
+(`python -m app.mechanics.e2e_seed`, refused in production) and writes one request into the development database.
 
 ## LLM layer (off by default)
 

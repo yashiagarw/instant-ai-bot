@@ -722,6 +722,27 @@ export interface Mechanic {
   jobs_today: number;
   acceptance_rate: number | null;
   documents: number | null;
+  /** Phase 5.3: verified mechanics can sign in to the mechanic app (/m). */
+  verified_at?: string | null;
+  verified_by?: string;
+  photo_url?: string | null;
+  whatsapp_opted_in?: boolean;
+}
+
+export interface AutoOfferSwitch {
+  zone: string;
+  service_type: "at_location" | "tow" | "workshop";
+  enabled: boolean;
+  updated_by: string;
+  updated_at: string | null;
+}
+
+export interface AutoOffer {
+  zones: { code: string; label: string }[];
+  job_types: { code: AutoOfferSwitch["service_type"]; label: string }[];
+  switches: AutoOfferSwitch[];
+  offer_expiry_seconds: number;
+  escalate_seconds: number;
 }
 
 export interface MechanicInput {
@@ -804,12 +825,15 @@ export interface Assignment {
   id: number;
   mechanic_id: number;
   mechanic: string;
-  status: "offered" | "accepted" | "declined" | "withdrawn" | "completed";
+  status: "offered" | "accepted" | "declined" | "withdrawn" | "completed" | "expired";
   offered_at: string;
   responded_at: string | null;
   offered_by: string;
   match: { suggested?: boolean; score?: number; distance_km?: number | null; reasons?: string[] };
   note: string;
+  /** Phase 5.3: an open offer closes as "expired" after this; auto = made by auto-offer. */
+  expires_at?: string | null;
+  auto?: boolean;
 }
 
 export interface RequestEvent {
@@ -858,6 +882,10 @@ export interface RequestDetail extends QueueRow {
   internal_notes: { id: number; created_at: string; author: string; text: string }[];
   outcome: Outcome | null;
   notifications?: NotificationRow[];
+  /** Auto-offer is offering it (until an agent takes it). */
+  auto_dispatch?: boolean;
+  /** The mechanic's arrival estimate. */
+  eta_at?: string | null;
 }
 
 /** A notification about a request (backend/app/notify): numbers masked, no message text. Read-only. */
@@ -1201,6 +1229,17 @@ export const adminApi = {
     call<MechanicDocument>("POST", `/mechanics/${id}/documents${query({ kind, filename: file.name })}`, file),
   documentUrl: (id: number, doc: number) => `${API_URL}/api/admin/mechanics/${id}/documents/${doc}`,
   deleteDocument: (id: number, doc: number) => call<void>("DELETE", `/mechanics/${id}/documents/${doc}`),
+  setVerified: (id: number, verified: boolean) => call<Mechanic>("PUT", `/mechanics/${id}/verified`, { verified }),
+  uploadPhoto: (id: number, file: File) => call<Mechanic>("POST", `/mechanics/${id}/photo`, file),
+  setWhatsappOptin: (id: number, opt_in: boolean, note = "") =>
+    call<{ mechanic_id: number; opted_in: boolean; since: string | null; source: string | null }>(
+      "PUT",
+      `/mechanics/${id}/whatsapp-optin`,
+      { opt_in, note },
+    ),
+  autoOffer: (signal?: AbortSignal) => call<AutoOffer>("GET", "/dispatch/auto-offer", undefined, signal),
+  setAutoOffer: (zone: string, service_type: AutoOfferSwitch["service_type"], enabled: boolean) =>
+    call<AutoOffer>("PUT", "/dispatch/auto-offer", { zone, service_type, enabled }),
 
   requests: (q: QueueQuery, signal?: AbortSignal) =>
     call<QueueRow[]>("GET", `/requests${query({ ...q, mine: q.mine || undefined })}`, undefined, signal),

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from datetime import time
+from datetime import UTC, datetime, time
 from decimal import Decimal
 
 from sqlalchemy import delete, select
@@ -47,6 +47,8 @@ def seed(session: Session) -> list[Mechanic]:
         m.name, m.base_pincode, m.base_area, m.max_jobs_per_day = name, pin, area, max_jobs
         m.rating = Decimal(rating) if rating else None
         m.on_duty, m.active, m.notes = True, True, "Fake mechanic for development (app.mechanics.dev_seed)."
+        if m.verified_at is None:  # can sign in to the mechanic app locally (phone code printed by the console SMS)
+            m.verified_at, m.verified_by = datetime.now(UTC), "dev_seed"
         m.skills.clear(), m.zones.clear(), m.shifts.clear()
         session.flush()  # delete the old rows before adding the same pincodes again
         m.skills = [MechanicSkill(category_code=c) for c in skills if c in known]

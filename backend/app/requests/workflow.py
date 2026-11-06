@@ -12,7 +12,8 @@ customer's timeline and the admin timeline are built from them).
     completed, cancelled: final
 
 offered and accepted come from the assignment actions (offer a mechanic, record their answer); completed needs the
-confirmed fault (record_outcome). Times are stored in UTC and shown in India time.
+confirmed fault (record_outcome). Times are stored in UTC and shown in India time. Offers expire, move on and escalate
+in app/requests/dispatch.py (Phase 5.3).
 """
 
 from __future__ import annotations
@@ -167,8 +168,19 @@ def _close_open_assignment(session: Session, req: ServiceRequest, status: Assign
     return a
 
 
-def offer(session: Session, req: ServiceRequest, mechanic_id: int, actor: Actor, match: dict, note: str = ""):
-    """Offer the job to a mechanic (the agent called them): status offered, one open assignment."""
+def offer(
+    session: Session,
+    req: ServiceRequest,
+    mechanic_id: int,
+    actor: Actor,
+    match: dict,
+    note: str = "",
+    *,
+    expires_at: datetime | None = None,
+    auto: bool = False,
+):
+    """Offer the job to a mechanic (an agent, or auto-offer): status offered, one open assignment. It expires at
+    `expires_at` (the dispatch cron closes it); the first offer starts the round that escalates if nobody accepts."""
     if req.status != S.triaged:
         raise TransitionError(f"Only a triaged request can be offered to a mechanic (this one is {req.status}).")
     a = RequestAssignment(
@@ -178,7 +190,11 @@ def offer(session: Session, req: ServiceRequest, mechanic_id: int, actor: Actor,
         offered_by=actor.label,
         match=match,
         note=note,
+        expires_at=expires_at,
+        auto=auto,
     )
+    if req.dispatch_started_at is None:
+        req.dispatch_started_at = datetime.now(UTC)
     session.add(a)
     session.flush()
     event(session, req, EventKind.offer, actor, note, {"mechanic_id": mechanic_id, "assignment_id": a.id})
@@ -191,6 +207,8 @@ def respond(session: Session, req: ServiceRequest, accepted: bool, actor: Actor,
     a = open_assignment(session, req)
     if req.status != S.offered or a is None or a.status != AssignmentStatus.offered:
         raise TransitionError("There is no open offer to answer.")
+    if a.expires_at is not None and a.expires_at <= datetime.now(UTC):
+        raise TransitionError("This offer has expired.")
     a.status = AssignmentStatus.accepted if accepted else AssignmentStatus.declined
     a.responded_at = datetime.now(UTC)
     if note:

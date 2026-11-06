@@ -128,10 +128,10 @@ def _mechanic_by_hash(session: Session, settings: Settings, from_hash: str | Non
 
 
 def _button(session: Session, settings: Settings, row: WhatsappInbound) -> tuple[bool, str]:
-    from app.admin import audit
+    """Accept / Reject from WhatsApp: the same path as the mechanic app (dispatch.answer -> workflow.respond)."""
     from app.mechanics.models import Mechanic
-    from app.requests import workflow
-    from app.requests.models import AssignmentStatus, RequestAssignment, ServiceRequest
+    from app.requests import dispatch
+    from app.requests.models import RequestAssignment, ServiceRequest
 
     parts = str(row.data.get("payload", "")).split(":")
     if len(parts) != 3 or parts[0] != "offer" or parts[2] not in ("accept", "reject") or not parts[1].isdigit():
@@ -143,41 +143,16 @@ def _button(session: Session, settings: Settings, row: WhatsappInbound) -> tuple
     mech = session.get(Mechanic, a.mechanic_id)
     if mech is None or optins.phone_hash(settings, mech.phone) != row.from_hash:
         return False, "the sender is not the mechanic this job was offered to"
-    req = session.get(ServiceRequest, a.request_id, with_for_update=True)  # one answer at a time (admin or button)
-    session.refresh(a)
-    if a.status != AssignmentStatus.offered:
-        same = (a.status == AssignmentStatus.accepted and accept) or (
-            a.status == AssignmentStatus.declined and not accept
-        )
-        if same:
-            return False, f"repeat press: the offer is already {a.status}"
-        _reply(session, row, "offer_closed", mechanic=mech, params={"reference": req.reference})
-        return False, f"the offer is {a.status}"
-    first = (mech.name.split() or ["Mechanic"])[0]
-    verb = "accepted" if accept else "declined"
-    actor = workflow.Actor(None, f"{first} (mechanic, WhatsApp)")
-    before = str(req.status)
     try:
-        workflow.respond(session, req, accept, actor, "answered on WhatsApp")
-    except workflow.TransitionError as e:
-        _reply(session, row, "offer_closed", mechanic=mech, params={"reference": req.reference})
-        return False, f"not allowed: {e}"
-    audit.record(
-        session,
-        actor_id=None,
-        actor_label=actor.label,
-        action="request.set_status",
-        entity_type="service_request",
-        entity_id=req.id,
-        before={"status": before},
-        after={
-            "status": str(req.status),
-            "note": f"mechanic {mech.id} {'accepted' if accept else 'declined'} on WhatsApp",
-        },
-    )
+        req = dispatch.answer(session, a, mech, accept, "WhatsApp")
+    except dispatch.AnswerRefused as e:
+        if e.closed:
+            ref = session.get(ServiceRequest, a.request_id).reference
+            _reply(session, row, "offer_closed", mechanic=mech, params={"reference": ref})
+        return False, e.reason
     template = "offer_accepted_ack" if accept else "offer_declined_ack"
     _reply(session, row, template, mechanic=mech, params={"reference": req.reference})
-    return True, f"mechanic {mech.id} {verb} {req.reference}"
+    return True, f"mechanic {mech.id} {'accepted' if accept else 'declined'} {req.reference}"
 
 
 def _keyword(session: Session, settings: Settings, row: WhatsappInbound) -> tuple[bool, str]:

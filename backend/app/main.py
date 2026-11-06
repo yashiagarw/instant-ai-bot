@@ -16,6 +16,7 @@ from app.diagnosis import api as diagnosis_api
 from app.estimates import api as estimates_api
 from app.knowledge.edits import api as knowledge_admin_api
 from app.mechanics import admin_api as mechanics_admin_api
+from app.mechanics import app_api as mechanic_app_api
 from app.notify import api as notify_api
 from app.notify import service as notify
 from app.parts import admin_api as parts_admin_api
@@ -23,6 +24,7 @@ from app.parts import api as parts_api
 from app.quality import api as quality_api
 from app.requests import admin_api as requests_admin_api
 from app.requests import api as requests_api
+from app.requests import dispatch_admin_api, tracking_api
 from app.uploads import admin_api as media_admin_api
 from app.uploads import api as uploads_api
 from app.vehicles import admin_api as vehicles_admin_api
@@ -73,6 +75,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(notify_api.me_router, prefix="/api")
     app.include_router(notify_api.webhook_router, prefix="/api")
     app.include_router(notify_api.admin_router, prefix="/api")
+    app.include_router(mechanic_app_api.router, prefix="/api")
+    app.include_router(tracking_api.router, prefix="/api")
+    app.include_router(dispatch_admin_api.router, prefix="/api")
     app.include_router(media_admin_api.public_router)  # /media/uploaded/<sha1>.jpg (before the /media files below)
     # every /api/admin route runs the access check with a permission
     check_admin_routes(
@@ -87,6 +92,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         requests_admin_api.router,
         quality_api.router,
         notify_api.admin_router,
+        dispatch_admin_api.router,
     )
     if settings.media_dir.is_dir():
         app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")

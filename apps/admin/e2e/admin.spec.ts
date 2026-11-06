@@ -2,7 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { FakeAdmin, PASSWORD, SETUP_KEY } from "./fake-admin";
 
-const ALL = ["Overview", "Requests", "Mechanics", "Knowledge", "Vehicles", "Parts & Prices", "Datasets", "Quality", "Users", "Audit log"];
+const ALL = ["Overview", "Requests", "Mechanics", "Auto-offer", "Knowledge", "Vehicles", "Parts & Prices", "Datasets", "Quality", "Users", "Audit log"];
 const MENUS: Record<string, string[]> = {
   "boss@im.test": ALL,
   "content@im.test": ["Overview", "Knowledge", "Vehicles", "Parts & Prices", "Datasets", "Quality"],
@@ -97,7 +97,7 @@ for (const [email, expected] of Object.entries(MENUS)) {
     await expect(nav.getByRole("link")).toHaveText(expected);
     // Pages behind hidden items say "No access" when opened by their address.
     for (const label of ALL.filter((l) => !expected.includes(l))) {
-      const href = { "Parts & Prices": "/parts", "Audit log": "/audit" }[label] ?? `/${label.toLowerCase()}`;
+      const href = { "Parts & Prices": "/parts", "Audit log": "/audit", "Auto-offer": "/dispatch" }[label] ?? `/${label.toLowerCase()}`;
       await page.goto(href);
       await expect(page.getByTestId("no-access")).toBeVisible();
     }

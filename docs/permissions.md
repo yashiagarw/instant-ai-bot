@@ -43,6 +43,7 @@ table against it and calls every admin endpoint with every role.
 | `mechanics.documents` | yes | no | no | no | no |
 | `quality.read` | yes | yes | no | no | no |
 | `quality.golden` | yes | yes | no | no | no |
+| `dispatch.manage` | yes | no | no | no | no |
 
 What each permission covers:
 
@@ -58,10 +59,11 @@ What each permission covers:
 | `requests.update` | `PATCH /api/admin/requests/{id}` (an allowed status change; cancel / escalate need a note), `PUT .../{id}/agent` (take it; giving it to someone else needs `staff.manage`), `POST .../{id}/offer` (to a mechanic), `.../response` (the mechanic accepted / declined), `.../notes` (internal), `.../outcome` (confirmed fault: completes the job) |
 | `mechanics.read` | `GET /api/admin/mechanics`, `GET /api/admin/mechanics/{id}` (with the mechanic's phone number; jobs today, acceptance rate) |
 | `mechanics.manage` | `POST /api/admin/mechanics`, `PUT .../{id}`, `PUT .../{id}/skills`, `.../zones`, `.../availability` (weekly shifts, India time), `.../duty` (on / off duty); live, audited |
-| `mechanics.documents` | `GET/POST /api/admin/mechanics/{id}/documents`, `GET/DELETE .../documents/{doc}`: ID documents, encrypted with `MECHANIC_DOCS_KEY`; every view written to the audit log |
+| `mechanics.documents` | `GET/POST /api/admin/mechanics/{id}/documents`, `GET/DELETE .../documents/{doc}`: ID documents, encrypted with `MECHANIC_DOCS_KEY`; every view written to the audit log. `PUT /api/admin/mechanics/{id}/verified`: verified mechanics can sign in to the mechanic app (`/m`) |
 | `self` (overview) | `GET /api/admin/overview`: today (India time). Its parts depend on the caller: requests today by status and the unassigned ones (`requests.read`), diagnoses, safety alerts and LLM spend today (`quality.read`); the rest is null |
 | `quality.read` | `GET /api/admin/quality` (metrics; `days`), `GET /api/admin/quality/review` (`kind`: negative_feedback, low_confidence, no_match; `days`), `GET /api/admin/quality/sessions/{id}` (read-only replay; phone numbers, emails and number plates masked), `GET /api/admin/quality/faults` |
 | `quality.golden` | `POST /api/admin/quality/sessions/{id}/golden`: writes the session as a real case to `data/eval/golden/real_cases/` (no personal data) and records it |
+| `dispatch.manage` | `GET/PUT /api/admin/dispatch/auto-offer`: auto-offer on / off per zone and job type (off by default; audited) |
 | `content.read` | `GET /api/admin/content/generated-questions`, `GET /api/admin/content/image-labels` |
 | `content.review` | `POST /api/admin/content/generated-questions/{id}/review` (approve / reject) |
 | `content.read` (datasets) | `GET /api/admin/datasets` (versions, categories, active job), `GET /api/admin/datasets/versions/{id}` (validation report, diff, eval), `GET /api/admin/datasets/jobs/{id}` (progress) |
@@ -84,7 +86,8 @@ only for convenience: the API checks every call.
 | --- | --- |
 | Overview | `self` (every staff member) |
 | Requests | `requests.read` (actions: `requests.update`; the customer's number: `requests.contact` and owning the request) |
-| Mechanics | `mechanics.read` (editing: `mechanics.manage`; the Documents section: `mechanics.documents`) |
+| Mechanics | `mechanics.read` (editing, photo and WhatsApp opt-in: `mechanics.manage`; the Documents section and "verified" for the mechanic app: `mechanics.documents`) |
+| Auto-offer | `dispatch.manage` (super admins) |
 | Knowledge, Vehicles, Parts & Prices, Datasets | `content.read` (editing: `knowledge.edit`; the unlisted-vehicles queue: `vehicles.manage`) |
 | Quality | `quality.read` ("Add to golden set": `quality.golden`) |
 | Users | `staff.read` (Staff tab) or `customers.read` (Customers tab) |
@@ -139,3 +142,14 @@ The table is append-only (a trigger refuses UPDATE and DELETE).
 | `parts.csv_import` | a CSV price import: rows, valid, errors, flagged |
 | `media.upload` | a picture uploaded in the admin app |
 | `dataset.publish_override` | published although the eval gate blocked it: the gate's reasons in `before`, the written reason in `after` |
+
+## Mechanic app (/m)
+
+Mechanics are not staff: they sign in to the mechanic app with a code sent by SMS to the phone number of their
+mechanic record, and only while the record is active and verified (`mechanics.verified_at`, set with
+`mechanics.documents`). Their session (cookie `im_mech`, path `/api/mechanic`) reaches `/api/mechanic/*` only, and
+there only their own offers and jobs (anything else answers 404). Before accepting they see the job type, car,
+diagnosis summary and approximate area; after accepting, the address, a map link and the customer's masked number
+(calls go through the masked call provider). Every answer, status change and on / off duty change is in the audit log
+as "<first name> (mechanic, app)".
+

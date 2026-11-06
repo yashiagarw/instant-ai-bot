@@ -55,6 +55,7 @@ export function MechanicEditor({ id }: { id: number }) {
           Mechanic added. Set their skills, zones and shifts below.
         </p>
       )}
+      <AppAccess mechanic={m} manage={manage} verify={me.permissions.includes("mechanics.documents")} onSaved={set} reload={reload} />
       <Details mechanic={m} manage={manage} onSaved={set} />
       <Skills mechanic={m} manage={manage} onSaved={set} />
       <Zones mechanic={m} manage={manage} onSaved={set} />
@@ -513,6 +514,94 @@ function Documents({ mechanic: m }: { mechanic: Mechanic }) {
           </Button>
         </div>
       </Dialog>
+    </Section>
+  );
+}
+
+// ---------------------------------------------------------------- app access, photo, WhatsApp (Phase 5.3)
+
+const MECHANIC_WHATSAPP_TEXT =
+  "I agree to get job offers from Instant Mechanic on WhatsApp, with Accept and Reject buttons. I can stop them at any time by sending STOP.";
+
+function AppAccess({
+  mechanic: m,
+  manage,
+  verify,
+  onSaved,
+  reload,
+}: Saved & { verify: boolean; reload: () => void }) {
+  const { status, setStatus, busy, save } = useSave(onSaved);
+  const [file, setFile] = useState<File | null>(null);
+  async function whatsapp(on: boolean) {
+    setStatus({ kind: "idle" });
+    try {
+      await adminApi.setWhatsappOptin(m.id, on, on ? "agreed on a call (wording read out)" : "asked to stop");
+      setStatus({ kind: "saved", text: on ? "WhatsApp opt-in recorded." : "WhatsApp opt-in withdrawn." });
+      reload();
+    } catch (e) {
+      setStatus({ kind: "error", text: errorMessage(e) });
+    }
+  }
+  return (
+    <Section
+      title="Mechanic app and contact"
+      intro="Verified mechanics sign in to the mechanic app (/m) with a code sent to their phone. Customers see their photo and first name."
+    >
+      <div className="flex flex-wrap items-center gap-4">
+        {m.photo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element -- a short-lived signed link from the private bucket
+          <img src={m.photo_url} alt={`Photo of ${m.name}`} className="size-20 rounded-full object-cover" />
+        ) : (
+          <span className="flex size-20 items-center justify-center rounded-full bg-ink/10 text-sm text-ink/70">No photo</span>
+        )}
+        <dl className="grid gap-1 text-ink">
+          <div className="flex gap-2">
+            <dt className="font-semibold">App sign-in:</dt>
+            <dd data-testid="verified">{m.verified_at ? `verified by ${m.verified_by || "admin"}` : "not verified (cannot sign in)"}</dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="font-semibold">WhatsApp offers:</dt>
+            <dd data-testid="whatsapp">{m.whatsapp_opted_in ? "opted in" : "no opt-in (SMS instead)"}</dd>
+          </div>
+        </dl>
+      </div>
+      <div className="flex flex-wrap gap-3">
+        {verify && (
+          <Button type="button" variant="outline" className="min-h-11 rounded-full" disabled={busy}
+            onClick={() => void save(() => adminApi.setVerified(m.id, !m.verified_at), m.verified_at ? "No longer verified: signed out." : "Verified: they can sign in to the app.")}>
+            {m.verified_at ? "Remove verification" : "Mark verified"}
+          </Button>
+        )}
+        {manage && (
+          <Button type="button" variant="outline" className="min-h-11 rounded-full" disabled={busy} onClick={() => void whatsapp(!m.whatsapp_opted_in)}>
+            {m.whatsapp_opted_in ? "Withdraw WhatsApp opt-in" : "Record WhatsApp opt-in"}
+          </Button>
+        )}
+      </div>
+      {manage && !m.whatsapp_opted_in && (
+        <p className="text-sm text-ink/80">
+          Before recording it, read this to them on the call and get a clear yes: <q className="font-semibold">{MECHANIC_WHATSAPP_TEXT}</q> They can
+          also send START to our WhatsApp number.
+        </p>
+      )}
+      {manage && (
+        <form
+          className="flex flex-wrap items-end gap-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (file) void save(() => adminApi.uploadPhoto(m.id, file), "Photo saved.");
+          }}
+        >
+          <label className="flex flex-col gap-1 text-sm font-semibold text-ink">
+            Photo (JPEG, PNG, WebP or HEIC)
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/heic" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="min-h-11" />
+          </label>
+          <Button type="submit" className="min-h-11 rounded-full" disabled={busy || !file}>
+            Upload photo
+          </Button>
+        </form>
+      )}
+      <SaveStatus status={status} />
     </Section>
   );
 }

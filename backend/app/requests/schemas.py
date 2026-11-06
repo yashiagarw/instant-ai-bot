@@ -113,6 +113,7 @@ class ServiceRequestIn(BaseModel):
 
 
 class ServiceRequestOut(BaseModel):
+    id: uuid.UUID = Field(description="For the live tracking page (/track/{id}), open to this browser and the account")
     reference: str = Field(examples=["IM-7K3Q9P"])
     status: RequestStatus
     urgent: bool
