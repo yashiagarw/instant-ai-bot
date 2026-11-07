@@ -204,6 +204,7 @@ class EngineV2(Engine):
             for fid in order
             if fid in self.high_risk_faults and (prob[fid] >= HIGH_RISK_PROBABILITY or v1_score[fid] >= HIGH_RISK_SCORE)
         }
+        likely_high = {}  # TEMPORARY (CI gate test, reverted in the next commit): drops "likely cause" alerts
 
         def safety(likely_any=None):
             return evaluate(
