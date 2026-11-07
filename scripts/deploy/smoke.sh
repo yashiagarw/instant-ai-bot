@@ -12,7 +12,8 @@ set -u
 WEB=$1 API=$2 ADMIN=$3 WRITE=${4:-}
 WAIT=${SMOKE_WAIT:-120}
 FAILED=0
-CURL="curl -sS --max-time 15 --retry 2 --retry-all-errors"
+# SMOKE_INSECURE=1: the local production stack only (Caddy's own certificate, no port-80 redirect test).
+CURL="curl -sS --max-time 15 --retry 2 --retry-all-errors ${SMOKE_INSECURE:+-k}"
 
 check() {  # name, then a command that must succeed
   name=$1; shift
@@ -44,12 +45,14 @@ check "website HSTS header"                     header "https://$WEB/" "strict-t
 check "service worker not cached"               header "https://$WEB/sw.js" "cache-control: no-cache, no-store"
 check "admin sign-in page"                      status200 "https://$ADMIN/login"
 check "admin CSP header"                        header "https://$ADMIN/login" "content-security-policy:"
-check "http redirects to https"                 http_redirects "$WEB"
+[ -n "${SMOKE_INSECURE:-}" ] || check "http redirects to https" http_redirects "$WEB"
 
 if [ "$WRITE" = "--write" ]; then
   start() {
     variant=$($CURL "https://$API/api/vehicles/search?q=swift&limit=1" | sed -n 's/.*"variant_id":\([0-9]*\).*/\1/p' | head -1)
-    [ -n "$variant" ] || return 1
+    if [ -z "$variant" ]; then
+      echo "      (no vehicles yet: a new server before its data is loaded, docs/server-setup.md step 10)"; return 0
+    fi
     $CURL -f -X POST "https://$API/api/diagnosis/sessions" -H 'Content-Type: application/json' -H "Origin: https://$WEB" \
       -d "{\"vehicle\":{\"variant_id\":$variant},\"category_ids\":[\"battery\"],\"text\":\"smoke test: battery weak\"}" \
       | grep -Eq '"(question|done)"'

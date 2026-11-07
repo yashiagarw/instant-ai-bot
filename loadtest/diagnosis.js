@@ -50,15 +50,27 @@ const TEXTS = ["car not starting in the morning, clicking sound", "gaadi garam h
 
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const params = (step, extra = {}) => ({
-  headers: { "Content-Type": "application/json", Origin: ORIGIN, "X-Request-ID": `k6-${__VU}-${__ITER}-${step}` },
+  headers: { "Content-Type": "application/json", Origin: ORIGIN, "X-Request-ID": `k6-${__VU}-${typeof __ITER === "undefined" ? "setup" : __ITER}-${step}` },
   tags: { kind: "api", step },
   ...extra,
 });
 
 export function setup() {
   if (!API) fail("set API_URL (scripts/loadtest.sh does)");
-  const r = http.get(`${API}/api/health/ready`, params("setup", { tags: { kind: "setup" } }));
+  const warm = (step) => ({ ...params(step), tags: { kind: "setup" }, timeout: "120s" });
+  const r = http.get(`${API}/api/health/ready`, warm("setup"));
   if (r.status !== 200) fail(`API not ready at ${API}: ${r.status} ${r.body}`);
+  // Warm up, not measured: each API process builds its diagnosis engine (and loads the search model) on its first
+  // request, as after any restart; a running server is warm. Enough calls to reach every process.
+  for (let i = 0; i < 12; i++) {
+    http.get(`${API}/api/categories`, warm("warmup"));
+    const s = http.get(`${API}/api/vehicles/search?q=swift&limit=1`, warm("warmup"));
+    const hit = s.status === 200 && s.json("results") && s.json("results")[0];
+    if (hit) {
+      http.post(`${API}/api/diagnosis/sessions`, JSON.stringify({ vehicle: { variant_id: hit.variant_id },
+        topic_id: "ac", text: "warm up" }), warm("warmup"));
+    }
+  }
 }
 
 export default function () {

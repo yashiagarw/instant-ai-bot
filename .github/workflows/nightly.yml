@@ -2,7 +2,7 @@
 #   - the full eval (every case, ~5,400) when main changed since the last full run, gated against the previous
 #     full run with the publish rules (danger cases missed, top-3), the result kept as the next baseline
 #   - Trivy over the images now on main (new vulnerabilities are published every day, code changes or not)
-#   - GHCR clean-up: untagged image layers older than 30 days (every sha tag is kept for rollback)
+#   - GHCR clean-up on Sundays: untagged image layers (every sha tag is kept for rollback)
 name: Nightly
 
 on:
@@ -122,13 +122,13 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
-  trivy:
-    name: Trivy (images on main)
+  maintenance:
+    name: Trivy on the images on main; GHCR clean-up (Sundays)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
-      - name: Scan
+      - name: Trivy
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
@@ -144,21 +144,30 @@ jobs:
               aquasec/trivy:0.67.2 image --quiet --scanners vuln --ignorefile /.trivyignore --severity HIGH,CRITICAL \
               --ignore-unfixed --exit-code 1 "$repo/$image:main" || failed=1
           done
-          exit $failed
-
-  ghcr-cleanup:
-    name: GHCR clean-up (untagged only)
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        package: [autocare-api, autocare-backup, autocare-web, autocare-admin]
-    steps:
-      - name: Delete untagged versions (every tag stays, for rollback)
+          echo "failed=$failed" >> "$GITHUB_ENV"
+      - name: Sunday?
+        id: day
+        run: echo "sunday=$([ "$(date -u +%u)" = 7 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      # Untagged layers only: every sha tag stays, so any commit can be redeployed.
+      - name: GHCR clean-up (api)
+        if: steps.day.outputs.sunday == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/delete-package-versions@v5
         continue-on-error: true   # the package does not exist before the first push to main
-        with:
-          package-name: ${{ matrix.package }}
-          package-type: container
-          delete-only-untagged-versions: "true"
-          min-versions-to-keep: 20
+        with: { package-name: autocare-api, package-type: container, delete-only-untagged-versions: "true", min-versions-to-keep: 20 }
+      - name: GHCR clean-up (backup)
+        if: steps.day.outputs.sunday == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with: { package-name: autocare-backup, package-type: container, delete-only-untagged-versions: "true", min-versions-to-keep: 20 }
+      - name: GHCR clean-up (web)
+        if: steps.day.outputs.sunday == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with: { package-name: autocare-web, package-type: container, delete-only-untagged-versions: "true", min-versions-to-keep: 20 }
+      - name: GHCR clean-up (admin)
+        if: steps.day.outputs.sunday == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with: { package-name: autocare-admin, package-type: container, delete-only-untagged-versions: "true", min-versions-to-keep: 20 }
+      - name: Result
+        run: exit "${failed:-0}"

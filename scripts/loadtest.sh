@@ -27,7 +27,7 @@ case "$target" in
     dcp -f "$ROOT/docker-compose.loadtest.yml" up -d --no-build --no-deps --wait api
     restore="local"
     # k6 runs in a container: "localhost" must reach this machine's Caddy (same certificate name, so same host name).
-    host_ip=$(docker run --rm --add-host gw:host-gateway alpine:3.20 getent hosts gw | awk '{print $1}')
+    host_ip=$(docker run --rm --add-host gw:host-gateway alpine:3.20 getent ahostsv4 gw | awk 'NR==1{print $1}')
     ;;
   staging)
     : "${STAGING_SSH:?set STAGING_SSH=deploy@<staging server> (the deploy user; docs/server-setup.md)}"

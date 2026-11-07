@@ -20,6 +20,7 @@ AI car diagnosis chatbot and mechanic assistance platform for [Instant Mechanic]
 | `docker-compose.yml` | Development: PostgreSQL 16 + pgvector, S3-compatible storage for photos (SeaweedFS), Redis for background jobs; the apps with hot reload under the `app` profile |
 | `docker-compose.prod.yml`, `docker/caddy` | Production stack behind Caddy with automatic HTTPS ([Phase 5.1](#phase-51-containers-and-production)) |
 | `backend/Dockerfile`, `apps/Dockerfile` | Production images: API + worker (one image), web / admin |
+| `.github/workflows`, `scripts/deploy`, `loadtest` | CI/CD, deploys over SSH with rollback, the k6 load test ([Phase 5.6](#phase-56-cicd-and-launch-preparation)); [server setup](docs/server-setup.md), [launch checklist](docs/launch-checklist.md) |
 
 ## Requirements
 
@@ -1177,6 +1178,169 @@ APP=web .`); the decoder is copied during its build.
 cd backend && uv run pytest -q                                 # + Hindi names, request language
 pnpm test                                                      # + i18n parity/ICU, car parts vs taxonomy and GLB, 3D gate, Hindi pages
 pnpm --filter web exec playwright test --workers=1             # + e2e/visual.spec.ts: 3D within the CSP, skipped on slow/low-memory/reduced motion, Hindi
+```
+
+## Phase 5.6: CI/CD and launch preparation
+
+GitHub Actions tests every change, builds the images, deploys staging, and deploys production after your approval,
+rolling back by itself when production's smoke test fails. Servers: [docs/server-setup.md](docs/server-setup.md).
+Before going live: [docs/launch-checklist.md](docs/launch-checklist.md).
+
+| Workflow | When | What |
+|---|---|---|
+| `ci.yml` | every pull request (and on main) | ruff + pytest; ESLint, `pnpm typecheck` and Vitest; `uv audit` + `pnpm audit`; the **eval gate** (quick). Jobs whose files did not change are skipped |
+| `main.yml` | push to `main` | the CI checks, Playwright (web + admin), images to GHCR + Trivy, **staging** deploy + smoke test, **production after approval** + smoke test, automatic rollback |
+| `main.yml` (dry run) | push to a `ci/**` branch | Playwright, images pushed by sha, Trivy; never deploys (tests the pipeline without touching main) |
+| `nightly.yml` | 02:00 India time | full eval (only when main changed), Trivy on the images on main, GHCR clean-up of untagged layers |
+| `deploy.yml` | by hand (Actions > "Deploy (manual)") | deploy any earlier commit, or roll back, on staging or production (production asks for approval) |
+
+- **Eval gate** (`python -m app.datasets.ci_eval`): the publish gate's own evaluation and rules, now in CI. A pull
+  request fails when more of the **800 danger cases** are missed than on `main`, or top-3 accuracy drops more than
+  **3 points**, measured on the cases both have. The quick scope is every danger case plus the test split (3,125
+  cases, ~5 min on a laptop); the nightly full scope is every case (5,407, ~10 min). The baseline is `main`'s last
+  report (kept in the Actions cache); the eval database is rebuilt only when the data, the importer or a migration
+  changes (`scripts/ci/eval-db.sh`, cached as a dump).
+- **Images**: private GHCR, `ghcr.io/<owner>/autocare-api:<sha>` (also the worker), `autocare-backup:<sha>`, and
+  `autocare-web:<env>-<sha>` / `autocare-admin:<env>-<sha>`, built per environment because their API and photo
+  addresses are baked into the browser code. Every sha tag is kept (rollback to any commit); the nightly job only
+  removes untagged layers. The servers pull with a classic token that has only `read:packages`.
+- **Deploy** (`scripts/deploy/remote-deploy.sh` on the server, over SSH as the `deploy` user): the release's compose
+  file and Caddy config go to `/opt/autocare/releases/<sha>`, settings stay in `/opt/autocare/shared`; `migrate` runs
+  first, then it waits until every service is healthy; production takes an encrypted backup first. Then
+  `scripts/deploy/smoke.sh` from outside (HTTPS, readiness and migrations, the pages, security headers, `/sw.js` not
+  cached; on staging it also starts a diagnosis).
+- **Rollback** (automatic on a failed production smoke test, or by hand): the previous release's images, **without**
+  the migrate step; the database is never downgraded ([docs/runbooks/rollback.md](docs/runbooks/rollback.md)). The
+  readiness check now reports a database newer than the code as `"migrations":"ahead"` and stays ready, so the
+  previous release serves after a release that added a migration.
+- **Domains are settings** (`WEB_DOMAIN`, `ADMIN_DOMAIN`, `API_DOMAIN`, `FILES_DOMAIN` in `.env.prod`); defaults
+  diagnose., admin., api. and files.instantmechanic.online (instantmechanic.online stays on the existing site; Caddy no
+  longer redirects www.). The API's CORS origins (`WEB_ORIGIN`, `ADMIN_ORIGIN`) and photo links
+  (`S3_PUBLIC_ENDPOINT_URL`) now follow them in docker-compose.prod.yml; the CSP follows the build values.
+- **`API_WORKERS`** (new, default 2): API processes. One process uses one CPU core; the load test showed one is not
+  enough. Each holds about 0.9 GB: 3 on the 8 GB production server, 2 on staging.
+
+### Load test (k6)
+`loadtest/diagnosis.js`: concurrent diagnosis sessions as customers use them (car search, a problem tile, 30% also
+type a description, answer until done, result, estimates, explanations), with think times; every step must have
+p95 < 800 ms (no LLM step: `LLM_PROVIDER=none`), errors < 1%. One command, k6 in Docker:
+```bash
+STAGING_SSH=deploy@<staging server> sh scripts/loadtest.sh staging          # 200 sessions, 5 min (raises staging's per-IP limits for the run, then restores them)
+sh scripts/loadtest.sh local 200 3m                                          # the local production stack
+sh scripts/loadtest.sh https://api.example https://diagnose.example 200 5m   # anything else (its limits must allow it)
+```
+**Results so far: the local production stack on a MacBook (8 GB, Docker VM 4 GB / 8 CPUs, dev servers also
+running). Not representative of a server**: rerun on staging with the command above before launch.
+
+| Run (2026-11-07, local) | Sessions | Requests | Errors | p95 all steps | Steps over 800 ms (p95) |
+|---|---|---|---|---|---|
+| 200 users, 1 API process, no warm-up | 126 | 2,809 | 22.6% | 60 s (timeouts) | all |
+| 50 users, 1 API process | 236 | 2,953 | 0.30% | 1.49 s | answer, start, result, estimates, categories |
+| 50 users, 2 API processes | 261 | 3,192 | 0% | 320 ms | categories only (cold engine: fixed by the warm-up) |
+| **200 users, 2 API processes, warmed up** | **1,501** | **17,948** | **0.07%** | **657 ms** | answer 829 ms, result 975 ms |
+
+Per step at 200 users with 2 processes (p95): vehicle search 162 ms, categories 431 ms, start 466 ms, answer 829 ms,
+result 975 ms, estimates 705 ms, explanations 390 ms. Findings: one API process tops out at one CPU core, hence
+`API_WORKERS`; each process builds its diagnosis engine on its first request (the test warms up first, as a running
+server is); on staging (dedicated 2 vCPUs) or production (4 vCPUs, `API_WORKERS=3`) the remaining two steps should
+pass, which the staging run will confirm.
+
+### GitHub setup (once)
+1. **Environments** (Settings > Environments): create `production` first, with **Required reviewers: you**,
+   "Prevent self-review" off (you approve your own), and **Deployment branches: `main` only**. Then `staging`, also
+   `main` only, no reviewers.
+2. **Secrets and variables per environment** (Settings > Environments > the environment). Same names in both, different
+   values; production's are **new**, never copied from a laptop or from staging:
+
+   | Secret | Value | Where it comes from |
+   |---|---|---|
+   | `DEPLOY_SSH_HOST` | the server's IP (or reserved IP) | DigitalOcean droplet page |
+   | `DEPLOY_SSH_USER` | `deploy` | [server-setup.md](docs/server-setup.md) step 3 |
+   | `DEPLOY_SSH_KEY` | the private key `gha_<env>` (whole file) | `ssh-keygen -t ed25519` (step 8); its `.pub` in the server's `authorized_keys`; then delete it from the laptop |
+   | `DEPLOY_SSH_KNOWN_HOSTS` | the server's host key line | `ssh-keyscan -t ed25519 <ip>`, after checking the fingerprint on the server (step 8) |
+
+   | Variable (not secret: baked into public pages) | Staging | Production |
+   |---|---|---|
+   | `WEB_DOMAIN` | diagnose.staging.instantmechanic.online | diagnose.instantmechanic.online |
+   | `ADMIN_DOMAIN` | admin.staging.instantmechanic.online | admin.instantmechanic.online |
+   | `API_DOMAIN` | api.staging.instantmechanic.online | api.instantmechanic.online |
+   | `FILES_DOMAIN` | files.staging.instantmechanic.online | files.instantmechanic.online |
+   | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | a staging Turnstile widget's site key (or empty) | the production widget's site key (Cloudflare > Turnstile, hostnames = WEB_DOMAIN) |
+   | `NEXT_PUBLIC_SENTRY_DSN` | the browser DSN of a Sentry project (or empty) | the production project's browser DSN |
+   | `NEXT_PUBLIC_MAP_PROVIDER` | `stadia` | `stadia` |
+   | `NEXT_PUBLIC_MAP_KEY` | a Stadia Maps key restricted to ADMIN_DOMAIN | a separate key restricted to admin.instantmechanic.online |
+   | `DEPLOY_SSH_PORT` | optional, default 22 | optional |
+
+   No repository-level secrets are needed: CI pushes images with the built-in `GITHUB_TOKEN`. Until an environment
+   has its four secrets and the domain variables, its deploy job is skipped with a notice (production also waits for
+   staging).
+3. **After the first push to `main`**: GHCR has the packages `autocare-api`, `-backup`, `-web`, `-admin` (private).
+   Each package > Package settings > "Manage Actions access": the repository with **Write** (already set when the
+   workflow created it).
+
+### Server settings (on each server, never in GitHub)
+`/opt/autocare/shared/.env.prod` (from `.env.prod.example`) and `/opt/autocare/shared/backend/.env.prod` (from
+`backend/.env.prod.example`), `chmod 600`. Generate every secret on the server or a trusted laptop, store it in the
+password manager, and use new values for production:
+
+| Setting | How to make it / where it comes from |
+|---|---|
+| `WEB_DOMAIN`, `ADMIN_DOMAIN`, `API_DOMAIN`, `FILES_DOMAIN` | the same as the GitHub variables |
+| `CADDY_TLS` | the ops email address (certificate notices) |
+| `API_WORKERS` | 3 (production), 2 (staging) |
+| `POSTGRES_PASSWORD` | `python3 -c "import secrets; print(secrets.token_hex(24))"` |
+| `BACKUP_AGE_RECIPIENT` | `age-keygen` on a trusted laptop: the **public** key ([runbooks/restore.md](docs/runbooks/restore.md)) |
+| `BACKUP_REMOTE`, `BACKUP_S3_*` | an R2 (or B2/S3) bucket per environment and a token limited to it |
+| `AUTH_SECRET` | `python3 -c "import secrets; print(secrets.token_urlsafe(48))"` |
+| `STAFF_TOTP_KEY`, `MECHANIC_DOCS_KEY` | two different Fernet keys: `python3 -c "import base64,os; print(base64.urlsafe_b64encode(os.urandom(32)).decode())"` |
+| `S3_ACCESS_KEY`, `S3_SECRET_KEY` | random: `openssl rand -hex 16` and `openssl rand -hex 32` (SeaweedFS on the server) |
+| `HELPLINE_NUMBER`, `SUPPORT_EMAIL` | the real staffed number (still a placeholder) and the support inbox |
+| `EMAIL_PROVIDER` + `SMTP_*` or `RESEND_API_KEY`, `EMAIL_FROM` | the email provider ([notifications-setup.md](docs/notifications-setup.md)) |
+| `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, `MSG91_SENDER_ID`, `MSG91_TPL_*` | MSG91 account and the DLT-approved templates |
+| `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_TPL_*` | Meta WhatsApp Cloud API (permanent system-user token) |
+| `WHATSAPP_VERIFY_TOKEN` | random: `openssl rand -hex 24`, also typed into Meta's webhook settings |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | `docker compose ... run --rm tools python -m app.notify.push keys` (keep the pair) |
+| `EXOTEL_SID`, `EXOTEL_API_KEY`, `EXOTEL_API_TOKEN`, `EXOTEL_CALLER_ID` | Exotel account after KYC |
+| `TURNSTILE_SECRET_KEY` | the Turnstile widget's secret key (pairs with the site key variable) |
+| `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | the Sentry project's server DSN; `staging` / `production` |
+| `LLM_PROVIDER`, `ANTHROPIC_API_KEY` | `none` until the AI-answers decision (launch checklist) |
+
+`/opt/autocare/shared/deploy.env`: `IMAGE_REPO=ghcr.io/<owner>`, `DEPLOY_ENVIRONMENT=staging|production`,
+`COMPOSE_PROFILES=storage`, `PRE_DEPLOY_BACKUP=1` on production. Registry login once:
+`docker login ghcr.io` with a classic token that has only `read:packages` ([server-setup.md](docs/server-setup.md) step 8).
+
+### GitHub Actions minutes (private repo, free plan: 2,000 a month)
+Estimated (Linux runners, billed per job and rounded up; to be replaced by the measured times of the first runs):
+
+| Run | Jobs | Minutes |
+|---|---|---|
+| Pull request push touching backend + data | changes 1, backend ~10, frontend ~5, audit ~2, eval ~12 (first time after a data change ~25) | **~30** |
+| Pull request push, frontend only | changes 1, frontend ~5, audit ~2 (backend and eval skipped) | **~8** |
+| Push to main | CI ~30, Playwright ~12, images + Trivy ~15, staging ~12, production ~12 (only when approved) | **~80** |
+| `ci/**` dry run | Playwright ~12, images + Trivy ~15 | ~27 |
+| Nightly | Trivy ~4 every day; full eval ~20 only on days main changed | ~4-24 |
+
+A month with 30 pull-request pushes (half frontend-only), 12 merges to main deployed to production, and main changing
+on 12 days: 30 × 19 + 12 × 80 + 30 × 4 + 12 × 20 ≈ **1,900 minutes**: close to the 2,000 limit. If it runs over:
+merge in batches (each merge costs ~80), approve production for a batch rather than every merge, or run Playwright
+nightly instead of on every merge (saves ~12 per merge). GitHub stops runs at the limit; it does not bill unless a
+spending limit is set (Settings > Billing).
+
+### After pulling
+```bash
+pnpm install                                   # new "typecheck" scripts only
+cd backend && uv sync && cd ..                 # no new migration
+# docker-compose.prod.yml: API_WORKERS (default 2) and the domains now set WEB_ORIGIN, ADMIN_ORIGIN and
+# S3_PUBLIC_ENDPOINT_URL. Your local .env.prod (localhost domains) gives the same values as before: nothing to change.
+```
+
+### Tests
+```bash
+cd backend && uv run pytest -q tests/test_ci_eval.py tests/test_hardening.py   # gate rules, readiness "ahead"
+cd backend && uv run python -m app.datasets.ci_eval run --scope quick --out /tmp/eval.json   # the CI eval locally
+pnpm typecheck                                  # what CI runs (next typegen + tsc)
+docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7   # workflow lint
+SMOKE_INSECURE=1 sh scripts/deploy/smoke.sh localhost localhost:8443 localhost:8444 --write   # local production stack
 ```
 
 ## LLM layer (off by default)
