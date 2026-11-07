@@ -288,3 +288,18 @@ def test_hnsw_falls_back_to_exact_when_the_filter_leaves_too_few_rows(search, fa
     )
     assert calls == [hs.VECTOR_HNSW_SQL, hs.VECTOR_EXACT_SQL]  # 2 tyre rows < 50: exact query as well
     assert {r[2] for r in rows} == {faults["tyre"].id}
+
+
+def test_lite_mode_searches_by_text_only(db_session, version, faults, monkeypatch):  # noqa: F811
+    """EMBEDDING_MODEL=none (the free demo): no query vector at all; words, typos and Devanagari still match."""
+    sync(db_session, version.id, FakeEmbedder())  # the stored rows of the version (their text is what is searched)
+    lite = HybridSearch(lambda: nullcontext(db_session), None, FakeEmbedder().name)
+    monkeypatch.setattr(lite, "nearest", lambda *a, **k: pytest.fail("LITE mode must not run the vector list"))
+    battery, tyre = faults["battery"].id, faults["tyre"].id
+    both = {battery, tyre}
+    words = lite("battery down", both)
+    assert max(words, key=lambda f: words[f].score) == battery
+    typo = lite.hits("battry", both)
+    assert typo and typo[0].fault_id == battery and "fuzzy" in typo[0].ranks and "vector" not in typo[0].ranks
+    hindi = lite("टायर पंक्चर", both)  # its Hinglish form, "tyre puncture", is searched as text
+    assert max(hindi, key=lambda f: hindi[f].score) == tyre

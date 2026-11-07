@@ -106,8 +106,14 @@ _loaded: dict[str, SentenceTransformerEmbedder] = {}
 _load_lock = threading.Lock()
 
 
+LITE_SETTINGS = ("", "none", "off")
+
+
 def load_embedder(setting: str) -> SentenceTransformerEmbedder:
-    """The model for EMBEDDING_MODEL or a stored model name, loaded once per process (raises ModelError)."""
+    """The model for EMBEDDING_MODEL or a stored model name, loaded once per process (raises ModelError).
+    LITE mode (EMBEDDING_MODEL=none) never gets here: it raises before anything heavy is imported."""
+    if setting.strip().lower() in LITE_SETTINGS:
+        raise ModelError("EMBEDDING_MODEL=none (LITE mode): no embedding model in this process")
     with _load_lock:
         hit = _loaded.get(setting)
         if hit is None:

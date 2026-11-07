@@ -785,6 +785,8 @@ export function sendToStorage(form: UploadForm, file: File, onProgress: (p: numb
 }
 
 export const photosApi = {
+  /** Whether this server takes photos (PHOTO_UPLOADS_ENABLED; off in the free demo). */
+  config: (signal?: AbortSignal) => get<{ enabled: boolean }>("/uploads/config", signal),
   start: (sessionId: string, contentType: string, size: number) =>
     post<UploadForm>("/uploads", { session_id: sessionId, content_type: contentType, size }),
   complete: (id: string) => post<Photo>(`/uploads/${id}/complete`),

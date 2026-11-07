@@ -37,16 +37,29 @@ DbSession = Annotated[Session, Depends(get_session)]
 DECLARED = {"image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"}
 NOT_FOUND = "Photo not found"
 STORAGE_DOWN = "We couldn't reach our photo storage. Please try again, or carry on without a photo."
+PHOTOS_OFF = "Photo upload is switched off on this site. Please carry on without a photo."
 
 
 def get_storage(request: Request) -> Storage:
     state = request.app.state
+    if not state.settings.photo_uploads_enabled:  # PHOTO_UPLOADS_ENABLED=false (the free demo: no storage)
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, PHOTOS_OFF)
     if getattr(state, "storage", None) is None:
         state.storage = make_storage(state.settings)
     return state.storage
 
 
 StorageDep = Annotated[Storage, Depends(get_storage)]
+
+
+class UploadsConfigOut(BaseModel):
+    enabled: bool = Field(description="False when photo upload is switched off (PHOTO_UPLOADS_ENABLED=false).")
+
+
+@router.get("/config", response_model=UploadsConfigOut)
+def uploads_config(request: Request) -> UploadsConfigOut:
+    """Whether customers can add photos (the photo step is hidden when not)."""
+    return UploadsConfigOut(enabled=request.app.state.settings.photo_uploads_enabled)
 
 
 def limit_uploads(request: Request) -> None:
@@ -266,11 +279,13 @@ def list_uploads(
     response: Response,
     session: DbSession,
     caller: CallerDep,
-    storage: StorageDep,
     session_id: Annotated[uuid.UUID, Query()],
 ):
-    """Your ready photos for one diagnosis session."""
+    """Your ready photos for one diagnosis session (none when photo upload is switched off)."""
     response.headers["Cache-Control"] = "no-store"
+    if not request.app.state.settings.photo_uploads_enabled:
+        return []
+    storage = get_storage(request)
     ds = session.get(DiagnosisSession, session_id)
     if ds is None or not caller.owns(ds):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")

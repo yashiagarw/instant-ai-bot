@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 
 import { RequestForm } from "@/components/request/request-form";
 import { mockApi } from "./api-mock";
-import { FakeDiagnosis } from "./fake-diagnosis";
+import { FakeDiagnosis, REQUEST_CONFIG } from "./fake-diagnosis";
 
 let fake: FakeDiagnosis;
 
@@ -159,4 +159,19 @@ test("the request carries the language of the pages the customer used (notificat
   await screen.findByTestId("confirmation");
   expect(fake.requests[0]).toMatchObject({ language: "hi" });
   localStorage.removeItem("im.lang");
+});
+
+test("no helpline configured (the free demo): only the 112 emergency line", async () => {
+  const saved = REQUEST_CONFIG.helpline_number;
+  REQUEST_CONFIG.helpline_number = "";
+  try {
+    const id = session({ vehicle: { variant_id: 16 }, topic_id: "flat_tyre" }, [302]);
+    render(<RequestForm sessionId={id} />);
+    const line = await screen.findByTestId("helpline");
+    expect(line.textContent).toContain("112");
+    expect(line.textContent).not.toContain("+91");
+    expect(within(line).getByRole("link", { name: "Call 112" }).getAttribute("href")).toBe("tel:112");
+  } finally {
+    REQUEST_CONFIG.helpline_number = saved;
+  }
 });

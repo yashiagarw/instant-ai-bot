@@ -2,11 +2,16 @@ import path from "node:path";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
+import { apiRouting, isDemo } from "../../packages/ui/src/api-proxy";
 import { securityHeaders } from "../../packages/ui/src/security-headers";
+
+// The free demo calls the API through this site (API_PROXY_TARGET): packages/ui/src/api-proxy.ts.
+const API = apiRouting(process.env);
+const DEMO = isDemo(process.env);
 
 // Phase 5.4: CSP and other security headers, from the values this build uses (packages/ui/src/security-headers.ts).
 const SECURITY_HEADERS = securityHeaders({
-  apiUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000",
+  apiUrl: API.browserApiUrl,
   filesUrl: process.env.NEXT_PUBLIC_FILES_URL ?? "http://localhost:8333",
   sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   turnstile: Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY),
@@ -18,6 +23,7 @@ const SECURITY_HEADERS = securityHeaders({
 });
 
 const nextConfig: NextConfig = {
+  env: API.env,
   // Docker images (apps/Dockerfile) build with NEXT_OUTPUT=standalone: a self-contained server.js with only the files
   // it needs, traced from the workspace root so packages/ui is included. Local `next start` (and Playwright) unchanged.
   ...(process.env.NEXT_OUTPUT === "standalone"
@@ -34,7 +40,7 @@ const nextConfig: NextConfig = {
         { source: "/diagnose", destination: "/en/diagnose" },
         { source: "/diagnose/:path*", destination: "/en/diagnose/:path*" },
       ],
-      afterFiles: [],
+      afterFiles: API.rewrites,
       fallback: [],
     };
   },
@@ -46,7 +52,11 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/:path*", headers: SECURITY_HEADERS },
+      {
+        source: "/:path*",
+        // The free demo is never indexed by search engines (NEXT_PUBLIC_DEMO).
+        headers: DEMO ? [...SECURITY_HEADERS, { key: "X-Robots-Tag", value: "noindex, nofollow" }] : SECURITY_HEADERS,
+      },
       // Phase 5.5: the service worker file is never kept by the browser or a proxy, so each deploy's worker (a new
       // build id) is picked up on the next page load. It is generated: scripts/service-worker.mjs.
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },

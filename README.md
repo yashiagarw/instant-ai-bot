@@ -1357,6 +1357,52 @@ docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7   # workflow lin
 SMOKE_INSECURE=1 sh scripts/deploy/smoke.sh localhost localhost:8443 localhost:8444 --write   # local production stack
 ```
 
+## Free demo deployment (optional)
+
+A zero-cost demo for testers: Vercel Hobby (web and admin), Render free (API), Neon free (Postgres), Upstash free
+(Redis). Every step, every variable and the free-plan limits: **[docs/deploy-free-demo.md](docs/deploy-free-demo.md)**.
+The docker-compose + SSH deployment (Phase 5.6) is unchanged and remains the real one.
+
+What makes it fit:
+- **LITE mode** (`EMBEDDING_MODEL=none`): torch and the embedding model are never installed (`uv sync --no-group
+  embeddings`, `backend/Dockerfile.lite`) or imported. Hybrid search runs without its vector list: full text,
+  spelling correction and the Hinglish form of Hindi text. Safety rules are rule-based and unaffected.
+- **Background jobs in the API** (`BACKGROUND_JOBS=api`, `backend/app/background.py`): notifications are sent after
+  the commit that queued them and swept every minute; dispatch (offer expiry, auto-offer, escalation) every 20 s;
+  retention at start and daily. Each tick takes a Postgres advisory lock.
+- **Switched off**: dataset jobs (`DATASET_JOBS_ENABLED=false`: 503 with a message, the admin Datasets page says so),
+  photo upload (`PHOTO_UPLOADS_ENABLED=false`: the step is hidden), pictures (`SHOW_PICTURES=false`).
+- **Same-origin API** (`API_PROXY_TARGET` on Vercel): `/api/*` and `/media/*` are rewritten to Render, so cookies are
+  first-party on `*.vercel.app`; CSP `connect-src 'self'`. `NEXT_PUBLIC_DEMO=1`: a Demo banner and noindex.
+  `ENVIRONMENT=demo`: real secrets required, console SMS/WhatsApp/calls allowed. No `HELPLINE_NUMBER`: the request
+  form shows only 112.
+- **Data**: `python -m app.demo_export` copies only the published version and the catalogues (an allowlist; a test
+  fails when a new table is not classified). Rehearsed into an empty local database: 118,446 rows, 152 MB.
+
+Measured on the Mac (lite image, `docker run --memory=512m`, against the exported data): 125 MiB idle, **192 MiB
+peak** during k6 with 10 concurrent diagnosis sessions for 3 minutes (841 requests, API p95 101 ms).
+
+Quick eval, LITE vs normal (version 38, same database):
+
+| Metric | Normal (vectors) | LITE (no vectors) |
+|---|---|---|
+| Quick gate: top-3 (3,125 cases) | 75.05% | 75.01% |
+| Quick gate: **safety recall** (800 danger cases) | **98.88%** (9 missed) | **98.88%** (9 missed) |
+| Harness test split: top-3 (2,733 cases) | 75.05% | 75.01% |
+| Harness: safety recall (408) / false alarms | 98.53% / 0% | 98.53% / 0% |
+| Harness: Hindi (Devanagari) top-3 (24) | 58.3% | 62.5% |
+| Harness: Hinglish top-3 (671) | 69.2% | 69.3% |
+| Harness: typo top-3 (220) | 59.6% | 59.1% |
+| Harness: English top-3 (862) | 79.8% | 79.6% |
+| Quick gate run time | 469 s | 308 s |
+
+Try it locally:
+```bash
+docker build -f backend/Dockerfile.lite -t autocare-api-lite .                         # about 650 MB, no torch
+cd backend && EMBEDDING_MODEL=none uv run python -m app.datasets.ci_eval run --scope quick --out /tmp/lite.json
+cd backend && uv run pytest -q tests/test_free_demo.py tests/test_demo_export.py
+```
+
 ## LLM layer (off by default)
 
 `backend/app/llm` adds two optional steps, each with a non-LLM fallback. The engine always decides which question

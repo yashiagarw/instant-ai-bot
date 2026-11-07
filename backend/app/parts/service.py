@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from app.config import get_settings
 from app.enums import CoverageLevel, PriceSegment, ReviewStatus
 from app.knowledge.models import DatasetVersion, Fault, FaultLink, LinkRelation
 from app.knowledge.questions.inputs import target_version
@@ -169,7 +170,7 @@ def _part_out(part: Part, fit: str, compat: list[tuple], prices: list[PartPrice]
                 caption=img.image.caption,
                 image_type=img.image.image_type,
             )
-            for img in part.images
+            for img in (part.images if get_settings().show_pictures else ())  # SHOW_PICTURES (the free demo: off)
         ],
     }
 

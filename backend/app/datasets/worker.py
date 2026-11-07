@@ -62,7 +62,11 @@ def make_pipeline(settings, factory) -> Pipeline:
     def search(model_name: str):
         if settings.diagnosis_search != "hybrid":
             return None
+        from app.config import embeddings_enabled
         from app.diagnosis.search import HybridSearch
+
+        if not embeddings_enabled(settings):  # LITE mode: text-only search, no model
+            return HybridSearch(factory.begin, None, model_name)
 
         model = pipe.embedder_named(model_name)
         if model is None:

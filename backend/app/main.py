@@ -1,5 +1,7 @@
 """FastAPI entry point: uv run uvicorn app.main:app --reload"""
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -44,12 +46,30 @@ def init_sentry_once(settings: Settings) -> None:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
-    if settings.environment == "production" and settings.auth_secret.startswith("dev-only"):
-        raise RuntimeError("Set AUTH_SECRET to a long random value in production")
+    # The public free demo (ENVIRONMENT=demo) must have real secrets too; it only keeps the console senders.
+    if settings.environment in ("production", "demo") and settings.auth_secret.startswith("dev-only"):
+        raise RuntimeError(f"Set AUTH_SECRET to a long random value in {settings.environment}")
     fernet(settings)  # STAFF_TOTP_KEY must be valid (and set, in production) before staff can sign in
     logs.configure("api", settings.log_format, settings.log_level)
     init_sentry_once(settings)
-    app = FastAPI(title="Instant Mechanic API", version="0.1.0")
+    runner_box: dict = {}
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        # BACKGROUND_JOBS=api (no worker, e.g. the free demo on Render): notifications, dispatch and retention run on
+        # a thread of this process (app/background.py). The default (worker) starts nothing here.
+        if settings.background_jobs == "api":
+            from app.background import BackgroundRunner
+
+            runner_box["runner"] = BackgroundRunner(settings, app.state.session_factory)
+            runner_box["runner"].start()
+        try:
+            yield
+        finally:
+            if runner := runner_box.get("runner"):
+                runner.stop()
+
+    app = FastAPI(title="Instant Mechanic API", version="0.1.0", lifespan=lifespan)
 
     app.state.settings = settings
     notify.use_settings(settings)  # request events queue notifications with these settings

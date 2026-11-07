@@ -126,6 +126,9 @@ class OverviewOut(BaseModel):
     active_job: JobOut | None
     can_manage: bool
     can_override: bool
+    jobs_enabled: bool = Field(
+        True, description="False when dataset jobs are switched off (DATASET_JOBS_ENABLED=false, e.g. the free demo)."
+    )
 
 
 class EvalIn(BaseModel):
@@ -193,6 +196,18 @@ def _queue(request: Request) -> jobs.JobQueue:
     return queue
 
 
+JOBS_OFF = (
+    "Dataset import, rebuild, eval and publish are switched off on this server (DATASET_JOBS_ENABLED=false: the free "
+    "demo has no background worker). The published version is served as it is."
+)
+
+
+def require_jobs(request: Request) -> None:
+    """503 with a clear message when dataset jobs are switched off (the admin Datasets page shows it)."""
+    if not request.app.state.settings.dataset_jobs_enabled:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, JOBS_OFF)
+
+
 def start_job(
     request: Request,
     session: Session,
@@ -204,6 +219,7 @@ def start_job(
     before: dict | None = None,
 ) -> DatasetJob:
     """Create the job and its audit row, commit, then put it on the queue."""
+    require_jobs(request)
     try:
         job = jobs.create_job(session, kind, version.id, staff.user.id, staff.label, params)
     except jobs.JobBusy as e:
@@ -290,7 +306,7 @@ async def _raw_body(request: Request) -> bytes:
 
 @router.get("", response_model=OverviewOut)
 @requires(Perm.content_read)
-def overview(staff: CurrentStaff, session: DbSession):
+def overview(request: Request, staff: CurrentStaff, session: DbSession):
     """The live version, every version (newest first), the categories and their files, and the active job."""
     live = live_version(session)
     config = load_config()
@@ -325,6 +341,7 @@ def overview(staff: CurrentStaff, session: DbSession):
         active_job=job_out(active) if active else None,
         can_manage=Perm.datasets_manage in staff.perms,
         can_override=Perm.datasets_override in staff.perms,
+        jobs_enabled=request.app.state.settings.dataset_jobs_enabled,
     )
 
 
@@ -365,6 +382,7 @@ def upload(
 ):
     """Upload a new version of a category's Excel file (the request body). It becomes a draft built in the
     background: the other categories are copied from the published version."""
+    require_jobs(request)
     config = load_config()
     files = [n for n, e in sorted(config.files.items()) if category in e.categories.values()]
     if not files:

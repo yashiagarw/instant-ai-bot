@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Devanagari } from "next/font/google";
 import "./globals.css";
 import { DevServiceWorkerReset } from "@/components/dev-service-worker-reset";
+import { DemoBanner } from "@im/ui/demo-banner";
+import { isDemo } from "@im/ui/api-proxy";
 import { ErrorReporting } from "@/components/error-reporting";
 import { sharedMessages } from "@/i18n/messages";
 import { IntlProvider } from "@/i18n/provider";
@@ -32,9 +34,14 @@ export const metadata: Metadata = {
   // The manifest (src/app/manifest.ts) is linked automatically; iPhones also want these for "Add to Home Screen".
   icons: { apple: "/icons/apple-touch-icon.png" },
   appleWebApp: { capable: true, title: "Instant Mechanic", statusBarStyle: "default" },
+  // The free demo is never indexed (NEXT_PUBLIC_DEMO; next.config.ts also sends X-Robots-Tag).
+  ...(isDemo(process.env) ? { robots: { index: false, follow: false } } : {}),
 };
 
-const API_ORIGIN = new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").origin;
+// Empty in the free demo, where the API is reached through this site (API_PROXY_TARGET): nothing to preconnect to.
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const API_ORIGIN = API_URL ? new URL(API_URL).origin : null;
+const DEMO = isDemo(process.env);
 
 export const viewport: Viewport = { themeColor: "#D9620F" };
 
@@ -47,9 +54,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         {/* Phase 5.5: every page calls the API right after it starts (categories, the result, sign-in state): open
             that connection while the page's own files load. The API sends cookies, hence use-credentials. */}
-        <link rel="preconnect" href={API_ORIGIN} crossOrigin="use-credentials" />
+        {API_ORIGIN && <link rel="preconnect" href={API_ORIGIN} crossOrigin="use-credentials" />}
       </head>
       <body className="min-h-full flex flex-col">
+        <DemoBanner demo={DEMO} />
         <ErrorReporting />
         <DevServiceWorkerReset />
         {/* Header, footer and other shared parts in English; the /hi pages wrap theirs in Hindi ([locale]/layout). */}

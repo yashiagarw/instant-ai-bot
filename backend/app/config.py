@@ -10,6 +10,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
+    # development, production, or demo (the public free demo: real secrets required as in production, but the
+    # console SMS, call and notification senders are allowed; docs/deploy-free-demo.md).
     environment: str = "development"
     # SQLAlchemy URL, psycopg 3 driver.
     database_url: str = "postgresql+psycopg://autocare:autocare@localhost:5432/autocare"
@@ -31,7 +33,22 @@ class Settings(BaseSettings):
     # data/models (e.g. minilm-im-v1, built with `python -m app.knowledge.finetune train`). Changing it affects new
     # dataset builds only: each version keeps the model it was built with, so a new model goes live only by building a
     # draft on the Datasets page, passing the eval gate and publishing it.
+    # `none` = LITE mode (the free demo on a 512 MB server, docs/deploy-free-demo.md): torch and the model are never
+    # imported or downloaded; search uses full-text, spelling correction and the Hinglish form of Devanagari only (the
+    # stored rows of the served version are still searched, by text).
     embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    # Where the background jobs run: `worker` (the arq worker, docker-compose) or `api` (inside the API process, for
+    # hosts without a worker such as Render's free plan): notification sending and sweep, offer expiry / escalation
+    # dispatch, retention. Dataset jobs need the worker (DATASET_JOBS_ENABLED).
+    background_jobs: Literal["worker", "api"] = "worker"
+    # Dataset import / rebuild / eval / publish jobs from the admin Datasets page (off in the free demo: no worker and
+    # no embedding model there; the admin page says so).
+    dataset_jobs_enabled: bool = True
+    # Customer photo uploads (needs S3-compatible storage, S3_*). Off in the free demo: the photo step is hidden.
+    photo_uploads_enabled: bool = True
+    # Fault and part pictures (files in MEDIA_DIR, extracted by the importer). False in the free demo, whose server has
+    # no data/media: no picture links are sent, so no broken images (docs/deploy-free-demo.md, "Pictures").
+    show_pictures: bool = True
     # Per-IP limit on new diagnosis sessions: at most N per window.
     session_rate_limit: int = 10
     session_rate_window_seconds: int = 60
@@ -234,6 +251,11 @@ class Settings(BaseSettings):
     openai_price_input_per_m: float = 0.0
     openai_price_cached_input_per_m: float = 0.0
     openai_price_output_per_m: float = 0.0
+
+
+def embeddings_enabled(settings: Settings) -> bool:
+    """False in LITE mode (EMBEDDING_MODEL=none): no torch, no model, no vectors for queries."""
+    return settings.embedding_model.strip().lower() not in ("", "none", "off")
 
 
 @lru_cache

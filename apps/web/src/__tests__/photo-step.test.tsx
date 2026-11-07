@@ -220,3 +220,9 @@ test("results and request pages: the gallery shows photos with findings and phot
   cleanup();
   expect(render(<PhotoGallery photos={[]} />).container.innerHTML).toBe("");
 });
+
+test("the step is hidden when the server has photo upload switched off (the free demo)", async () => {
+  mockApi({ "/api/uploads/config": { enabled: false } }, photos);
+  const { container } = render(<PhotoStep sessionId="s1" />);
+  await waitFor(() => expect(container.innerHTML).toBe(""));
+});

@@ -46,8 +46,36 @@ export function isUrgent(result: ResultOut | null): boolean {
   return !!result && (result.mode === "fast_track" || result.safety_alerts.length > 0);
 }
 
+// No helpline configured (HELPLINE_NUMBER empty, as in the free demo): only the national emergency number, 112.
+function Emergency112({ urgent }: { urgent: boolean }) {
+  return (
+    <div
+      className={
+        urgent
+          ? "flex flex-col gap-2 rounded-3xl bg-ink p-5 text-white sm:flex-row sm:items-center sm:justify-between"
+          : "rounded-2xl border border-border bg-white p-4 text-ink"
+      }
+      data-testid="helpline"
+    >
+      <p className="flex items-center gap-2 text-lg font-bold">
+        <Phone aria-hidden="true" className="size-5 shrink-0" />
+        {urgent ? "In danger? Call the emergency number:" : "In an emergency, call"}{" "}
+        <span className="tracking-wide whitespace-nowrap">112</span>
+      </p>
+      {urgent && (
+        <a
+          href="tel:112"
+          className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-full bg-white px-6 text-lg font-bold whitespace-nowrap text-ink outline-none focus-visible:ring-3 focus-visible:ring-white/70"
+        >
+          Call 112
+        </a>
+      )}
+    </div>
+  );
+}
+
 function Helpline({ number, urgent }: { number: string; urgent: boolean }) {
-  if (!number) return null;
+  if (!number) return <Emergency112 urgent={urgent} />;
   return (
     <div
       className={

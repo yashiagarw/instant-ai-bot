@@ -19,7 +19,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 import engine as eng
-from app.config import Settings
+from app.config import Settings, get_settings
 from app.diagnosis import explain, present
 from app.diagnosis.knowledge import load_knowledge
 from app.diagnosis.models import (
@@ -126,7 +126,15 @@ def hybrid_search(state, model: str | None = None) -> HybridSearch | None:
     `model` (the version's embedding model; default the original). `state.embedder` can be set (tests); otherwise the
     model is loaded. A model that cannot be loaded (its folder in data/models is missing or was rebuilt) leaves the
     version on the built-in keyword index, with an error in the log, instead of failing every diagnosis."""
+    from app.config import embeddings_enabled
+
     embedder = getattr(state, "embedder", None)
+    settings = getattr(state, "settings", None)
+    if embedder is None and settings is not None and not embeddings_enabled(settings):
+        # LITE mode: text-only search over the rows of the version's model; torch is never imported.
+        from app.knowledge.importer.embed import MODEL_NAME as default_model  # no torch: embed.py imports it lazily
+
+        return HybridSearch(state.session_factory.begin, None, model or default_model)
     if embedder is None:
         from app.knowledge.importer.embed import MODEL_NAME, ModelError, load_embedder
 
@@ -670,7 +678,8 @@ def public_details(session: Session, engine: eng.Engine, fault_ids: list[int]) -
             **present.present(**raw[fid], clean=lambda t, n=file_no: replace(t, n)),
             "media": [],
         }
-    for link in session.scalars(select(FaultImage).where(FaultImage.fault_id.in_(fault_ids))):
+    pictures = get_settings().show_pictures  # SHOW_PICTURES=false: no picture files on this server (the free demo)
+    for link in session.scalars(select(FaultImage).where(FaultImage.fault_id.in_(fault_ids))) if pictures else ():
         out[link.fault_id]["media"].append(
             {
                 "file": link.image.path.removeprefix("data/media/"),
