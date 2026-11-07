@@ -3,6 +3,11 @@
 A global rule with trigger phrases uses them instead of the words of its heading (engine/safety.py). Rules are matched
 by their sheet row (source_ref), which stays the same across re-imports. Re-run `apply` after every import.
 
+`placeholder_roadside_actions`: sheet values in the roadside action column that are not advice ("No - None.", the
+road-repairable value in some file 12 rows). They are cleared (the sheet value is kept in details as
+`sheet_roadside_action`), so the rule's own stop-driving text is its advice. Otherwise every rule with the same
+placeholder shared one "advice" and the engine merged their alerts into the most serious one, hiding the others.
+
     uv run python -m app.knowledge.safety_triggers check
     uv run python -m app.knowledge.safety_triggers apply
 """
@@ -37,8 +42,25 @@ def _flat(items: list) -> list[str]:
     return out
 
 
+def clear_placeholder_actions(session: Session, doc: dict, version: DatasetVersion) -> int:
+    """Clear placeholder roadside actions (see the module docstring) on every rule of the version; returns how many."""
+    placeholders = {str(p).strip().lower() for p in doc.get("placeholder_roadside_actions") or [] if str(p).strip()}
+    if not placeholders:
+        return 0
+    n = 0
+    for rule in session.scalars(select(SafetyRule).where(SafetyRule.dataset_version_id == version.id)):
+        value = (rule.roadside_action or "").strip()
+        if value and value.lower() in placeholders:
+            rule.details = {**(rule.details or {}), "sheet_roadside_action": value}
+            rule.roadside_action = ""
+            n += 1
+    session.flush()
+    return n
+
+
 def apply_triggers(session: Session, doc: dict, version: DatasetVersion | None = None) -> int:
     version = version or target_version(session)
+    clear_placeholder_actions(session, doc, version)
     rules = {
         r.source_ref: r
         for r in session.scalars(

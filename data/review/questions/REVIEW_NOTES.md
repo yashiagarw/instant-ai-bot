@@ -316,7 +316,7 @@ Hindi danger words become Hinglish in the app ("धुआं" -> "dhuan", "भ�
 ### Still to check
 
 - battery.yaml and tyre.yaml were reviewed by a person and were not changed. battery: "battery hot" is on 5 faults, so 2 of those rules cannot fire from it; please move it to the 3 most serious.
-- File 12 sheet rules (engine, electrical) often have the roadside action "No - None.". Alerts with identical advice are merged into the most serious one, so a medium rule such as EL-27 shows inside a high-risk alert. Real roadside actions for these rules would fix it.
+- File 12 sheet rules (engine, electrical) often have the roadside action "No - None.". Alerts with identical advice are merged into the most serious one, so a medium rule such as EL-27 shows inside a high-risk alert. Real roadside actions for these rules would fix it. **Done for the merging (section 9):** the placeholder is now cleared on import; real roadside actions are still wanted.
 - English "smoke" (a global rule) still fires on "black smoke from the exhaust". Consider giving the global smoke rule location words too.
 - Extra customer phrases: `data/review/phrases/` (REVIEW_NOTES.md there).
 
@@ -334,3 +334,29 @@ Hindi danger words become Hinglish in the app ("धुआं" -> "dhuan", "भ�
   rates it so; check that this is wanted.
 - Evaluation after this change (test split): safety recall 99.2% (was 99.0%), Phase 1 100%, top-3 75.0% (unchanged),
   human-written safety texts 5 of 8 (was 4 of 8), no false alarms.
+
+## 9. Danger cases the eval missed (7 Nov 2026)
+
+Approved by `claude_code (auto, pending mechanic sign-off)`. A mechanic must check each item below and sign it off
+by name (a Hindi speaker for the Hindi/Hinglish phrases). Applied after every import by `questions load --all` and
+`safety_triggers apply` (both are steps of the dataset build and of `scripts/ci/eval-db.sh`).
+
+| Rule | Change | Source file | What to check |
+|---|---|---|---|
+| brakes **F11-BR-04 Complete brake failure** (high) | New danger phrases: `brake fail`, `brakes fail`, `brake failed`, `brakes failed`, `brake failure` (Hindi "ब्रेक फेल" reads as "brake fail") | `questions/brakes.yaml` | That every message naming brake failure should stop the conversation with this rule's emergency steps |
+| global **F18 r70 "Engine stopped in water: do NOT restart"** (high) | First reviewed trigger phrases: `stopped in water`, `stalled in water`, `died in water`, `engine submerged`, `paani doob band`, `pani doob band`, `paani dub band`, `pani dub band`, `paani doobi band` (each needs all its words; Hindi "पानी में डूब ... बंद" reads as "paani dub ... band") | `safety_global_triggers.yaml` | The Hinglish words. Left out on purpose: "paani doob" alone (the car was under water earlier: the flood faults' own rules handle it, and the first version stopped those conversations early) and "paani engine band" (also matches AC water dripping) |
+| global **F18 r68 "Anyone injured, trapped, fire, smoke or fuel leak: call 112"** (high) | Added fuel smell **with** smoke: `petrol gandh dhuan`, `petrol badbu dhuan`, `petrol smell dhuan`, `diesel gandh dhuan`, `diesel badbu dhuan`, `petrol smell smoke`, `fuel smell smoke`, `diesel smell smoke` (each fires only when all its words are in the message) | `safety_global_triggers.yaml` | Whether fuel smell plus smoke should be "call 112". Fuel smell alone stays with the fuel faults' own rules |
+| **68 file 12 rules with roadside action "No - None."** | Cleared on import (the sheet value is kept as `details.sheet_roadside_action`). Their own stop-driving line is now their advice, so they are no longer merged into another rule's alert just because they share the placeholder. Example: F12-EN-21 "milky oil" (medium, "Stop driving long distances.") now shows next to F12-EN-03 (high, "Switch off the engine.") instead of inside it | `safety_global_triggers.yaml` (`placeholder_roadside_actions`) | Customers see more separate alerts on engine and electrical results. Real roadside actions for these 68 rules are still wanted (the data has none) |
+
+| Same database (version 38), engine v2, hybrid search | Before | After |
+|---|---|---|
+| Quick gate: danger cases missed | 9 of 800 | **0 of 800** |
+| Quick gate: top-3 (3,125 cases) | 75.05% | 75.05% |
+| Quick gate: Hindi / typo / Hinglish / English top-3 | 58.3 / 59.5 / 69.1 / 79.8% | 58.3 / 59.5 / 69.1 / 79.8% |
+| Every case (5,407): top-3 | 75.54% | 75.54% (no case changed) |
+| Every case: false alarms (cases that must not alert) | 0 of 4 | 0 of 4 |
+| 4,587 non-danger cases: a high alert where there was none | | **0** |
+| Non-danger cases whose high alerts changed | | 9: in 6 an extra separate alert (no longer merged), in 3 the same advice under another rule; no advice lost |
+
+A first version with "paani doob" alone fired F18 r70 on "Gaadi paani me doob gayi thi" (under water earlier), stopped
+that conversation early and cost 2 top-3 cases; the phrases now need "band" (the engine stopped).

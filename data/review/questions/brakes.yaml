@@ -1438,6 +1438,11 @@ faults:
     - no braking
     - large fluid leak
     - pedal neeche tak
+    - brake fail
+    - brakes fail
+    - brake failed
+    - brakes failed
+    - brake failure
     safety_trigger_options:
     - question: brakes-q01
       option: No, the car is still moving and the brakes are not working
