@@ -78,6 +78,8 @@ export class FakeDatasets {
   jobs: Job[] = [];
   nextId = 42;
   publishBodies: Json[] = [];
+  /** False: the server has DATASET_JOBS_ENABLED=false (the free demo). */
+  jobsEnabled = true;
   rollbackBodies: Json[] = [];
 
   private live() {
@@ -153,6 +155,7 @@ export class FakeDatasets {
         ],
         active_job: active ? this.jobOut(active) : null,
         can_manage: perms.has("datasets.manage"), can_override: perms.has("datasets.override"),
+        jobs_enabled: this.jobsEnabled,
       } }; // prettier-ignore
     }
     const job = path.match(/^\/datasets\/jobs\/(\d+)$/);

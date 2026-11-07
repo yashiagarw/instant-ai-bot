@@ -321,6 +321,8 @@ export interface DatasetsOverview {
   active_job: DatasetJob | null;
   can_manage: boolean;
   can_override: boolean;
+  /** False when this server cannot run dataset jobs (DATASET_JOBS_ENABLED=false, the free demo). */
+  jobs_enabled?: boolean;
 }
 
 // ---------------------------------------------------------------- knowledge editors (backend/app/knowledge/edits/api.py)

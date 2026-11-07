@@ -641,3 +641,26 @@ def test_versions_without_a_recorded_model_use_the_original():
 
     assert version_model(DatasetVersion(checksum="x")) == MODEL_NAME
     assert version_model(DatasetVersion(checksum="x", embedding_model="local/a@1")) == "local/a@1"
+
+
+def test_dataset_jobs_switched_off_say_so(db_session, world, staff, app):  # noqa: F811
+    """DATASET_JOBS_ENABLED=false (the free demo, no worker): upload, rebuild, eval and publish answer 503 with a
+    clear message, nothing is queued, and the overview tells the admin page."""
+    from app.knowledge.models import DatasetJob
+
+    content = staff["content_admin"]
+    app.state.settings = app.state.settings.model_copy(update={"dataset_jobs_enabled": False})
+    jobs_before = db_session.scalar(select(func.count()).select_from(DatasetJob))
+    r = upload(content, battery_file(world["raw"] / "off.xlsx"))
+    assert r.status_code == 503 and "switched off" in r.json()["detail"]
+    assert "DATASET_JOBS_ENABLED" in r.json()["detail"]
+    # Every job (rebuild, eval, publish, rollback, knowledge-edit drafts) goes through start_job, which checks first.
+    from fastapi import HTTPException
+
+    from app.datasets.api import require_jobs
+
+    with pytest.raises(HTTPException) as e:
+        require_jobs(type("R", (), {"app": app})())
+    assert e.value.status_code == 503
+    assert db_session.scalar(select(func.count()).select_from(DatasetJob)) == jobs_before
+    assert content.get("/api/admin/datasets").json()["jobs_enabled"] is False

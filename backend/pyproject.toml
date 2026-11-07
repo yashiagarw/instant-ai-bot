@@ -12,6 +12,8 @@ dependencies = [
     "cryptography>=50.0.2",
     "fastapi>=0.161.1",
     "http-ece>=1.2.1",
+    # The engine's vectors and probabilities (was only pulled in by torch before the embeddings group).
+    "numpy>=2",
     "openai>=3.37.0",
     "openpyxl>=3.1.5",
     "pgvector>=0.5.1",
@@ -23,11 +25,8 @@ dependencies = [
     "pyotp>=2.10.0",
     "pyyaml>=6.0.3",
     "qrcode>=7",
-    "sentence-transformers>=6.2.0",
     "sentry-sdk>=2",
     "sqlalchemy>=2",
-    # Pulled in by sentence-transformers; listed so [tool.uv.sources] can point Linux at the CPU-only wheels.
-    "torch>=2.14.1,<2.15",
     "uvicorn[standard]>=0.54.0",
 ]
 
@@ -40,6 +39,9 @@ train = [
 [tool.uv]
 # Not an installable package: run from this folder (uv run uvicorn app.main:app).
 package = false
+# `uv sync` installs the embeddings group too (local development, CI, the docker-compose images). The free demo's
+# LITE image leaves it out: `uv sync --no-group embeddings` (backend/Dockerfile.lite, EMBEDDING_MODEL=none).
+default-groups = ["dev", "embeddings"]
 
 # CPU-only torch on Linux (the Docker images and servers: no CUDA libraries, about 4 GB smaller). macOS keeps the
 # PyPI wheel (Apple MPS) for local development and fine-tuning.
@@ -52,6 +54,12 @@ url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 [dependency-groups]
+# The search model (hybrid search vectors, the importer's embeddings, fine-tuning): about 1.5 GB with torch.
+embeddings = [
+    "sentence-transformers>=6.2.0",
+    # Pulled in by sentence-transformers; listed so [tool.uv.sources] can point Linux at the CPU-only wheels.
+    "torch>=2.14.1,<2.15",
+]
 dev = [
     "httpx2>=2.16.0",
     "pytest>=9.1.1",

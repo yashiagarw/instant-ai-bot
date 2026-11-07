@@ -79,6 +79,17 @@ export function PhotoStep({ sessionId, defaultMode = "damage" }: { sessionId: st
   const [skipped, setSkipped] = useState(false);
   const [status, setStatus] = useState("");
   const [mode, setMode] = useState<PhotoMode>(defaultMode);
+  // Off when the server has photo upload switched off (the free demo). Any failure here keeps the step.
+  const [enabled, setEnabled] = useState(true);
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    photosApi
+      .config(ctrl.signal)
+      .then((c) => setEnabled(c.enabled !== false))
+      .catch(() => undefined);
+    return () => ctrl.abort();
+  }, []);
 
   // Photos already added to this diagnosis (after a reload). Failure here just shows none.
   useEffect(() => {
@@ -188,6 +199,8 @@ export function PhotoStep({ sessionId, defaultMode = "damage" }: { sessionId: st
       </Button>
     </div>
   );
+
+  if (!enabled) return null;
 
   if (skipped && photos.length === 0 && step.kind === "idle") {
     return (

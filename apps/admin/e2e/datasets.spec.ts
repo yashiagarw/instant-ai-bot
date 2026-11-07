@@ -74,3 +74,13 @@ test("datasets: roll a category back to an archived version in one click", async
   await page.goto("/datasets");
   await expect(page.getByText("v42 · battery rolled back to v40").first()).toBeVisible();
 });
+
+test("datasets: the free demo says dataset changes are switched off and offers no upload", async ({ page }) => {
+  const fake = new FakeAdmin().as("content@im.test");
+  fake.datasets.jobsEnabled = false;
+  await fake.install(page);
+  await page.goto("/datasets");
+  await expect(page.getByTestId("jobs-off")).toContainText("Dataset changes are switched off on this server");
+  await expect(page.getByRole("region", { name: "Live version" })).toContainText("v41 · battery");
+  await expect(page.getByRole("form", { name: "Upload a category file" })).toHaveCount(0);
+});

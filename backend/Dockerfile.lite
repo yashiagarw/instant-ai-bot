@@ -1,0 +1,69 @@
+# LITE API image for the free demo (docs/deploy-free-demo.md): Render's free web service, 512 MB RAM.
+#   docker build -f backend/Dockerfile.lite -t autocare-api-lite .        (build context: the repo root)
+# No torch and no embedding model (EMBEDDING_MODEL=none: text-only search), no worker (BACKGROUND_JOBS=api: the
+# notification, dispatch and retention jobs run in this process), no dataset jobs, no photo upload, no pictures.
+# The docker-compose deployments keep backend/Dockerfile (the full image); nothing here changes them.
+
+ARG PYTHON_IMAGE=python:3.12-slim-bookworm
+
+FROM ghcr.io/astral-sh/uv:0.13.5 AS uv
+
+# ---------------------------------------------------------------- dependencies without the embeddings group
+FROM ${PYTHON_IMAGE} AS deps
+COPY --from=uv /uv /usr/local/bin/uv
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PYTHON=/usr/local/bin/python3
+WORKDIR /app/backend
+# Plain COPY (no BuildKit cache mounts), so hosted builders such as Render's build it as is.
+COPY backend/pyproject.toml backend/uv.lock ./
+RUN uv sync --frozen --no-dev --no-group embeddings --no-install-project --no-cache \
+    && rm -rf /opt/venv/lib/python3.12/site-packages/pip* \
+    && find /opt/venv -depth -type d \( -name tests -o -name test \) -path '*site-packages/*' -exec rm -rf {} + \
+    && ! /opt/venv/bin/python -c "import torch" 2>/dev/null
+
+# ---------------------------------------------------------------- runtime
+FROM ${PYTHON_IMAGE} AS runtime
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN groupadd --system --gid 10001 app \
+    && useradd --system --uid 10001 --gid app --home-dir /app --no-create-home --shell /usr/sbin/nologin app
+ENV PATH=/opt/venv/bin:$PATH \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    # Fewer malloc arenas and BLAS threads: a smaller, steadier footprint on 512 MB.
+    MALLOC_ARENA_MAX=2 \
+    OMP_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    # demo: real secrets required (as production), console SMS/calls/messages allowed (production refuses them).
+    ENVIRONMENT=demo \
+    # The free demo's switches (each documented in backend/app/config.py); Render's settings can override them.
+    EMBEDDING_MODEL=none \
+    DIAGNOSIS_SEARCH=hybrid \
+    BACKGROUND_JOBS=api \
+    DATASET_JOBS_ENABLED=false \
+    PHOTO_UPLOADS_ENABLED=false \
+    SHOW_PICTURES=false \
+    LLM_PROVIDER=none \
+    TRUST_FORWARDED_FOR=true \
+    MIGRATE_ON_START=true \
+    PORT=8000
+COPY --from=deps /opt/venv /opt/venv
+WORKDIR /app/backend
+# Only the reviewed data the API reads at run time (taxonomy, review files, catalogue, golden cases); not the
+# original Excel files, pictures or eval reports.
+COPY data/schema /app/data/schema
+COPY data/review /app/data/review
+COPY data/catalogue /app/data/catalogue
+COPY data/eval/golden /app/data/eval/golden
+COPY backend/alembic.ini ./
+COPY backend/alembic ./alembic
+COPY backend/engine ./engine
+COPY backend/app ./app
+RUN python -m compileall -q app engine alembic
+USER app
+EXPOSE 8000
+# Migrations first (Render's free plan has no pre-deploy step; one instance, so no race), then one API process.
+# Render sends PORT; its proxy is the only one in front, so X-Forwarded-* are trusted.
+CMD ["sh", "-c", "if [ \"$MIGRATE_ON_START\" = true ]; then alembic upgrade head; fi && exec uvicorn app.main:app --host 0.0.0.0 --port \"$PORT\" --proxy-headers --forwarded-allow-ips '*' --timeout-keep-alive 75 --no-server-header --no-access-log"]

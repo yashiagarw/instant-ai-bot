@@ -51,7 +51,7 @@ def make_search(kind: str, embedding_model: str | None = None):
     The version needs vectors of that model: `python -m app.knowledge.embeddings sync --model <model>`."""
     if kind != "hybrid":
         return None
-    from app.config import get_settings
+    from app.config import embeddings_enabled, get_settings
     from app.db import make_engine, make_session_factory
     from app.diagnosis.search import HybridSearch
     from app.knowledge.embeddings import version_model
@@ -62,6 +62,8 @@ def make_search(kind: str, embedding_model: str | None = None):
     if embedding_model is None:
         with factory() as session:
             embedding_model = version_model(target_version(session))
+    if not embeddings_enabled(get_settings()):  # LITE mode (EMBEDDING_MODEL=none): text-only search, no model
+        return HybridSearch(factory.begin, None, embedding_model)
     model = SentenceTransformerEmbedder(embedding_model)
     return HybridSearch(factory.begin, lambda t: model.encode([t])[0], model.name)
 
@@ -115,6 +117,7 @@ def evaluate(
         "embeddings": embeddings,
         "search": search,
         "vector_model": hybrid.model_name if hybrid else None,
+        "vectors": bool(hybrid and hybrid._embed),  # False in LITE mode (EMBEDDING_MODEL=none)
         "cases": len(cases),
         "cases_by_type": dict(sorted(Counter(c.type for c in cases).items())),
         "cases_by_source": dict(sorted(Counter(c.source for c in cases).items())),

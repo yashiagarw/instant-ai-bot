@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { isDemo } from "@im/ui/api-proxy";
+import { DemoBanner } from "@im/ui/demo-banner";
 import { ErrorReporting } from "@/components/error-reporting";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -16,6 +18,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-warm-white">
+        <DemoBanner demo={isDemo(process.env)} />
         <ErrorReporting />
         {children}
       </body>

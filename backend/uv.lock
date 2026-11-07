@@ -340,6 +340,7 @@ wheels = [
 name = "autocare-backend"
 version = "0.1.0"
 source = { virtual = "." }
+default-groups = ["dev", "embeddings"]
 dependencies = [
     { name = "alembic" },
     { name = "anthropic" },
@@ -349,6 +350,7 @@ dependencies = [
     { name = "cryptography" },
     { name = "fastapi" },
     { name = "http-ece" },
+    { name = "numpy" },
     { name = "openai" },
     { name = "openpyxl" },
     { name = "pgvector" },
@@ -360,11 +362,8 @@ dependencies = [
     { name = "pyotp" },
     { name = "pyyaml" },
     { name = "qrcode" },
-    { name = "sentence-transformers" },
     { name = "sentry-sdk" },
     { name = "sqlalchemy" },
-    { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'linux'" },
-    { name = "torch", version = "2.14.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'linux'" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -380,6 +379,11 @@ dev = [
     { name = "pytest" },
     { name = "ruff" },
 ]
+embeddings = [
+    { name = "sentence-transformers" },
+    { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'linux'" },
+    { name = "torch", version = "2.14.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'linux'" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -393,6 +397,7 @@ requires-dist = [
     { name = "datasets", marker = "extra == 'train'", specifier = ">=3" },
     { name = "fastapi", specifier = ">=0.161.1" },
     { name = "http-ece", specifier = ">=1.2.1" },
+    { name = "numpy", specifier = ">=2" },
     { name = "openai", specifier = ">=3.37.0" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pgvector", specifier = ">=0.5.1" },
@@ -404,11 +409,8 @@ requires-dist = [
     { name = "pyotp", specifier = ">=2.10.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "qrcode", specifier = ">=7" },
-    { name = "sentence-transformers", specifier = ">=6.2.0" },
     { name = "sentry-sdk", specifier = ">=2" },
     { name = "sqlalchemy", specifier = ">=2" },
-    { name = "torch", marker = "sys_platform != 'linux'", specifier = ">=2.14.1,<2.15" },
-    { name = "torch", marker = "sys_platform == 'linux'", specifier = ">=2.14.1,<2.15", index = "https://download.pytorch.org/whl/cpu" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
 ]
 provides-extras = ["train"]
@@ -418,6 +420,11 @@ dev = [
     { name = "httpx2", specifier = ">=2.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "ruff", specifier = ">=0.17.2" },
+]
+embeddings = [
+    { name = "sentence-transformers", specifier = ">=6.2.0" },
+    { name = "torch", marker = "sys_platform != 'linux'", specifier = ">=2.14.1,<2.15" },
+    { name = "torch", marker = "sys_platform == 'linux'", specifier = ">=2.14.1,<2.15", index = "https://download.pytorch.org/whl/cpu" },
 ]
 
 [[package]]

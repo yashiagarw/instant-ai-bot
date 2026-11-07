@@ -58,6 +58,8 @@ def _n_key(metric: str) -> str | None:
 def _search_label(m: dict) -> str:
     """What free-text matching used: hybrid search (keyword index + full-text + vectors + typos) or the keyword
     index alone (optionally with its old embedding bonus, `--embeddings`)."""
+    if m.get("search") == "hybrid" and m.get("vectors") is False:
+        return "search hybrid LITE (keyword index + full-text + typos + Hinglish forms; no vectors)"
     if m.get("search") == "hybrid":
         return f"search hybrid (keyword index + full-text + vectors from {m.get('vector_model', '?')} + typos)"
     return "search keyword index" + (" + embedding bonus" if m.get("embeddings") else " only")

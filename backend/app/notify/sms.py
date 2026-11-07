@@ -45,7 +45,8 @@ class SmsSender(Protocol):
 
 
 class ConsoleSms:
-    """Development only: prints the full code so you can log in without an SMS account."""
+    """Development and the free demo: prints the code so you can log in without an SMS account. The phone number is
+    masked to its last 4 digits (the demo's logs are on a hosted service)."""
 
     name = "console"
 
@@ -55,7 +56,8 @@ class ConsoleSms:
 
     def send_otp(self, phone: str, code: str) -> None:
         self.sent.append((phone, code))
-        print(f"\n[console SMS] to {phone}: Your Instant Mechanic login code is {code}. It expires in 5 minutes.\n")
+        to = mask_phone(phone)
+        print(f"\n[console SMS] to {to}: Your Instant Mechanic login code is {code}. It expires in 5 minutes.\n")
 
     def send_template(self, phone: str, template_id: str, values: list[str], text: str) -> str:
         self.messages.append((phone, text))

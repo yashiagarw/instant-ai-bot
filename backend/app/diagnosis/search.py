@@ -233,12 +233,13 @@ class Vocabulary:
 
 class HybridSearch:
     """`search(text, fault_ids)` for the engine. `connect()` returns a context manager yielding a Session (one per
-    call, so the engine can be shared). `embed(text)` returns the query vector from the same model as the rows."""
+    call, so the engine can be shared). `embed(text)` returns the query vector from the same model as the rows; None
+    (LITE mode) searches by text only."""
 
     def __init__(
         self,
         connect: Callable[[], AbstractContextManager[Session]],
-        embed: Callable[[str], list[float]],
+        embed: Callable[[str], list[float]] | None,
         model_name: str,
         *,
         k: int = RRF_K,
@@ -254,7 +255,9 @@ class HybridSearch:
         self.connect, self.model_name = connect, model_name
         self.k, self.per_list, self.vector_floor, self.fuzzy_floor = k, per_list, vector_floor, fuzzy_floor
         self._vocabulary: Vocabulary | None = None
-        self._embed = lru_cache(maxsize=cache_size)(lambda t: tuple(embed(t)))
+        # embed None = LITE mode (EMBEDDING_MODEL=none): the vector list is left out; full-text and the spelling-
+        # corrected list (and the Hinglish form of Devanagari) still search the same rows.
+        self._embed = lru_cache(maxsize=cache_size)(lambda t: tuple(embed(t))) if embed else None
         self._cached = lru_cache(maxsize=cache_size)(self._search)
 
     def vocabulary(self, session: Session) -> Vocabulary:
@@ -288,7 +291,7 @@ class HybridSearch:
             )
             # One vector list over both forms: each row keeps its best similarity.
             best: dict[tuple[str, int], tuple] = {}
-            for v in variants:
+            for v in variants if self._embed else ():
                 vec = "[" + ",".join(f"{x:.6f}" for x in self._embed(v)) + "]"
                 for r in self.nearest(session, {**params, "v": vec}, len(ids)):
                     key = (r[0], r[1])

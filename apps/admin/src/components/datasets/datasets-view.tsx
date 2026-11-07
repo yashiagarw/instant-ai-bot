@@ -88,9 +88,26 @@ export function DatasetsView() {
         )}
       </section>
 
+      {d.jobs_enabled === false && (
+        <section
+          role="note"
+          aria-labelledby="jobs-off-heading"
+          className="flex flex-col gap-1 rounded-3xl border border-border bg-warm-white p-4 sm:p-5"
+          data-testid="jobs-off"
+        >
+          <h2 id="jobs-off-heading" className="text-lg font-bold text-ink">
+            Dataset changes are switched off on this server
+          </h2>
+          <p className="text-ink">
+            This is the free demo, which has no background worker. Upload, rebuild, eval and publish are off; the live
+            version above is served as it is. Change datasets on the full deployment (docs/deploy-free-demo.md).
+          </p>
+        </section>
+      )}
+
       {shown && <JobProgress job={shown} canCancel={d.can_manage} onCancelled={reload} />}
 
-      {d.can_manage && (
+      {d.can_manage && d.jobs_enabled !== false && (
         <UploadCard
           overview={d}
           busy={!!job && (job.status === "queued" || job.status === "running")}

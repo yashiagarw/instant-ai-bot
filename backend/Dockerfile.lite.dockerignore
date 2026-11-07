@@ -1,0 +1,21 @@
+# backend/Dockerfile.lite (the free demo API). Build context is the repo root; only backend code and reviewed data.
+*
+!backend/pyproject.toml
+!backend/uv.lock
+!backend/alembic.ini
+!backend/alembic
+!backend/app
+!backend/engine
+!data
+# Mounted at run time, never baked: the original Excel files, extracted pictures, uploads, fine-tuned models.
+data/raw
+data/media
+data/uploads
+data/models
+data/eval/reports
+data/eval/images/photos
+**/__pycache__
+**/*.pyc
+**/.DS_Store
+**/.env
+**/.env.*

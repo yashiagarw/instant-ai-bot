@@ -61,8 +61,8 @@ def temporary_password() -> str:
 def fernet(settings: Settings) -> Fernet:
     key = settings.staff_totp_key
     if key in PLACEHOLDERS:
-        if settings.environment == "production":
-            raise RuntimeError("Set STAFF_TOTP_KEY (a Fernet key) in production")
+        if settings.environment in ("production", "demo"):  # demo: the public free demo
+            raise RuntimeError(f"Set STAFF_TOTP_KEY (a Fernet key) in {settings.environment}")
         key = base64.urlsafe_b64encode(hashlib.sha256(f"staff-totp|{settings.auth_secret}".encode()).digest()).decode()
     try:
         return Fernet(key)
