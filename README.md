@@ -1316,25 +1316,26 @@ Measured on the test pull request (#1, 2026-11-07; Linux runners, each job bille
 | Job | Measured | Billed |
 |---|---|---|
 | What changed | 0.1 min | 1 |
-| Backend (ruff, pytest) | 5.7 min (8.2 cold) | 6 |
+| Backend (ruff, pytest) | 5.7-8.2 min (runners vary) | 6-9 |
 | Frontend (lint, types, Vitest) | 1.3-2.0 min | 2-3 |
 | Dependency audit | 0.3 min | 1 |
-| Eval gate, eval database cached | 6.0 min (restore 12 s, quick eval 4.9 min) | 6 |
+| Eval gate, eval database cached | 6.0-8.2 min (restore 12 s, quick eval 4.9-7 min) | 6-9 |
 | Eval gate, after a data / importer / migration change | 13.5 min (database rebuilt in 6.7 min) | 14 |
-| Playwright, web + admin (main) | 4.3 min | 5 |
-| Images API + backup + Trivy (main) | 1.4 min cached, 5.2 min full build | 2-6 |
+| Playwright, web + admin (main) | 4.3-6.0 min | 5-6 |
+| Images API + backup + Trivy (main) | 1.4-2.4 min cached, 5.2 min full build | 2-6 |
 
 | Run | Billed minutes |
 |---|---|
-| Pull request push touching backend, data and frontend | ~17 (~25 after a data change) |
+| Pull request push touching backend, data and frontend | ~17-22 (~28 after a data change) |
 | Pull request push, frontend only | ~5 |
 | Pull request push, backend but not the engine or data (no eval) | ~8 |
-| Push to main, deployed to staging and production | ~45 (CI 17, Playwright 5, images 2-6, staging ~10 and production ~10 estimated: no servers yet) |
+| Push to main, deployed to staging and production | ~45-50 (CI 17-22, Playwright 5-6, images 2-6, staging ~10 and production ~10 estimated: no servers yet) |
 | `ci/**` dry run | ~7-11 |
 | Nightly | ~3 (Trivy); ~11 more on days main changed (full eval) |
 
 A month with 30 pull-request pushes (half frontend-only), 12 merges deployed to production and main changing on 12
-days: 15 × 17 + 15 × 5 + 12 × 45 + 30 × 3 + 12 × 11 ≈ **1,090 minutes** of the 2,000. Headroom for a busy month;
+days: 15 × 20 + 15 × 5 + 12 × 48 + 30 × 3 + 12 × 11 ≈ **1,170 minutes** of the 2,000 (1,090 at the fastest
+measured times). Headroom for a busy month;
 if it gets tight, merge in batches (each merge ~45). GitHub stops runs at the limit and bills nothing unless a
 spending limit is set (Settings > Billing). The cache (eval database 48 MB, model, uv, pnpm, baselines) stays well
 under the 10 GB per repository.
