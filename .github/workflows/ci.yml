@@ -39,11 +39,11 @@ jobs:
       frontend: ${{ steps.f.outputs.frontend || 'true' }}
       eval: ${{ steps.f.outputs.eval || 'true' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: github.event_name != 'pull_request'
       - id: f
         if: github.event_name == 'pull_request'
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             backend:
@@ -94,8 +94,8 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
         with:
           version: ${{ env.UV_VERSION }}
           python-version: ${{ env.PYTHON_VERSION }}
@@ -113,9 +113,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -129,13 +129,14 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
         with:
           version: ${{ env.UV_VERSION }}
           python-version: ${{ env.PYTHON_VERSION }}
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
+          enable-cache: false   # uv audit reads the lock file only: nothing to cache
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
       # Images are scanned on main (main.yml, Trivy) after they are built.
@@ -164,8 +165,8 @@ jobs:
       LLM_PROVIDER: none
       RATE_LIMIT_BACKEND: memory
     steps:
-      - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
         with:
           version: ${{ env.UV_VERSION }}
           python-version: ${{ env.PYTHON_VERSION }}
@@ -174,13 +175,13 @@ jobs:
       - run: uv sync --frozen --no-dev
         working-directory: backend
       - name: Embedding model (cached)
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .hf
           key: hf-paraphrase-multilingual-MiniLM-L12-v2
       - name: Eval database (cached by everything it is built from)
         id: db
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: eval-db.dump
           key: eval-db-${{ hashFiles('data/raw/**', 'data/review/**', 'data/schema/**', 'data/catalogue/**', 'backend/app/knowledge/**', 'backend/app/vehicles/**', 'backend/alembic/**', 'backend/uv.lock', 'scripts/ci/eval-db.sh') }}
@@ -197,7 +198,7 @@ jobs:
           ls -lh eval-db.dump
       - name: Save the eval database
         if: steps.db.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: eval-db.dump
           key: ${{ steps.db.outputs.cache-primary-key }}
@@ -206,7 +207,7 @@ jobs:
         run: uv run python -m app.datasets.ci_eval run --scope quick --out "$GITHUB_WORKSPACE/eval-quick.json"
       - name: Baseline from main
         if: ${{ !inputs.save-baseline }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: eval-baseline.json
           key: eval-baseline-quick-${{ github.event.pull_request.base.sha || github.sha }}
@@ -221,7 +222,7 @@ jobs:
       # previous baseline first (the same gate), so a regression cannot become the new normal unnoticed.
       - name: Previous baseline (main)
         if: inputs.save-baseline
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: eval-baseline.json
           key: eval-baseline-quick-${{ github.sha }}
@@ -236,11 +237,11 @@ jobs:
         if: inputs.save-baseline
         run: cp eval-quick.json eval-baseline.json
       - if: inputs.save-baseline
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: eval-baseline.json
           key: eval-baseline-quick-${{ github.sha }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: eval-quick-report

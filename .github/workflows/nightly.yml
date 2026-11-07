@@ -40,10 +40,10 @@ jobs:
       LLM_PROVIDER: none
       RATE_LIMIT_BACKEND: memory
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Already evaluated this commit?
         id: done
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: eval-baseline-full.json
           key: eval-baseline-full-${{ github.sha }}
@@ -52,7 +52,7 @@ jobs:
         if: steps.done.outputs.cache-hit == 'true'
         run: |
           echo "::notice::main has not changed since the last full eval (${{ github.sha }}): skipped"
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10
         if: steps.done.outputs.cache-hit != 'true'
         with:
           version: ${{ env.UV_VERSION }}
@@ -62,7 +62,7 @@ jobs:
       - if: steps.done.outputs.cache-hit != 'true'
         run: uv sync --frozen --no-dev
         working-directory: backend
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         if: steps.done.outputs.cache-hit != 'true'
         with:
           path: .hf
@@ -70,7 +70,7 @@ jobs:
       - name: Eval database (cached)
         id: db
         if: steps.done.outputs.cache-hit != 'true'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: eval-db.dump
           key: eval-db-${{ hashFiles('data/raw/**', 'data/review/**', 'data/schema/**', 'data/catalogue/**', 'backend/app/knowledge/**', 'backend/app/vehicles/**', 'backend/alembic/**', 'backend/uv.lock', 'scripts/ci/eval-db.sh') }}
@@ -85,7 +85,7 @@ jobs:
             docker exec ${{ job.services.postgres.id }} pg_dump -U autocare -d autocare -Fc > eval-db.dump
           fi
       - if: steps.done.outputs.cache-hit != 'true' && steps.db.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: eval-db.dump
           key: ${{ steps.db.outputs.cache-primary-key }}
@@ -95,7 +95,7 @@ jobs:
         run: uv run python -m app.datasets.ci_eval run --scope full --out "$GITHUB_WORKSPACE/eval-full.json"
       - name: Previous full run
         if: steps.done.outputs.cache-hit != 'true'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: eval-baseline-full.json
           key: eval-baseline-full-${{ github.sha }}
@@ -110,11 +110,11 @@ jobs:
         if: steps.done.outputs.cache-hit != 'true'
         run: cp eval-full.json eval-baseline-full.json
       - if: steps.done.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: eval-baseline-full.json
           key: eval-baseline-full-${{ github.sha }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always() && steps.done.outputs.cache-hit != 'true'
         with:
           name: eval-full-report
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Trivy
         env:
           TRIVY_USERNAME: ${{ github.actor }}

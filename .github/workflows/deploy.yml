@@ -47,7 +47,7 @@ jobs:
           if [ "$ACTION" = deploy ]; then
             echo "$SHA" | grep -Eq '^[0-9a-f]{40}$' || { echo "::error::give the full 40-character commit sha"; exit 1; }
           fi
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.action == 'deploy' && inputs.sha || github.sha }}
       - id: repo
