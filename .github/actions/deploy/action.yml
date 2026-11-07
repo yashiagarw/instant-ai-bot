@@ -1,0 +1,151 @@
+# Deploy one commit to one environment (Phase 5.6): build that environment's web and admin images (their API and
+# photo addresses are baked in at build time), ship the release files, deploy over SSH with
+# scripts/deploy/remote-deploy.sh, smoke-test from outside, and roll back to the previous release if the smoke test
+# fails (the database is never downgraded). Used by .github/workflows/main.yml and deploy.yml.
+name: Deploy
+description: Build web/admin for an environment, deploy over SSH, smoke test, roll back on failure
+inputs:
+  environment: { description: staging or production, required: true }
+  sha: { description: the commit to deploy, required: true }
+  image-repo: { description: "ghcr.io/<owner>", required: true }
+  registry-token: { description: token that can push to GHCR (GITHUB_TOKEN), required: true }
+  ssh-host: { required: true }
+  ssh-user: { required: true }
+  ssh-port: { required: false, default: "22" }
+  ssh-key: { description: private key of the deploy user, required: true }
+  ssh-known-hosts: { description: the server's host key line(s), required: true }
+  web-domain: { required: true }
+  admin-domain: { required: true }
+  api-domain: { required: true }
+  files-domain: { required: true }
+  turnstile-site-key: { required: false, default: "" }
+  sentry-dsn: { description: public browser DSN, required: false, default: "" }
+  map-provider: { required: false, default: "stadia" }
+  map-key: { required: false, default: "" }
+  smoke-write: { description: "--write on staging (starts a diagnosis)", required: false, default: "" }
+  build-web: { description: build the web/admin images (false when they already exist for this sha), required: false, default: "true" }
+outputs:
+  deployed: { description: true when the release is live and passed the smoke test, value: "${{ steps.done.outputs.deployed }}" }
+runs:
+  using: composite
+  steps:
+    - name: Registry login
+      shell: bash
+      env:
+        TOKEN: ${{ inputs.registry-token }}
+      run: echo "$TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+    - uses: docker/setup-buildx-action@v4
+      if: inputs.build-web == 'true'
+
+    - name: Web image (${{ inputs.environment }})
+      if: inputs.build-web == 'true'
+      uses: docker/build-push-action@v7
+      with:
+        context: .
+        file: apps/Dockerfile
+        push: true
+        tags: ${{ inputs.image-repo }}/autocare-web:${{ inputs.environment }}-${{ inputs.sha }}
+        cache-from: type=registry,ref=${{ inputs.image-repo }}/autocare-web:buildcache-${{ inputs.environment }}
+        cache-to: type=registry,ref=${{ inputs.image-repo }}/autocare-web:buildcache-${{ inputs.environment }},mode=max
+        build-args: |
+          APP=web
+          NEXT_PUBLIC_API_URL=https://${{ inputs.api-domain }}
+          NEXT_PUBLIC_FILES_URL=https://${{ inputs.files-domain }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ inputs.turnstile-site-key }}
+          NEXT_PUBLIC_SENTRY_DSN=${{ inputs.sentry-dsn }}
+          NEXT_PUBLIC_SENTRY_ENVIRONMENT=${{ inputs.environment }}
+          BUILD_ID=${{ inputs.sha }}
+
+    - name: Admin image (${{ inputs.environment }})
+      if: inputs.build-web == 'true'
+      uses: docker/build-push-action@v7
+      with:
+        context: .
+        file: apps/Dockerfile
+        push: true
+        tags: ${{ inputs.image-repo }}/autocare-admin:${{ inputs.environment }}-${{ inputs.sha }}
+        cache-from: type=registry,ref=${{ inputs.image-repo }}/autocare-admin:buildcache-${{ inputs.environment }}
+        cache-to: type=registry,ref=${{ inputs.image-repo }}/autocare-admin:buildcache-${{ inputs.environment }},mode=max
+        build-args: |
+          APP=admin
+          NEXT_PUBLIC_API_URL=https://${{ inputs.api-domain }}
+          NEXT_PUBLIC_FILES_URL=https://${{ inputs.files-domain }}
+          NEXT_PUBLIC_SENTRY_DSN=${{ inputs.sentry-dsn }}
+          NEXT_PUBLIC_SENTRY_ENVIRONMENT=${{ inputs.environment }}
+          NEXT_PUBLIC_MAP_PROVIDER=${{ inputs.map-provider }}
+          NEXT_PUBLIC_MAP_KEY=${{ inputs.map-key }}
+
+    - name: Scan the web and admin images (Trivy, high/critical with a fix)
+      if: inputs.build-web == 'true'
+      shell: bash
+      env:
+        TRIVY_USERNAME: ${{ github.actor }}
+        TRIVY_PASSWORD: ${{ inputs.registry-token }}
+      run: |
+        for app in web admin; do
+          docker run --rm -e TRIVY_USERNAME -e TRIVY_PASSWORD \
+            -v "$PWD/.trivyignore:/.trivyignore:ro" aquasec/trivy:0.67.2 image --quiet --scanners vuln \
+            --ignorefile /.trivyignore --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            "${{ inputs.image-repo }}/autocare-$app:${{ inputs.environment }}-${{ inputs.sha }}"
+        done
+
+    - name: SSH key (pinned host key, never trust on first use)
+      shell: bash
+      env:
+        SSH_KEY: ${{ inputs.ssh-key }}
+        KNOWN_HOSTS: ${{ inputs.ssh-known-hosts }}
+      run: |
+        install -m 700 -d ~/.ssh
+        printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+        printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
+        cat > ~/.ssh/config <<EOF
+        Host deploy-target
+          HostName ${{ inputs.ssh-host }}
+          User ${{ inputs.ssh-user }}
+          Port ${{ inputs.ssh-port }}
+          IdentityFile ~/.ssh/deploy_key
+          IdentitiesOnly yes
+          StrictHostKeyChecking yes
+          ServerAliveInterval 30
+        EOF
+
+    - name: Ship the release files and the datasets
+      shell: bash
+      run: |
+        release=/opt/autocare/releases/${{ inputs.sha }}
+        tar -czf - docker-compose.prod.yml docker-compose.loadtest.yml docker/caddy docker/backup scripts/deploy \
+          | ssh deploy-target "mkdir -p $release && tar -xzf - -C $release"
+        tar -czf - data/raw | ssh deploy-target "mkdir -p /opt/autocare/shared && tar -xzf - -C /opt/autocare/shared"
+
+    - name: Deploy (migrations run first; waits until every service is healthy)
+      id: deploy
+      shell: bash
+      run: ssh deploy-target "sh /opt/autocare/releases/${{ inputs.sha }}/scripts/deploy/remote-deploy.sh deploy ${{ inputs.sha }}"
+
+    - name: Smoke test from outside
+      id: smoke
+      shell: bash
+      run: sh scripts/deploy/smoke.sh "${{ inputs.web-domain }}" "${{ inputs.api-domain }}" "${{ inputs.admin-domain }}" ${{ inputs.smoke-write }}
+
+    - name: Roll back to the previous release (no database downgrade)
+      if: failure() && steps.deploy.outcome != 'skipped'
+      shell: bash
+      run: |
+        echo "::error::${{ inputs.environment }} deploy of ${{ inputs.sha }} failed: rolling back to the previous release"
+        ssh deploy-target "sh /opt/autocare/releases/${{ inputs.sha }}/scripts/deploy/remote-deploy.sh rollback" \
+          && sh scripts/deploy/smoke.sh "${{ inputs.web-domain }}" "${{ inputs.api-domain }}" "${{ inputs.admin-domain }}" \
+          && echo "::warning::Rolled back. The database was left as it is: docs/runbooks/rollback.md" \
+          || echo "::error::Rollback did not pass its smoke test either: follow docs/runbooks/rollback.md by hand"
+        exit 1
+
+    - id: done
+      shell: bash
+      run: |
+        echo "deployed=true" >> "$GITHUB_OUTPUT"
+        ssh deploy-target "sh /opt/autocare/releases/${{ inputs.sha }}/scripts/deploy/remote-deploy.sh status" >> "$GITHUB_STEP_SUMMARY" || true
+
+    - name: Forget the SSH key
+      if: always()
+      shell: bash
+      run: rm -f ~/.ssh/deploy_key ~/.ssh/config

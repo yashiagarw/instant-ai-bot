@@ -1,8 +1,8 @@
 # Local production test only (README "Phase 5.1"): docker compose -f docker-compose.prod.yml -f docker-compose.prod.local.yml
 # On localhost the app, admin, API and photo hosts are ports of https://localhost instead of subdomains:
 # `localhost` has no registrable domain, so api.localhost would be a different *site* from localhost and browsers would
-# withhold the API's SameSite cookies (anonymous diagnosis and login), unlike instantmechanic.online and its
-# subdomains in production. Ports do not change the site. Matching .env.prod values:
+# withhold the API's SameSite cookies (anonymous diagnosis and login), unlike production, where diagnose., api. and
+# admin.instantmechanic.online are subdomains of one site. Ports do not change the site. Matching .env.prod values:
 #   WEB_DOMAIN=localhost  API_DOMAIN=localhost:8443  ADMIN_DOMAIN=localhost:8444  FILES_DOMAIN=localhost:8445
 services:
   caddy:

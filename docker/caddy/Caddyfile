@@ -1,9 +1,10 @@
 # Reverse proxy for docker-compose.prod.yml, with automatic HTTPS (Let's Encrypt / ZeroSSL).
-# Hosts come from the root .env.prod (see .env.prod.example):
-#   WEB_DOMAIN    instantmechanic.online        -> web:3000   (www. redirects here)
-#   ADMIN_DOMAIN  admin.instantmechanic.online  -> admin:3000
-#   API_DOMAIN    api.instantmechanic.online    -> api:8000   (/api, /media, /docs)
-#   FILES_DOMAIN  files.instantmechanic.online  -> storage:8333 (SeaweedFS, only with the `storage` profile)
+# Hosts come from the root .env.prod (see .env.prod.example; production defaults shown, staging uses its own):
+#   WEB_DOMAIN    diagnose.instantmechanic.online -> web:3000
+#   ADMIN_DOMAIN  admin.instantmechanic.online    -> admin:3000
+#   API_DOMAIN    api.instantmechanic.online      -> api:8000   (/api, /media, /docs)
+#   FILES_DOMAIN  files.instantmechanic.online    -> storage:8333 (SeaweedFS, only with the `storage` profile)
+# instantmechanic.online itself (and www.) stays on the company's existing site: not served here (Phase 5.6).
 # CADDY_TLS: an email address for ACME certificates in production, or `internal` for the local test (Caddy's own CA,
 # hosts localhost, localhost:8443/8444/8445: see docker-compose.prod.local.yml). HSTS_MAX_AGE: 0 locally so browsers
 # do not pin https on localhost.
@@ -33,11 +34,6 @@
 {$WEB_DOMAIN} {
 	import common
 	reverse_proxy web:3000
-}
-
-www.{$WEB_DOMAIN} {
-	import common
-	redir https://{$WEB_DOMAIN}{uri} permanent
 }
 
 {$ADMIN_DOMAIN} {

@@ -304,9 +304,17 @@ def test_live_and_ready(api, monkeypatch):
     assert ready.status_code == 200 and ready.json()["migrations"] == "ok" and ready.json()["database"] == "ok"
     from app.api import health
 
+    current = health.migration_head()
     monkeypatch.setattr(health, "migration_head", lambda: "9999")
+    monkeypatch.setattr(health, "migration_revisions", lambda: frozenset({current, "9999"}))
     behind = c.get("/api/health/ready")
     assert behind.status_code == 503 and behind.json()["migrations"] == "behind"
+    # Phase 5.6: after a rollback the database has a migration the running (previous) code does not know. It still
+    # serves (the new columns are ignored; rollback never downgrades): ready, reported as "ahead".
+    monkeypatch.setattr(health, "migration_head", lambda: "0001")
+    monkeypatch.setattr(health, "migration_revisions", lambda: frozenset({"0001"}))
+    ahead = c.get("/api/health/ready")
+    assert ahead.status_code == 200 and ahead.json()["migrations"] == "ahead"
 
 
 # ---------------------------------------------------------------- request id into the worker

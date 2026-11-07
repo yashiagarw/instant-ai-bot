@@ -15,7 +15,8 @@
   },
   "scripts": {
     "lint": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@sentry/browser": "11.11.0",

@@ -1,0 +1,260 @@
+# Checks for every pull request, and the same checks on main (called by main.yml). Phase 5.6.
+#   lint + type checks + tests (backend, frontend), dependency audit, and the quick eval gate: the engine and data of
+#   this commit against the last report from main (fails when more of the 800 danger cases are missed, or top-3 drops
+#   more than 3 points: the publish gate's rules, app.datasets.ci_eval).
+# Fast on a pull request: jobs whose files did not change are skipped (shown as skipped, which counts as passed), and
+# uv / pnpm / the eval database are cached. Playwright, Trivy and the full eval run on main or nightly only.
+name: CI
+
+on:
+  pull_request:
+  workflow_call:
+    inputs:
+      save-baseline:
+        description: Save the eval report as the baseline pull requests compare with (main only)
+        type: boolean
+        default: false
+
+concurrency:
+  # A new push to a pull request cancels its older run; runs on main are never cancelled.
+  group: ci-${{ github.event_name }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  UV_VERSION: "0.13.5"
+  NODE_VERSION: "24"
+
+jobs:
+  changes:
+    name: What changed
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    outputs:
+      backend: ${{ steps.f.outputs.backend || 'true' }}
+      frontend: ${{ steps.f.outputs.frontend || 'true' }}
+      eval: ${{ steps.f.outputs.eval || 'true' }}
+    steps:
+      - uses: actions/checkout@v7
+        if: github.event_name != 'pull_request'
+      - id: f
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - 'data/**'
+              - '.github/workflows/**'
+            frontend:
+              - 'apps/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/**'
+            eval:
+              - 'backend/engine/**'
+              - 'backend/app/diagnosis/**'
+              - 'backend/app/knowledge/**'
+              - 'backend/app/datasets/**'
+              - 'backend/app/llm/**'
+              - 'backend/alembic/**'
+              - 'backend/uv.lock'
+              - 'data/**'
+              - 'scripts/ci/**'
+              - '.github/workflows/ci.yml'
+
+  backend:
+    name: Backend (ruff, pytest)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: autocare
+          POSTGRES_PASSWORD: autocare
+          POSTGRES_DB: autocare_test
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U autocare" --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7.4-alpine
+        ports: ["6379:6379"]
+    env:
+      DATABASE_URL: postgresql+psycopg://autocare:autocare@localhost:5432/autocare_test
+      TEST_DATABASE_URL: postgresql+psycopg://autocare:autocare@localhost:5432/autocare_test
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3   # exact: this action publishes no moving major tag
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest -q -p no:cacheprovider
+
+  frontend:
+    name: Frontend (lint, types, vitest)
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  dependencies:
+    name: Dependency audit (uv, pnpm)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3   # exact: this action publishes no moving major tag
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: false   # uv audit reads the lock file only: nothing to cache
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # Images are scanned on main (main.yml, Trivy) after they are built.
+      - run: SCAN_IMAGES=0 sh scripts/security-scan.sh
+
+  eval:
+    name: Eval gate (quick, 800 danger cases)
+    needs: changes
+    if: needs.changes.outputs.eval == 'true' || inputs.save-baseline
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: autocare
+          POSTGRES_PASSWORD: autocare
+          POSTGRES_DB: autocare
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U autocare" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://autocare:autocare@localhost:5432/autocare
+      HF_HOME: ${{ github.workspace }}/.hf
+      DIAGNOSIS_SEARCH: hybrid
+      DIAGNOSIS_ENGINE: v2
+      LLM_PROVIDER: none
+      RATE_LIMIT_BACKEND: memory
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3   # exact: this action publishes no moving major tag
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - run: uv sync --frozen --no-dev
+        working-directory: backend
+      - name: Embedding model (cached)
+        uses: actions/cache@v6
+        with:
+          path: .hf
+          key: hf-paraphrase-multilingual-MiniLM-L12-v2
+      - name: Eval database (cached by everything it is built from)
+        id: db
+        uses: actions/cache/restore@v6
+        with:
+          path: eval-db.dump
+          key: eval-db-${{ hashFiles('data/raw/**', 'data/review/**', 'data/schema/**', 'data/catalogue/**', 'backend/app/knowledge/**', 'backend/app/vehicles/**', 'backend/alembic/**', 'backend/uv.lock', 'scripts/ci/eval-db.sh') }}
+      - name: Restore the eval database
+        if: steps.db.outputs.cache-hit == 'true'
+        run: |
+          docker exec -i ${{ job.services.postgres.id }} pg_restore -U autocare -d autocare --no-owner < eval-db.dump
+          cd backend && uv run alembic upgrade head
+      - name: Build the eval database (datasets, flows, phrases, search index)
+        if: steps.db.outputs.cache-hit != 'true'
+        run: |
+          sh scripts/ci/eval-db.sh
+          docker exec ${{ job.services.postgres.id }} pg_dump -U autocare -d autocare -Fc > eval-db.dump
+          ls -lh eval-db.dump
+      - name: Save the eval database
+        if: steps.db.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: eval-db.dump
+          key: ${{ steps.db.outputs.cache-primary-key }}
+      - name: Run the quick eval (every danger case + the test split)
+        working-directory: backend
+        run: uv run python -m app.datasets.ci_eval run --scope quick --out "$GITHUB_WORKSPACE/eval-quick.json"
+      - name: Baseline from main
+        if: ${{ !inputs.save-baseline }}
+        uses: actions/cache/restore@v6
+        with:
+          path: eval-baseline.json
+          key: eval-baseline-quick-${{ github.event.pull_request.base.sha || github.sha }}
+          restore-keys: eval-baseline-quick-
+      - name: No baseline from main cached yet? Use the committed one (data/eval/baseline)
+        if: ${{ !inputs.save-baseline }}
+        run: |
+          if [ ! -f eval-baseline.json ]; then
+            cp data/eval/baseline/quick.json eval-baseline.json
+            echo "::notice::No eval baseline from main in the cache: compared with data/eval/baseline/quick.json"
+          fi
+      - name: Gate (publish rules)
+        if: ${{ !inputs.save-baseline }}
+        working-directory: backend
+        run: >-
+          uv run python -m app.datasets.ci_eval gate --candidate "$GITHUB_WORKSPACE/eval-quick.json"
+          --baseline "$GITHUB_WORKSPACE/eval-baseline.json" --summary "$GITHUB_STEP_SUMMARY"
+      # main: this report becomes the baseline for pull requests. A safety drop on main itself is checked against the
+      # previous baseline first (the same gate), so a regression cannot become the new normal unnoticed.
+      - name: Previous baseline (main)
+        if: inputs.save-baseline
+        uses: actions/cache/restore@v6
+        with:
+          path: eval-baseline.json
+          key: eval-baseline-quick-${{ github.sha }}
+          restore-keys: eval-baseline-quick-
+      - name: No previous baseline cached? Use the committed one
+        if: inputs.save-baseline
+        run: '[ -f eval-baseline.json ] || cp data/eval/baseline/quick.json eval-baseline.json'
+      - name: Gate against the previous baseline (main)
+        if: inputs.save-baseline
+        working-directory: backend
+        run: >-
+          uv run python -m app.datasets.ci_eval gate --candidate "$GITHUB_WORKSPACE/eval-quick.json"
+          --baseline "$GITHUB_WORKSPACE/eval-baseline.json" --summary "$GITHUB_STEP_SUMMARY"
+      - name: New baseline (main)
+        if: inputs.save-baseline
+        run: cp eval-quick.json eval-baseline.json
+      - if: inputs.save-baseline
+        uses: actions/cache/save@v6
+        with:
+          path: eval-baseline.json
+          key: eval-baseline-quick-${{ github.sha }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: eval-quick-report
+          path: eval-quick.json
+          retention-days: 14
+          if-no-files-found: ignore

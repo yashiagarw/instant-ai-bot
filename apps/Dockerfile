@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # Production image for one Next.js app of the pnpm workspace. Build context: the repo root.
 #   docker build -f apps/Dockerfile --build-arg APP=web   --build-arg NEXT_PUBLIC_API_URL=https://api.instantmechanic.online -t autocare-web .
+#   (CI builds these per environment with its own domains: .github/workflows/main.yml)
 #   docker build -f apps/Dockerfile --build-arg APP=admin --build-arg NEXT_PUBLIC_API_URL=https://api.instantmechanic.online -t autocare-admin .
 # NEXT_PUBLIC_* values are inlined into the browser bundle at build time: changing one means rebuilding the image.
 # The result is Next's standalone server (output: "standalone", see next.config.ts) running as the non-root `node` user.
@@ -33,6 +34,8 @@ ARG NEXT_PUBLIC_FILES_URL=
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=
 ARG NEXT_PUBLIC_SENTRY_DSN=
 ARG NEXT_PUBLIC_SENTRY_ENVIRONMENT=production
+# The service worker's id (scripts/service-worker.mjs): the commit in CI; time + random when empty.
+ARG BUILD_ID=
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
     NEXT_PUBLIC_MAP_TILE_URL=${NEXT_PUBLIC_MAP_TILE_URL} \
     NEXT_PUBLIC_MAP_ATTRIBUTION=${NEXT_PUBLIC_MAP_ATTRIBUTION} \
@@ -42,6 +45,7 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
     NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY} \
     NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN} \
     NEXT_PUBLIC_SENTRY_ENVIRONMENT=${NEXT_PUBLIC_SENTRY_ENVIRONMENT} \
+    BUILD_ID=${BUILD_ID} \
     NEXT_OUTPUT=standalone \
     NEXT_TELEMETRY_DISABLED=1 \
     NODE_OPTIONS=--max-old-space-size=2048
