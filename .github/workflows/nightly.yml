@@ -52,7 +52,7 @@ jobs:
         if: steps.done.outputs.cache-hit == 'true'
         run: |
           echo "::notice::main has not changed since the last full eval (${{ github.sha }}): skipped"
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3   # exact: this action publishes no moving major tag
         if: steps.done.outputs.cache-hit != 'true'
         with:
           version: ${{ env.UV_VERSION }}
