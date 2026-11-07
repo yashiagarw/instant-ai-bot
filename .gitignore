@@ -34,3 +34,6 @@ REVIEW_NOTES.md
 
 # OWASP ZAP reports (scripts/zap-baseline.sh)
 zap-reports/
+
+# k6 load test summaries (scripts/loadtest.sh)
+loadtest/results/

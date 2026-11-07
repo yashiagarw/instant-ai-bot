@@ -5,7 +5,7 @@
 |---|---|---|
 | `https://api.instantmechanic.online/api/health/live` | 200 | the API process answers (no dependencies) |
 | `https://api.instantmechanic.online/api/health/ready` | 200, `"status":"ok"` | database answers and migrations are at head; `"degraded"` = Redis down (jobs wait) |
-| `https://instantmechanic.online/healthz` | 200 | the website's server answers |
+| `https://diagnose.instantmechanic.online/healthz` | 200 | the website's server answers |
 | `https://admin.instantmechanic.online/healthz` | 200 | the admin app's server answers |
 | `https://files.instantmechanic.online/healthz` | 200 | photo storage (SeaweedFS profile only) |
 

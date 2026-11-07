@@ -1,0 +1,109 @@
+# Manual deploy or rollback (Phase 5.6): Actions > "Deploy (manual)" > Run workflow.
+#   deploy    any earlier commit of main whose images are in GHCR (e.g. to go back further than one release, or to
+#             rehearse a rollback on staging). Its web/admin images are built if that environment has none yet.
+#   rollback  the previous release on that environment (the same as the automatic rollback; no database downgrade)
+# Production needs the same approval as the main pipeline (GitHub environment "production").
+name: Deploy (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Where
+        type: choice
+        options: [staging, production]
+        required: true
+      action:
+        description: What
+        type: choice
+        options: [deploy, rollback]
+        required: true
+      sha:
+        description: Commit to deploy (full sha; for "deploy" only)
+        required: false
+
+concurrency:
+  group: deploy-refs/heads/main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  run:
+    name: ${{ inputs.action }} ${{ inputs.environment }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Check the input
+        env:
+          ACTION: ${{ inputs.action }}
+          SHA: ${{ inputs.sha }}
+          HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+        run: |
+          [ -n "$HOST" ] || { echo "::error::${{ inputs.environment }} has no DEPLOY_SSH_HOST: set it up first (README \"Phase 5.6\")"; exit 1; }
+          if [ "$ACTION" = deploy ]; then
+            echo "$SHA" | grep -Eq '^[0-9a-f]{40}$' || { echo "::error::give the full 40-character commit sha"; exit 1; }
+          fi
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.action == 'deploy' && inputs.sha || github.sha }}
+      - id: repo
+        run: echo "repo=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+      - name: Images exist for this commit?
+        id: images
+        if: inputs.action == 'deploy'
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          repo=${{ steps.repo.outputs.repo }}
+          docker manifest inspect "$repo/autocare-api:${{ inputs.sha }}" >/dev/null \
+            || { echo "::error::no API image for ${{ inputs.sha }} (only commits that went through main have one)"; exit 1; }
+          if docker manifest inspect "$repo/autocare-web:${{ inputs.environment }}-${{ inputs.sha }}" >/dev/null 2>&1 \
+            && docker manifest inspect "$repo/autocare-admin:${{ inputs.environment }}-${{ inputs.sha }}" >/dev/null 2>&1; then
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deploy
+        if: inputs.action == 'deploy'
+        uses: ./.github/actions/deploy
+        with:
+          environment: ${{ inputs.environment }}
+          sha: ${{ inputs.sha }}
+          build-web: ${{ steps.images.outputs.build }}
+          image-repo: ${{ steps.repo.outputs.repo }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-host: ${{ secrets.DEPLOY_SSH_HOST }}
+          ssh-user: ${{ secrets.DEPLOY_SSH_USER }}
+          ssh-port: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          ssh-known-hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          web-domain: ${{ vars.WEB_DOMAIN }}
+          admin-domain: ${{ vars.ADMIN_DOMAIN }}
+          api-domain: ${{ vars.API_DOMAIN }}
+          files-domain: ${{ vars.FILES_DOMAIN }}
+          turnstile-site-key: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          sentry-dsn: ${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+          map-provider: ${{ vars.NEXT_PUBLIC_MAP_PROVIDER || 'stadia' }}
+          map-key: ${{ vars.NEXT_PUBLIC_MAP_KEY }}
+          smoke-write: ${{ inputs.environment == 'staging' && '--write' || '' }}
+      - name: Rollback
+        if: inputs.action == 'rollback'
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          USER_: ${{ secrets.DEPLOY_SSH_USER }}
+          PORT: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -p "$PORT" -o StrictHostKeyChecking=yes "$USER_@$HOST" \
+            'sh "/opt/autocare/releases/$(cat /opt/autocare/shared/current)/scripts/deploy/remote-deploy.sh" rollback'
+          rm -f ~/.ssh/deploy_key
+          sh scripts/deploy/smoke.sh "${{ vars.WEB_DOMAIN }}" "${{ vars.API_DOMAIN }}" "${{ vars.ADMIN_DOMAIN }}"

@@ -27,6 +27,11 @@ x-backend: &backend
   env_file:
     - path: ./backend/.env.prod
   environment:
+    # Addresses from the domains in the root .env.prod (Phase 5.6), so CORS, cookies and photo links always match
+    # Caddy. Set WEB_ORIGIN / ADMIN_ORIGIN / S3_PUBLIC_ENDPOINT_URL in .env.prod only to override (e.g. a cloud bucket).
+    WEB_ORIGIN: ${WEB_ORIGIN:-https://${WEB_DOMAIN:?set WEB_DOMAIN in .env.prod}}
+    ADMIN_ORIGIN: ${ADMIN_ORIGIN:-https://${ADMIN_DOMAIN:?set ADMIN_DOMAIN in .env.prod}}
+    S3_PUBLIC_ENDPOINT_URL: ${S3_PUBLIC_ENDPOINT_URL:-https://${FILES_DOMAIN:?set FILES_DOMAIN in .env.prod}}
     # Built here from the root .env.prod so the database credentials live in one place (use a URL-safe password).
     DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-autocare}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}@db:5432/${POSTGRES_DB:-autocare}
     REDIS_URL: redis://redis:6379/0
@@ -265,14 +270,16 @@ services:
     logging: *logging
 
   # Customer photos on the same server (profile `storage`). Browsers upload through Caddy at FILES_DOMAIN
-  # (S3_PUBLIC_ENDPOINT_URL); the API uses http://storage:8333 (S3_ENDPOINT_URL). The S3 key pair and the allowed
-  # browser origin (WEB_ORIGIN) come from backend/.env.prod.
+  # (S3_PUBLIC_ENDPOINT_URL); the API uses http://storage:8333 (S3_ENDPOINT_URL). The S3 key pair comes from
+  # backend/.env.prod; the allowed browser origin from WEB_DOMAIN (root .env.prod).
   storage:
     image: chrislusf/seaweedfs:3.80
     profiles: ["storage"]
     restart: unless-stopped
     env_file:
       - path: ./backend/.env.prod
+    environment:
+      WEB_ORIGIN: ${WEB_ORIGIN:-https://${WEB_DOMAIN:?set WEB_DOMAIN in .env.prod}}
     entrypoint: ["/bin/sh", "-c"]
     command:
       - >-

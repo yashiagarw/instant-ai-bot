@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "build:car": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-car-model.mts",
-    "hindi:review": "node scripts/hindi-review.mjs"
+    "hindi:review": "node scripts/hindi-review.mjs",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@im/ui": "workspace:*",

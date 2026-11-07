@@ -8,6 +8,7 @@
     "dev:admin": "pnpm --filter admin dev",
     "build": "pnpm --filter web --filter admin build",
     "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:e2e": "pnpm --filter web --filter admin test:e2e",
     "test:security": "sh scripts/security-scan.sh",

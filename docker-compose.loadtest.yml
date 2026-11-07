@@ -1,0 +1,10 @@
+# Load test only (Phase 5.6): per-IP limits raised so one k6 machine can act as 200 customers. Never on production.
+#   local:   docker compose -f docker-compose.prod.yml -f docker-compose.prod.local.yml -f docker-compose.loadtest.yml ...
+#   staging: remote-deploy.sh limits loadtest   (and `limits normal` afterwards)
+# scripts/loadtest.sh does both for you.
+services:
+  api:
+    environment:
+      SESSION_RATE_LIMIT: "100000"
+      GLOBAL_RATE_LIMIT: "1000000"
+      LLM_PROVIDER: none

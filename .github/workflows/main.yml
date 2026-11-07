@@ -1,0 +1,218 @@
+# Every push to main (Phase 5.6): the CI checks, Playwright, the images in GitHub Container Registry, then staging,
+# then production after approval (GitHub environment "production"), with an automatic rollback when production's
+# smoke test fails. Staging and production are skipped, with a message, until their servers and secrets exist
+# (docs/server-setup.md, README "Phase 5.6").
+#
+# Images (private GHCR, every tag kept so any commit can be redeployed or rolled back to):
+#   ghcr.io/<owner>/autocare-api:<sha>        API, worker and one-off jobs; the same image for staging and production
+#   ghcr.io/<owner>/autocare-backup:<sha>     the backup service
+#   ghcr.io/<owner>/autocare-web:<env>-<sha>  web / admin: built per environment, because their API and photo
+#   ghcr.io/<owner>/autocare-admin:<env>-<sha>  addresses are baked into the browser code
+name: Main
+
+# Branches named ci/** run it as a dry run (Playwright, images pushed by sha, Trivy) to test the pipeline without
+# touching main; their CI checks run on their pull request, and they never deploy.
+on:
+  push:
+    branches: [main, "ci/**"]
+
+concurrency:
+  # One deploy at a time; a newer push waits instead of cancelling a deploy halfway.
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: read
+
+env:
+  NODE_VERSION: "24"
+
+jobs:
+  ci:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/ci.yml
+    with:
+      save-baseline: true
+
+  e2e:
+    name: Playwright (web, admin; API mocked)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Chromium
+        run: pnpm --filter web exec playwright install --with-deps chromium
+      - run: pnpm --filter web exec playwright test --workers=2
+      - run: pnpm --filter admin exec playwright test --workers=2
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-results
+          path: |
+            apps/web/test-results
+            apps/admin/test-results
+          retention-days: 7
+
+  images:
+    name: Images (API, backup) to GHCR + Trivy
+    needs: ci
+    if: ${{ !cancelled() && needs.ci.result != 'failure' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    outputs:
+      repo: ${{ steps.repo.outputs.repo }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: repo
+        run: echo "repo=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile
+          target: runtime
+          push: true
+          tags: |
+            ${{ steps.repo.outputs.repo }}/autocare-api:${{ github.sha }}
+            ${{ steps.repo.outputs.repo }}/autocare-api:main
+          cache-from: type=registry,ref=${{ steps.repo.outputs.repo }}/autocare-api:buildcache
+          cache-to: type=registry,ref=${{ steps.repo.outputs.repo }}/autocare-api:buildcache,mode=max
+      - name: Backup image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/backup
+          push: true
+          tags: |
+            ${{ steps.repo.outputs.repo }}/autocare-backup:${{ github.sha }}
+            ${{ steps.repo.outputs.repo }}/autocare-backup:main
+          cache-from: type=registry,ref=${{ steps.repo.outputs.repo }}/autocare-backup:buildcache
+          cache-to: type=registry,ref=${{ steps.repo.outputs.repo }}/autocare-backup:buildcache,mode=max
+      - name: Trivy (high and critical with a fix fail; .trivyignore lists accepted ones)
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for image in autocare-api autocare-backup; do
+            docker run --rm -e TRIVY_USERNAME -e TRIVY_PASSWORD -v "$PWD/.trivyignore:/.trivyignore:ro" \
+              aquasec/trivy:0.67.2 image --quiet --scanners vuln --ignorefile /.trivyignore \
+              --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "${{ steps.repo.outputs.repo }}/$image:${{ github.sha }}"
+          done
+
+  staging:
+    name: Staging
+    needs: [images, e2e]
+    if: ${{ github.ref == 'refs/heads/main' && !cancelled() && needs.images.result == 'success' && needs.e2e.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    environment: staging
+    outputs:
+      deployed: ${{ steps.deploy.outputs.deployed || 'false' }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Configured?
+        id: check
+        env:
+          HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          USER_: ${{ secrets.DEPLOY_SSH_USER }}
+          WEB: ${{ vars.WEB_DOMAIN }}
+          API: ${{ vars.API_DOMAIN }}
+        run: |
+          missing=""
+          for v in HOST KEY KNOWN USER_ WEB API; do eval "[ -n \"\$$v\" ]" || missing="$missing $v"; done
+          if [ -n "$missing" ]; then
+            msg="Staging is not set up yet (missing:$missing): deploy skipped. README \"Phase 5.6\" lists the staging secrets and variables; docs/server-setup.md the server."
+            echo "::notice title=Staging skipped::$msg"; echo "### Staging skipped" >> "$GITHUB_STEP_SUMMARY"; echo "$msg" >> "$GITHUB_STEP_SUMMARY"
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deploy to staging
+        id: deploy
+        if: steps.check.outputs.configured == 'true'
+        uses: ./.github/actions/deploy
+        with:
+          environment: staging
+          sha: ${{ github.sha }}
+          image-repo: ${{ needs.images.outputs.repo }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-host: ${{ secrets.DEPLOY_SSH_HOST }}
+          ssh-user: ${{ secrets.DEPLOY_SSH_USER }}
+          ssh-port: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          ssh-known-hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          web-domain: ${{ vars.WEB_DOMAIN }}
+          admin-domain: ${{ vars.ADMIN_DOMAIN }}
+          api-domain: ${{ vars.API_DOMAIN }}
+          files-domain: ${{ vars.FILES_DOMAIN }}
+          turnstile-site-key: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          sentry-dsn: ${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+          map-provider: ${{ vars.NEXT_PUBLIC_MAP_PROVIDER || 'stadia' }}
+          map-key: ${{ vars.NEXT_PUBLIC_MAP_KEY }}
+          smoke-write: --write
+
+  production:
+    name: Production (after approval)
+    needs: [images, staging]
+    # Only after staging took this commit: no approval request while staging is not set up.
+    if: needs.staging.outputs.deployed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+      - name: Configured?
+        id: check
+        env:
+          HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          USER_: ${{ secrets.DEPLOY_SSH_USER }}
+          WEB: ${{ vars.WEB_DOMAIN }}
+          API: ${{ vars.API_DOMAIN }}
+        run: |
+          missing=""
+          for v in HOST KEY KNOWN USER_ WEB API; do eval "[ -n \"\$$v\" ]" || missing="$missing $v"; done
+          if [ -n "$missing" ]; then
+            msg="Production is not set up yet (missing:$missing): deploy skipped. README \"Phase 5.6\" lists the production secrets and variables."
+            echo "::notice title=Production skipped::$msg"; echo "### Production skipped" >> "$GITHUB_STEP_SUMMARY"; echo "$msg" >> "$GITHUB_STEP_SUMMARY"
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deploy to production (rolls back automatically if the smoke test fails)
+        if: steps.check.outputs.configured == 'true'
+        uses: ./.github/actions/deploy
+        with:
+          environment: production
+          sha: ${{ github.sha }}
+          image-repo: ${{ needs.images.outputs.repo }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-host: ${{ secrets.DEPLOY_SSH_HOST }}
+          ssh-user: ${{ secrets.DEPLOY_SSH_USER }}
+          ssh-port: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          ssh-known-hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          web-domain: ${{ vars.WEB_DOMAIN }}
+          admin-domain: ${{ vars.ADMIN_DOMAIN }}
+          api-domain: ${{ vars.API_DOMAIN }}
+          files-domain: ${{ vars.FILES_DOMAIN }}
+          turnstile-site-key: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          sentry-dsn: ${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+          map-provider: ${{ vars.NEXT_PUBLIC_MAP_PROVIDER || 'stadia' }}
+          map-key: ${{ vars.NEXT_PUBLIC_MAP_KEY }}

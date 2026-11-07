@@ -1,0 +1,164 @@
+# Nightly (Phase 5.6), 02:00 India time:
+#   - the full eval (every case, ~5,400) when main changed since the last full run, gated against the previous
+#     full run with the publish rules (danger cases missed, top-3), the result kept as the next baseline
+#   - Trivy over the images now on main (new vulnerabilities are published every day, code changes or not)
+#   - GHCR clean-up: untagged image layers older than 30 days (every sha tag is kept for rollback)
+name: Nightly
+
+on:
+  schedule:
+    - cron: "30 20 * * *"   # 20:30 UTC = 02:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  PYTHON_VERSION: "3.12"
+  UV_VERSION: "0.13.5"
+
+jobs:
+  full-eval:
+    name: Full eval (every case)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: autocare
+          POSTGRES_PASSWORD: autocare
+          POSTGRES_DB: autocare
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U autocare" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://autocare:autocare@localhost:5432/autocare
+      HF_HOME: ${{ github.workspace }}/.hf
+      DIAGNOSIS_SEARCH: hybrid
+      DIAGNOSIS_ENGINE: v2
+      LLM_PROVIDER: none
+      RATE_LIMIT_BACKEND: memory
+    steps:
+      - uses: actions/checkout@v5
+      - name: Already evaluated this commit?
+        id: done
+        uses: actions/cache/restore@v4
+        with:
+          path: eval-baseline-full.json
+          key: eval-baseline-full-${{ github.sha }}
+          lookup-only: true
+      - name: Nothing new
+        if: steps.done.outputs.cache-hit == 'true'
+        run: |
+          echo "::notice::main has not changed since the last full eval (${{ github.sha }}): skipped"
+      - uses: astral-sh/setup-uv@v6
+        if: steps.done.outputs.cache-hit != 'true'
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - if: steps.done.outputs.cache-hit != 'true'
+        run: uv sync --frozen --no-dev
+        working-directory: backend
+      - uses: actions/cache@v4
+        if: steps.done.outputs.cache-hit != 'true'
+        with:
+          path: .hf
+          key: hf-paraphrase-multilingual-MiniLM-L12-v2
+      - name: Eval database (cached)
+        id: db
+        if: steps.done.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: eval-db.dump
+          key: eval-db-${{ hashFiles('data/raw/**', 'data/review/**', 'data/schema/**', 'data/catalogue/**', 'backend/app/knowledge/**', 'backend/app/vehicles/**', 'backend/alembic/**', 'backend/uv.lock', 'scripts/ci/eval-db.sh') }}
+      - name: Restore or build the eval database
+        if: steps.done.outputs.cache-hit != 'true'
+        run: |
+          if [ "${{ steps.db.outputs.cache-hit }}" = true ]; then
+            docker exec -i ${{ job.services.postgres.id }} pg_restore -U autocare -d autocare --no-owner < eval-db.dump
+            (cd backend && uv run alembic upgrade head)
+          else
+            sh scripts/ci/eval-db.sh
+            docker exec ${{ job.services.postgres.id }} pg_dump -U autocare -d autocare -Fc > eval-db.dump
+          fi
+      - if: steps.done.outputs.cache-hit != 'true' && steps.db.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: eval-db.dump
+          key: ${{ steps.db.outputs.cache-primary-key }}
+      - name: Full eval
+        if: steps.done.outputs.cache-hit != 'true'
+        working-directory: backend
+        run: uv run python -m app.datasets.ci_eval run --scope full --out "$GITHUB_WORKSPACE/eval-full.json"
+      - name: Previous full run
+        if: steps.done.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: eval-baseline-full.json
+          key: eval-baseline-full-${{ github.sha }}
+          restore-keys: eval-baseline-full-
+      - name: Gate (publish rules)
+        if: steps.done.outputs.cache-hit != 'true'
+        working-directory: backend
+        run: >-
+          uv run python -m app.datasets.ci_eval gate --candidate "$GITHUB_WORKSPACE/eval-full.json"
+          --baseline "$GITHUB_WORKSPACE/eval-baseline-full.json" --summary "$GITHUB_STEP_SUMMARY"
+      - name: Keep as the next baseline
+        if: steps.done.outputs.cache-hit != 'true'
+        run: cp eval-full.json eval-baseline-full.json
+      - if: steps.done.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: eval-baseline-full.json
+          key: eval-baseline-full-${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.done.outputs.cache-hit != 'true'
+        with:
+          name: eval-full-report
+          path: eval-full.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+  trivy:
+    name: Trivy (images on main)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Scan
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          repo=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}
+          echo "$TRIVY_PASSWORD" | docker login ghcr.io -u "$TRIVY_USERNAME" --password-stdin
+          failed=0
+          for image in autocare-api autocare-backup; do
+            if ! docker manifest inspect "$repo/$image:main" >/dev/null 2>&1; then
+              echo "::notice::$image:main not in GHCR yet (built by the first push to main): skipped"; continue
+            fi
+            docker run --rm -e TRIVY_USERNAME -e TRIVY_PASSWORD -v "$PWD/.trivyignore:/.trivyignore:ro" \
+              aquasec/trivy:0.67.2 image --quiet --scanners vuln --ignorefile /.trivyignore --severity HIGH,CRITICAL \
+              --ignore-unfixed --exit-code 1 "$repo/$image:main" || failed=1
+          done
+          exit $failed
+
+  ghcr-cleanup:
+    name: GHCR clean-up (untagged only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        package: [autocare-api, autocare-backup, autocare-web, autocare-admin]
+    steps:
+      - name: Delete untagged versions (every tag stays, for rollback)
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true   # the package does not exist before the first push to main
+        with:
+          package-name: ${{ matrix.package }}
+          package-type: container
+          delete-only-untagged-versions: "true"
+          min-versions-to-keep: 20

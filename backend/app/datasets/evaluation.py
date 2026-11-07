@@ -68,6 +68,11 @@ def scope_for(categories: list[str] | None, full: bool) -> dict:
     return {"categories": None if full else sorted(categories or []), "split": "all" if full else "test", "full": full}
 
 
+def is_danger_case(case) -> bool:
+    """A case that expects a safety alert (its result has `alert_ok`): the cases safety recall is measured on."""
+    return bool(case.expected_alert) and not case.expected_alert.get("none")
+
+
 def case_key(knowledge, case) -> tuple[str, str]:
     """(key that is the same in every dataset version, readable label). Generated safety cases carry rule and answer
     ids in their own id, which are new in every version: they are keyed by the rule's fault, risk and the trigger
@@ -116,7 +121,9 @@ def run_eval(
         if scope["categories"] is not None:
             found = [c for c in found if c.category in set(scope["categories"])]
         if scope["split"] != "all":
-            found = [c for c in found if ck.split_of(c) == scope["split"]]
+            # "danger_all" (the CI quick eval, Phase 5.6): every danger case, whatever its split, plus the split.
+            keep = (lambda c: is_danger_case(c)) if scope.get("danger_all") else (lambda c: False)
+            found = [c for c in found if ck.split_of(c) == scope["split"] or keep(c)]
         return found
 
     cases, real_cases = in_scope(cases), in_scope(real_cases)
