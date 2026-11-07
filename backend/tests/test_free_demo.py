@@ -129,3 +129,15 @@ def test_the_demo_needs_real_secrets_but_may_print_codes(test_settings):
             test_settings.model_copy(update={"environment": "demo", "auth_secret": "x" * 64, "staff_totp_key": ""})
         )
     assert isinstance(make_sms(test_settings.model_copy(update={"environment": "demo"})), ConsoleSms)
+
+
+def test_the_console_login_code_line_shows_only_the_last_4_digits(capsys):
+    """The demo's logs are on Render: the login code is there, the phone number only as its last 4 digits."""
+    from app.notify.sms import ConsoleSms
+
+    sms = ConsoleSms()
+    sms.send_otp("+919876500011", "482913")
+    out = capsys.readouterr().out
+    assert "482913" in out and "0011" in out
+    assert "9876500011" not in out and "98765" not in out
+    assert sms.sent == [("+919876500011", "482913")]  # tests still read the full number

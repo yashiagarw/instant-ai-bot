@@ -127,7 +127,7 @@ Pictures (`data/media`) are **not** needed: the demo runs with `SHOW_PICTURES=fa
    `https://<render address>/api/health/ready`: `{"status":"ok","database":"ok","migrations":"ok","redis":"ok"}`.
 
 A customer logging in with a phone number gets no SMS: the code appears in Render > Logs (search for `[console SMS]`
-and the phone number). Tell testers to ask you for it, or use the admin app, which needs no SMS.
+and the last 4 digits of the phone number; the rest is masked). Tell testers to ask you for it, or use the admin app, which needs no SMS.
 
 ## 5. Vercel (website and admin)
 Two projects from the same repository.
@@ -183,8 +183,8 @@ Then sign in at `https://<admin project>.vercel.app`. Invite other staff from th
 - The rate limits use the first `X-Forwarded-For` address (Vercel's view of the client). Someone calling the Render
   address directly could fake that header and get a fresh rate-limit bucket: acceptable for a demo; the real
   deployment has only Caddy in front.
-- Do not put real customers' data into the demo: it has no backups and console SMS prints phone numbers and login
-  codes into Render's logs (only people with access to the Render service can read them).
+- Do not put real customers' data into the demo: it has no backups and console SMS prints login codes (with only the
+  last 4 digits of the phone number) into Render's logs (only people with access to the Render service can read them).
 
 ## Later (optional)
 - **Custom subdomains** (e.g. `demo.instantmechanic.online`): Vercel > project > Settings > Domains > add, then the

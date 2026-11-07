@@ -322,7 +322,7 @@ Anonymous diagnosis and requests work exactly as before; an account is optional.
   Another customer's request answers 404.
 - API: `GET /api/me`, `/api/me/vehicles` (`DELETE /api/me/vehicles/{id}`), `/api/me/sessions`, `/api/me/requests`,
   `GET /api/requests/{id}`, `POST /api/auth/logout`, `DELETE /api/me` (body `{"confirm": "DELETE"}`).
-- Logs never contain a full phone number or a code (`+91******3210`), except the console SMS provider's own line.
+- Logs never contain a full phone number (`+91******3210`); only the console SMS provider's own line shows the code.
 
 ### Try login locally (console SMS)
 
@@ -330,7 +330,7 @@ Anonymous diagnosis and requests work exactly as before; an account is optional.
 enter any valid mobile (e.g. 9876543210), press **Send code**, and read the code in the **API terminal**:
 
 ```
-[console SMS] to +919876543210: Your Instant Mechanic login code is 482913. It expires in 5 minutes.
+[console SMS] to +91******3210: Your Instant Mechanic login code is 482913. It expires in 5 minutes.
 ```
 
 Type it, tick the consent box and press **Log in**. Diagnoses you made in that browser before logging in appear in
