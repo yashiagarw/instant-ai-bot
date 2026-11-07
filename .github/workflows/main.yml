@@ -86,9 +86,10 @@ jobs:
           file: backend/Dockerfile
           target: runtime
           push: true
+          # The moving :main tag (scanned nightly) only from main; a ci/** dry run pushes its sha tag only.
           tags: |
             ${{ steps.repo.outputs.repo }}/autocare-api:${{ github.sha }}
-            ${{ steps.repo.outputs.repo }}/autocare-api:main
+            ${{ github.ref == 'refs/heads/main' && format('{0}/autocare-api:main', steps.repo.outputs.repo) || '' }}
           cache-from: type=registry,ref=${{ steps.repo.outputs.repo }}/autocare-api:buildcache
           cache-to: type=registry,ref=${{ steps.repo.outputs.repo }}/autocare-api:buildcache,mode=max
       - name: Backup image
@@ -96,9 +97,10 @@ jobs:
         with:
           context: docker/backup
           push: true
+          # The moving :main tag (scanned nightly) only from main; a ci/** dry run pushes its sha tag only.
           tags: |
             ${{ steps.repo.outputs.repo }}/autocare-backup:${{ github.sha }}
-            ${{ steps.repo.outputs.repo }}/autocare-backup:main
+            ${{ github.ref == 'refs/heads/main' && format('{0}/autocare-backup:main', steps.repo.outputs.repo) || '' }}
           cache-from: type=registry,ref=${{ steps.repo.outputs.repo }}/autocare-backup:buildcache
           cache-to: type=registry,ref=${{ steps.repo.outputs.repo }}/autocare-backup:buildcache,mode=max
       - name: Trivy (high and critical with a fix fail; .trivyignore lists accepted ones)
