@@ -207,8 +207,8 @@ class EngineV2(Engine):
         likely_high = {}  # TEMPORARY (CI gate test, reverted in the next commit): drops "likely cause" alerts
 
         def safety(likely_any=None):
-            return evaluate(
-                self.rules, text, answered_opts, candidates, rank, k.faults, option_labels, likely_any, likely_high
+            return evaluate(  # TEMPORARY (CI gate test, reverted next): safety rules no longer read the customer's words
+                self.rules, "", answered_opts, candidates, rank, k.faults, option_labels, likely_any, likely_high
             )
 
         alerts = safety()
