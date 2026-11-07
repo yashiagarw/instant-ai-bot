@@ -1198,7 +1198,8 @@ Before going live: [docs/launch-checklist.md](docs/launch-checklist.md).
   request fails when more of the **800 danger cases** are missed than on `main`, or top-3 accuracy drops more than
   **3 points**, measured on the cases both have. The quick scope is every danger case plus the test split (3,125
   cases, ~5 min on a laptop); the nightly full scope is every case (5,407, ~10 min). The baseline is `main`'s last
-  report (kept in the Actions cache); the eval database is rebuilt only when the data, the importer or a migration
+  report (kept in the Actions cache; until `main` has run once, the committed `data/eval/baseline/quick.json`);
+  the eval database is rebuilt only when the data, the importer or a migration
   changes (`scripts/ci/eval-db.sh`, cached as a dump).
 - **Images**: private GHCR, `ghcr.io/<owner>/autocare-api:<sha>` (also the worker), `autocare-backup:<sha>`, and
   `autocare-web:<env>-<sha>` / `autocare-admin:<env>-<sha>`, built per environment because their API and photo
@@ -1310,21 +1311,33 @@ password manager, and use new values for production:
 `docker login ghcr.io` with a classic token that has only `read:packages` ([server-setup.md](docs/server-setup.md) step 8).
 
 ### GitHub Actions minutes (private repo, free plan: 2,000 a month)
-Estimated (Linux runners, billed per job and rounded up; to be replaced by the measured times of the first runs):
+Measured on the test pull request (#1, 2026-11-07; Linux runners, each job billed rounded up to the minute):
 
-| Run | Jobs | Minutes |
+| Job | Measured | Billed |
 |---|---|---|
-| Pull request push touching backend + data | changes 1, backend ~10, frontend ~5, audit ~2, eval ~12 (first time after a data change ~25) | **~30** |
-| Pull request push, frontend only | changes 1, frontend ~5, audit ~2 (backend and eval skipped) | **~8** |
-| Push to main | CI ~30, Playwright ~12, images + Trivy ~15, staging ~12, production ~12 (only when approved) | **~80** |
-| `ci/**` dry run | Playwright ~12, images + Trivy ~15 | ~27 |
-| Nightly | Trivy ~4 every day; full eval ~20 only on days main changed | ~4-24 |
+| What changed | 0.1 min | 1 |
+| Backend (ruff, pytest) | 5.7 min (8.2 cold) | 6 |
+| Frontend (lint, types, Vitest) | 1.3-2.0 min | 2-3 |
+| Dependency audit | 0.3 min | 1 |
+| Eval gate, eval database cached | 6.0 min (restore 12 s, quick eval 4.9 min) | 6 |
+| Eval gate, after a data / importer / migration change | 13.5 min (database rebuilt in 6.7 min) | 14 |
+| Playwright, web + admin (main) | 4.3 min | 5 |
+| Images API + backup + Trivy (main) | 1.4 min cached, 5.2 min full build | 2-6 |
 
-A month with 30 pull-request pushes (half frontend-only), 12 merges to main deployed to production, and main changing
-on 12 days: 30 × 19 + 12 × 80 + 30 × 4 + 12 × 20 ≈ **1,900 minutes**: close to the 2,000 limit. If it runs over:
-merge in batches (each merge costs ~80), approve production for a batch rather than every merge, or run Playwright
-nightly instead of on every merge (saves ~12 per merge). GitHub stops runs at the limit; it does not bill unless a
-spending limit is set (Settings > Billing).
+| Run | Billed minutes |
+|---|---|
+| Pull request push touching backend, data and frontend | ~17 (~25 after a data change) |
+| Pull request push, frontend only | ~5 |
+| Pull request push, backend but not the engine or data (no eval) | ~8 |
+| Push to main, deployed to staging and production | ~45 (CI 17, Playwright 5, images 2-6, staging ~10 and production ~10 estimated: no servers yet) |
+| `ci/**` dry run | ~7-11 |
+| Nightly | ~3 (Trivy); ~11 more on days main changed (full eval) |
+
+A month with 30 pull-request pushes (half frontend-only), 12 merges deployed to production and main changing on 12
+days: 15 × 17 + 15 × 5 + 12 × 45 + 30 × 3 + 12 × 11 ≈ **1,090 minutes** of the 2,000. Headroom for a busy month;
+if it gets tight, merge in batches (each merge ~45). GitHub stops runs at the limit and bills nothing unless a
+spending limit is set (Settings > Billing). The cache (eval database 48 MB, model, uv, pnpm, baselines) stays well
+under the 10 GB per repository.
 
 ### After pulling
 ```bash

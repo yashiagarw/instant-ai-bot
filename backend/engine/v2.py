@@ -204,11 +204,10 @@ class EngineV2(Engine):
             for fid in order
             if fid in self.high_risk_faults and (prob[fid] >= HIGH_RISK_PROBABILITY or v1_score[fid] >= HIGH_RISK_SCORE)
         }
-        likely_high = {}  # TEMPORARY (CI gate test, reverted in the next commit): drops "likely cause" alerts
 
         def safety(likely_any=None):
-            return evaluate(  # TEMPORARY (CI gate test, reverted next): safety rules no longer read the customer's words
-                self.rules, "", answered_opts, candidates, rank, k.faults, option_labels, likely_any, likely_high
+            return evaluate(
+                self.rules, text, answered_opts, candidates, rank, k.faults, option_labels, likely_any, likely_high
             )
 
         alerts = safety()
