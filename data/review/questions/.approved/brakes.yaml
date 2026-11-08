@@ -1,5 +1,5 @@
 category: brakes
-loaded_at: '2026-10-31T12:09:46+00:00'
+loaded_at: '2026-11-07T18:55:38+00:00'
 reviewed_by: claude_code (auto, pending mechanic sign-off)
 approved:
   question brakes-main:
@@ -1450,6 +1450,11 @@ approved:
     - no braking
     - large fluid leak
     - pedal neeche tak
+    - brake fail
+    - brakes fail
+    - brake failed
+    - brakes failed
+    - brake failure
     safety_trigger_options:
     - question: brakes-q01
       option: No, the car is still moving and the brakes are not working
