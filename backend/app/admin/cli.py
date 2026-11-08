@@ -3,6 +3,10 @@
     uv run python -m app.admin.cli create-super-admin --email you@example.com --name "Your Name"
     uv run python -m app.admin.cli reset-two-factor --email you@example.com    # lost phone: set up again on sign-in
     uv run python -m app.admin.cli unlock --email you@example.com              # after too many wrong tries
+    uv run python -m app.admin.cli reset-password --email you@example.com      # forgotten password
+
+reset-password asks for the new password twice (not shown; never an argument), with the same rules as
+create-super-admin. It also unlocks the account and signs out its sessions; two-factor stays as it is.
 
 create-super-admin asks for a password (twice, not shown), prints a QR code and the secret for the authenticator
 app ONCE, and saves the account only after you type a current 6-digit code from the app. It refuses when an active
@@ -114,6 +118,21 @@ def reset_two_factor(session: Session, email: str, out: Out) -> int:
     return 0
 
 
+def reset_password(session: Session, email: str, ask_secret: Ask, out: Out) -> int:
+    user = staff.find(session, email)
+    if user is None:
+        out(f"No staff account for {email}.")
+        return 1
+    password = ask_password(user.email, ask_secret, out)
+    if password is None:
+        out("Password not changed.")
+        return 1
+    staff.reset_password(session, staff.CLI, user, password)
+    session.commit()
+    out(f"New password set for {user.email}; it is unlocked and its sessions are signed out. Two-factor is unchanged.")
+    return 0
+
+
 def unlock(session: Session, email: str, out: Out) -> int:
     user = staff.find(session, email)
     if user is None:
@@ -135,7 +154,7 @@ def main(argv: list[str] | None = None, ask: Ask = input, ask_secret: Ask = getp
     c.add_argument("--email", required=True)
     c.add_argument("--name", required=True)
     c.add_argument("--another", action="store_true", help="even though an active super admin exists")
-    for name in ("reset-two-factor", "unlock"):
+    for name in ("reset-two-factor", "unlock", "reset-password"):
         sub.add_parser(name).add_argument("--email", required=True)
     args = ap.parse_args(argv)
 
@@ -146,6 +165,8 @@ def main(argv: list[str] | None = None, ask: Ask = input, ask_secret: Ask = getp
                 return create_super_admin(session, settings, args.email, args.name, ask, ask_secret, out, args.another)
             if args.command == "reset-two-factor":
                 return reset_two_factor(session, args.email, out)
+            if args.command == "reset-password":
+                return reset_password(session, args.email, ask_secret, out)
             return unlock(session, args.email, out)
         except staff.StaffError as e:
             out(str(e))
