@@ -422,6 +422,67 @@ def test_cli_does_not_save_without_a_matching_code(db_session, test_settings):
     assert db_session.scalar(select(func.count()).select_from(StaffUser)) == 0
 
 
+NEW_PASSWORD = "a different long passphrase"
+
+
+def test_cli_reset_password_unlocks_signs_out_and_keeps_two_factor(app, db_session, test_settings):
+    user, secret = make_staff(db_session, test_settings, "agent@im.test", ["support_agent"])
+    old_hash, old_totp = user.password_hash, user.totp_secret_enc
+    agent = sign_in(app, "agent@im.test", secret)
+    user.failed_logins, user.locked_until = 5, service.now() + timedelta(minutes=15)
+    db_session.commit()
+
+    printed: list[str] = []
+    prompts: list[str] = []
+    answers = iter([NEW_PASSWORD, NEW_PASSWORD])
+
+    def ask_secret(prompt):
+        prompts.append(prompt)
+        return next(answers)
+
+    assert cli.reset_password(db_session, " Agent@IM.test ", ask_secret, printed.append) == 0
+    assert len(prompts) == 2 and "not shown" in prompts[0]
+    assert NEW_PASSWORD not in "\n".join(printed + prompts)  # never printed
+    db_session.refresh(user)
+    assert user.password_hash != old_hash and user.password_hash.startswith("$argon2id$")
+    assert service.security.verify_password(user.password_hash, NEW_PASSWORD)
+    assert user.failed_logins == 0 and user.locked_until is None
+    assert user.totp_secret_enc == old_totp  # two-factor unchanged
+    assert agent.get("/api/admin/auth/me").status_code == 401  # existing sessions ended
+    row = db_session.scalar(select(AuditLog).where(AuditLog.action == "staff.reset_password"))
+    assert row.actor_label == "cli" and row.before["locked_until"] and row.after["locked_until"] is None
+    assert old_hash not in str(row.before) and user.password_hash not in str(row.after)
+    # The old password no longer works; the new one does, with the same authenticator.
+    r = browser(app).post("/api/admin/auth/login", json={"email": "agent@im.test", "password": PASSWORD,
+                                                         "code": code(secret, 1)})  # fmt: skip
+    assert r.status_code == 401
+    sign_in(app, "agent@im.test", secret, password=NEW_PASSWORD, ahead=1)
+
+
+def test_cli_reset_password_refuses_unknown_weak_or_mismatched(db_session, test_settings):
+    printed: list[str] = []
+    assert cli.reset_password(db_session, "nobody@im.test", lambda p: pytest.fail("asked"), printed.append) == 1
+    assert printed[-1] == "No staff account for nobody@im.test."
+    user, _ = make_staff(db_session, test_settings, "agent@im.test", ["support_agent"])
+    old_hash = user.password_hash
+    tries = iter(
+        ["short", NEW_PASSWORD, "something else entirely", "agent agent agent", NEW_PASSWORD, "nope nope nope"]
+    )
+    assert cli.reset_password(db_session, "agent@im.test", lambda p: next(tries), printed.append) == 1
+    assert printed[-1] == "Password not changed." and any("differ" in line for line in printed)
+    db_session.refresh(user)
+    assert user.password_hash == old_hash
+    assert (
+        db_session.scalar(select(func.count()).select_from(AuditLog).where(AuditLog.action == "staff.reset_password"))
+        == 0
+    )
+
+
+def test_cli_parses_reset_password_without_a_password_argument():
+    with pytest.raises(SystemExit):
+        cli.main(["reset-password", "--email", "a@b.c", "--password", "x"], out=lambda s: None)
+
+
 def test_customer_login_still_works(app):
     c = customer(app)
     assert c.get("/api/me").json()["user"]["phone_masked"].endswith("3210")

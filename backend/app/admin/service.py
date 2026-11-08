@@ -197,6 +197,18 @@ def reset_two_factor(session: Session, actor: Actor, user: StaffUser) -> None:
     _write(session, actor, "staff.reset_two_factor", user, before, snapshot(user))
 
 
+def reset_password(session: Session, actor: Actor, user: StaffUser, new: str) -> None:
+    """Set a new password without the old one (the CLI, for a forgotten password). Clears the lockout and wrong
+    tries, ends the account's sessions; two-factor stays as it is. The caller checks the password policy."""
+    before = snapshot(user)
+    user.password_hash = security.hash_password(new)
+    user.password_changed_at, user.must_change_password = now(), False
+    user.failed_logins, user.locked_until = 0, None
+    revoke_sessions(session, user)
+    session.flush()
+    _write(session, actor, "staff.reset_password", user, before, snapshot(user))
+
+
 def change_password(
     session: Session, settings: Settings, actor: Actor, user: StaffUser, current: str, code: str, new: str
 ) -> None:
